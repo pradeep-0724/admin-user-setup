@@ -1,0 +1,37 @@
+
+<div class="main-body">
+    <span> {{envTitle}} {{envTitle}} {{envTitle}} {{envTitle}} {{envTitle}} {{envTitle}} {{envTitle}}</span>
+    <div class="login-card d-flex justify-content-center align-items-center">
+        <div class="col-6">
+            <h2>Welcome to Admin&User Interface</h2>
+        </div>
+        <div class="col-6">
+            <form [formGroup]="signUpForm">
+                <div class="input-group">
+                    <label for="email">Enter Email Address</label>
+                    <input class="input" type="text" id="email" formControlName="email">
+                    <app-error [controlName]="signUpForm.controls['email']"></app-error>
+                </div>
+                <div class="input-group">
+                    <label for="mobile">Enter Mobile</label>
+                    <input type="text" id="mobile" formControlName="mobile">
+                    <app-error [controlName]="signUpForm.controls['mobile']"></app-error>
+                </div>
+                <div class="input-group">
+                    <label for="password">Enter Password</label>
+                    <input type="text" id="password" formControlName="password">
+                    <app-error [controlName]="signUpForm.controls['password']"></app-error>
+                </div>
+                <div class="input-group">
+                    <label for="c_password">Enter Confirm Password</label>
+                    <input type="text" id="c_password" formControlName="c_password">
+                    <app-error [controlName]="signUpForm.controls['c_password']"></app-error>
+                </div>
+                <div>
+                    <button class="btn btn-primary" type="submit" (click)="submit()">Sign Up</button>
+                    <button class="btn btn-secondary">check</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

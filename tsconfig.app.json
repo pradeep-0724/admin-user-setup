@@ -3,6 +3,8 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "strict": true,
+    "strictPropertyInitialization": false,
     "outDir": "./out-tsc/app",
     "types": [
       "node"

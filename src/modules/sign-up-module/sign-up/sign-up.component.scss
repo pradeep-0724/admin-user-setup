@@ -1,0 +1,19 @@
+@import "../../../../public/styles/helpers/global";
+
+.main-body{
+    background: linear-gradient(
+    to right,
+    #e883e5,#fd1d1d,#fcb045
+  );
+
+    height: 1000px;
+    width: auto;
+}
+.login-card{
+    display: block;
+    height: 600px;
+    background-color: aquamarine !important;
+}
+h4{
+  background-color: chartreuse;
+}
