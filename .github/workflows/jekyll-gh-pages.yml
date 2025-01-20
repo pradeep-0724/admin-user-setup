@@ -29,11 +29,11 @@ jobs:
 
       # Build the Angular application for production
       - name: Build app
-        run: npm run prod-start # Runs your production build script
+        run: npm run prod-start
 
       # Deploy the build artifacts to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist/my-server # Update this path to match your `dist` folder
+          publish_dir: ./dist/my-server # Update this path to your Angular build output folder
