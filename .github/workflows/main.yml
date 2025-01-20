@@ -21,7 +21,7 @@ jobs :
       - name : Install Dependencies
         run : npm run build
       - name : upload  artifcats
-        uses : actions/Breadcrumbsupload-pages-artifact@v3
+        uses : actions/upload-pages-artifact@v3
         with : 
           name : 'github pages' 
           path : build
