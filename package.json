@@ -7,10 +7,11 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "prod-start": "ng build --configuration=production --port=5000 ",
-    "test-start": "ng build --configuration=test --port=5000 ",
-    "dev-start": "ng serve --configuration=development --port=5000 ",
+    "prod-start": "ng build --configuration=production",
+    "test-start": "ng build --configuration=test",
+    "dev-start": "ng serve --configuration=development --port=5000",
     "serve:ssr:my-server": "node dist/my-server/server/server.mjs"
+  
   },
   "private": true,
   "dependencies": {
