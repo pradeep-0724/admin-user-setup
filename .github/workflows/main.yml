@@ -1,1 +1,7 @@
 
+name : user-management-setup
+'on' : push
+jobs : 
+    my-job : 
+    runs-on : ubuntu-latest
+    run : echo 'user-management-setup demo'
