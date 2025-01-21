@@ -9,8 +9,7 @@
     "test": "ng test",
     "prod-start": "ng build --configuration=production",
     "test-start": "ng build --configuration=test",
-    "dev-start": "ng serve --configuration=development --port=5000",
-    "serve:ssr:my-server": "node dist/my-server/server/server.mjs"
+    "dev-start": "ng serve --configuration=development --port=5000"
   
   },
   "private": true,
