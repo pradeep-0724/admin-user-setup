@@ -24,7 +24,7 @@ jobs :
         run: npm install
 
       - name : Build Angular Application
-        run : npm run build:ssr -- --output-path=dist/my-server
+        run : npm run build:ssr -- --output-path=dist/my-server/browser
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
