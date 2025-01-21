@@ -12,24 +12,30 @@ jobs :
   build-and-deploy :
     runs-on : ubuntu-latest
     steps :
-      - name : Checkout Source
+      - name : Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         uses : actions/checkout@v4
+
       - name : SetUp Node
         uses : actions/setup-node@v4
         with:
           node-version: 18
-      - name : Install Dependencies
-        run : npm run build
+
+      - name: Install dependencies
+        run: npm install
+
+      - name : Build Angular Application
+        run : npm run prod-start
+
       - name : upload  artifcats
         uses : actions/upload-pages-artifact@v3
         with : 
           name : 'github pages' 
-          path : build
+          path : dist/my-server
+
       - name : deploy to github pages 
         uses : actions/deploy-pages@v4
         with : 
           token : ${{secrets.GITHUB_TOKEN}}
-          artifact_name : 'github-pages'
 
 
 
