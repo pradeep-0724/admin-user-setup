@@ -24,13 +24,13 @@ jobs :
         run: npm install
 
       - name : Build Angular Application
-        run : npm run prod-start
+        run : ng build --configuration=production --base-href="/admin-user-setup/"
+
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           name: 'github-pages'
-
           path : dist/my-server
 
       - name : deploy to github pages 
