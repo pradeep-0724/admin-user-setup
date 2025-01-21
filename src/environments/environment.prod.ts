@@ -1,3 +1,3 @@
 export const environment = {
-    envTitle : 'This is Production Server'
+    envTitle : 'This is Production Server',
 };
