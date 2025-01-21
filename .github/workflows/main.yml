@@ -26,10 +26,11 @@ jobs :
       - name : Build Angular Application
         run : npm run prod-start
 
-      - name : upload  artifcats
-        uses : actions/upload-pages-artifact@v3
-        with : 
-          name : 'github pages' 
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: 'github-pages'
+
           path : dist/my-server
 
       - name : deploy to github pages 
