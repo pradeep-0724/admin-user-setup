@@ -10,7 +10,6 @@
     "prod-start": "ng build --configuration=production",
     "test-start": "ng build --configuration=test",
     "dev-start": "ng serve --configuration=development --port=5000"
-  
   },
   "private": true,
   "dependencies": {
