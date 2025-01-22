@@ -30,7 +30,7 @@ jobs :
         uses: actions/upload-pages-artifact@v3
         with:
           name: 'github-pages'
-          path : dist/my-server/browser
+          path : dist/my-server/browser/browser
 
       - name : deploy to github pages 
         uses : actions/deploy-pages@v4
