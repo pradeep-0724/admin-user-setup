@@ -1,0 +1,64 @@
+@import "../../../../../../../assets/styles/helpers/_variable.scss";
+.dialog-centered {
+  display: flex;
+  align-items: center;
+  min-height: calc(100% - var(--bs-modal-margin) * 2) !important;
+}
+.modal-header {
+  padding: 10px 15px !important;
+  border-bottom: 2px solid gainsboro;
+  .modal-title {
+    font-size: 16px;
+  }
+}
+.modal-bottom {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+  margin-bottom: 14px;
+  button {
+    width: auto;
+    margin-right: 14px;
+
+    padding: 8px 14px;
+  }
+}
+.form-wrap {
+  width: 80%;
+  margin: auto;
+  margin-top: 20px;
+  .input-wrap label {
+    font-weight: 600;
+  }
+}
+.info-icon {
+  position: absolute;
+  top: 0px;
+  right:0;
+}
+.input-wrap {
+  position: relative;
+  margin-top: 10px;
+}
+.coordinates-wrap {
+  color: rgb(119, 204, 237);
+  display: flex;
+  position: absolute;
+  top: 1%;
+  right: 0%;
+  justify-content: flex-end;
+  p {
+    cursor: pointer;
+  }
+}
+.material-wrap input{
+  padding-right: 6% !important;
+}
+.input--bd-error{
+   border-bottom: 1px solid red;
+}
+
+// code for toolTip
+// ::ng-deep .mat-tooltip.custom-tooltip {
+//   background-color: white;
+//   color: black;}

@@ -1,0 +1,37 @@
+
+
+.material-wrap{
+    .error{
+       
+            border: 1px solid #eb1e4a;
+            &::placeholder{
+                color: #eb1e4a;
+            }
+        }
+
+    .join-field {
+        padding: 0;
+        height: 40px;
+        padding-left: 5px;
+        border: none;
+        @media (max-width: 320px) {
+           font-size: 12px; 
+           
+        }
+    }
+    
+
+    .labour-field{
+        // margin-left: 4px;
+        margin-top: 4px;
+    }
+
+    .upper-case{
+        text-transform: uppercase;
+    }
+
+    .mobile-code-style{
+        height: 60px;
+    }
+} 
+ 
