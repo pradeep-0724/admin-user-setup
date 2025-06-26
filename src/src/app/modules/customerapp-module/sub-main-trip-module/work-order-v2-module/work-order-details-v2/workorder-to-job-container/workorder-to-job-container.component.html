@@ -1,0 +1,730 @@
+<div class="charge-popup def-color">
+  <div class="def-color px-4 py-3 border-bottom calc-height">
+    <h6 class="fs-5 ">Schedule {{headingName}}</h6>
+  </div>
+  <div class="alert alert-danger" role="alert" *ngIf="containerName || isDifferentDestinations"> 
+    Can't select this container {{containerName}} because it  has different destinations
+  </div>
+
+  <div class="alert alert-danger" role="alert" *ngIf="containerErrorMsg"> 
+    {{containerErrorMsg}}
+  </div>
+
+  <div class="row mx-0">
+    <div class="col-md-7 px-0">
+      <div
+        class="d-flex flex-wrap justify-content-between align-items-center def-color px-3 py-2 ps-4 border-end calc-height">
+        <span class="fw-semibold fs-6 ">Container List</span>
+        <div class="d-flex flex-wrap  align-items-center">
+          <div class=" position-relative">
+            <input [(ngModel)]="search" placeholder="Search" class="search-filter border-0 ps-3 "><span
+              class="search-icon"><i class="bi bi-search"></i></span>
+          </div>
+          <div class="select-wrap schedule-live-load">
+            <button class="btn--action" [ngClass]="{'filterOpen':showFilter }" (click)="showFilter = !showFilter"
+              style="zoom:85%">
+              <span *ngIf="isFilterApplied && !showFilter" class="material-icons filterBullet">
+                fiber_manual_record
+              </span>
+              <img *ngIf="!isFilterApplied && !showFilter" src="../../../../../../assets/img/filter-icon.svg" alt="">
+              <img *ngIf="isFilterApplied && !showFilter" src="../../../../../../assets/img/filter_icon_2.svg" alt="">
+              <img *ngIf="showFilter" src="../../../../../../assets/img/filter-icon-svg-3.svg" alt="">
+            </button>
+            <app-filter [config]="options" [clearFilter]="clearFilter" [data]="containerList" [visible]="showFilter"
+              (onApplied)="filterApplied($event)" (onClear)="filterApplied($event)"></app-filter>
+          </div>
+        </div>
+      </div>
+
+      <div class="custom-table-container sticky-table-container border-end ws-nowrap" id="setHeight1">
+        <table [ngClass]="{'h-100':containerList.length==0}">
+          <thead>
+            <tr>
+              <th>Container No.</th>
+              <th> Container Type</th>
+              <th>Container Size</th>
+              <ng-container *ngIf="operationType>0">
+                <ng-container *ngIf="operationType==1 || operationType==2">
+                  <th>Storage From</th>
+                  <th>Storage To</th>
+                </ng-container>
+                <ng-container *ngIf="operationType==2 || operationType==3">
+                  <th>Cutoff Date</th>
+                </ng-container>
+              </ng-container>
+              <th class="text-center" *ngIf="operationType!=5">Route</th>
+              <th class="fixed-right"></th>
+            </tr>
+          </thead>
+          <tbody *ngIf="(copyOfcontainerList|containerSearch:search).length==0">
+            <tr class="border-0 ">
+              <td class="bg-white" colspan="30">
+                <div class="no-list-data-wrap">
+                  <figure>
+                    <img src="assets/img/no-content.png" alt="">
+                  </figure>
+                  <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+          <tbody>
+            <tr *ngFor="let data of copyOfcontainerList|containerSearch:search;let i=index">
+              <td>{{data?.name || '-'}}</td>
+              <td>{{data?.type?.label || '-'}}</td>
+              <td>{{data?.size || '-'}}</td>
+              <ng-container *ngIf="operationType>0">
+              </ng-container>
+              <ng-container *ngIf="operationType>0">
+                <ng-container *ngIf="operationType==1 || operationType==2">
+                  <td>{{dateChangeTime(data?.storage_from) || '-'}}</td>
+                  <td>{{dateChangeTime(data?.storage_to) || '-'}}</td>
+                </ng-container>
+                <ng-container *ngIf="operationType==2 || operationType==3">
+                  <td>{{dateChange(data?.cutoff) || '-'}}</td>
+                </ng-container>
+              </ng-container>
+              <td class="icon-box"  *ngIf="operationType!=5">
+                <div class="d-flex align-items-center justify-content-center" (click)="openContainerPath(data['id'])"><i
+                    class="bi bi-clock-history cursor-pointer"></i></div>
+              </td>
+              <td class="icon-box fixed-right">
+                <div class="d-flex align-items-center justify-content-center" (click)="addContainerToJob(data)"><span
+                    class="material-icons add fs-5 green-text cursor-pointer">add_circle_outline</span></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-md-5 px-0" [formGroup]="workOrderJobForm">
+      <div style="height: 52px;"
+        class="d-flex flex-wrap justify-content-between align-items-center def-color px-3 py-3 ps-4 border-bottom">
+        <span class="fw-semibold fs-6 ">Selected Container </span>
+      </div>
+      <div formArrayName="job_list" id="setHeight2" cdkScrollable>
+        <ng-container *ngFor="let control of workOrderJobForm.controls.job_list['controls'];let i = index"
+          class="drag-item py-2" [formGroupName]="i">
+          <div class="select-container-wrap m-3 border-start border-end border-bottom"
+            [ngClass]="{'active':i==selectedJobTab}"  (click)="selectJob(i)">
+            <div class="alert-message">
+              <app-add-trip-v2-documents-expiry  [scheduledJobsForSelectedVehicleList]="scheduledJobsForSelectedVehicleList[i]"
+              [documentExpiryData]="documentExpiryData"></app-add-trip-v2-documents-expiry>
+            </div>
+            <div class="custom-table-container no-scroll-table mb-2">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Container No.</th>
+                    <th> Container Type</th>
+                    <th>Container Size</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="control.value['containers']?.length == 0">
+                  <tr class="border-0">
+                    <td colspan="30" class="py-0 pt-2">
+                      <div class="d-flex align-items-center justify-content-center">
+                        <img src="../../../../../../../assets/img/icons/container-box.png" class="no-container-sm "
+                          alt="">
+                        <h5 class="mt-0 primary-brand-text">No container added!</h5>
+                      </div>
+                    </td>
+                  </tr>
+
+                </tbody>
+                <tbody>
+                  <tr *ngFor="let data of control.value['containers'];let j=index">
+                    <td>{{data?.name || '-'}}</td>
+                    <td>{{data?.type?.label || '-'}}</td>
+                    <td>{{data?.size || '-'}}</td>
+                    <td class="icon-box">
+                      <div class="d-flex align-items-center justify-content-center">
+                        <span class="material-icons remove fs-5 error-text cursor-pointer"
+                          [ngClass]="{'disabled':i!=selectedJobTab}"
+                          (click)="removeFromJob(data,j)">highlight_off</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row mx-0 px-1">
+
+              <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6">
+                <material-dropdown [searchable]="true" placeholder="Vehicle No." [addItemText]="'+ Add Market Vehicle'"
+                  [selectedOption]="control.value['vehicle_op']" [addable]="true" [party]="true"
+                  [isUpperCaseAllowed]="true" (addPartyPopup)="openAddVehicle($event)"
+                  (addValueToList)="addValueToVehiclePopUp($event)" [params]="vehicleNamePopup" [maxLength]="14">
+                  <select #customSelect formControlName="vehicle" (change)="onVehicleChange(control)">
+                    <option *ngFor="let option of vehicleList" value="{{ option?.id }}">
+                      {{ option?.reg_number }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <p class="font-small-blue" *ngIf="control.value['vehicle']">
+                  &nbsp;{{control.value['is_transporter']?'Market Vehicle':'Own Vehicle'}}</p>
+              </div>
+
+
+              <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6"
+                [ngClass]="{'disable':control.value['is_transporter']}">
+                <material-dropdown [searchable]="true" placeholder="Asset No.1"
+                  [selectedOption]="control.value['asset_1_op']">
+                  <select #customSelect formControlName="asset_1"
+                    (change)="assetSelected(control,'asset_1','asset_1_specification')">
+                    <ng-container *ngFor="let option of assetData">
+                      <option
+                        *ngIf="control.get('asset_2').value !== option?.id && control.get('asset_3').value !== option?.id"
+                        value="{{ option?.id }}">
+                        {{ option?.display_no }}
+                      </option>
+                    </ng-container>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="control.controls.asset_1"></app-error>
+                <p class="font-small-blue" *ngIf="control.value['asset_1_specification']">
+                  &nbsp;{{control.value['asset_1_specification']}}</p>
+
+              </div>
+
+
+              <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6"
+                [ngClass]="{'disable':control.value['is_transporter']}">
+                <material-dropdown [searchable]="true" placeholder="Asset No.2"
+                  [selectedOption]="control.value['asset_2_op']">
+                  <select #customSelect formControlName="asset_2"
+                    (change)="assetSelected(control,'asset_2','asset_2_specification')">
+                    <ng-container *ngFor="let option of assetData">
+                      <option
+                        *ngIf="control.get('asset_1').value !== option?.id && control.get('asset_3').value !== option?.id"
+                        value="{{ option?.id }}">
+                        {{ option?.display_no }}
+                      </option>
+                    </ng-container>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="control.controls.asset_2"></app-error>
+                <p class="font-small-blue" *ngIf="control.value['asset_2_specification']">
+                  &nbsp;{{control.value['asset_2_specification']}}</p>
+              </div>
+
+
+              <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6"
+                [ngClass]="{'disable':control.value['is_transporter']}">
+                <material-dropdown [searchable]="true" placeholder="Asset No.3"
+                  [selectedOption]="control.value['asset_3_op']">
+                  <select #customSelect formControlName="asset_3"
+                    (change)="assetSelected(control,'asset_3','asset_3_specification')">
+                    <ng-container *ngFor="let option of assetData">
+                      <option
+                        *ngIf="control.get('asset_1').value !== option?.id && control.get('asset_2').value !== option?.id"
+                        value="{{ option?.id }}">
+                        {{ option?.display_no }}
+                      </option>
+                    </ng-container>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="control.controls.asset_3"></app-error>
+                <p class="font-small-blue" *ngIf="control.value['asset_3_specification']">
+                  &nbsp;{{control.value['asset_3_specification']}}</p>
+
+              </div>
+
+
+
+              <div *ngIf="!control.value['is_transporter']" class="px-1 col-lg-4 col-md-6">
+                <app-multi-driver-select [driverList]="driverList" [driverControl]="control.controls.driver"
+                  [boxDesign]="true"></app-multi-driver-select>
+              </div>
+              <div *ngIf="control.value['is_transporter']" class="custom-box-input-wrap px-1 col-lg-4 col-md-6">
+                <input type="text" class="box-input" placeholder="Operator Name" formControlName="driver">
+              </div>
+
+
+              <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6 input-wrap error"
+                [ngClass]="addErrorClass(control.controls.vehicle_provider)" *ngIf="control.value['is_transporter']">
+                <material-dropdown [searchable]="true" placeholder="Vehicle Provider"
+                  [selectedOption]="control.value['vehicle_provider_op']" [addable]="true" [addBlank]="true"
+                  [maxLength]="46" [status]="true" [party]="true" (addPartyPopup)="openAddPartyModal($event, 'vendor')"
+                  (addValueToList)="addValueToPartyPopup($event, vehicleprovider)" [params]="partyNamePopup">
+                  <select #customSelect formControlName="vehicle_provider">
+                    <option *ngFor="let option of partyListVendor" value="{{ option?.id }}">
+                      {{ option?.party_display_name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="control.controls.vehicle_provider"></app-error>
+              </div>
+
+
+              <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6" *ngIf="isShowTerminal">
+                <div>
+                  <material-dropdown [searchable]="true" placeholder="Terminal"
+                    [selectedOption]="control.value['terminal_op']" [postApiUrl]="optionsDropdownUrl"
+                    [params]="pointOfTypeParam" (postApiResponse)="getNewTerminal($event,control)"
+                    (addValueToList)="addNewTerminal($event,workOrderJobForm)" [addable]="true">
+                    <select #customSelect formControlName="terminal" class="no-style select--modify">
+                      <option *ngFor="let option of terminalList" value="{{ option?.id }}">
+                        {{ option?.label }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </div>
+
+              <div class="date-time-input-wrap px-1 col-lg-6 col-md-6 mb-2">
+                <app-date-and-time-picker class="date-picker-border-wrapper"  [control]="control.controls.date"></app-date-and-time-picker>
+                <app-error [controlName]="control.controls.date"></app-error>
+              </div>
+              <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6" *ngIf="isShowContainerHandling">
+                <material-dropdown [searchable]="true" [selectedOption]="control.value['container_handling_op']"  placeholder="Container Handling" >
+                  <select #customSelect formControlName="job_type">
+                    <option *ngFor="let option of containerJobType" value="{{ option?.id }}">
+                      {{ option?.label }}
+                    </option>
+                  </select>
+                </material-dropdown>
+              </div>
+              <div  class="custom-box-input-wrap px-1 col-lg-4 col-md-6" *ngIf="isShowConsiderationAmount">
+                <input type="text" positiveThreeDigitDecimalNumber class="box-input" placeholder="Consideration Amount" formControlName="consideration_amount">
+              </div>
+              
+            </div>
+            
+              <div class="px-3 pt-0 d-flex justify-content-end">
+                <button class="row-btn row-btn-add my-3" (click)="addNewJob(i);$event.stopPropagation()"
+                  *ngIf="workOrderJobForm.controls.job_list['controls'].length-1==i  && isContainersGreaterthenOne"><span
+                    class="material-icons">
+                    add
+                  </span></button>
+                <button class="row-btn row-btn-delete my-3"
+                  *ngIf="workOrderJobForm.controls.job_list['controls'].length!=1" (click)="deleteJobList(i)"><span
+                    class="material-icons">
+                    close
+                  </span></button>
+              </div>
+
+         
+            <hr class="m-0 p-0" *ngIf="operationType==5">
+            <ng-container *ngIf="operationType==5">
+              <div class="row mx-0  p-1 pt-3 pb-0 "
+              *ngFor="let item of control.get('destinations').controls;let ind = index;"
+              formArrayName="destinations">
+              <ng-container [formGroupName]="ind">
+                <div class=" custom-box-input-wrap px-1 col-lg-3 col-md-6  error"
+                  [ngClass]="addErrorClass(control.get('destinations').controls[ind].get('point_type'))">
+                  <material-dropdown [searchable]="true" placeholder="Point Type" [disabled]="ind+1<=disabledIndex"
+                    [addable]="true" class="dropDownWidth" [addBlank]="false" [postApiUrl]="pointOfTypeUrl"
+                    [params]="pointOfTypeParamLoc" (postApiResponse)="getNewPointOfType($event,ind)"
+                    (addValueToList)="addNewPointOfType($event)" [selectedOption]="item.value['point_type_op']">
+                    <select #customSelect formControlName="point_type" class="no-style select--modify">
+                      <option *ngFor="let option of pointTypeList" [value]="option?.id">
+                        {{ option?.label }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+
+                <div class="custom-box-input-wrap px-1 col-lg-3 col-md-6 input-wrap error"
+                  [ngClass]="addErrorClass(control.get('destinations').controls[ind].get('area'))">
+                  <material-dropdown [searchable]="true" placeholder="Select Location" [addable]="true"
+                    [postApiUrl]="areaApi" [params]="areaParams" (postApiResponse)="getNewArea($event,item,ind)"
+                    (addValueToList)="addNewArea($event,ind)" [selectedOption]="item.value['area_label']">
+                    <select #customSelect formControlName="area" class="no-style select--modify"
+                      (change)="areaSelected(item)">
+                      <option *ngFor="let option of areaList" [value]="option?.id">
+                        {{ option?.label }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+                <div class=" col-lg-4 col-md-6 px-1">
+                  <div class=" mb-0 clearfix location-input">
+                    <app-location-v2 [isnameRequired]="false" [disabled]="ind+1<=disabledIndex"
+                      [isFromToInvalid]="isFromToInvalid" (placeDetails)="locationSelected($event, ind)"
+                      [placeForm]="item['controls'].location"></app-location-v2>
+                  </div>
+                </div>
+                <div class="col-lg-2 col-md-2 pt-2 mt-1 d-flex justify-content-end">
+                  <div class="me-2" *ngIf="ind == control.get('destinations').controls.length-1" (click)="addNewDestinationFormGroup()"><span
+                      class="material-icons add fs-5 green-text cursor-pointer">add_circle_outline</span></div>
+                      <div class="" *ngIf=" ind!=0 && ind !=1" (click)="removeNewDestinationFormGroup(ind)"><span
+                        class="material-icons remove fs-5 error-text cursor-pointer">highlight_off</span></div>
+                </div>
+              </ng-container>
+            </div>
+            </ng-container>
+            <!-- /////////////// Pullout -->
+            <ng-container *ngIf="canShowToken">
+              <ng-container   *ngIf="(movementType==1 || movementType==2) && (operationType ==1 || operationType==2) && operationType !=5">
+                <div class="d-flex align-items-center fw-semibold px-2 mb-2">
+                  <mat-checkbox [formControl]="control.get('pullout_token')"   (change)="tokenSelected($event.checked,control.get('pullout'))"  color="primary">Add Pullout Token</mat-checkbox><hr class="w-100 ms-4"></div>
+                
+                <ng-container  *ngIf="control.get('pullout_token').value">
+                  <div class="row mx-0 px-1" formGroupName="pullout" >
+                  
+                    <div class="custom-box-input-wrap px-1 col-lg-6 col-md-6" [ngClass]="{'disable':control.value['pullout']['token_existed']}">
+                      <label for="">Token Number</label>
+                      <input type="text" class="box-input" placeholder="Token Number" (change)="onTokenChange($event,control.get('pullout'))" formControlName="token_no">
+                    </div>
+    
+                    <div class="input-wrap mb-2 px-1 col-lg-6 col-md-12 "  [ngClass]="{'disable':control.value['pullout']['token_existed']}">
+                      <label for="">Token Slot Date</label>
+                      <div class="date-time-input-wrap">
+                      <app-date-and-time-picker  (dateTimeSelected)="dateTimeSelected($event,control.get('pullout'))" [control]="control.get('pullout').get('token_date')"></app-date-and-time-picker>
+                    </div>
+  
+                    </div>
+    
+                    <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6"  [ngClass]="{'disable':control.value['pullout']['token_existed']}">
+                      <label for="">Token Slot</label>
+                      <material-dropdown [searchable]="true" placeholder="Token Slot" [addable]="false" [party]="false"
+                        [isUpperCaseAllowed]="false"  [selectedOption]="control.value['pullout']['token_slot_op']">
+                        <select #customSelect formControlName="token_slot">
+                          <option *ngFor="let option of timeSlots" value="{{ option?.value }}">
+                            {{ option?.label }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                    </div>
+  
+                    <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6"   [ngClass]="{'disable':control.value['pullout']['token_existed']}">
+                      <div>
+                      <label for="">Terminal</label>
+                        <material-dropdown [searchable]="true" placeholder="Terminal"
+                          [selectedOption]="control.value['pullout']['terminal_op']" [postApiUrl]="optionsDropdownUrl"
+                          [params]="pointOfTypeParam" (postApiResponse)="getNewTerminal($event,control.get('pullout'))"
+                          (addValueToList)="addNewTerminal($event)" [addable]="true">
+                          <select #customSelect formControlName="terminal" class="no-style select--modify">
+                            <option *ngFor="let option of terminalList" value="{{ option?.id }}">
+                              {{ option?.label }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                      </div>
+                    </div>
+    
+                    <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6">
+                      <label for="">Token Responsibility</label>
+                      <material-dropdown [searchable]="true" placeholder="Token Responsibility" [addable]="false" [party]="false"
+                        [isUpperCaseAllowed]="false" [selectedOption]="control.value['pullout']['token_responsibility_op']" >
+                        <select #customSelect formControlName="token_responsibility">
+                          <option *ngFor="let option of tokenResponsibilityOptions" value="{{ option?.value }}">
+                            {{ option?.label }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                    </div>
+                    <ng-container *ngIf="control.get('pullout').get('token_responsibility').value =='1'">
+    
+                      <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6" >
+                      <label for="">Token Amount</label>
+                        <input type="text" class="box-input" placeholder="Token Amount"  (change)="tokenAmountChange(control.get('pullout'))" positiveDigitNumber formControlName="token_amount">
+                      </div>
+    
+                      <div class=" col-lg-4 col-md-6 px-1 custom-box-input-wrap  ">
+                      <label for="">Payment Mode</label>
+                        <material-dropdown [searchable]="true" [addable]="false" placeholder="Payment Mode">
+                          <select #customSelect formControlName="payment_mode" class="no-style select--modify">
+                            <option value="paid_by_driver">
+                              Paid By Employee
+                            </option>
+                            <option *ngFor="let option of bankList" value="{{ option?.id }}">
+                              {{ option?.display_name }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                      </div>
+            
+                      <div class="px-1 col-lg-4 col-md-6 custom-box-input-wrap" *ngIf="control.get('pullout').get('payment_mode').value === 'paid_by_driver'">
+                      <label for="">Employee</label>
+                        <material-dropdown [searchable]="true" [addable]="false" [addBlank]="false"placeholder="Employee Name">
+                          <select #customSelect formControlName="employee" class="no-style select--modify">
+                            <option *ngFor="let option of employeeList" value="{{ option?.id }}">
+                              {{ option?.first_name }} {{ option?.last_name }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                      </div>
+  
+                      <div class=" col-lg-4 col-md-6 px-1 custom-box-input-wrap">
+                      <label for="">Include In Invoice</label>
+                        <material-dropdown [searchable]="true"  [selectedOption]="control.value['pullout']['include_in_invoice_op']"  placeholder="Include In Invoice" [addable]="false" [addBlank]="false" >
+                          <select #customSelect formControlName="include_in_invoice" class="no-style select--modify"   (change)="includeInvoiceSelected(control.get('pullout'))">
+                            <option *ngFor="let option of includeInInvoiceCharge" value="{{ option?.value}}">
+                              {{ option?.label }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                      </div>
+  
+                      <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6" *ngIf="control.get('pullout').get('include_in_invoice').value =='0'">
+                      <label for="">Charge Amount</label>
+                        <input type="text" class="box-input" placeholder="Charge Amount" positiveDigitNumber formControlName="charge_amount">
+                      </div>
+                    </ng-container>
+                    <div class="d-flex py-3 pb-3 gap-2 flex-wrap px-1 ">
+                      <file-uploader-v2 class="zo-85" (onFileUploaded)="fileUploader($event,control.get('pullout'))" fileName="Document Unknown" [uploaderId]="'1234'"
+                        [isShowOnlyUpload]="false"></file-uploader-v2>
+                      <app-file-delete-view class="zo-85"  [showInlineEdit]="true" [editedFileName]="editedFileName" [fileData]="document"
+                        *ngFor="let document of  control.get('pullout').get('documents').value"
+                        (fileDeleted)="fileDeleted($event,control.get('pullout'))"></app-file-delete-view>
+                      </div>
+                  </div>
+
+                </ng-container>
+              </ng-container>
+  
+               <!-- //////////// Deposit Token -->
+  
+              <ng-container    *ngIf="(movementType==1 || movementType==2) &&  (operationType ==3 || operationType==2) && operationType !=5">
+                <div class="d-flex align-items-center fw-semibold px-2 mb-2">
+                  <mat-checkbox  [formControl]="control.get('deposit_token')"  (change)="tokenSelected($event.checked,control.get('deposit'))" color="primary">Add Deposit Token</mat-checkbox><hr class="w-100 ms-4"></div>
+                <ng-container  *ngIf="control.get('deposit_token').value">
+                  <div class="row mx-0 px-1" formGroupName="deposit" >
+                  
+                    <div class="custom-box-input-wrap px-1 col-lg-6 col-md-6"  [ngClass]="{'disable':control.value['deposit']['token_existed']}">
+                      <label for="">Token Number</label>
+                      <input type="text" class="box-input" placeholder="Token Number"  (change)="onTokenChange($event,control.get('deposit'))" formControlName="token_no">
+                    </div>
+    
+                    <div class="custom-box-input-wrap px-1 col-lg-6 col-md-6 mb-2"   [ngClass]="{'disable':control.value['deposit']['token_existed']}">
+                      <label for="">Token Slot Date</label>
+                      <div class="date-time-input-wrap">
+                      <app-date-and-time-picker  (dateTimeSelected)="dateTimeSelected($event,control.get('deposit'))" [control]="control.get('deposit').get('token_date')"></app-date-and-time-picker>
+                    </div>
+  
+                    </div>
+    
+                    <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6"   [ngClass]="{'disable':control.value['deposit']['token_existed']}">
+                      <label for="">Token Slot</label>
+                      <material-dropdown [searchable]="true" placeholder="Token Slot" [addable]="false" [party]="false"
+                        [isUpperCaseAllowed]="false"   [selectedOption]="control.value['deposit']['token_slot_op']">
+                        <select #customSelect formControlName="token_slot">
+                          <option *ngFor="let option of timeSlots" value="{{ option?.value }}">
+                            {{ option?.label }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                    </div>
+  
+                    <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6"    [ngClass]="{'disable':control.value['deposit']['token_existed']}">
+                      <div>
+                      <label for="">Terminal</label>
+                        <material-dropdown [searchable]="true" placeholder="Terminal"
+                          [selectedOption]="control.value['deposit']['terminal_op']" [postApiUrl]="optionsDropdownUrl"
+                          [params]="pointOfTypeParam" (postApiResponse)="getNewTerminal($event,control.get('deposit'))"
+                          (addValueToList)="addNewTerminal($event)" [addable]="true">
+                          <select #customSelect formControlName="terminal" class="no-style select--modify">
+                            <option *ngFor="let option of terminalList" value="{{ option?.id }}">
+                              {{ option?.label }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                      </div>
+                    </div>
+  
+                    <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6">
+                      <label for="">Token Responsibility</label>
+                      <material-dropdown [searchable]="true" placeholder="Token Responsibility" [addable]="false" [party]="false"
+                        [isUpperCaseAllowed]="false" [selectedOption]="control.value['deposit']['token_responsibility_op']" >
+                        <select #customSelect formControlName="token_responsibility">
+                          <option *ngFor="let option of tokenResponsibilityOptions" value="{{ option?.value }}">
+                            {{ option?.label }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                    </div>
+                    <ng-container *ngIf="control.get('deposit').get('token_responsibility').value =='1'">
+    
+                      <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6" >
+                      <label for="">Token Amount</label>
+                        <input type="text" class="box-input" (change)="tokenAmountChange(control.get('deposit'))" placeholder="Token Amount" positiveDigitNumber formControlName="token_amount">
+                      </div>
+    
+                      <div class=" col-lg-4 col-md-6 px-1 custom-box-input-wrap  ">
+                      <label for="">Payment Mode</label>
+                        <material-dropdown [searchable]="true" [addable]="false" placeholder="Payment Mode">
+                          <select #customSelect formControlName="payment_mode" class="no-style select--modify">
+                            <!-- <option value="monthly">Monthly</option> -->
+                            <option value="paid_by_driver">
+                              Paid By Employee
+                            </option>
+                            <option *ngFor="let option of bankList" value="{{ option?.id }}">
+                              {{ option?.display_name }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                      </div>
+            
+                      <div class="px-1 col-lg-4 col-md-6 custom-box-input-wrap" *ngIf="control.get('deposit').get('payment_mode').value === 'paid_by_driver'">
+                      <label for="">Employee</label>
+                        <material-dropdown [searchable]="true" [addable]="false" [addBlank]="false"placeholder="Employee Name">
+                          <select #customSelect formControlName="employee" class="no-style select--modify">
+                            <option *ngFor="let option of employeeList" value="{{ option?.id }}">
+                              {{ option?.first_name }} {{ option?.last_name }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                        <!-- <p class="font-small-blue text-end">&nbsp;{{addDriverAllowanceForm.get('paid_designation').value}}</p> -->
+                      </div>
+  
+                      <div class=" col-lg-4 col-md-6 px-1 custom-box-input-wrap">
+                      <label for="">Include In Invoice</label>
+                        <material-dropdown [searchable]="true"  [selectedOption]="control.value['deposit']['include_in_invoice_op']"  placeholder="Include In Invoice" [addable]="false" [addBlank]="false" >
+                          <select #customSelect formControlName="include_in_invoice" class="no-style select--modify"    (change)="includeInvoiceSelected(control.get('deposit'))">
+                            <option *ngFor="let option of includeInInvoiceCharge" value="{{ option?.value}}">
+                              {{ option?.label }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                      </div>
+  
+                      <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6" *ngIf="control.get('deposit').get('include_in_invoice').value =='0'">
+                      <label for="">Charge Amount</label>
+                        <input type="text" class="box-input" placeholder="Charge Amount" positiveDigitNumber formControlName="charge_amount">
+                      </div>
+                    </ng-container>
+    
+                    <div class="d-flex py-3 gap-2 flex-wrap px-1">
+                      <file-uploader-v2 class="zo-85" (onFileUploaded)="fileUploader($event,control.get('deposit'))" fileName="Document Unknown" [uploaderId]="'1234'"
+                        [isShowOnlyUpload]="false"></file-uploader-v2>
+                      <app-file-delete-view class="zo-85" [showInlineEdit]="true" [editedFileName]="editedFileName" [fileData]="document"
+                        *ngFor="let document of  control.get('deposit').get('documents').value"
+                        (fileDeleted)="fileDeleted($event,control.get('deposit'))"></app-file-delete-view>
+                      </div>
+                  </div>
+                </ng-container>
+              </ng-container>
+  
+              <!-- /VGM -->
+  
+              <ng-container *ngIf="movementType==2 && operationType !=1 && operationType !=5 ">
+                <div class="d-flex align-items-center fw-semibold px-2 mb-2">
+                  <mat-checkbox  [formControl]="control.get('vgm_token')" (change)="tokenSelectedForVGM(vgm)" color="primary">Add VGM Token</mat-checkbox>
+                 <hr class="w-100 ms-4"></div>
+
+                <ng-container *ngIf="control.get('vgm_token').value">
+                  <ng-container   *ngFor="let vgm of control.get('vgm').controls;let iii = index;"formArrayName="vgm" >
+                    <ng-container  [formGroupName]="iii">
+                      <div class="row mx-0 px-1"  >
+                      
+                        <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6">
+                      <label for="">Reference Number</label>
+                          <input type="text" class="box-input" placeholder="Reference Number" formControlName="reference_no">
+                        </div>
+                        <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6">
+                          <label for="">Container No</label>
+                          <input type="text" class="box-input" placeholder="Container No" formControlName="container_no">
+                        </div>
+
+                        <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6">
+                          <label for="">VGM Date</label>
+                          <mat-form-field>
+                            <input matInput [matDatepicker]="vgm_date" formControlName="vgm_date" (focus)="vgm_date.open()"
+                              placeholder="Schedule Date">
+                            <mat-datepicker-toggle matSuffix [for]="vgm_date"></mat-datepicker-toggle>
+                            <mat-datepicker #vgm_date></mat-datepicker>
+                          </mat-form-field>
+                        </div>
+        
+                        <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6">
+                          <label for="">VGM Responsibility</label>
+                          <material-dropdown [searchable]="true" placeholder="VGM Responsibility" [addable]="false" [party]="false"
+                            [isUpperCaseAllowed]="false" [selectedOption]="vgm.value['vgm_responsibility_op']" >
+                            <select #customSelect formControlName="vgm_responsibility">
+                              <option *ngFor="let option of tokenResponsibilityOptions" value="{{ option?.value }}">
+                                {{ option?.label }}
+                              </option>
+                            </select>
+                          </material-dropdown>
+                        </div>
+                        <ng-container *ngIf="vgm.get('vgm_responsibility').value =='1'">
+  
+        
+                          <div class=" col-lg-4 col-md-6 px-1 custom-box-input-wrap  ">
+                          <label for="">Payment Mode</label>
+                            <material-dropdown [searchable]="true" [addable]="false" placeholder="Payment Mode">
+                              <select #customSelect formControlName="payment_mode" class="no-style select--modify">
+                                <option value="paid_by_driver">
+                                  Paid By Employee
+                                </option>
+                                <option *ngFor="let option of bankList" value="{{ option?.id }}">
+                                  {{ option?.display_name }}
+                                </option>
+                              </select>
+                            </material-dropdown>
+                          </div>
+                
+                          <div class="px-1 col-lg-4 col-md-6 custom-box-input-wrap" *ngIf="vgm.get('payment_mode').value === 'paid_by_driver'">
+                          <label for="">Employee</label>
+                            <material-dropdown [searchable]="true" [addable]="false" [addBlank]="false"placeholder="Employee Name">
+                              <select #customSelect formControlName="employee" class="no-style select--modify">
+                                <option *ngFor="let option of employeeList" value="{{ option?.id }}">
+                                  {{ option?.first_name }} {{ option?.last_name }}
+                                </option>
+                              </select>
+                            </material-dropdown>
+                          </div>
+
+                          <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6">
+                            <label for="">VGM Amount</label>
+                              <input type="text" class="box-input" (change)="tokenAmountChangeForVGM(vgm)" placeholder="VGM Amount" positiveDigitNumber formControlName="vgm_amount">
+                            </div>
+      
+                          <div class=" col-lg-4 col-md-6 px-1 custom-box-input-wrap">
+                          <label for="">Include In Invoice</label>
+                            <material-dropdown [searchable]="true"  [selectedOption]="vgm.value['include_in_invoice_op']"  placeholder="Include In Invoice" [addable]="false" [addBlank]="false" >
+                              <select #customSelect formControlName="include_in_invoice" class="no-style select--modify" (change)="includeInvoiceSelectedForVGM(vgm)">
+                                <option *ngFor="let option of includeInInvoiceCharge" value="{{ option?.value}}">
+                                  {{ option?.label }}
+                                </option>
+                              </select>
+                            </material-dropdown>
+                          </div>
+      
+                          <div class="custom-box-input-wrap px-1 col-lg-4 col-md-6" *ngIf="vgm.get('include_in_invoice').value =='0'">
+                          <label for="">Charge Amount</label>
+                            <input type="text" class="box-input" placeholder="Charge Amount" positiveDigitNumber formControlName="charge_amount">
+                          </div>   
+                        </ng-container>
+        
+                        <div class="d-flex py-3 gap-2 flex-wrap px-1">
+                          <file-uploader-v2 class="zo-85"  (onFileUploaded)="fileUploader($event,vgm)" fileName="Document Unknown" [uploaderId]="'1234'"
+                            [isShowOnlyUpload]="false"></file-uploader-v2>
+                          <app-file-delete-view class="zo-85"  [showInlineEdit]="true" [editedFileName]="editedFileName" [fileData]="document"
+                            *ngFor="let document of  vgm.get('documents').value"
+                            (fileDeleted)="fileDeleted($event,vgm)"></app-file-delete-view>
+  
+                          </div>
+                      </div>
+  
+                      <div class="d-flex justify-content-end px-4 pb-2 mb-3" [ngClass]="{'border-bottom':iii != control.get('vgm').controls.length-1}">
+                        <div class="me-2" *ngIf="iii == control.get('vgm').controls.length-1" (click)="addNewVGMFormGroup()"><span
+                            class="material-icons add fs-5 green-text cursor-pointer">add_circle_outline</span></div>
+                            <div class="" *ngIf=" iii!=0" (click)="removeVGMFormGroup(iii)"><span
+                              class="material-icons remove fs-5 error-text cursor-pointer">highlight_off</span></div>
+                      </div>
+                    </ng-container>
+                  </ng-container>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </div>
+
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end px-4 p-2 custom-footer-bg calc-height">
+    <button class="btn btn--sm me-2 " (click)="historyBack()" >Cancel</button>
+    <button class="btn btn--sm btn--primary" (click)="save()">Create</button>
+  </div>
+
+</div>
+<app-add-party-popup *ngIf="showAddPartyPopup.status" vendorPartyType="2" [popDetail]="showAddPartyPopup"
+  [isVendor]="vendor" (closeModal)="closePartyPopup()" (partyAdded)="addPartyToOption($event)"></app-add-party-popup>

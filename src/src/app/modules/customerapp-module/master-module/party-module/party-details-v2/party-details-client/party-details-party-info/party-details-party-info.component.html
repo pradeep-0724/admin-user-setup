@@ -1,0 +1,371 @@
+<div class="container-fluid">
+    <div class="row align-items-lg-stretch line-height-normal">
+        <div class="col-lg-6 pe-lg-2 p-0 ">
+            <div class="   layout-bg def-color h-100  d-flex flex-column">
+
+               <div class="rounded-3 p-3 card-shadow mb-3 ">
+                <div class="d-flex justify-content-between align-items-center"><span class="fs-6 fw-bold">Details</span>
+                    <button *ngIf="isPartyEditPermission" class="gb-edit-btn" [routerLink]="[preFixUrl+'/onboarding/party/edit/'+partyId]"><span
+                            class="material-icons"> create </span>
+                    </button>
+                </div>
+                <div
+                    class="border-1 border-bottom d-flex justify-content-between  px-4 p-y-15px mt-3">
+                    <span class="fw-semibold me-5">Company</span><span>{{partInfoDetails?.company_name}}</span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Email</span><span>{{partInfoDetails?.email_address ?
+                        partInfoDetails?.email_address:'-'}}</span>
+                </div>
+                <div class=" d-flex border-bottom justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Phone</span><span>{{partInfoDetails?.mobile_country_code}}
+                        {{partInfoDetails?.mobile ? partInfoDetails?.mobile:'-'}}</span>
+                </div>
+                <div class=" d-flex border-bottom justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Employee In Charge</span><span>
+                        {{partInfoDetails?.sales_person_name ? partInfoDetails?.sales_person_name:'-'}}</span>
+                </div>
+                <div class=" d-flex border-bottom justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Party Approver</span><span>
+                        {{partInfoDetails?.party_approver ? partInfoDetails?.party_approver:'-'}}</span>
+                </div>
+            </div>
+            <div class="rounded-3 p-3 card-shadow mb-3 flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fs-6 fw-bold">Address</span>
+                    <button class="gb-edit-btn" *ngIf="isPartyEditPermission" [routerLink]="[preFixUrl+'/onboarding/party/edit/'+partyId]"><span
+                            class="material-icons"> create </span>
+                    </button>
+
+                </div>
+
+                <div class="border-1 border-bottom d-flex justify-content-between   px-4 p-y-15px pt-0 mt-3">
+                    <div class="fw-semibold me-4 ws-nowrap">Billing Address</div>
+                    <div *ngIf="!partInfoDetails?.address[0]?.address_line_1 && !partInfoDetails?.address[0]?.street && !partInfoDetails?.address[0]?.state && !partInfoDetails?.address[0]?.country && !partInfoDetails?.address[0]?.pincode;else billing_address">-</div>
+                    <ng-template #billing_address>
+                    <div class="address-text ">{{partInfoDetails?.address[0]?.address_line_1 && partInfoDetails?.address[0]?.address_line_1 +", "}}
+                        {{partInfoDetails?.address[0]?.street}}<br /> {{partInfoDetails?.address[0]?.state}}<br />
+                        {{partInfoDetails?.address[0]?.country}}<br /> {{partInfoDetails?.address[0]?.pincode}}</div>
+                    </ng-template>
+                </div>
+                <div class=" d-flex justify-content-between  px-4 p-y-15px">
+                    <div class="fw-semibold me-4 ws-nowrap">Shipping Address</div>
+                    <div *ngIf="!partInfoDetails?.address[1]?.address_line_1 && !partInfoDetails?.address[1]?.street && !partInfoDetails?.address[1]?.state && !partInfoDetails?.address[1]?.country && !partInfoDetails?.address[1]?.pincode;else shipping_address">-</div>
+                    <ng-template #shipping_address>
+                    <div class="address-text ">{{partInfoDetails?.address[1]?.address_line_1 && partInfoDetails?.address[1]?.address_line_1 +", "}}
+                        {{partInfoDetails?.address[1]?.street}}<br /> {{partInfoDetails?.address[1]?.state}}<br />
+                        {{partInfoDetails?.address[1]?.country}}<br /> {{partInfoDetails?.address[1]?.pincode}}</div>
+                    </ng-template>
+                </div>
+            </div>    
+                <ng-container *ngIf="isTax">
+                    <div class="rounded-3 p-3 card-shadow flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fs-6 fw-bold">Tax</span>
+                        <button class="gb-edit-btn" *ngIf="isPartyEditPermission" [routerLink]="[preFixUrl+'/onboarding/party/edit/'+partyId]"><span
+                            class="material-icons"> create </span>
+                    </button>
+                    </div>
+                    <div
+                        class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px pt-0 mt-3">
+                        <span class="fw-semibold">{{isTds?'VAT':'GST'}}
+                            registration</span><span>{{partInfoDetails?.tax_details?.treatment?.label}}</span>
+                    </div>
+                    <div [ngClass]="{'border-bottom':isTds}"class=" d-flex justify-content-between align-items-center px-4 p-y-15px">
+                        <span class="fw-semibold">{{isTds?'TRN':'GSTIN'}}
+                        </span><span>{{partInfoDetails?.tax_details?.gstin ?
+                            partInfoDetails?.tax_details?.gstin:'-'}}</span>
+                    </div>
+                    <ng-container *ngIf="isTds">
+                        <div class="border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                            <span class="fw-semibold">Corporate Tax Registration
+                            </span><span>{{partInfoDetails?.tax_details?.crn_treatment ?
+                                partInfoDetails?.tax_details?.crn_treatment?.label:'-'}}</span>
+                        </div>
+                        <div class=" d-flex justify-content-between align-items-center px-4 p-y-15px">
+                            <span class="fw-semibold">CRN
+                            </span><span>{{partInfoDetails?.tax_details?.crn_no ?
+                                partInfoDetails?.tax_details?.crn_no:'-'}}</span>
+                        </div>
+                    </ng-container>
+                </div>
+                </ng-container>
+
+            </div>
+        </div>
+        <div class="col-lg-6 ps-lg-2 p-0  mt-4 mt-lg-0 ">
+            
+            <div class="rounded-3 p-3 h-100  layout-bg def-color card-shadow">
+                
+                <div class="d-flex justify-content-between align-items-center"><span class="fs-6 fw-bold">Balance</span>
+                    <button *ngIf="isPartyEditPermission" class="gb-edit-btn" [routerLink]="[preFixUrl+'/onboarding/party/edit/'+partyId]"><span
+                            class="material-icons"> create </span>
+                    </button>
+                </div>
+
+                <div
+                    class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px mt-3">
+                    <span class="fw-semibold">Opening Balance</span><span>{{ currency_type?.symbol}}
+                        {{partInfoDetails?.opening_balance?.open_balance}}</span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Opening
+                        Date</span><span>{{partInfoDetails?.opening_balance?.open_balance_date}}</span>
+                </div>
+
+                <div class="py-4">
+                    <span class="fs-6 fw-bold">Billing</span>
+                </div>
+                <div
+                    class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px pt-0 mt-3">
+                    <span class="fw-semibold">Preferred Payment
+                        Method</span><span>{{partInfoDetails?.billing_payment_method
+                        ?partInfoDetails?.billing_payment_method:'-'}}</span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px pt-0 mt-3">
+                   <span class="fw-semibold"> Payment Mode </span>
+                    <span>{{partInfoDetails?.payment_mode || '-'}}</span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Terms</span><span>{{partInfoDetails?.terms || '-'}} <span *ngIf="partInfoDetails?.terms=='Custom'">( {{partInfoDetails?.terms_days}} Days )</span> </span> 
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Note</span><span>{{partInfoDetails?.notes
+                        ?partInfoDetails?.notes:'-'}}</span>
+                </div>
+
+                <div class="py-4">
+                    <span class="fs-6 fw-bold">Credit Limit</span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Grace Period <app-simple-tooltip [infoText]="'Enter the grace period (days) for the customer in Add party screen or in Page Settings > Parties.'" [ml]="10"></app-simple-tooltip></span><span>{{partInfoDetails?.grace_period == 1 ? partInfoDetails?.grace_period +' day':partInfoDetails?.grace_period +' days'}}</span>
+                </div>
+                <div
+                    class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px pt-0 mt-3">
+                    <span class="fw-semibold">Credit Limit</span> <span
+                        *ngIf="partInfoDetails?.credit_details?.limit==''"> NA</span> <span
+                        *ngIf="partInfoDetails?.credit_details?.limit!=''"> {{ currency_type?.symbol}}
+                        {{partInfoDetails?.credit_details?.limit| numberFormat}}</span>
+                </div>
+
+              
+
+                <div class="py-4">
+                    <span class="fs-6 fw-bold">Credit Balance</span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Credit Amount Used</span><span>{{ currency_type?.symbol}}
+                        {{partInfoDetails?.credit_details?.used| numberFormat}}</span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Remaining Credit Amount</span><span
+                        *ngIf="partInfoDetails?.credit_details?.limit==''"> NA</span> <span
+                        *ngIf="partInfoDetails?.credit_details?.limit!=''"> {{ currency_type?.symbol}}
+                        {{partInfoDetails?.credit_details?.remaining | numberFormat}}</span>
+                </div>
+
+                <div *ngIf="partInfoDetails" >
+                    <div class="d-flex justify-content-between align-items-center py-3" [ngClass]="{'disable':!isPartyEditPermission}">
+                        <span class="fs-6 fw-bold">KYC</span>
+    
+                        <div class="kyc-toggle-switch" (click)="changeKyc()" [ngClass]="partInfoDetails.kyc?'checked':'not-checked'">
+                            <div class="switch-text rounded-pill "  >{{partInfoDetails.kyc?'Yes':'No'}}</div>
+                        </div>
+    
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <div class="row rounded-3 mt-3  layout-bg def-color custom-shadow-md">
+        <app-table-widget [isSearch]="true"  (searchedData)="searchCertificate($event)" tableTitle="Certificate" [isFilter]="true" filterUrl ="party/certificate/filters/"
+        (filterDataEmitter)="filterDataOngoing($event)"></app-table-widget>
+        <!-- table code goes here -->
+        <div class="col-12 p-0 pb-3">
+            <div class="custom-table-container ">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>CERTIFICATE NAME</th>
+                            <th>CERTIFICATE NO.</th>
+                            <th>ISSUE DATE</th>
+                            <th>EXPIRY DATE</th>
+                            <th>EXPIRY DAYS TO GO</th>
+                            <th class="text-center"> HISTORY</th>
+                            <th class="text-center">VIEW</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <!-- do-data-component -->
+                    <tbody *ngIf="partyCertificateList.length==0">
+                        <tr class="border-0">
+                            <td class="bg-white" colspan="30">
+                                <div class="no-list-data-wrap">
+                                    <figure>
+                                        <img src="assets/img/no-content.png" alt="">
+                                    </figure>
+                                    <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                    <tbody>
+                        <tr *ngFor="let doc of partyCertificateList">
+                            <td>{{doc?.name}}</td>
+                            <td>{{doc?.number ? doc?.number :'-'}}</td>
+                            <td>{{doc?.issue_date ? doc?.issue_date :'-'}}</td>
+                            <td>{{doc?.expiry_date ? doc?.expiry_date :'-'}}</td>
+                            <td [ngStyle]="getStyle(doc?.expiry_days?.color)">{{doc?.expiry_days?.name ?doc?.expiry_days?.name:'-'}}</td>
+                            <td class="button-box">
+                                <div class="justify-content-center align-items-center d-flex">
+                                    <button  (click)="openDocumentsHistory(doc)" [disabled]="!doc.has_history" 
+                                       >
+                                        <span class="material-icons fs-4  " [ngStyle]="{'color': doc?.has_history  ? '#676A6E' : '#CCCCCC'}">
+                                            history
+                                        </span>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="icon-box">
+                                <div class="justify-content-center align-items-center d-flex">
+                                    <button (click)="viewUploadedDocument(doc)" [disabled]="doc?.files.length == 0">
+                                        <span class="material-icons fs-4"
+                                            [ngStyle]="{'color': doc?.files.length > 0 ? '#15A4F6' : '#CCCCCC'}">
+                                            remove_red_eye
+                                        </span>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center align-items-center" *ngIf="isPartyEditPermission">
+                                    <div class="position-relative">
+                                        <i class="material-icons more-icon"
+                                            (click)="optionsList($event, 'party_'+doc?.name)">more_vert</i>
+                                        <ul class="more-actions__menu table-popup"
+                                            [ngClass]="{show: showOptions === 'party_'+doc?.name}">
+                                            <ng-container>
+                                                <li class="more-actions__item" *ngIf="doc?.expiry_days"
+                                                    (click)="renewDocuments(doc)"><span class="material-icons me-2">
+                                                        sync
+                                                    </span>Renew</li>
+                                            </ng-container>
+                                            <li class="more-actions__item"  [queryParams]="{tab:1, name: doc?.name}"
+                                                [routerLink]="[preFixUrl+'/onboarding/party/edit/',partyId]">
+                                                <i class="material-icons">edit</i>Edit</li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+
+
+
+
+
+    <div class="row rounded-3 mt-3  layout-bg def-color card-shadow  pb-3">
+        <app-table-widget [isEditButton]="isPartyEditPermission" tableTitle="Point of Contact"
+            (editButtonEvent)="editButton($event)"></app-table-widget>
+
+        <div class="col-12 p-0">
+            <div class="custom-table-container ">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>NAME</th>
+                            <th>DESIGNATION</th>
+                            <th>MOBILE NUMBER</th>
+                            <th>WORK NUMBER</th>
+                            <th>EMAIL</th>
+                            <th class=" icon-box">DEFAULT CONTACT</th>
+                        </tr>
+                    </thead>
+
+                    <!-- do-data-component -->
+                    <tbody *ngIf="partyContactList.length==0">
+                        <tr class="border-0">
+                            <td class="bg-white" colspan="30">
+                                <div class="no-list-data-wrap">
+                                    <figure>
+                                        <img src="assets/img/no-content.png" alt="">
+                                    </figure>
+                                    <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                    <tbody>
+                        <!-- Rows -->
+                        <tr *ngFor="let contact of partyContactList">
+                            <td>{{contact?.display_name}}</td>
+                            <td>{{contact?.designation ?contact?.designation:'-'}}</td>
+                            <td>{{contact?.contact_no}}</td>
+                            <td> {{contact?.work_number?.no ?contact?.work_number?.no:'-'}} | {{contact?.work_number?.ext ?contact?.work_number?.ext:'-'}}</td>
+                            <td>{{contact?.email_address}}</td>
+                            <td class=" icon-box">
+                                <div class="justify-content-center align-items-center d-flex" [ngClass]="{'disable':!isPartyEditPermission}">
+                                    <input type="radio" [checked]="contact.default"
+                                        (change)="makeContactDefault(contact)" class="default-contect-btn" />
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="row align-items-lg-stretch">
+            <div class="  mt-3 layout-bg def-color px-0 h-100  d-flex flex-column">
+
+               <div class="rounded-3 p-3  card-shadow ">
+                <div class="d-flex justify-content-between align-items-center mb-3"><span class="fs-6 fw-bold">Other Details</span>
+                    <button *ngIf="isPartyEditPermission" class="gb-edit-btn" [routerLink]="[preFixUrl+'/onboarding/party/edit/'+partyId]"><span
+                            class="material-icons"> create </span>
+                    </button>
+                </div>
+                <p class="primary-brand-text fs-6 text-center p-5 fw-semibold" *ngIf="customFieldData.length == 0">No Custom Fields Added !!</p>
+                <div class="row mx-0">
+                    
+                <div *ngFor = "let partInfoDetails of customFieldData;let i= index" class="col-lg-6"
+                    >
+<div class=" border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px h-100" [ngClass]="{'border-top':i==0 || i==1,'py-2':partInfoDetails.field_type.data_type=='checkbox'}">
+                    <span class="fw-semibold">{{partInfoDetails.field_label}}</span><span  *ngIf="partInfoDetails.field_type.data_type!='date'&& partInfoDetails.field_type.data_type!='checkbox'">{{partInfoDetails?.value ? partInfoDetails?.value : '-'}}</span>
+                    <span *ngIf="partInfoDetails.field_type.data_type=='date'" >{{convertToNormalDate(partInfoDetails?.value)  }}</span>
+                    <span *ngIf="partInfoDetails.field_type.data_type=='checkbox'" ><span class="material-icons def-color" *ngIf="partInfoDetails?.value==false">
+                        check_box_outline_blank
+                        </span><span class="material-icons  primary-brand-text" *ngIf="partInfoDetails?.value==true">
+                        check_box
+                        </span></span>
+                    </div>
+
+                </div>
+            
+            </div>
+               
+              </div>
+        </div>
+    </div>
+</div>
+<app-view-uploaded-document *ngIf="viewUploadedDocs.show" [viewUploadedDocs]="viewUploadedDocs"></app-view-uploaded-document>
+<app-party-certificate-renew  *ngIf="popUpRenewDocuments?.show" [popUpRenewDocuments]="popUpRenewDocuments"
+(dataFromRenewalDoc)="dataFromRenewalDoc($event)"></app-party-certificate-renew>

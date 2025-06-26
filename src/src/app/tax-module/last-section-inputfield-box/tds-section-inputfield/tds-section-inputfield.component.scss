@@ -1,0 +1,35 @@
+.min-width-500{
+    min-width: 440px;
+}
+@media (max-width:767px){
+    .min-width-500{
+        min-width: auto;
+        max-width: unset;
+        display: flex;
+      
+        padding: 0;
+        justify-content: flex-end;
+        align-items:center;
+        .d-inline-block{
+            display:flex !important;
+            width:auto !important;
+        }
+      
+      }
+      .removeStyles{
+          width:auto;
+          padding:0;
+          input{
+             
+            min-width:auto !important;
+            margin:auto;
+        }
+      }
+}
+@media (max-width:480px){
+    .mobileBlock{
+      display: block;
+      width: 100%;
+      margin: 5px auto 15px auto;
+    }
+}

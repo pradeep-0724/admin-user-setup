@@ -1,0 +1,59 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+
+p {
+  color: $text-color;
+}
+
+
+
+
+.expanded_table {
+  width: 100% !important;
+}
+
+.work-order-extended-list>.expanded-trip:nth-child(2n) {
+  background-color: #F6F6F6;
+
+
+}
+
+.expanded-trip {
+  border-bottom: 1px solid #CDCDCD;
+}
+
+
+
+
+.g-map-icon {
+  width: 15px;
+
+  img {
+    width: 100%;
+  }
+}
+
+.field-name {
+  color: #7E7E7E;
+  font-weight: 500;
+  margin-right: 10px;
+
+}
+
+
+
+
+
+.field-value {
+  color: $text-color;
+  font-weight: 600;
+}
+
+
+
+.tempo {
+  width: 100%;
+  background-color: blue;
+}
+
+

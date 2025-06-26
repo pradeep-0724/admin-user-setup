@@ -1,0 +1,124 @@
+<section>
+
+  <div class="right-section__header">
+    <h1 class="heading w-auto my-1">TDS Payable</h1>
+    <div class="header-actions w-auto my-1">
+      <button class="btn btn--primary btn--dropdown  mg-right-10 export-mobile-icon" (click)="$event.stopPropagation();canDownloadTrialBalance = !canDownloadTrialBalance">Export<span><i class="fas fa-file-export"></i></span><i class="material-icons mobile-hide">arrow_drop_down</i>
+        <ul class="more-actions__menu" [ngClass]="{'show': canDownloadTrialBalance}">
+          <li class="more-actions__item" type="button"  (click)="downLoadxlsx()" >Export As EXCEL</li>
+        </ul>
+       </button>
+
+
+        <div class="mobile-calender">
+            <input type="text" class="form-control  date-range date-range-style" [ngModelOptions]="{standalone: true}" bsDaterangepicker
+            [(ngModel)]="selectedRange" (bsValueChange)="filterTdsPayable($event)"
+            [bsConfig]="{ rangeInputFormat: 'DD MMM YYYY', showWeekNumbers: false }">
+        </div>
+    </div>
+  </div>
+  <div class="balance-header box-shadow">
+    <div class="row">
+
+      <div class="col-sm-12 actions-item">
+        <div class="actions-wrap align-items-center">
+          <button class="btn" [ngClass]="{'btn--primary': selectedType == 'overall'}"  (click)="onSelectedType('overall')">Overall</button>
+          <button class="btn  mg-left-10" [ngClass]="{'btn--primary': selectedType== 'expanded'}"  (click)="onSelectedType('expanded')">Expanded</button>
+          <div class="select-wrap ms-2">
+            <span class="show-text me-1">Showing</span>
+            <select [(ngModel)]="filter_by" name="" class="no-style select--modify">
+              <option *ngFor="let num of filter" value="{{ num.value }}">{{
+                  num.key
+                }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="table-wrapper-list  bg-white pb-0">
+    <div [ngSwitch]="selectedType" >
+      <div *ngSwitchCase="'overall'" [ngClass]="{'list_height': tdsData.length!=0}" >
+        <table class="table-container">
+          <thead>
+              <tr>
+                  <th>Party Name</th>
+                  <th>Pan Number</th>
+                  <th>TDS Amount ({{ currency_type?.symbol}})</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr *ngIf="tdsData.length == 0">
+                  <td colspan="10" style="background-color: #fff">
+                      <div class="no-content-wrapper">
+                          <figure class="no-content-pic">
+                              <img src="assets/img/no-content.png" alt="">
+                          </figure>
+                          <div class="no-content-txt">
+                              <h5 class="heading">No data found!</h5>
+                          </div>
+                      </div>
+                  </td>
+              </tr>
+              <tr *ngFor="let item of tdsData | paginate: {id:'pagination1', itemsPerPage: filter_by, currentPage: p1 }; let i = index;">
+                    <td><a target="_blank" class="custom-link" [routerLink]="[prefixUrl+'/onboarding/party/details/vendor/'+item.party.id]">{{ item.party.display_name }}</a></td>  
+                    <td>{{ item.pan }}</td>
+                    <td>{{ item.tds_amount }}</td>
+              </tr>
+          </tbody>
+      </table>
+      </div>
+      <div *ngSwitchCase="'expanded'">
+        <table class="table-container">
+          <thead>
+              <tr>
+                  <th>Bill Type</th>
+                  <th>Party Name</th>
+                  <th>Pan Number</th>
+                  <th>Bill Date</th>
+                  <th>Bill Number</th>
+                  <th>Shortage</th>
+                  <th>Cash Advance ({{ currency_type?.symbol}})</th>
+                  <th>Fuel Advance ({{ currency_type?.symbol}})</th>
+                  <th>Bill Amount ({{ currency_type?.symbol}})</th>
+                  <th>TDS Amount ({{ currency_type?.symbol}})</th>
+              </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="tdsData.length == 0">
+              <td colspan="10" style="background-color: #fff">
+                  <div class="no-content-wrapper">
+                      <figure class="no-content-pic">
+                          <img src="assets/img/no-content.png" alt="">
+                      </figure>
+                      <div class="no-content-txt">
+                          <h5 class="heading">No data found!</h5>
+                      </div>
+                  </div>
+              </td>
+            </tr>
+            <tr *ngFor="let item of tdsData | paginate: {id:'pagination1', itemsPerPage: filter_by, currentPage: p1 }; let i = index;">
+                  <td>{{ item.bill_type }}</td>
+                  <td><a target="_blank" class="custom-link" [routerLink]="[prefixUrl+'/onboarding/party/details/vendor/'+item.party.id]">{{ item.party.display_name }}</a></td>
+                  <td>{{ item.pan }}</td>
+                  <td>{{ item.bill_date }}</td>
+                  <td>{{ item.bill_number }}</td>
+                  <td>{{ item.shortage }}</td>
+                  <td>{{ item.cash_advance }}</td>
+                  <td>{{ item.fuel_advance }}</td>
+                  <td>{{ item.bill_amount }}</td>
+                  <td>{{ item.tds_amount }}</td>
+            </tr>
+          </tbody>
+      </table>
+      </div>
+      <div class="table-page-no">
+        <pagination-controls id="pagination1"  previousLabel='' nextLabel="" directionLinks="true" class="my-pagination"
+            (pageChange)="p1 = $event" (pageBoundsCorrection)="p1=$event">
+        </pagination-controls>
+      </div>
+    </div>
+</div>
+
+
+</section>

@@ -1,0 +1,43 @@
+<div class="p-4 def-color">
+<form [formGroup]="partySetting">
+  <p  class="fw-semibold mb-3">Do you want the default KYC of a new customer to be ?</p>
+  <!-- <p class="mb-3">I don't know the proper words which will come here but we can explain our user by this what this thing do and what it mean </p> -->
+  <mat-radio-group formControlName="default_kyc">
+    <mat-radio-button [value]="true" color="primary" class="me-5">Yes</mat-radio-button>
+    <mat-radio-button [value]="false" color="primary">No</mat-radio-button>
+  </mat-radio-group>
+
+<hr class="w-90 my-4">
+  <p class="fw-semibold mb-3"> Do you want the default Credit Limit of a new customer to be ?</p>
+  <!-- <p class="mb-3">I don't know the proper words which will come here but we can explain our user by this what this thing do and what it mean</p> -->
+  <div class="row mx-0">
+    <div class="col-md-4 px-0">
+      <div class="input-wrap mb-0">
+        <label for="" class="">Credit Limit</label>
+        <input type="text" positiveDigitNumber  class="no-style input--bd" placeholder="" value=""
+        formControlName="default_credit_limit">
+    </div>
+    </div>
+   
+  </div>
+
+  <hr class="w-90 my-4">
+  <p class="fw-semibold mb-3"> Do you want the default Grace Period of a new customer to be ?</p>
+    <!-- <p class="mb-3">I don't know the proper words which will come here but we can explain our user by this what this thing do and what it mean</p> -->
+
+  <div class="row mx-0">
+    
+    <div class="col-md-4 px-0">
+        <div class="input-wrap ">
+            <label for="" class="">Grace Period</label>
+            <input type="text" positiveDigitNumber  class="no-style input--bd" placeholder="" value=""
+            formControlName="default_grace_limit">
+        </div>
+    </div>
+  </div>
+
+
+
+
+</form>
+</div>

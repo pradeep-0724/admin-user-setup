@@ -1,0 +1,144 @@
+@import "../../../../../../assets/styles/helpers/variable";
+.specification-wrap{
+  border-right: 1px solid #eaeaea;
+  .row{
+    min-height: 250px;
+    .border-end{
+      border-color: #eaeaea !important;
+    }
+
+  }
+  
+}
+.veh-type{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  box-shadow: 0px 0px 3px #00000029;
+border: 1px solid #BBBBBB;
+padding: 10px 65px;
+border-radius: 4px;
+cursor: pointer;
+transition: all 200ms ease-in-out ;
+&.active{
+  border: 1px solid $primary-brand-color;
+  box-shadow: 0px 0px 3px $primary-brand-color;
+}
+&:hover{
+  background-color: #f2f2f2cd;
+  transform: translateY(-3px);
+}
+  img{
+    display: block;
+  width: 55px;
+  
+  margin: auto;
+
+  }
+  
+}
+
+
+.select-veh-truck{
+  font-size: 120px ;
+ 
+  color: #B2B2B2;
+
+}
+.select-veh-text{
+  font-size: 16px ;
+  color: #B2B2B2;
+  font-weight: 600;
+  margin-top: 30px;
+
+}
+
+.mobile-no-wrapper {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+
+  img {
+    width: 25px;
+    border-radius: 3px;
+    margin-right: 7px;
+    position: absolute;
+    top: 2px;
+    left: 0;
+
+  }
+}
+
+
+.mobile-no-wrapper input {
+  margin-left: 0px !important;
+}
+
+.mobile-no-wrapper > .mobile-no{
+  width: calc(100% - 97px);
+}
+
+:host ::ng-deep {
+  .country-prefix .input--bd {
+    margin-top: 0.02px;
+    padding-left: 30px;
+    width: 90px;
+  }
+
+}
+.dot{
+  font-size: 10px;
+  vertical-align: middle;
+}
+.inspected-specification{
+  .input-wrap{
+
+    max-width: 240px;
+    flex-grow: 1;
+
+
+  }
+  .row-btn{
+  
+    margin-left: 10px;
+    padding: 7px;
+    transition: all 100ms ease-in-out;
+    border-radius: 4px;
+    color: $white;
+  
+    .material-icons{
+      font-size: 16px;
+    }
+   
+    &-add{
+      background: $green;
+    }
+    &-delete{
+      background: $error-txt;
+    }
+    &-copy{
+      background: $sky-blue;
+    }
+  
+  
+  }
+
+
+}
+
+.invalid-input{
+  border-color:  red;
+}
+.btn-group-1{
+  .f-b{
+    border-radius: 3px 0px 0px 3px ;
+  }
+  .s-b{
+    border-radius: 0px 3px 3px 0px ;
+    padding: 2px;
+    min-width: 35px
+
+  }
+}

@@ -1,0 +1,23 @@
+<div class="right-section__header pd-20-30 mb-0 py-2" *ngIf="purchaseOrderData">
+  <h1 class="heading">PURCHASE ORDER DETAILS</h1>
+  <div class="header-actions mt-0">
+    <div *ngxPermissionsOnly="[purchasePer[1]]">
+      <button *ngIf="isEditable" class="btn--action"  [routerLink]="[prefixUrl+'/inventory/purchase-order/edit', purchaseOrderData.id]">
+          <i class="material-icons">edit</i>
+      </button>
+    </div>
+      <button class="btn--action mg-left-10" (click)="downloadPdf(purchaseOrderData)">
+        <i class="material-icons">cloud_download</i>
+     </button>
+  </div>
+</div>
+
+<div>
+  <pdf-viewer [src]="pdfSrc"
+  [render-text]="true"
+  [stick-to-page]="true"
+  [autoresize]="true"
+  [original-size]="false"
+  [show-all]="true"></pdf-viewer>
+</div>
+

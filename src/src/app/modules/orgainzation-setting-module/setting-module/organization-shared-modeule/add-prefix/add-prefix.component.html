@@ -1,0 +1,58 @@
+<form [formGroup]="prefixform" class="def-color">
+  <div class="modal-body p-4 ">
+    
+    <div class="row  mx-0">
+      <p class="col-lg-12 mb-4 fs-6 fw-semibold">
+        {{screenname}}  Section
+      </p>
+      <div class="col-md-3 col-6">
+        <div class="input-wrap error "  [ngClass]="addErrorClass(prefixform.get('alpha_prefix'))">
+          <label class="input--required" for="">Prefix</label>
+          <input type="text" class="no-style input--bd"formControlName="alpha_prefix" maxlength="5" (focusout)="changeInFields()">
+          <app-error [controlName]="prefixform.get('alpha_prefix')"></app-error>
+      </div>
+      </div>
+      <div class="col-md-1 col-2 px-0">
+        <div class="d-flex flex-column text-center">
+          <label class=" checkbox-15 fw-semibold  "  for="">Year</label>
+            <mat-checkbox color="primary"  class="mt-4 d-block mx-auto" formControlName="is_year" (change)="changeInFields()" ></mat-checkbox>
+           </div>
+      </div>
+      <div class="col-md-1 col-2 px-0">
+        <div class="d-flex flex-column text-center">
+          <label class="fw-semibold checkbox-15  "  for="">Month</label>
+            <mat-checkbox color="primary"  class="mt-4 d-block mx-auto" formControlName="is_month" (change)="changeInFields()" ></mat-checkbox>
+       </div>
+      </div>
+      <div class="col-md-1 col-2 px-0">
+        <div class="d-flex flex-column text-center">
+          <label class="fw-semibold checkbox-15  "  for="">Date</label>
+          <mat-checkbox color="primary" class="mt-4 d-block mx-auto" formControlName="is_day" (change)="changeInFields()"></mat-checkbox>
+       </div>
+      </div>
+      <div class="col-md-3 col-6 ">
+        <div class="input-wrap error" [ngClass]="addErrorClass(prefixform.get('starting_index'))">
+          <label  for="" class="input--required" >Serial No</label>
+          <input type="text" class="no-style input--bd"formControlName="starting_index"  maxlength="6" (change)="changeInFields()">
+          <app-error [controlName]="prefixform.get('starting_index')"></app-error>
+      </div>
+      </div>
+      <div class="col-md-3 col-6  ">
+        <div class="input-wrap">
+          <label for="" >Sample</label>
+          <div class="input--bd line-height-normal">{{prefixform.controls.sample.value}}</div>
+        </div>
+      </div>
+      <div class="col-lg-12" *ngIf="canShowUpdateButton">
+      <button class="updateMark" (click)="upadtePrefix()">
+        <span class="updateText">{{updateText}}</span>
+        <span class="successTest"  [ngClass]="{'successTickmark': successMsg}"></span>
+      </button>
+    </div>
+    </div>
+    
+    
+  </div>
+  
+</form>
+

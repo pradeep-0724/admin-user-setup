@@ -1,0 +1,48 @@
+
+<div class="form-layout__card">
+  <form [formGroup]="tripFuelExpenseForm">
+  <div class="row mt-3 readonlyStyles">
+    <div class="width-20">
+      <div class=" clearfix">
+        <label for="" class="">Fuel Purchase</label>
+        <input  type="text" class="no-style input-border" tabindex="-1" value="" readonly formControlName="fuel_purchesed">
+      </div>
+    </div>
+    <div class="width-20">
+      <div class=" clearfix">
+        <label for="" class="">Party Advance</label>
+        <input  type="text" class="no-style input-border" value="" tabindex="-1" readonly formControlName="party_advance">
+      </div>
+    </div>
+    <div class="width-20">
+      <div class=" clearfix">
+        <label for="" class="">Total</label>
+        <input  type="text" class="no-style input-border" value="" tabindex="-1" readonly formControlName="total">
+      </div>
+    </div>
+    <div class="width-20">
+      <div class=" clearfix">
+        <label for="" class="">Trip Fuel</label>
+        <input  type="text" class="no-style input-border" value="" tabindex="-1" positiveThreeDigitDecimalNumber  formControlName="trip_fuel" (change)="calculation()">
+      </div>
+    </div>
+
+    <div class="width-20">
+      <div class=" clearfix">
+        <label for="" class="">Change on Stock</label>
+
+        <!-- <input  type="text" class="no-style input-border" [ngClass]="{'showInvalid':!ischangeInstockPositive}" value="" readonly formControlName="change_on_stock">
+        <p style="color: red;" *ngIf="!ischangeInstockPositive">Change on stock should be greater than Zero</p> -->
+
+        <input  type="text" class="no-style input--bd input-border"  tabindex="-1"value="" readonly formControlName="change_on_stock">
+        <p class="text-danger" *ngIf="!ischangeInstockPositive">Current fuel stock is in -ve</p>
+
+      </div>
+    </div>
+
+  </div>
+
+
+
+  </form>
+</div>

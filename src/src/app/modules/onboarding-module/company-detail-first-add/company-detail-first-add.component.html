@@ -1,0 +1,252 @@
+
+<div class="def-color px-4 py-3 layout-bg">
+    <h6 class="fs-5">Company {{isEdit?'Updation':'Creation'}} </h6>
+</div>
+<form [formGroup]="details">
+    <div class="form-layout shadow-inset-top-lg">
+        <div class="form-layout__card  pt-4">
+            <div class='form-body px-4' style="display: block;">
+                <div class="row align-items-center">
+                    <div class="col-lg-3 col-md-6">
+                        <profile-pic  (onFileUploaded)="imageUpload($event,0)"
+                            [accept]="'image/jpeg,image/x-jpg,image/png, capture=camera'" [uploaderId]="'company-profile'"
+                            [imagePreview]="profile_img_url">
+                        </profile-pic>
+                    </div>
+                    <div class="col-lg-3  col-md-6">
+                        <div class="input-wrap error company-name"
+                            [ngClass]="addErrorClass(details.controls.company_name)">
+                            <label for="" class="input--required">Company Name in English</label>
+                            <input formControlName="company_name" type="text" class="no-style input--bd"
+                                placeholder="Name of your Company in English" (change)="nameAutoPopulate($event)" value=""
+                                required>
+                            <span class="border-anim"></span>
+                            <app-error [controlName]="details.controls.company_name"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-3  col-md-6">
+                        <div class="input-wrap  company-name"
+                            [ngClass]="addErrorClass(details.controls.company_native_name)">
+                            <label for="" class="input">Company Name in Native</label>
+                            <input formControlName="company_native_name" type="text" class="no-style input--bd"
+                                placeholder="Name of your Company in Native"  value="">
+                            <span class="border-anim"></span>
+                            <app-error [controlName]="details.controls.company_native_name"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(details.controls.company_display_name)">
+                            <label for="" class="input--required">Display Name</label>
+                            <input formControlName="company_display_name" type="text" class="no-style input--bd"
+                                placeholder="Name of your Company" value="" required>
+                            <span class="border-anim"></span>
+                            <app-error [controlName]="details.controls.company_display_name"></app-error>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 country-filed-height">
+                        <div class="input-wrap mb-0">
+                            <label for="" class="input--required">Contact number</label>
+                        </div>
+                        <div class="row mx-0">
+                            <div class="col-4 px-0 me-3">
+                                <div class="width-country-code custom-margin me-0">
+                                    <div class="input-wrap">
+                                        <material-dropdown class="dropDownWidth px-0"
+                                            [selectedOption]="initialValues.primary_mobile_number_code">
+                                            <select #customSelect formControlName="primary_mobile_number_code"
+                                                class="no-style select--modify">
+                                                <option *ngFor="let phone_code of countryPhoneCode"
+                                                    value=" {{ phone_code }}">
+                                                    {{phone_code}}
+                                                </option>
+                                            </select>
+                                        </material-dropdown>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="px-0 number-grow col-7 px-0">
+                                <div class="input-wrap error px-0 col-4 w-100"
+                                    [ngClass]="addErrorClass(details.controls.primary_mobile_number)">
+
+                                    <input type="text" formControlName="primary_mobile_number" maxlength="10"
+                                        pattern="^[0-9]*$" class="no-style input--bd" placeholder="9900000000" />
+
+                                    <app-error [controlName]="details.controls.primary_mobile_number"></app-error>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                      
+                            <div class="input-wrap error" [ngClass]="addErrorClass(details.controls.email_address)">
+                                <label for="" class="input--required">Email Address</label>
+                                <input appLowerCase formControlName="email_address" type="email"
+                                    class="no-style input--bd" placeholder="test@gmail.com" value="" required>
+
+                                <app-error [controlName]="details.controls.email_address"></app-error>
+                                <!-- <div *ngIf="editIdValue!=='null'">
+                                    <p style=" color: red ;font-size: 12px;"
+                                        *ngIf="isVerificationMessage">
+                                        {{ verificationMessage }}
+                                    </p>
+                                    <p style=" color: green; cursor: pointer;"
+                                        (click)="verifyEmail()" *ngIf="isVerificationApplicable">
+                                        Verify
+                                    </p>
+                                    <p style="color: green;  word-wrap:break-word; font-size: 12px;"
+                                        *ngIf="!isVerificationApplicable">
+                                        {{emailVerificationStatus}}
+                                    </p>
+                                </div> -->
+                            </div>
+                          
+                        
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap" [class.disabled]="isEdit"
+                            [ngClass]="addErrorClass(details.controls.books_begin)">
+                            <label for="" class="input--required d-inline-block">Migration Date
+
+                            </label>
+                            <div class="placeOfSupplyToolTip">
+                                <span class="material-icons blinkAnimation">info</span>
+                                <div class="data">Please add the start date of your Chart of Account with
+                                    TransportSimple, Once added we cannot change the Date</div>
+                            </div>
+                            <mat-form-field [class.disabled]="isEdit">
+                                <input matInput [matDatepicker]="picker2" readonly (focus)="picker2.open()"
+                                    formControlName="books_begin" placeholder="DD/MM/YYYY">
+                                <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                                <mat-datepicker #picker2></mat-datepicker>
+                            </mat-form-field>
+                            <app-error [controlName]="details.controls.books_begin"></app-error>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap" [ngClass]="addErrorClass(details.controls.country)"
+                            [class.disabled]="true">
+                            <label for="" class="input--required">Country</label>
+                            <material-dropdown [searchable]="false" [disabled]="true" [addable]="false" class="dropDownWidth"
+                                [selectedOption]="initialValues?.country">
+                                <select #customSelect formControlName="country" class="no-style select--modify">
+                                    <option *ngFor="let option of country" value="{{ option?.id }}">
+                                        {{ option?.name }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <app-error [controlName]="details.controls.country"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap" [class.disabled]="isEdit">
+                            <label for="" class="input--required">Time Zone</label>
+                            <material-dropdown [searchable]="false" [disabled]="isEdit" [addable]="false" class="dropDownWidth"
+                                [selectedOption]="initialValues?.timeZone">
+                                <select #customSelect formControlName="timezone" class="no-style select--modify">
+                                    <option *ngFor="let option of timeZone" value="{{ option?.id }}">
+                                        {{ option?.name }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <app-error [controlName]="details.controls.timezone"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap" [ngClass]="addErrorClass(details.controls.currency)">
+                            <label for="" class="input--required">Currency</label>
+                            <material-dropdown [searchable]="false" [addable]="false" class="dropDownWidth"
+                                [selectedOption]="initialValues?.currency">
+                                <select #customSelect formControlName="currency" class="no-style select--modify">
+                                    <option *ngFor="let option of currency" value="{{ option?.id }}">
+                                        {{ option?.currency }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <app-error [controlName]="details.controls.currency"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6" [class.disabled]="isEdit">
+                        <div class="input-wrap" [ngClass]="addErrorClass(details.controls.from_financial_month)">
+                            <label for="" class="input--required">From Financial Month</label>
+                            <material-dropdown [searchable]="false" [disabled]="isEdit" [addable]="false" class="dropDownWidth"
+                                [selectedOption]="initialValues?.fromfinancial">
+                                <select #customSelect formControlName="from_financial_month" 
+                                    class="no-style select--modify">
+                                    <option *ngFor="let option of month" value="{{ option?.id }}">
+                                        {{ option?.name }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <app-error [controlName]="details.controls.from_financial_month"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6" [class.disabled]="isEdit">
+                        <div class="input-wrap" [ngClass]="addErrorClass(details.controls.to_financial_month)">
+                            <label for="" class="input--required">To Financial Month</label>
+                            <material-dropdown [searchable]="false" [disabled]="isEdit"  [addable]="false" class="dropDownWidth"
+                                [selectedOption]="initialValues?.tofinancial">
+                                <select #customSelect formControlName="to_financial_month"
+                                    class="no-style select--modify">
+                                    <option *ngFor="let option of month" value="{{ option?.id }}">
+                                        {{ option?.name }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <app-error [controlName]="details.controls.to_financial_month"></app-error>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- </div> -->
+            </div>
+        </div>
+
+        <div class="border-top border-2" *ngIf="isTax">
+            <button class="add-del-toggle px-3 py-3 " type="button" (click)="showTaxForm = !showTaxForm;">
+                <span *ngIf="!showTaxForm"><i class="bi bi-caret-right-fill "></i></span>
+                <span *ngIf="showTaxForm"><i class="bi bi-caret-down-fill "></i></span>
+                <span class="ms-3">Tax Details</span>
+            </button>
+        </div>
+        <div *ngIf="showTaxForm" class="pt-3 px-4">
+            <app-company-tax-box (companyTaxData)="taxData($event)" [isTaxFormValid]="isTaxFormValid" [taxDetails]="taxDetails"></app-company-tax-box>
+        </div>
+    </div>
+    <div class="company-details-tab">
+        <mat-tab-group mat-stretch-tabs="false" class="mat-group" animationDuration="0ms" mat-align-tabs="start">
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <span>Company Address</span>
+                </ng-template>
+                <app-company-detail-second-add (addreesDetails)="addreesDetails($event)"
+                    [editValues]="editValues"></app-company-detail-second-add>
+            </mat-tab>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <span>Documents</span>
+                </ng-template>
+                <edit-company-documents [employee_details]="details" [isEdit]="true" [editValues]="editValues"></edit-company-documents>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+
+
+
+
+    <div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end">
+
+        <button class="btn  btn--sm me-2" type="button" *ngIf="!isEdit"
+            [routerLink]="[preFixUrl+'/overview']">Cancel</button>
+        <button class="btn  btn--sm me-2" type="button" *ngIf="isEdit"
+            [routerLink]="[preFixUrl+'/organization_setting/profile']">Cancel</button>
+        <button class="btn btn--primary btn--sm" type="button" (click)="submitForm()">Save</button>
+
+    </div>
+   
+
+</form>

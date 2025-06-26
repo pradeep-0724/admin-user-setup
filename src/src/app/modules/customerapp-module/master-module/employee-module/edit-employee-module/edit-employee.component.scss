@@ -1,0 +1,26 @@
+.progress-bar-wrap {
+    &.no-click {
+        position: relative;
+        &:before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 1;
+        }
+    }
+}.progress-bar-wrap {
+    @media (max-width:639px) {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  
+    .progress-bar-list {
+      min-height: 20px;
+      margin-bottom: 0;
+      z-index: 3;
+  
+    }
+  }
+  

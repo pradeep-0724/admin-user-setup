@@ -1,0 +1,20 @@
+.error-reg {
+  color: #eb1e4a;
+  font-size: 12px;
+}
+.progress-bar-wrap {
+  @media (max-width:639px) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .progress-bar-list {
+    min-height: 20px;
+    margin-bottom: 0;
+    z-index: 3;
+
+  }
+}
+.isTax{
+  display: none;
+}

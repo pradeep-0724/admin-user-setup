@@ -1,0 +1,230 @@
+<form [formGroup]="employee_details">
+    <div class="form-layout form-layout--pd">
+        <div class="form-layout__card" [ngClass]="{'active': information_toggle}">
+            <div class="form-layout__header tabIndexActive">
+                <h2 class="sub-heading">
+                    General Information
+                </h2>
+                <span class="collapse-line"></span>
+                <a class="collapse-icon" (click)="information_toggle = !information_toggle"></a>
+            </div>
+            <div class="alert-msg" *ngIf="apiError">
+                <span class="icon-wrap"></span>
+                <p class="message-cont">{{ apiError }}</p>
+            </div><br>
+            <div class='form-body'>
+                <div class="row tabIndexActiveFields">
+                    <div class="col-xl-12">
+                        <profile-pic (onFileRead)="onImageUploaded($event)" (onFileUploaded)="imageUpload($event,0)"
+                            [accept]="'image/jpeg,image/x-jpg,image/png, capture=camera'"
+                            [uploaderId]="'employee_pro_pic'" [imagePreview]="profile_img_url">
+                        </profile-pic>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(employee_details.controls.first_name)">
+                            <label for="" class="input--required">Full Name</label>
+                            <input  formControlName="first_name" type="text" class="no-style input--bd" placeholder="Name" value="" (change)="setDisplayName()">
+                           <!--  <span class="border-anim"></span> -->
+                            <app-error [controlName]="employee_details.controls.first_name"></app-error>
+                        </div>
+                    </div>
+                    <!-- <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(employee_details.controls.last_name)">
+                            <label for="" class="input--required">Last Name</label>
+                            <input appTitleCase formControlName="last_name" type="text" class="no-style input--bd"
+                                placeholder="Last Name" value="" (change)="setDisplayName()">
+                            <app-error [controlName]="employee_details.controls.last_name"></app-error>
+                        </div>
+                    </div> -->
+
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(employee_details.controls.display_name)">
+                            <label for="" class="input--required">Display Name</label>
+                            <input  formControlName="display_name" type="text" class="no-style input--bd"
+                                placeholder="Display Name" value="">
+                            <app-error [controlName]="employee_details.controls.display_name"></app-error>
+                            <span *ngIf="display_name_error" class="error-reg">{{display_name_error}}</span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-sm-6 country-filed-height">
+                        <div class="input-wrap mb-0"><label for="" class="input--required">Contact number</label></div>
+
+
+                        <div class="row mx-0">
+                            <div class="col-4 px-0">
+                                <div class="width-country-code custom-margin me-0">
+                                    <material-dropdown class="dropDownWidth px-0"
+                                        [selectedOption]="initialValues.contact_country_code">
+                                        <select #customSelect formControlName="contact_country_code"
+                                            class="no-style select--modify">
+                                            <option *ngFor="let phone_code of countryPhoneCode"
+                                                value=" {{ phone_code }}">
+                                                {{phone_code}}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                </div>
+                            </div>
+
+
+                            <div class="px-0 number-grow col-7 px-0">
+                                <div class="ms-3">
+
+                                    <div class="input-wrap error px-0 col-8 w-100"
+                                        [ngClass]="addErrorClass(employee_details.controls.contact)">
+
+                                        <input type="text" formControlName="contact" maxlength="10" pattern="^[0-9]*$"
+                                            class="no-style input--bd" placeholder="9900000000"
+                                            (change)="checkMobileNumber()">
+                                        <span *ngIf="contact_error" class="error-reg">{{contact_error}}</span>
+                                        <span
+                                            *ngIf="employee_details.controls.contact.touched && employee_details.controls.contact.hasError('pattern')"
+                                            class="error-reg">Enter a Valid Number</span>
+                                        <app-error [controlName]="employee_details.controls.contact"></app-error>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap" [ngClass]="addErrorClass(employee_details.controls.joining_date)">
+                            <label for="" class="input--required">Date of Joining</label>
+                            <mat-form-field class="width--100">
+                                <input matInput placeholder="DD/MM/YYYY" [min]="dob" [matDatepicker]="picker1"
+                                    (focus)="picker1.open()" formControlName="joining_date"
+                                    (dateChange)="onDateChange($event)">
+                                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                                <mat-datepicker #picker1></mat-datepicker>
+                            </mat-form-field>
+                            <app-error [controlName]="employee_details.controls.joining_date"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap clearfix">
+                            <label for="">Department</label>
+                            <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                                 [params]="designationParams"
+                                (postApiResponse)="getNewDesignations ($event)"
+                                (addValueToList)="addParamsToDesignation ($event)"
+                                [selectedOption]="initialValues.designation">
+                                <select #customSelect formControlName="designation" class="no-style select--modify">
+                                    <option *ngFor="let option of designationList" value="{{ option?.id }}">
+                                        {{ option?.label }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                        </div>
+                    </div>
+
+                    <!-- <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap clearfix">
+                            <label for="">Date of Birth</label>
+                            <mat-form-field class="width--100">
+                                <input matInput placeholder="DD/MM/YYYY" [max]="current_day" [matDatepicker]="picker2" (focus)="picker2.open()" formControlName="date_of_birth">
+                                <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                                <mat-datepicker #picker2></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div> -->
+                    <!--
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap">
+                            <label for="">Employee ID</label>
+                            <input appUpperCase formControlName="employee_id" type="text" class="no-style input--bd" placeholder="875432" value="">
+
+                        </div>
+                    </div> -->
+
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap error"
+                            [ngClass]="addErrorClass(employee_details.controls.email_address)">
+                            <label for="">Email ID</label>
+                            <input appLowerCase type="email" formControlName="email_address" class="no-style input--bd"
+                                placeholder="name@gmail.com">
+                            <app-error [controlName]="employee_details.controls.email_address"></app-error>
+                        </div>
+                    </div>
+                    <!-- <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap clearfix">
+                            <label for="">Blood Group</label>
+                            <material-dropdown [searchable]="true" [addable]="false"  [addBlank]="true" class="dropDownWidth" [selectedOption]="initialValues.bloodGroup">
+                                <select #customSelect formControlName="blood_group" class="no-style select--modify">
+                                    <option *ngFor="let option of bloodGroup" value="{{ option?.id }}">
+                                        {{ option?.label }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                        </div>
+                    </div> -->
+                    <!-- <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap">
+                            <label for="">Father's Name</label>
+                            <input appTitleCase type="text" formControlName="father_name" class="no-style input--bd" placeholder="Name">
+
+                        </div>
+                    </div> -->
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap error "
+                            [ngClass]="addErrorClass(employee_details.controls.vehicle_assigned)">
+                            <label for="">Vehicle Assigned</label>
+                            <material-dropdown [searchable]="true" [addable]="false" [addBlank]="true"
+                                class="dropDownWidth" [selectedOption]="initialValues.vehicle_assigned">
+                                <select #customSelect formControlName="vehicle_assigned"
+                                    class="no-style select--modify">
+                                    <option *ngFor="let option of vehicleData" value="{{ option?.id }}">
+                                        {{ option?.reg_number }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <app-error [controlName]="employee_details.controls.vehicle_assigned"></app-error>
+                        </div>
+                    </div>
+                    <!-- <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap clearfix">
+                            <label for="">Reference Person</label>
+                            <input appTitleCase name="" formControlName="reference_person" class="no-style input--bd" placeholder="Reference person" value="">
+
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+        <div class="form-layout__card" [ngClass]="{'active': remarks_toggle}">
+            <div class="form-layout__header">
+                <h2 class="sub-heading">
+                    Remarks
+                </h2>
+                <span class="collapse-line"></span>
+                <a class="collapse-icon" (click)="remarks_toggle = ! remarks_toggle"></a>
+            </div>
+            <div class="form-body">
+                <div class="row tabIndexActiveFields">
+                    <div class="col-sm-8">
+                        <div class="input-wrap">
+                            <input type="text" formControlName="remarks" class="no-style input--bd"
+                                placeholder="Comments" value="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom-btn-wrap py-2 px-4">
+        <div class="btn-wrap  ">
+            <button class="btn btn-back btn--sm" type="button"
+                [routerLink]="[prefixUrl+'/onboarding/employee/view']">Cancel</button>
+            <button class="btn btn--sm" type="button" (click)="finishForm(employee_details)">Finish</button>
+            <button class="btn btn--primary btn-mg-left btn--save-continue" type="button"
+                (click)="submitForm(employee_details)">Save & Continue</button>
+        </div>
+    </div>
+</form>
+
+<!--[controlName]="'designation'"  -->

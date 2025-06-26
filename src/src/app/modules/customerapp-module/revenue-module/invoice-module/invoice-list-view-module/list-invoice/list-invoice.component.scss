@@ -1,0 +1,92 @@
+@import"../../../../../../../assets/styles/helpers/variable";
+
+.live-status-toggle {
+  color: $text-color;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+
+}
+
+.live-status-card {
+  display: flex;
+  align-items: center;
+  padding: 7px 0 13px 0;
+  position: relative;
+
+  .live-status-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    border: 2px solid red;
+    margin-right: 14px;
+    border-radius: 50%;
+  }
+
+  &::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: -3px;
+    
+    border-radius: 4px;
+    border:1px solid  $gray-500;
+    height: 50%;
+    transform: translateY(-70%);
+
+  }
+
+}
+
+.live-status-wrap div:nth-child(4) div::after{
+  display: none;
+ 
+}
+
+.yellow-card {
+  .live-status-icon {
+    color: $yellow-color;
+    border-color: $yellow-color;
+  }
+
+  .trips-amount {
+    color: $yellow-color;
+  }
+}
+
+.blue-card {
+  .live-status-icon {
+    color: $sky-blue;
+    border-color: $sky-blue;
+  }
+
+  .trips-amount {
+    color: $sky-blue;
+  }
+}
+
+.green-card {
+  .live-status-icon {
+    color: $green;
+    border-color: $green;
+  }
+
+  .trips-amount {
+    color: $green;
+  }
+}
+.red-card{
+  .live-status-icon {
+    color: $error-txt;
+    border-color: $error-txt;
+  }
+
+  .trips-amount {
+    color: $error-txt;
+  }
+
+}

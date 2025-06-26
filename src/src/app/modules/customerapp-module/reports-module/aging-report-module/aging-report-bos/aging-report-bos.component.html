@@ -1,0 +1,66 @@
+
+
+<app-list-widget [tabSelectionList]="tabSelectionList" [isFilter]="true"  [filterUrl]="filterUrl"  [isDropDown]="true" [isExport]="true"
+(exportList)="exportXls($event)" (listWidgetData)="listWidgetData($event)" >
+</app-list-widget>
+
+<div class="parent-wrap">
+<div class="alert-msg" *ngIf="apiError">
+  <span class="icon-wrap"></span>
+  <p class="message-cont">{{ apiError }}</p>
+</div>
+
+<div class="custom-table-container def-color"    (scroll)="onScroll($event)">
+  <table [ngClass]="{'h-100':storeData.length==0}">
+
+      <thead>
+        <tr>
+          <th  >BoS Date</th>
+            <th >Due Date</th> 
+            <th >BoS No</th>
+            <th >Customer</th>
+            <th >Status</th>
+            <th >Age</th>
+            <th >BoS Amount({{ currency_type?.symbol}})</th>
+            <th>Balance ({{ currency_type?.symbol}})</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="storeData.length == 0">
+          <tr class="border-0">
+              <td class="bg-white" colspan="30">
+                  <div class="no-list-data-wrap">
+                      <figure>
+                          <img src="assets/img/no-content.png" alt="">
+                      </figure>
+                      <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                  </div>
+              </td>
+          </tr>
+
+      </tbody>
+
+      <tbody>
+        <tr *ngFor="let data of storeData ; let i = index;">
+            
+          <td>{{data.bos_date}}</td>
+          <td>{{ data.due_date }}</td>
+          <td  ><a class="custom-link" (click)="routeToBos(data.id)">{{data.bos_number?data.bos_number:'-'}}</a></td>
+          <td><a target="_blank"  class="custom-link" [routerLink]="[prefixUrl+'/onboarding/party/details/client/'+data.party.id]">{{ data?.party?.display_name }}</a></td>
+          <td>{{ data?.status }}</td>
+          <td class="rupee-symbol rupee-symbol--sm"> {{ data.age }}</td>
+          <td class="rupee-symbol rupee-symbol--sm"> {{ data.total_amount | numberFormat }}</td>
+          <td class="rupee-symbol rupee-symbol--sm"> {{ data.balance | numberFormat }}</td>
+
+
+
+
+
+           
+        </tr>
+      </tbody>
+  </table>
+</div>
+
+
+ 
+</div>

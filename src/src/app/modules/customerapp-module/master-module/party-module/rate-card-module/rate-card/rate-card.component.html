@@ -1,0 +1,239 @@
+<div class="add-rate-card-wrap">
+<div class="right-section__header align-items-center justify-content-between ">
+    <h1 class="heading col-10">{{rateCardId?'Edit':'Add'}} Rental Charge</h1>
+</div>
+
+<div class=" position-relative  add-edit-quotation-wrap">
+  <form [formGroup]="rateCardForm">
+      <div class="shadow-inset-top-lg ">
+          <div class="row px-4 pt-4">
+              <div class="col-lg-3 col-6">
+                  <div class="input-wrap error" [ngClass]="addErrorClass(rateCardForm.controls.date)">
+                      <label for="" class="input--required">Date</label>
+                      <mat-form-field>
+                          <input matInput [matDatepicker]="date"
+                              formControlName="date" (focus)="date.open()" placeholder="DD/MM/YYYY" readonly>
+                          <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                          <mat-datepicker #date></mat-datepicker>
+                      </mat-form-field>
+                      <app-error [controlName]="rateCardForm.controls.date"></app-error>
+                  </div>
+              </div>
+              <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                  <div class="input-wrap clearfix error" [ngClass]="addErrorClass(rateCardForm.controls.zone)">
+                      <label for="" class="input--required">Zone</label>
+                      <div>
+                          <material-dropdown 
+                              [selectedOption]="initialValues.zone">
+                              <select #customSelect formControlName="zone" class="no-style select--modify" (change)="getdefaultRateCards()">
+                                  <option *ngFor="let option of zonesList" value="{{ option?.id }}">
+                                      {{ option?.name }}
+                                  </option>
+                              </select>
+                          </material-dropdown>
+                          <app-error [controlName]="rateCardForm.controls.zone"></app-error>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-lg-3 col-6">
+                <div class="input-wrap clearfix error" [ngClass]="addErrorClass(rateCardForm.controls.billing_unit)">
+                    <label for="" class="input--required">Billing Unit</label>
+                    <material-dropdown [selectedOption]="initialValues.billingUnit" [addErrorClass]="addErrorClass(rateCardForm.controls.billing_unit)">
+                        <select #customSelect formControlName="billing_unit" (change)="onBillingUnitChange();getdefaultRateCards()"
+                            class="no-style select--modify">
+                            <option *ngFor="let option of rateCardBillingList" value="{{ option?.value}}">
+                                {{ option?.label }}
+                            </option>
+                        </select>
+                    </material-dropdown>
+               </div>
+            </div>
+          </div>
+
+          <div  class="fake-tab-bar"><span >Rental Charge</span></div>
+          <div class="p-4">
+          <div class="addable-row-table">
+            <table>
+              <thead>
+                <tr>
+                  <th rowspan="2" class="input--required">
+                    VEHICLE CATEGORY
+                  </th>
+                  <th rowspan="2" class="input--required">
+                    SPECIFICATION
+                  </th>
+                  <th colspan="3" class="text-center">{{rateCardTableLabel.daily}}</th>
+                  <th colspan="3" class="text-center">{{rateCardTableLabel.weekly}}</th>
+                  <th colspan="3" class="text-center">{{rateCardTableLabel.monthly}}</th>
+                  <th class="border-top-0 border-end-0 border-bottom-0 fixed-right"></th>
+                </tr>
+                <tr>
+                  <th >WITH FUEL</th>
+                  <th >WITHOUT FUEL</th>
+                  <th  >EXTRA
+                  <ng-container *ngIf="rateCardForm.controls.billing_unit.value=='hour'">
+                      HOURS
+                  </ng-container>
+                  <ng-container *ngIf="rateCardForm.controls.billing_unit.value=='day'">
+                      DAYS
+                  </ng-container>
+                  </th>
+                  <th >WITH FUEL</th>
+                  <th >WITHOUT FUEL</th>
+                  <th >EXTRA 
+                    <ng-container *ngIf="rateCardForm.controls.billing_unit.value=='hour'">
+                      HOURS
+                  </ng-container>
+                  <ng-container *ngIf="rateCardForm.controls.billing_unit.value=='day'">
+                      DAYS
+                  </ng-container>
+                  </th>
+                  <th >WITH FUEL</th>
+                  <th >WITHOUT FUEL</th>
+                  <th >EXTRA 
+                    <ng-container *ngIf="rateCardForm.controls.billing_unit.value=='hour'">
+                      HOURS
+                  </ng-container>
+                  <ng-container *ngIf="rateCardForm.controls.billing_unit.value=='day'">
+                      DAYS
+                  </ng-container>
+                  </th>
+                                    <th class="border-top-0 border-end-0 border-bottom-0 fixed-right"></th>
+                </tr>
+              </thead>
+              <tbody formArrayName="ratecardmeta">
+                <tr *ngFor="let rateCard of rateCardForm.controls.ratecardmeta['controls']; let i = index;"
+                [formGroupName]="i">
+                <td>
+                  <material-dropdown [searchable]="true" [selectedOption]="initialValues.vehicle_category[i]" 
+                  [addErrorClass]="addErrorClass(rateCard.controls.vehicle_category)">
+                  <select #customSelect formControlName="vehicle_category"  (change)="getVehicleSpecificationList(rateCard,i)" >
+                      <option *ngFor="let option of vehicleTypeList" value="{{ option.value }}">
+                          {{ option.label }}
+                      </option>
+                  </select>
+                </material-dropdown>
+                </td>
+                  <td>
+                    <material-dropdown [searchable]="true" [selectedOption]="initialValues.specification[i]" 
+                [addErrorClass]="addErrorClass(rateCard.controls.specification)">
+                <select #customSelect formControlName="specification" (change)="prefillRowBySpecification(i)"  >
+                    <option *ngFor="let option of specificationList[i]" value="{{ option?.id }}">
+                        {{ option?.specification }}
+                    </option>
+                </select>
+              </material-dropdown>
+                  </td>
+                  <ng-container formGroupName="daily">
+                    <td >
+                      <div  >
+                        <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="Eg.: 1234567"
+                        formControlName="with_fuel" value="0" [ngClass]="addErrorClass(rateCard.get('daily').get('with_fuel'))" >
+                      </div>
+                    </td>
+                    <td >
+                      <div  >
+                        <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="Eg.: 1234567"
+                        formControlName="without_fuel" [ngClass]="addErrorClass(rateCard.get('daily').get('without_fuel'))" >
+                      </div>
+                    </td>
+                    <td >
+                      <div  >
+                        <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="Eg.: 1234567"
+                        formControlName="additional_hours" [ngClass]="addErrorClass(rateCard.get('daily').get('additional_hours'))" >
+                      </div>
+                    </td>
+                  </ng-container>
+                  <ng-container formGroupName="weekly">
+                    <td >
+                      <div >
+                        <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="Eg.: 1234567"
+                        formControlName="with_fuel"  [ngClass]="addErrorClass(rateCard.get('weekly').get('with_fuel'))">
+                      </div>
+                    </td>
+                    <td >
+                      <div >
+                        <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="Eg.: 1234567"
+                        formControlName="without_fuel" [ngClass]="addErrorClass(rateCard.get('weekly').get('without_fuel'))" >
+                      </div>
+                    </td>
+                    <td >
+                      <div  >
+                        <input positiveThreeDigitDecimalNumber  type="text" class="error-box" placeholder="Eg.: 1234567"
+                        formControlName="additional_hours" [ngClass]="addErrorClass(rateCard.get('weekly').get('additional_hours'))" >
+                      </div>
+                    </td>
+                  </ng-container>
+                  <ng-container formGroupName="monthly">
+                    <td >
+                      <div  >
+                        <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="Eg.: 1234567"
+                        formControlName="with_fuel" [ngClass]="addErrorClass(rateCard.get('monthly').get('with_fuel'))" >
+                      </div>
+                    </td>
+                    <td >
+                      <div  >
+                        <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="Eg.: 1234567"
+                        formControlName="without_fuel"  [ngClass]="addErrorClass(rateCard.get('monthly').get('without_fuel'))">
+                      </div>
+                    </td>
+                    <td >
+                      <div  >
+                        <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="Eg.: 1234567"
+                        formControlName="additional_hours" [ngClass]="addErrorClass(rateCard.get('monthly').get('additional_hours'))" >
+                      </div>
+                    </td>
+                  </ng-container>
+                                    <td class="border-top-0 border-end-0 border-bottom-0 fixed-right add-close-btn-td-sm">
+                    <div class="d-flex" >
+                     
+                    <button class="  row-btn row-btn-delete " (click)="removeRateCard(i)" *ngIf="rateCardForm.controls.ratecardmeta['controls'].length !== 1"><span class="material-icons">
+                    close
+                    </span></button>
+                      <button class=" row-btn row-btn-add " (click)="addRateCard()"  *ngIf="i==rateCardForm.controls.ratecardmeta['controls'].length - 1"  ><span class="material-icons">
+                        add
+                        </span></button>
+                  
+                  
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div> 
+
+        </div>
+
+
+          
+      </div>
+ 
+      <div>
+       
+      </div>
+     
+
+
+
+      
+  </form>
+</div> 
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="custom-footer-bg d-flex justify-content-end py-2 px-4">
+
+  <button class="btn  btn--sm me-3" type="button" (click)="navigateToDetails()">Cancel</button>
+  <button class="btn btn--primary btn--sm" (click)="saveRateCard()">Save </button>
+
+</div>

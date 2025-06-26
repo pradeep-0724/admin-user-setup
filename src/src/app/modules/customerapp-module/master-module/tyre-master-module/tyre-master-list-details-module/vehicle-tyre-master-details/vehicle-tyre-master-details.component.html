@@ -1,0 +1,48 @@
+<div class="right-section__header mb-0" *ngIf="tyreMasterData">
+  <h1 class="heading">Tyre Master Details</h1>
+  <div class="header-actions mt-0">
+      <button class="btn--action" *ngxPermissionsOnly="[vehicle[0]]" [routerLink]="[prefixUrl+'/onboarding/vehicle/tyremaster/edit', tyreMasterData.id]">
+          <i class="material-icons">edit</i>
+      </button>
+
+  </div>
+</div>
+<div class="invoice-list-view">
+  <div class="form-layout w-100" id="content" #content *ngIf="tyreMasterData">
+    <div class="table-wrapper table--nobg tcol-3">
+        <table class="table-container bill">
+            <thead>
+                <tr>
+                    <th colspan="3" class="text-uppercase text-center bill__title">
+                        TYRE <span class="title_to_change">MASTER</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">
+                        <div class="bill-info-wrap">
+                            <span class="bill-info-label">Vehicle Make: </span>
+                            <span class="bill-info-value">{{tyreMasterData?.vehicle_make?.make_name }}</span>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <div class="bill-info-wrap">
+                            <span class="bill-info-label">Vehicle Model: </span>
+                            <span class="bill-info-value">{{tyreMasterData?.vehicle_model?.model_name}}</span>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <div class="bill-info-wrap">
+                            <span class="bill-info-label">No .of Tyres:</span>
+                            <span class="bill-info-value">{{tyreMasterData?.tyre_count}}</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="text-center"><img [src]="displayTyreImage(tyreMasterData.tyre_count)"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+  </div>
+</div>

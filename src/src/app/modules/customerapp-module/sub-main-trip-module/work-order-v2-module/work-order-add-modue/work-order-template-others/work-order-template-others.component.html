@@ -1,0 +1,148 @@
+<div>
+    <form [formGroup]="addWorkOrder">
+        <div>
+          <div class="p-4 pt-0">
+            <div class="row tabIndexActiveFields mx-0">
+              <div class="col-xl-3 col-lg-3 col-md-3 col-6 route-input-box">
+                <div class="input-wrap error dropdownArrow mb-0"
+                  [ngClass]="addErrorClass(addWorkOrder.controls.route_code)">
+                  <label for="" class="input">Route</label>
+                  <app-tool-tip class="tool-tip-position route-tool-tip-position"
+                    [totalSlides]="routeToolTip.content.length" position="right"
+                    [toolTipContent]="routeToolTip"></app-tool-tip>
+                  <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialDetails.route_code">
+                    <select #customSelect formControlName="route_code" class="no-style select--modify"
+                      (change)="routeSelected()">
+                      <option *ngFor="let option of routeCodeList" value="{{ option?.name }}">
+                        {{ option?.name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                  <app-error [controlName]="addWorkOrder.controls.route_code"></app-error>
+                </div>
+              </div>
+            </div>
+          </div>
+          <app-multiple-destination [parentForm]="addWorkOrder" [contactPersonList]="contactPersonList" [isShowTime]="false"
+            [ismultipleDestinationFormValid]="ismultipleDestinationFormValid" [routeId]="routeId"
+            [routeDestinations]="routeDestinations"
+            [customerId]="customerId"></app-multiple-destination>
+          <div class="gb-tab-wrapper">
+            <app-tool-tip class="work-order-custom-field-tooltip" [totalSlides]="customfield_Info.content.length"
+            position="right" [toolTipContent]="customfield_Info"></app-tool-tip>
+            <mat-tab-group mat-stretch-tabs="false" class="mat-group" animationDuration="0ms" mat-align-tabs="start">
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <span [ngClass]="{ tabError:isFreightTabError}">Customer Freight</span>
+                </ng-template>
+                <app-billing-types [parentForm]="addWorkOrder" [billingTypeList]="billingTypeList" [isDisableBillingTypes]="isDisableBillingTypes"
+                  [workOrderClientFrightData]="workOrderClientFrightData" [isMandatory]="true"   [isAllMandatory]="true"[showUnitsAndRateFields]="true"
+                  [defaultBillingType]="defaultBillingType" [isFormValid]="isFormValidclientFright"
+                  ></app-billing-types>
+                  <app-add-edit-material-info-section [editDetails]="materialFreightEditDetails" [parentForm]="addWorkOrder"
+                  [isSubFormValid]="isFormValidclientFright"></app-add-edit-material-info-section>
+              </mat-tab>
+              <mat-tab>
+                <ng-template mat-tab-label>
+                    <span [ngClass]="{tabError:isAddChargesTabError  }">Additional Charges</span>
+                </ng-template>
+                <div class="p-4">
+                    <div class="mb-3">
+                        <button class="btn btn--primary ms-auto w-auto" (click)="addCharges()">+ Add Additional
+                            charge</button>
+
+                    </div>
+                    <div class="addable-row-table " formArrayName="additional_charge">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>
+                                        Additional Charge
+                                    </th>
+                                    <th *ngIf="isTax">Tax</th>
+                                    <th>Unit Of Measurement </th>
+                                    <th>No. Of Units </th>
+                                    <th>Unit Cost   ({{ currency_type?.symbol}})</th>
+                                    <th>Total Amount   ({{ currency_type?.symbol}})</th>
+
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <tr class="border-0" *ngIf="this.addWorkOrder.controls['additional_charge']['controls'].length==0">
+                                    <td class="bg-white" colspan="30">
+                                      <div class="no-list-data-wrap">
+                                        <figure>
+                                          <img src="assets/img/no-content.png" alt="">
+                                        </figure>
+                                        <h5 class="mt-3 primary-brand-text">No additional charges added!</h5>
+                                      </div>
+                                    </td>
+                                </tr>
+                                <tr *ngFor="let control of this.addWorkOrder.controls['additional_charge']['controls'];let i = index"
+                                    [formGroupName]="i">
+                                    <td class="ps-4"> <mat-checkbox formControlName="is_checked" (change)="onChangeAdditionalChargeCheckBox(control)"
+                                            color="primary"></mat-checkbox></td>
+                                    <td>{{control.get('name').value?.['name']}}</td>
+                                    <td  *ngIf="isTax" [ngClass]="{'invalid-input':control.get('tax').invalid && control.get('tax').touched ,'disable':!control.get('is_checked').value}">
+                                        <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="initialDetails.additionalTax[i]" [disabled]="!control.get('is_checked').value">
+                                            <select #customSelect name="" class="no-style select--modify error-box" formControlName="tax" (change)="onCalculationChange()">
+                                            <option *ngFor="let option of taxOptions"
+                                                value="{{ option.id }}">{{
+                                                option.label }}</option>
+                                            </select>
+                                          </material-dropdown>
+                                    </td>
+                                    <td [ngClass]="{'invalid-input':control.get('unit_of_measurement').invalid && control.get('unit_of_measurement').touched ,'disable':!control.get('is_checked').value}">
+                                        <material-dropdown [disabled]="!control.get('is_checked').value" [searchable]="true" [selectedOption]="initialDetails.unit[i]">
+                                            <select #customSelect formControlName="unit_of_measurement">
+                                                <option *ngFor="let option of unitOfMeasurementList" [ngValue]="option">
+                                                    {{ option?.label }}
+                                                </option>
+                                            </select>
+                                        </material-dropdown>
+                                    </td>
+                                    <td [ngClass]="{'invalid-input':control.get('quantity').invalid && control.get('quantity').touched ,'disable':!control.get('is_checked').value}">
+                                        <div>
+                                            <input type="text" [readonly]="!control.get('is_checked').value" [ngClass]="{'disable':!control.get('is_checked').value}" positiveThreeDigitDecimalNumber formControlName="quantity" class="error-box"
+                                                placeholder="Eg.: 1234567" value="0" (change)="onCalculationChange()" >
+                                        </div>
+                                    </td>
+
+                                    <td [ngClass]="{'invalid-input':control.get('unit_cost').invalid && control.get('unit_cost').touched ,'disable':!control.get('is_checked').value}">
+                                        <div>
+                                            <input [ngClass]="{'disable':!control.get('is_checked').value}" [readonly]="!control.get('is_checked').value" type="text" positiveThreeDigitDecimalNumber formControlName="unit_cost" class="error-box"
+                                                placeholder="Eg.: 1234567" value="0" (change)="onCalculationChange()">
+                                        </div>
+                                    </td>
+                                    <td [ngClass]="{'disable':!control.get('is_checked').value}">
+                                        <div>
+                                            <input [ngClass]="{'disable':!control.get('is_checked').value}" type="text" positiveThreeDigitDecimalNumber formControlName="total" class="error-box"
+                                                placeholder="Eg.: 1234567" readonly>
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </mat-tab>
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <span [ngClass]="{ tabError:iscustomFieldTabError }">Custom Field </span>
+                </ng-template>
+                <app-custom-field [isTrip]="false" [editData]="customFieldData" [parentForm]="addWorkOrder"
+                  [isFormValid]="isFormValidCustomField"></app-custom-field>
+              </mat-tab>
+            </mat-tab-group>
+          </div>
+          
+        </div>
+      </form>
+</div>
+ 
+  

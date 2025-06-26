@@ -1,0 +1,50 @@
+.showInvalid {
+  border: 1px solid red !important;
+}
+
+.form-layout__card {
+  overflow: hidden;
+}
+
+.table-wrapper {
+  overflow: hidden;
+}
+
+.table-wrapper.table--bd {
+  border: 0;
+}
+
+.driver-name-td {
+  position: relative;
+}
+
+.driver-occupation {
+  position: absolute;
+  bottom: -3px;
+  right: 7px;
+  color: #595fab;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.table-wrapper th {
+  font-size: 13px;
+  color: #676A6E;
+}
+
+::ng-deep {
+  .driver-allowance-section {
+    .table-wrapper tbody .input-wrap {
+      margin-right: 0px !important;
+    }
+
+    .table-wrapper th {
+      padding-top: 20px;
+      padding-bottom: 4px;
+    }
+
+    .table-wrapper tbody td {
+      padding-top: 4px;
+    }
+  }
+}

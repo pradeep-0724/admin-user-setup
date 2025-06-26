@@ -1,0 +1,23 @@
+<form [formGroup]="revenuePaymentForm">
+  <div class="row tabIndexActiveFields">
+    <div class="col-lg-3 col-sm-6">
+      <div class="input-wrap">
+         <label for="">Tax Deducted?</label>
+         <label for="check" class="check-box">
+             <input type="checkbox" id="check" formControlName="is_tax_deducted" (change)="taxCheck();">
+             <span class="check-mark"></span>
+             <span class="label-text">Yes, Customer has deducted tax.</span>
+         </label>
+     </div>
+ </div>
+ <div class="col-lg-3 col-sm-6">
+     <div class="input-wrap error" [class.disabled]="deductAmountDisabled" [ngClass]="addErrorClass(revenuePaymentForm.controls.deduction_amount)">
+         <label for="" class="input--required">Deduction Amount ({{ currency_type?.symbol}})</label>
+         <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd rupee-bg"  placeholder="2000"
+             formControlName="deduction_amount"  [attr.disabled]="deductAmountDisabled ? '' : null">
+         <span class="border-anim"></span>
+         <app-error [controlName]="revenuePaymentForm.controls.deduction_amount"></app-error>
+     </div>
+ </div>
+  </div>
+</form>

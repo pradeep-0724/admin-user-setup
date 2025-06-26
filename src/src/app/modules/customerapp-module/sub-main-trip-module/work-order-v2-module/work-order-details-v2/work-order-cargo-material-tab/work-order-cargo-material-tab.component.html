@@ -1,0 +1,57 @@
+<div >
+    <div >
+      <div >
+        <div class="custom-table-container mt-2" >
+          <table>
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>Unit</th>
+                <th>No. of Items
+                </th>
+                <th>Weight/item
+                </th>
+                <th>Volume/Item (LENGTH x WIDTH x HEIGHT)</th>
+                <th>Total Quantity</th>
+              </tr>
+            </thead>
+            <tbody *ngIf="materials.length==0">
+              <tr class="border-0">
+                <td colspan="30" class="bg-white">
+                  <div class="no-list-data-wrap">
+                    <figure>
+                      <img src="assets/img/no-content.png" alt="" />
+                    </figure>
+                    <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tbody>
+                <tr *ngFor="let m of materials">
+                    <td>
+                        {{m?.material?.name ? m?.material?.name : '-'}}
+                    </td>
+                    <td>{{m?.unit?.label ? m?.unit?.label : '-'}}</td>
+                    <td>{{m?.no_of_items ? m?.no_of_items : '-'}}</td>
+                    <td>{{m?.weight_per_item ? m?.weight_per_item : '-'}} {{m?.weight_unit ? m?.weight_unit?.label : ''}}</td>
+                    <td style="padding-top: 0px !important;padding-bottom: 0px !important;"><div class="d-flex align-items-center lbh-wrap py-2">
+                        <div class="lbh-box">{{m?.length ? m?.length : '-'}}</div>
+                        <span  class="material-icons"> close </span>
+                        <div class="lbh-box">{{m?.breadth ? m?.breadth :'-'}}</div>
+                        <span  class="material-icons"> close </span>
+                        <div class="lbh-box">{{m?.height ? m?.height : '-'}}</div>
+                        <span class="ms-2">{{m?.volume_unit ? m?.volume_unit?.label : ''}}</span>
+                      </div></td>
+                    <td>{{m?.total_quantity ? m?.total_quantity : '-'}}</td>
+                </tr>
+
+            </tbody>
+           
+          </table>
+        </div>
+      </div>
+    </div>
+   
+  </div>
+ 

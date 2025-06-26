@@ -1,0 +1,62 @@
+
+
+  <div >
+    <div class="px-4 py-3">
+      <button class="btn btn--primary ms-auto w-auto" [routerLink]="['add-role']">
+        + Add Role
+      </button>
+    </div>
+  
+    <div class="addable-row-table addable-row-table-display mx-2 mb-2">
+      <table>
+        <thead>
+          <tr>
+            <th>Role Name</th>
+            <th class="border-end-0">Description</th>
+            <th class="border-start-0"></th>
+          </tr>
+        </thead>
+        <tbody *ngIf="roleList.length == 0">
+          <tr class="border-0">
+            <td class="bg-white" colspan="30">
+              <div class="no-list-data-wrap my-5">
+                <figure>
+                  <img src="assets/img/no-content.png" alt="" />
+                </figure>
+                <h5 class="mt-3 primary-brand-text">No data found!</h5>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tbody>
+          <tr *ngFor="let role of roleList; let i = index">
+            <td style="width: 40%;">{{role?.name}}</td>
+                <td class="border-end-0 ">{{role?.description}}</td>
+            <td class="border-start-0 ">
+              <div class="d-flex align-items-center justify-content-end" >
+           
+              <span matTooltipPosition="above" matTooltipClass="mat-normal-tooltip" matTooltip="Edit"  class="gb-btn-hover me-2 cursor-pointer" [routerLink]="['edit-role/'+role?.id]"
+                  ><i class="material-icons def-color fs-5">edit</i></span
+                >
+
+                <span matTooltipPosition="above" matTooltipClass="mat-normal-tooltip" matTooltip="Clone"  class="gb-btn-hover me-2 cursor-pointer" (click)="cloneRole(role?.id)" 
+                  ><i class="material-icons sky-blue-text fs-5">file_copy</i></span
+                >
+          
+  
+            
+             
+              <span class="gb-btn-hover me-2 cursor-pointer"matTooltipPosition="above" matTooltipClass="mat-normal-tooltip" matTooltip="Delete"  (click)="popupFunction(role?.id,i)"
+              ><i class="material-icons text-danger fs-5">delete</i></span
+            >
+           
+              </div>
+            </td>
+            
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>
+

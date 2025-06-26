@@ -1,0 +1,117 @@
+<div>
+  <div class="d-flex justify-content-between align-items-center px-3 pt-2">
+    <p class="def-color fs-5 fw-semibold">EMPLOYEE SALARY</p>
+    <div class="d-flex align-items-center">
+      <button class="btn--action " *ngxPermissionsOnly="employeePermission[1]" [routerLink]="[prefixUrl+'/expense/salary_expense/edit', employeeSalaryDetails?.id]">
+        <i class="material-icons">edit</i>
+    </button>
+      <button class="btn--action mg-left-10 " (click)="openDetails()" *ngIf="routeToDetail"><i class="material-icons">close</i></button>
+    </div>
+  </div>
+  <div class="rectangle pb-5 pt-20">
+      <p class="heading mt-3 mb-1">Employee Salary</p>
+      <div class="container">
+      <div class="employee_section">
+        <div class="row mx-0">
+          <div class="col-md-3">
+            <p>Date:<span>{{employeeSalaryDetails?.date}}</span> </p>
+          </div>
+          <div class="col-md-3">
+            <p>Salary Month: <span>{{employeeSalaryDetails?.salary_year_month}}</span> </p>
+
+          </div>
+          <div class="col-md-3">
+            <p>Allowance Month:<span>{{employeeSalaryDetails?.allowance_year_month}}</span> </p>
+          </div>
+          <div class="col-md-3">
+            <p>Reference No: <span>{{employeeSalaryDetails?.reference_no}}</span> </p>
+
+          </div>
+          <div class="col-md-3">
+            <p>Payment Mode:<span>{{employeeSalaryDetails?.payment_mode?.name}}</span> </p>
+
+          </div>
+          <div class="col-md-3">
+            <p>Transaction Date: <span>{{employeeSalaryDetails?.transaction_date}}</span></p>
+          </div>
+          <div class="col-md-3">
+            <p>Employee Name: <span>{{employeeSalaryDetails?.employee?.display_name}}</span> </p>
+          </div>
+        </div>
+
+      </div>
+      </div>
+  <div class="container">
+  <div  class="accounting-details">
+    <p >Salary Details</p>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+       <th>Employee Name</th>
+       <th>Present</th>
+       <th>Absent</th>
+       <th>Trips</th>
+       <th>Salary  ({{ currency_type?.symbol}})</th>
+       <th>Allowance  ({{ currency_type?.symbol}})</th>
+       <th>Total ({{ currency_type?.symbol}})</th>
+        </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of employeeSalaryDetails?.salary">
+        <td>{{item?.employee.display_name}}</td>
+        <td>
+         {{item.present}}
+        </td>
+        <td>{{item.absent}}</td>
+        <td>{{item.trips}}</td>
+        <td>
+           {{item.salary_paid | numberFormat}}
+        </td>
+        <td>{{item.allowance_paid | numberFormat}}</td>
+        <td>{{item.total | numberFormat}}</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="container">
+    <div  class="accounting-details">
+      <p >Others Details</p>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+         <th>Employee Name</th>
+         <th>Expense Type</th>
+         <th>Amount Paid ({{ currency_type?.symbol}})</th>
+         <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of employeeSalaryDetails?.other">
+          <td>{{item?.employee?.display_name}}</td>
+          <td>
+            {{item?.expense_type?.name}}
+          </td>
+          <td>{{item.amount_paid | numberFormat}}</td>
+          <td>{{item?.description}}</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+   <hr>
+   <div class="container">
+     <p class="heading">Remarks</p>
+     <div class="last-section">
+       <p>Comment</p>
+       <p >Reminder Date: :{{employeeSalaryDetails?.reminder}}</p>
+     </div>
+     <p class="additional-note">Additional Notes: <span>{{employeeSalaryDetails?.comments}} </span> </p>
+    </div>
+   </div>
+</div>
+
+
+
+
+

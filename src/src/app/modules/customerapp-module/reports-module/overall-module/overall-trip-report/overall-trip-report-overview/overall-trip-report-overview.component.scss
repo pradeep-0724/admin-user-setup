@@ -1,0 +1,10 @@
+@import "../../../../../../../assets/styles/repeated/cost-card";
+@import "../../../../../../../assets/styles/helpers/variable";
+.card-shadow {
+    box-shadow: 0 0 6px #00000029;
+}
+:host ::ng-deep{
+     .trip-list-map-icon{
+      width: 15px;
+    }
+  }

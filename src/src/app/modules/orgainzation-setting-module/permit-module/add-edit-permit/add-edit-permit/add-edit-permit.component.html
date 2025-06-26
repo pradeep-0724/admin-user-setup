@@ -1,0 +1,213 @@
+
+<div class="def-color add-screen-wrap">
+    <div class="px-4 py-3">
+        <h6 class="fs-6 ">{{permitId ? 'Edit' :'Add'}}  Permit &nbsp;</h6>
+    </div>
+    <div class="shadow-inset-top-lg">
+
+
+        <form [formGroup]="permitForm">
+            <div>
+                <div class="row pt-4  mx-0 px-3">
+                <div class="col-md-3">
+                    <div class="input-wrap error " [ngClass]="addErrorClass(permitForm.controls.name)">
+                        <label for="" class="input input--required"> Permit Name</label>
+                        <input appUpperCase type="text" class="no-style input--bd" placeholder="123456" value=""
+                            formControlName="name">
+                        <app-error [controlName]="permitForm.controls.name"></app-error>
+                        <p class="error-reg" *ngIf="uniquePermitErr">{{uniquePermitErr}}</p>
+                    </div>
+                </div>
+                <div class="col-md-3 m-3">
+                    <div class=" fw-semibold  ">
+                        <mat-checkbox color="primary" formControlName="expiry_date_mandatory">Make Expiry Date
+                            Mandatory</mat-checkbox>
+                    </div>
+                </div>
+            </div>
+                <div class="fake-tab-bar d-flex align-items-center" id="fake-tab-bar-scroll">
+                    <div *ngFor="let permit of permitForm.get('states')['controls']; let i = index" (click)="tabChanged(i)"  [ngClass]="{ 'active': activeTab == i ,'tab-invalid': !permit.valid && permit.touched}"
+                    >State {{i+1}}  <button class="remove-permit-btn gb-btn-hover" *ngIf="i!=0" (click)="removeState(i)">✖</button></div>
+                    <button (click)="addMoreState()" class="add-permit-btn" matRipple><span class="material-icons">
+                        add
+                        </span></button>
+                </div>
+                <div formArrayName="states">
+                    <ng-container *ngFor="let control of permitForm.get('states')['controls']; let i = index">
+                        <div [formGroupName]="i" class="row mx-0" *ngIf="i==activeTab">
+                            <div class="col-lg-6 mx-0 px-0 border-end">
+                                <div class="row mx-0 pt-4 ps-3 pe-3">
+                                <div class="col-xl-6 col-lg-6 col-sm-6">
+                                    <div class="input-wrap max-height-150 error"
+                                        [ngClass]="addErrorClass(control.get('country'))">
+                                        <label for="" class="input--required">Country</label>
+                                        <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                                            [selectedOption]="{label:control.get('country').value,value:''}">
+                                            <select #customSelect formControlName="country"
+                                                class="no-style select--modify" (change)="countryChange()">
+                                                <option *ngFor="let option of countriesList" value="{{ option?.name }}">
+                                                    {{ option?.name }}
+                                                </option>
+                                            </select>
+                                        </material-dropdown>
+                                        <app-error [controlName]="control.get('country')">
+                                        </app-error>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-sm-6">
+                                    <div class="input-wrap max-height-150 error"
+                                        [ngClass]="addErrorClass(control['controls'].state)">
+                                        <label for="" class="input--required">State</label>
+                                        <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                                            [selectedOption]="{label:control.controls.state.value,value:''}">
+                                            <select #customSelect formControlName="state" (change)="stateSelected()"
+                                                class="no-style select--modify">
+                                                <option *ngFor="let option of statesList" value="{{ option?.name }}">
+                                                    {{ option?.name }}
+                                                </option>
+                                            </select>
+                                        </material-dropdown>
+                                        <app-error [controlName]="control['controls'].state"></app-error>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-sm-6">
+                                    <div class="input-wrap max-height-150 ">
+                                        <label for="" class="input--required">Coverage Area </label>
+                                        <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                                            [selectedOption]="initialDetails.areaSelection[i]">
+                                            <select #customSelect formControlName="area" (change)="coverageAreaSelected()"
+                                                class="no-style select--modify">
+                                                <option *ngFor="let option of areaCoverage" value="{{ option?.value }}">
+                                                    {{ option?.label }}
+                                                </option>
+                                            </select>
+                                        </material-dropdown>
+                                        <app-error [controlName]="control['controls'].area"></app-error>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-6 col-lg-6 col-sm-6" [ngClass]="{'disable' : control['controls'].area.value ==0}">
+                                    <div matAutocompleteOrigin #origin="matAutocompleteOrigin"
+                                        class="material-wrap input-wrap mb-0 min-height-wrap">
+                                        <!-- <button class="add-location gb-btn gb-btn-green"
+                                            *ngIf="control.controls.searchLocation.value"
+                                            (click)="addLocationWithoutLatLng()">+
+                                            Add</button> -->
+
+                                        <label for="" class="input">Area</label>
+                                        <div [formGroup]="permitForm">
+                                            <input  type="text" matInput formControlName="searchLocation"
+                                            placeholder="Select Area" class="no-style input--bd location-input"
+                                            [matAutocomplete]="auto" (focus)="openResentList()"/>
+                                        </div>
+                                       
+                                        <p class="error-reg" *ngIf="minLocationSelectedErr">{{minLocationSelectedErr}}
+                                        </p>
+                                    </div>
+                                    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="optionSelected()">
+                                        <ng-container *ngIf="newLocations.length > 0 && !isSelected">
+                                            <mat-option class="drop-down" *ngFor="let option of newLocations"
+                                                [value]="option.name">
+                                                {{ option.name }}
+                                            </mat-option>
+                                        </ng-container>
+                                    </mat-autocomplete>
+                                </div>
+                            </div>
+
+                                <div class="fake-tab-bar px-0"><div class="bg-white">Selected Area</div></div>
+                                <div class="row mx-0 ">
+                                    <ng-container
+                                        *ngFor="let control of permitForm.controls.states['controls']; let i = index">
+                                        <div class=" px-0" *ngIf="i==activeTab">
+                                            <div *ngIf="control.get('locations').value.length==0"
+                                                class="h-100 p-3 d-flex align-items-center justify-content-center flex-column no-location-selected ">
+                                                <span class="material-icons ">
+                                                    location_on
+                                                </span>
+                                                <p class="mt-4 fs-6 fw-semibold">No Area Added</p>
+                                            </div>
+
+                                            <div *ngIf="control.get('locations').value.length" id="locations-table"
+                                                class="custom-table-container">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="pt-4">No.</th>
+                                                            <th class="pt-4">Area</th>
+                                                            <th class="icon-box pt-4"></th>
+                                                            <th class="icon-box pt-4"></th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr *ngFor="let location of control.get('locations').value; let i= index"
+                                                            class="bg-white">
+                                                            <td>{{i+1}}</td>
+                                                            <td class="line-height-normal">{{location?.name}}</td>
+                                                            <td class="icon-box text-center">
+                                                                <img class="cursor-pointer "
+                                                                    [ngClass]=" location.locations?'gb-btn-hover':''"
+                                                                    style="width: 15px;min-width: 15px;"
+                                                                    (click)="zoomTo(location.locations)" alt=""
+                                                                    [src]="location.locations.length?googleMaps:googleMapsGray"
+                                                                    matTooltip=" This location doesn't have any coordinates ."
+                                                                    [matTooltipDisabled]="location.locations.length>0"
+                                                                    matTooltipClass="material-toltip-class"
+                                                                    [matTooltipPosition]="'above'" />
+                                                            </td>
+                                                            <td class="icon-box">
+                                                                <div
+                                                                    class="d-flex justify-content-center align-items-center">
+                                                                    <button class="gb-btn-hover"
+                                                                        (click)="removeLocation(i) "><i
+                                                                            class="material-icons text-danger">delete</i></button>
+                                                                </div>
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-6 p-2">
+                                <google-map height="100%" width="100%" *ngIf="zoom" [zoom]="zoom" [center]="center">
+                                        <ng-container  *ngFor="let control of permitForm.controls.states['controls']; let i = index">
+                                            <ng-container *ngIf="i==activeTab">
+                                                <ng-container *ngFor="let location of control.get('locations').value">
+                                                    <ng-container *ngFor="let paths of location.locations">
+                                                    <map-polygon [options]="location.polygonOptions" [paths]="paths" ></map-polygon>
+                                                    </ng-container>
+                                                </ng-container>
+                                            </ng-container>
+                                        </ng-container>
+                                </google-map>
+                            </div>
+                        </div>
+
+                    </ng-container>
+                </div>
+
+            </div>
+
+
+        </form>
+
+
+
+
+
+    </div>
+
+
+</div>
+<div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end calc-height">
+    <button class="btn btn--sm me-2" (click)="cancel()" type="submit">Cancel</button>
+    <button class="btn btn--primary btn--sm" (click)="submitForm()" type="submit">{{permitId ? 'Update'
+        :'Save'}}</button>
+</div>
+
+

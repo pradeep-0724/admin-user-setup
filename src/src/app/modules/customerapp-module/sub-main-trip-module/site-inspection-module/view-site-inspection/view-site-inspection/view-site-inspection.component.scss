@@ -1,0 +1,76 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+.right-section__header {
+    padding: 6px 20px;
+}
+
+b {
+    margin-right: 8px;
+}
+
+
+
+
+
+.trip-id {
+    margin-right: 14px;
+    color: $primary-brand-color;
+    font-weight: 600;
+    font-size: 15px;
+
+    button {
+        box-sizing: border-box;
+        padding: 7px;
+        border-radius: 7px;
+        border: 1px dotted transparent;
+        margin-right: 10px;
+
+        &:hover {
+            border-color: gainsboro;
+        }
+
+        .bi-chevron-left {
+            -webkit-text-stroke: 1px;
+            color: black;
+            font-size: 15px;
+        }
+    }
+}
+
+.trip-id+p {
+
+    padding-left: 14px;
+    font-weight: 600;
+    color: $green;
+    border-left: 2px solid gainsboro;
+    font-size: 15px;
+
+}
+.status-icon{
+    img{
+        max-width: 40px;
+    }
+}
+
+.attech-img-wrap{
+    border-bottom: 1.5px dashed $border-color;
+  }
+
+  .mh-450px{
+
+    min-height: 500px;
+    overflow: auto;
+  }
+  .upload-menu-wrapper .upload-menu__item.active{
+    position: static;
+  }
+  .upload-menu-wrapper {
+    background-color: transparent;
+
+  }
+
+  .details-wrap{
+    span{
+        line-height: normal;
+    }
+  }

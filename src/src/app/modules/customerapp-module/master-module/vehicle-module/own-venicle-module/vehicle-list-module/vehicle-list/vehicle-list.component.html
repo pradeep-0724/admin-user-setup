@@ -1,0 +1,118 @@
+<div class="calc-height">
+<div class="form-layout">
+  <div class="info-msg" *ngIf="!canCreateVehicle">
+    <p class="message-cont">Please Note: The Maximum Vehicle Limit ({{registeredVehicles}}) has been reached for the tenant. Please delete any unused  vehicles or 
+    contact the team to increase the limit.</p>
+  </div>
+</div>
+    <app-list-widget [tabSelectionList]="tabSelectionList" [isDateDropDown]="false" [isFilter]="true" [isExport]="true"   [isSettings]="true"     [settingsUrl]="settingsUrl"
+      (listWidgetData)="listWidgetData($event)" [isDropDown]="true" [buttonData]="buttonData" [isAddButton]="true"
+      [filterUrl]="filterUrl" (exportList)="exportList($event)"  (settingsApplied)="settingsApplied($event)">
+      <div class="video-button me-3" id="custom-button-left">
+        <button class="gb-video-play float-right" (click)="openGothrough()">
+          <i class="bi bi-play-circle-fill"></i>
+        </button>
+        <app-go-through [goThroughDetais]="goThroughDetais"></app-go-through>
+      </div>
+    </app-list-widget>
+  </div>
+
+  <ng-template #actionsTemplate let-vehicle let-index="i">
+    
+      <button class=" p-0 material-icons more-icon" *ngxPermissionsOnly="[vehiclePer[1],vehiclePer[2]]"
+        (click)="optionsList($event, 'list_'+vehicle.id)">more_vert</button>
+      <div class="more-actions__menu table-popup" [ngClass]="{show: showOptions === 'list_'+vehicle.id}">
+        <ng-container *ngxPermissionsOnly="vehiclePer[1]">
+          <button *ngIf=" !vehicle.is_archived_status " class="more-actions__item w-100"
+            (click)="editVehicle(vehicle.id)"><i class="material-icons">edit</i>Edit</button>
+        </ng-container>
+        <ng-container *ngxPermissionsOnly="vehiclePer[2]">
+          <button *ngIf=" !vehicle.is_archived_status " class="more-actions__item w-100"
+            (click)="popupFunction(vehicle, i)"><i class="material-icons">delete</i>Mark Inactive</button>
+        </ng-container>
+     
+        <ng-container>
+          <button class="more-actions__item w-100 py-0" *ngIf="vehicle.is_archived_status && canCreateVehicle"
+            (click)="activateVehicle(vehicle)"><i class="material-icons"><span
+                class="material-icons-outlined">
+                autorenew
+              </span></i>Activate</button>
+        </ng-container>
+
+      </div>
+  </ng-template>
+
+
+  <div class="custom-table-container " id="own-vehicle-list" (scroll)="onScroll($event)">
+    <table [ngClass]="{'h-100':vehicleList.length==0}">
+
+      <thead>
+         <tr>
+   
+           <ng-container *ngFor="let heading of vehicleListHeader">
+             <th> {{heading}} </th>
+           </ng-container>
+           <th class="icon-box"></th>
+         </tr>
+       </thead>
+       <tbody *ngIf="vehicleList.length == 0">
+         <tr class="border-0">
+           <td class="bg-white" colspan="30">
+             <div class="no-list-data-wrap">
+               <figure>
+                 <img src="assets/img/no-content.png" alt="">
+               </figure>
+               <h5 class="mt-3 primary-brand-text">No data found!</h5>
+             </div>
+           </td>
+         </tr>
+   
+       </tbody> 
+     <tbody>
+         <tr *ngFor="let veh of vehicleList; trackBy: trackById ;">
+           <ng-container *ngFor="let item of veh['extras'];let i =index">
+             <td class="ws-nowrap" *ngIf="item?.name !='Display No' && item?.name !='Operator'"> {{item?.value ? item?.value : '-'}} </td>
+             <ng-container *ngIf="item?.name=='Display No'">
+               <td >
+                <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/vehicle/own/details',veh.id]"  [queryParams]="{fromlist: 'own'}"> {{item.value}} </a>
+               </td>
+             </ng-container>
+             <ng-container *ngIf="item?.name=='Operator'">
+              <td *ngIf="item?.value?.length==0">-</td>
+              <td *ngIf="item?.value.length>0" class="td-2l">
+                <div class="text-2l">
+                <ng-container *ngFor="let emp of item?.value; let last = last">    
+                  <a class="py-0 custom-link " target="_blank"  [routerLink]="[prefixUrl+'/onboarding/employee/view/',emp.id]"> {{ emp?.display_name}} <span *ngIf="!last">,</span>
+                  </a>
+                </ng-container>
+              </div>
+              </td>
+            </ng-container>
+           </ng-container>
+           <td class="icon-box  tabIndexActive"  >
+            <div class="d-flex justify-content-center align-items-center" >
+                <div class="position-relative">
+                  <ng-container>
+                    <ng-container *ngIf="canCreateVehicle" >
+                      <ng-container *ngTemplateOutlet="actionsTemplate; context: { $implicit: veh,i }"></ng-container>
+                     </ng-container>
+                     <ng-container *ngIf="!canCreateVehicle && !veh.is_archived_status" >
+                      <ng-container *ngTemplateOutlet="actionsTemplate; context: { $implicit: veh,i }"></ng-container>
+                     </ng-container>
+      
+                  </ng-container>
+              </div>
+                </div>
+            
+
+        </td>
+
+
+         </tr>
+     </tbody>
+ </table>
+</div>
+
+
+
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

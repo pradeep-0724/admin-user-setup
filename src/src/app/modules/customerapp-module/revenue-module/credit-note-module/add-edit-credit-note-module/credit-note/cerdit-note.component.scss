@@ -1,0 +1,34 @@
+
+.section-footer .more-actions__menu{
+    width: 100%;
+    top: 45px;
+    left: initial;
+    right: 0;
+}
+.btn--save-credit{
+    white-space: nowrap;
+}
+.disableInput{
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.gst{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .hiddenContent{
+    display: none !important;
+  }
+  .alert-msg{
+      padding-bottom: 10px;
+  }
+  .error-msg-list{
+    padding-bottom: 10px;
+  }
+
+  .balance-block{
+    border-left: 1px solid #eaeaea;
+  }

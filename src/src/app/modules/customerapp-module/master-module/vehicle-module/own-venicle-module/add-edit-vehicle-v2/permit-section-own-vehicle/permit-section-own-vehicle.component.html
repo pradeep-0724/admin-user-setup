@@ -1,0 +1,117 @@
+
+<form [formGroup]="vehicleDetailsForm">
+    <div class="container-fluid">
+        <div class="border-0" *ngIf="vehiclePermitList.length==0">
+            <div class="bg-white" colspan="30">
+              <div class="no-list-data-wrap" *ngxPermissionsOnly="'super_user';else elseBlock">
+                <p>To configure a Permit, please click<a class="cursor-pointer text-primary"
+                  target="_blank"
+                  [href]="[prefixUrl+'/organization_setting/permit/add']"> Here</a></p>
+              </div>
+              <ng-template #elseBlock>
+                <div class="no-list-data-wrap" >
+                  <p >Please contact your Super Admin to configure Permits</p>
+                </div>
+              </ng-template>
+          </div>
+          </div>
+    <div class="row"  *ngIf="vehiclePermitList.length>0">
+        <div class="col-xl-3 col-lg-3 p-0">
+            <aside class="upload-menu-wrapper h-500px pb-2">
+                <nav class="upload-menu border-bottom-0">
+                    <ul>
+                        <li class="upload-menu__item d-flex justify-content-between align-items-center"
+                            *ngFor="let document of vehiclePermitList; let i = index;"
+                            [ngClass]="{'active': i==activeDoc,  'error':vehicleDetailsForm.controls.permits.controls[i].invalid && vehicleDetailsForm.controls.permits.controls[i].touched && isFormSubmitted}"
+                            (click)="changeDocument(i)">
+                            <a class="flex-grow-1" [id]="'permit-id'+document.name">{{ document.name }}</a>
+                        </li>
+                    </ul>
+                </nav>
+            </aside> 
+        </div>
+
+        <div class="col-lg-9 h-500px" formArrayName="permits">
+            <div  *ngFor="let document of vehiclePermitList; let i = index;" [formGroupName]="i"
+                [ngClass]="{'active': i==activeDoc}">
+                <div class="form-layout__card " [ngClass]="{'active': i==activeDoc}">
+                    <div class="form-body">
+
+                        <div class="px-3 py-4">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class=" col-lg-4 col-md-6">
+                                            <div class="input-wrap error"
+                                                [ngClass]="addErrorClass(vehicleDetailsForm.controls.permits.controls[i].controls.permit_id)">
+                                                <label for="" class="input">Permit ID </label>
+                                                <input  type="text" class="no-style input--bd" placeholder="AA00-1122"
+                                                    value="" formControlName="permit_id"  appUpperCase   (change)="onChangeNumber(vehicleDetailsForm.controls.permits.controls[i])">
+                                                <app-error
+                                                    [controlName]="vehicleDetailsForm.controls.permits.controls[i].controls.permit_id">
+                                                </app-error>
+                                            </div>
+                                        </div>
+                                        <div class=" col-lg-4 col-md-6">
+                                            <div class="input-wrap error error--type-1"
+                                                [ngClass]="addErrorClass(vehicleDetailsForm.controls.permits.controls[i].controls.date)">
+                                                <label for=""  [ngClass]="{'input--required':vehicleDetailsForm.controls.permits.controls[i].controls.expiry_date_mandatory.value && vehicleDetailsForm.controls.permits.controls[i].controls.permit_id.value}">Permit Expiry Date</label>
+                                                <mat-form-field class="width--100">
+                                                    <input matInput placeholder="DD/MM/YYYY" readonly
+                                                        [matDatepicker]="date" (focus)="date.open()"
+                                                        formControlName="date">
+                                                    <mat-datepicker-toggle matSuffix [for]="date">
+                                                    </mat-datepicker-toggle>
+                                                    <mat-datepicker #date startView="multi-year"></mat-datepicker>
+                                                </mat-form-field>
+                                                <app-error [controlName]="vehicleDetailsForm.controls.permits.controls[i].controls.date">
+                                                </app-error>
+                                            </div>
+                                        </div>
+                                        <div class=" col-lg-4 col-md-6">
+                                                <div class="input-wrap error"
+                                                    [ngClass]="addErrorClass(vehicleDetailsForm.controls.permits.controls[i].controls.permit_issuer)">
+                                                    <label for="" class="input">Permit Issuer</label>
+                                                    <material-dropdown [searchable]="true" [addBlank]="true" [addable]="true" [party]="true" 
+                                                    (addPartyPopup)="openAddPartyModal($event)" [params]="partyNamePopup" (addValueToList)="addValueToPartyPopup($event)"
+                                                    [selectedOption]="{label:vehicleDetailsForm.controls.permits.controls[i].controls.permit_issuer_label.value,value:''}"
+                                                        class="dropDownWidth">
+                                                        <select #customSelect formControlName="permit_issuer"
+                                                            class="no-style select--modify">
+                                                            <option *ngFor="let vendor of vendorList"
+                                                                value="{{ vendor.id }}">
+                                                                {{ vendor.party_display_name }}</option>
+                                                        </select>
+                                                    </material-dropdown>
+                                                    <app-error
+                                                        [controlName]="vehicleDetailsForm.controls.permits.controls[i].controls.permit_issuer"></app-error>
+                                                </div>
+                                            </div>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-4 pt-4 border-top">
+                                        
+                                            <file-uploader-v2 (onFileUploaded)="fileUploader($event,i)" [uploaderId]="'vehicle-document-'+i"
+                                            [isShowOnlyUpload]="false"></file-uploader-v2>
+                                     
+                                        <div  *ngFor="let document of vehicleDetailsForm.controls.permits.controls[i].controls.documents.value">
+                                            <app-file-delete-view [showInlineEdit]="false" [fileData]="document" 
+                                            (fileDeleted)="fileDeleted($event,i)"></app-file-delete-view>
+                                        </div>
+                                      
+                                    </div>
+                                </div>
+                             
+                                
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+    </div>
+    </div>
+</form>

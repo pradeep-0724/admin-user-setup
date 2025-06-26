@@ -1,0 +1,299 @@
+<ng-container *ngIf="showEndTripInputs">
+  <div class="alert-msg" *ngIf="tripForm.controls.error_message.value">
+    <span class="icon-wrap"></span>
+    <p class="message-cont">{{ tripForm.controls.error_message.value }}</p>
+  </div>
+</ng-container>
+
+
+
+<div style="margin: 30px 4%;">
+
+<div *ngIf="showClientFreights">
+
+  <!-- <div class="input-wrap">
+    <label *ngIf="!isTransporter" for="">Billing: Test</label>
+    <label *ngIf="isTransporter" for="">Client Billing: Test</label>
+    <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="selectedDropdown">
+      <select #customSelect class="no-style select--modify" (change)="billingDropDownChange($event)">
+        <option *ngFor="let option of dropdownType" value="{{ option?.value }}">
+          {{ option?.label }}
+        </option>
+      </select>
+    </material-dropdown>
+  </div> -->
+
+  <div class="input-wrap" [class.disabled]="isBillingTypeDisabled">
+  <div class="row col-xl-4 col-lg-4 col-md-5 col-sm-5 padding_left_0 row_margin_left_right">
+      <div class="row  row_margin_left_right tabIndexActive">
+      <div class="challan-header p-0">
+        <div class="input-group input-group-sm">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroup-sizing-sm" *ngIf="!isTransporter" for="">Billing:</span>
+              <span class="input-group-text" id="inputGroup-sizing-sm" *ngIf="isTransporter" for="">Client Billing:</span>
+            </div>
+        <material-dropdown [searchable]="true" [addable]="false"
+        [selectedOption]="selectedDropdown" class="form-control tabIndexActive"
+        aria-label="Small" aria-describedby="inputGroup-sizing-sm" [disabled]="isBillingTypeDisabled">
+          <select #customSelect class="no-style select--modify" (change)="billingDropDownChange($event)">
+            <option *ngFor="let option of dropdownType" value="{{ option?.value }}">
+              {{ option?.label }}
+            </option>
+          </select>
+        </material-dropdown>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div>
+    <app-trip-tonnes [isFormValid]="isFormValid" *ngIf="selectedDropdown?.name =='tonnes'" [isEdit]='true' [editData]="editFreightData" [storageRate]="storageRate"
+                     [materialOptionsList]="materialOptionsList" (dataFromBilling)="clientBilling($event)"
+                     [showUnloading]="showUnloading"></app-trip-tonnes>
+
+    <app-trip-kgs [isFormValid]="isFormValid" *ngIf="selectedDropdown?.name =='kgs'" [isEdit]='true' [editData]="editFreightData" [storageRate]="storageRate"
+                     [materialOptionsList]="materialOptionsList" (dataFromBilling)="clientBilling($event)"
+                     [showUnloading]="showUnloading"></app-trip-kgs>
+
+    <app-trip-kms [isFormValid]="isFormValid" *ngIf="selectedDropdown?.name =='kms'" [isEdit]='true' [editData]="editFreightData" [storageRate]="storageRate"
+                  [materialOptionsList]="materialOptionsList" (dataFromBilling)="clientBilling($event)"
+                  [showUnloading]="showUnloading"></app-trip-kms>
+    <app-trip-units [isFormValid]="isFormValid" *ngIf="selectedDropdown?.name =='units'" [isEdit]='true' [editData]="editFreightData" [storageRate]="storageRate"
+    [materialOptionsList]="materialOptionsList" (dataFromBilling)="clientBilling($event)"
+    [showUnloading]="showUnloading"></app-trip-units>
+
+    <app-trip-liters [isFormValid]="isFormValid" *ngIf="selectedDropdown?.name =='litres'" [isEdit]='true' [editData]="editFreightData" [storageRate]="storageRate"
+                    [materialOptionsList]="materialOptionsList" (dataFromBilling)="clientBilling($event)"
+                    [showUnloading]="showUnloading"></app-trip-liters>
+
+    <app-trip-hour [isFormValid]="isFormValid"  *ngIf="selectedDropdown?.name =='hour'" [isEdit]='true' [editData]="editFreightData" [storageRate]="storageRate"
+                    [materialOptionsList]="materialOptionsList" (dataFromBilling)="clientBilling($event)"
+                    [showUnloading]="showUnloading"></app-trip-hour>
+
+    <app-trip-days [isFormValid]="isFormValid" *ngIf="selectedDropdown?.name =='days'" [isEdit]='true' [editData]="editFreightData" [storageRate]="storageRate"
+                    [materialOptionsList]="materialOptionsList" (dataFromBilling)="clientBilling($event)"
+                    [showUnloading]="showUnloading"></app-trip-days>
+
+    <app-trip-fixed  *ngIf="selectedDropdown?.name =='jobs'" [isFormValid]="isFormValid" [isEdit]='true' [editData]="editFreightData"
+                    (dataFromBilling)="clientBilling($event)"
+                    [showUnloading]="showUnloading"></app-trip-fixed>
+
+    <app-trip-gallons [isFormValid]="isFormValid" *ngIf="selectedDropdown?.name =='gallon'" [isEdit]='true' [editData]="editFreightData" [storageRate]="storageRate"
+    [materialOptionsList]="materialOptionsList" (dataFromBilling)="clientBilling($event)"
+    [showUnloading]="showUnloading"></app-trip-gallons>
+  </div>
+</div>
+
+
+<div *ngIf="isTransporter && showVehicleFreights">
+  <!-- <div class="input-wrap">
+    <label for="">Vehicle Billing:</label>
+    <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="selectedVPDropdown">
+      <select #customSelect class="no-style select--modify" (change)="billingVPDropDownChange($event)">
+        <option *ngFor="let option of dropdownType" value="{{ option?.value }}">
+          {{ option?.label }}
+        </option>
+      </select>
+    </material-dropdown>
+  </div> -->
+
+
+  <div class="input-wrap">
+    <div class="row col-xl-4 col-lg-4 col-md-5 col-sm-5 padding_left_0 row_margin_left_right">
+
+        <div class="row row_margin_left_right tabIndexActive">
+        <div class="challan-header p-0">
+          <div class="input-group input-group-sm mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-sm" for="">Vehicle Billing:</span>
+
+              </div>
+          <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="selectedVPDropdown" class="tabIndexActive form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+            <select #customSelect class="no-style select--modify" (change)="billingVPDropDownChange($event)">
+              <option *ngFor="let option of dropdownType" value="{{ option?.value }}">
+                {{ option?.label }}
+              </option>
+            </select>
+          </material-dropdown>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+    </div>
+
+  <div>
+    <app-trip-tonnes [isFormValid]="isFormValid" *ngIf="selectedVPDropdown?.name =='tonnes'" [isEdit]='true' [storageRate]="storageRateTransporter" [editData]="editVPFreightData"
+                    [materialOptionsList]="materialOptionsList" (dataFromBilling)="vpBilling($event)"
+                    [showUnloading]="showUnloading"></app-trip-tonnes>
+
+    <app-trip-kgs [isFormValid]="isFormValid" *ngIf="selectedVPDropdown?.name =='kgs'" [isEdit]='true' [editData]="editVPFreightData" [storageRate]="storageRateTransporter"
+                  [materialOptionsList]="materialOptionsList" (dataFromBilling)="vpBilling($event)"
+                  [showUnloading]="showUnloading"></app-trip-kgs>
+
+    <app-trip-kms [isFormValid]="isFormValid" *ngIf="selectedVPDropdown?.name =='kms'" [isEdit]='true' [editData]="editVPFreightData" [storageRate]="storageRateTransporter"
+                  [materialOptionsList]="materialOptionsList" (dataFromBilling)="vpBilling($event)"
+                  [showUnloading]="showUnloading"></app-trip-kms>
+    <app-trip-units [isFormValid]="isFormValid" *ngIf="selectedVPDropdown?.name =='units'" [isEdit]='true' [editData]="editVPFreightData" [storageRate]="storageRateTransporter"
+    [materialOptionsList]="materialOptionsList" (dataFromBilling)="vpBilling($event)"
+    [showUnloading]="showUnloading"></app-trip-units>
+
+    <app-trip-liters [isFormValid]="isFormValid" *ngIf="selectedVPDropdown?.name =='litres'" [isEdit]='true' [editData]="editVPFreightData" [storageRate]="storageRateTransporter"
+                    [materialOptionsList]="materialOptionsList" (dataFromBilling)="vpBilling($event)"
+                    [showUnloading]="showUnloading"></app-trip-liters>
+
+    <app-trip-hour [isFormValid]="isFormValid"  *ngIf="selectedVPDropdown?.name =='hour'" [isEdit]='true' [editData]="editVPFreightData" [storageRate]="storageRateTransporter"
+                    [materialOptionsList]="materialOptionsList" (dataFromBilling)="vpBilling($event)"
+                    [showUnloading]="showUnloading"></app-trip-hour>
+
+    <app-trip-days [isFormValid]="isFormValid" *ngIf="selectedVPDropdown?.name =='days'" [isEdit]='true' [editData]="editVPFreightData" [storageRate]="storageRateTransporter"
+                    [materialOptionsList]="materialOptionsList" (dataFromBilling)="vpBilling($event)"
+                    [showUnloading]="showUnloading"></app-trip-days>
+
+    <app-trip-fixed *ngIf="selectedVPDropdown?.name =='jobs'" [isFormValid]="isFormValid" [isEdit]='true' [editData]="editVPFreightData"
+                    (dataFromBilling)="vpBilling($event)"
+                    [showUnloading]="showUnloading"></app-trip-fixed>
+    <app-trip-gallons [isFormValid]="isFormValid" *ngIf="selectedVPDropdown?.name =='gallon'" [isEdit]='true' [editData]="editVPFreightData" [storageRate]="storageRateTransporter"
+                        [materialOptionsList]="materialOptionsList" (dataFromBilling)="vpBilling($event)"
+                        [showUnloading]="showUnloading"></app-trip-gallons>
+  </div>
+</div>
+
+
+<div *ngIf="showEndTripInputs" [formGroup]="tripForm">
+  <div class="row tabIndexActiveFields">
+    <div class="col-xl-3 col-lg-3 col-sm-6">
+      <div class="input-wrap m-0 error" [ngClass]="addErrorClass(tripForm.controls.end_date)">
+          <label for="" class="input--required">Trip End Date & Time</label>
+          <mat-form-field>
+            <input matInput [ngxMatDatetimePicker]="end_date" [min]="mindate" formControlName="end_date"
+            [disabled]="false" (dateChange)="updateCalcs()">
+            <mat-datepicker-toggle matSuffix [for]="end_date"></mat-datepicker-toggle>
+            <ngx-mat-datetime-picker #end_date [showSpinners]="true"  [showSeconds]="false"
+              [stepHour]="1" [stepMinute]="1" [touchUi]="false"
+              [color]="'primary'" [enableMeridian]="true">
+            </ngx-mat-datetime-picker>
+          </mat-form-field>
+          <app-error [controlName]="tripForm.controls.end_date"></app-error>
+      </div>
+    </div>
+    <div class="col-lg-3 col-sm-6" *ngIf="isPodReceived">
+      <div class="input-wrap">
+        <label for="" class="input">Est PoD Receivable Term</label>
+        <material-dropdown [searchable]="true" [selectedOption]="initialDetails.podPaymentTerm" [addable]="false" class="dropDownWidth">
+          <select #customSelect formControlName="est_pod_receivable_term" class="no-style select--modify"
+          (change)="onpaymentTermSelected($event.target.value)">
+            <option *ngFor="let option of paymentTermList" value="{{ option.value }}">
+              {{ option.label }}
+            </option>
+          </select>
+        </material-dropdown>
+        <span class="border-anim"></span>
+      </div>
+    </div>
+    <div class="col-lg-3 col-sm-6" *ngIf="isPodReceived">
+      <div class="input-wrap error" [ngClass]="addErrorClass(tripForm.controls.estimated_pod_received_date)">
+        <label for="" class="input">Estimated PoD Receivable Date</label>
+        <mat-form-field>
+          <input [min]="this.mindate" matInput [matDatepicker]="estimated_pod_received_date" (focus)="estimated_pod_received_date.open()"
+           formControlName="estimated_pod_received_date" placeholder="DD/MM/YYYY" (dateChange)="updatePodDate()">
+          <mat-datepicker-toggle matSuffix [for]="estimated_pod_received_date"></mat-datepicker-toggle>
+          <mat-datepicker #estimated_pod_received_date></mat-datepicker>
+        </mat-form-field>
+        <app-error [controlName]="tripForm.controls.estimated_pod_received_date"></app-error>
+      </div>
+  </div>
+    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+      <div class="input-wrap clearfix error" [ngClass]="addErrorClass(tripForm.controls.end_kms)">
+        <label for="" class="input">Trip Distance</label>
+        <input  type="text" class="no-style input--bd" placeholder="123456" value="" formControlName="end_kms">
+        <app-error [controlName]="tripForm.controls.end_kms"></app-error>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6" *ngIf="!incomingFreightData.is_transporter">
+      <div class="input-wrap clearfix error readonlyStyles" [ngClass]="addErrorClass(tripForm.controls.total_fuel_stock)">
+        <label for="" class="input">Total Fuel Purchase</label>
+        <input  type="text" tabindex="-1" class="no-style input--bd border p-2" readonly placeholder="123456" value="" positiveThreeDigitDecimalNumber formControlName="total_fuel_stock">
+        <app-error [controlName]="tripForm.controls.total_fuel_stock"></app-error>
+        <span class="small-tag">On Stock: {{onStock}} Litres</span>
+
+      </div>
+
+    </div>
+
+    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6" *ngIf="!incomingFreightData.is_transporter">
+      <div class="input-wrap clearfix error readonlyStyles" [ngClass]="addErrorClass(tripForm.controls.fuel_consumed)">
+        <label for="" class="input">Trip Fuel Consumption</label>
+        <input  tabindex="-1"  type="text" class="no-style input--bd border p-2" placeholder="123456" value="" (change)="tripFuelConsumptionChange()" positiveThreeDigitDecimalNumber formControlName="fuel_consumed">
+        <app-error [controlName]="tripForm.controls.fuel_consumed"></app-error>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6" *ngIf="!incomingFreightData.is_transporter">
+      <div class="input-wrap clearfix error readonlyStyles" [ngClass]="addErrorClass(tripForm.controls.change_in_fuel_stock)">
+        <label for="" class="input">Change in stock</label>
+        <input  tabindex="-1"  type="text" readonly class="no-style input--bd border p-2" placeholder="123456" value="" positiveThreeDigitDecimalNumber formControlName="change_in_fuel_stock">
+        <p  class="mt-1 text-danger" *ngIf="tripForm.get('change_in_fuel_stock').invalid">Change in stock cannot be -ve</p>
+      </div>
+    </div>
+  </div>
+
+
+     <!-- custom Fields start here -->
+  <div class="tabIndexActiveFields">
+    <div *ngIf="customFieldDetails.length>0">
+      <div>
+        <h2 class="sub-heading">Checklist</h2>
+      </div>
+
+      <div class="row tabIndexActiveFields" formArrayName="custom_details">
+          <ng-container  *ngFor="let customfiled of tripForm['controls']['custom_details']['controls']; let iii = index;"
+            [formGroupName]="iii">
+
+                   <!-- text field -->
+                  <div class="col-xl-3 col-lg-3 col-md-4" *ngIf="customfiled.controls.field_type.value =='string'">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(customfiled.controls.value)">
+                      <label for="" class="input--required" *ngIf="customfiled.controls.mandatory.value">{{customfiled.controls.field_label.value}}</label>
+                      <label for="" class="input" *ngIf="!customfiled.controls.mandatory.value">{{customfiled.controls.field_label.value}}</label>
+                      <input type="text" class="no-style input--bd"  placeholder="" value=""
+                        formControlName="value">
+                        <app-error [controlName]="customfiled.controls.value"></app-error>
+                     </div>
+                  </div>
+
+                     <!-- check box -->
+                     <div class="col-xl-3 col-lg-3 col-md-4" *ngIf="customfiled.controls.field_type.value =='checkbox'">
+                      <div class="input-wrap error" [ngClass]="addErrorClass(customfiled.controls.value)">
+                        <label for="" class="input--required" *ngIf="customfiled.controls.mandatory.value">{{customfiled.controls.field_label.value}}</label>
+                        <label for="" class="input" *ngIf="!customfiled.controls.mandatory.value">{{customfiled.controls.field_label.value}}</label>
+                        <input type="checkbox" class="" placeholder="" value="" [checked]="customfiled.controls.value.value"
+                          formControlName="value">
+                          <app-error [controlName]="customfiled.controls.value"></app-error>
+                       </div>
+                    </div>
+                     <!-- drop down -->
+                    <div class="col-xl-3 col-lg-3 col-md-4" *ngIf="customfiled.controls.field_type.value =='select_option'">
+                      <div class="input-wrap error" [ngClass]="addErrorClass(customfiled.controls.value)">
+                        <label for="" class="input--required" *ngIf="customfiled.controls.mandatory.value">{{customfiled.controls.field_label.value}}</label>
+                        <label for="" class="input" *ngIf="!customfiled.controls.mandatory.value">{{customfiled.controls.field_label.value}}</label>
+                          <material-dropdown [searchable]="false" [addable]="false" [selectedOption]="customfiled.controls.selected_option.value" class="dropDownW" [addErrorClass]="customfiled.controls.value"             >
+                                <select #customSelect formControlName="value" class="no-style select--modify ">
+                                    <option *ngFor=" let option of customfiled.controls.option_list.value" value="{{ option }}">
+                                        {{ option }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <app-error [controlName]="customfiled.controls.value"></app-error>
+                      </div>
+                       </div>
+                     </ng-container>
+      </div>
+
+     </div>
+  </div>
+
+</div>
+</div>

@@ -1,0 +1,81 @@
+<div class="calc-height">
+    <app-list-widget (listWidgetData)="listWidgetData($event)"
+      [isFilter]="true"  listTitle="Vehicle Inspection" [isAddButton]="true" [filterUrl]="filterUrl" [isSettings]="true" [settingsUrl]="settingsUrl" (settingsApplied)="settingsApplied($event)"
+      [buttonData]="buttonData"[isExport]="true" (exportList)="exportList($event)">
+    </app-list-widget>  
+  </div>
+  
+  
+  <div id="quotation-list" class="custom-table-container p-0 def-color quotation-list ws-nowrap"
+   (scroll)="onScroll($event)">
+  <table [ngClass]="{'h-100':vehicleInspectionList.length==0}">
+  
+    <thead >
+      <tr>
+        <th *ngFor="let header of vehicleInspectionHeader">
+          {{header}}
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody *ngIf="vehicleInspectionList.length == 0">
+      <tr class="border-0">
+        <td class="bg-white" colspan="30">
+          <div class="no-list-data-wrap">
+            <figure>
+              <img src="assets/img/no-content.png" alt="">
+            </figure>
+            <h5 class="mt-3 primary-brand-text">No data found!</h5>
+          </div>
+        </td>
+      </tr>
+  
+    </tbody>
+  
+    <tbody>
+      
+  
+  
+      <tr *ngFor="let data of vehicleInspectionList; trackBy: trackById" >
+        <ng-container *ngFor="let item of data['extras'];let i =index">
+          <td class="ws-nowrap" *ngIf="item?.name!='Inspected By' && item?.name!='Vehicle Inspection No' && item?.name!='Operator' && item?.name!='Vehicle No.'"> {{item?.value ? item?.value : '-'}} </td>
+          <td *ngIf="item?.name=='Vehicle Inspection No'">
+            <a class="custom-link ws-nowrap"  [routerLink]="[prefixUrl+'/vehicle-inspection/view', data.id]" [queryParams]="{fromlist: 'vehicleInspection'}">{{item?.value}}</a>
+          </td>
+          <td *ngIf="item?.name=='Inspected By'">
+            <a class="custom-link ws-nowrap" target="_blank"  [routerLink]="[prefixUrl+'/onboarding/employee/view', item?.value.id]">{{item?.value.name ? item?.value.name : '-'}}</a>
+          </td>
+          <td *ngIf="item?.name=='Operator'">
+            <a class="custom-link ws-nowrap" target="_blank" [routerLink]="[prefixUrl+'/onboarding/employee/view', item?.value.id]">{{item?.value.name ? item?.value.name : '-'}}</a>
+          </td>
+          <td *ngIf="item?.name=='Vehicle No.'">
+            <a class="custom-link ws-nowrap" target="_blank"  [routerLink]="[prefixUrl+'/onboarding/vehicle/own/details', item?.value.id]">{{item?.value.name ? item?.value.name : '-'}}</a>
+          </td>
+
+        </ng-container>
+        <td class="icon-box  tabIndexActive">
+          <div class="d-flex justify-content-center align-items-center">
+            <div class="position-relative" *ngxPermissionsOnly="[vehicleInspection[1],vehicleInspection[2]]">
+              <i class="material-icons more-icon" (click)="optionsList($event, 'list_'+data.id)">more_vert</i>
+              <ul class="more-actions__menu table-popup" [ngClass]="{show: showOptions === 'list_'+data.id}">
+                <ng-container *ngIf="(vehicleCategiriesObj.categories.includes(1)||vehicleCategiriesObj.categories.includes(2))">
+                  <li class="more-actions__item" *ngxPermissionsOnly="vehicleInspection[1]"
+                  [routerLink]="[prefixUrl+'/vehicle-inspection/edit', data.id]"><i
+                    class="material-icons">edit</i>Edit</li>
+                </ng-container>
+                    <ng-container *ngIf="data.payment_status!='Partial Paid'">
+                      <li class="more-actions__item" *ngxPermissionsOnly="vehicleInspection[2]" 
+                        (click)="popupFunction(data, i)"><i class="material-icons">delete</i>Delete</li>
+                    </ng-container>
+              </ul>
+            </div>
+          </div>
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  
+  
+  <alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

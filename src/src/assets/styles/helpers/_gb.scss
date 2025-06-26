@@ -1,0 +1,188 @@
+@import "../helpers/variable";
+
+//select dropdown outine
+.gb-outline-select {
+    .mat-select-trigger {
+        padding: 10px 15px;
+        border-radius: 3px;
+        border: 1px solid #ACB5BD ;
+
+        height: unset;
+
+        .mat-select-value-text {
+            vertical-align: middle;
+            color: $text-color;
+            font-weight: 500;
+
+        }
+
+        .mat-select-arrow {
+            margin-left: 15px;
+        }
+    }
+
+}
+
+//search input box 
+
+.gb-search-filter {
+
+    position: relative;
+    input{
+        color: $text-color;
+    height: 35px;
+    border: 1px solid #ACB5BD !important;
+    border-radius: 35px;
+    padding: 10px 15px;
+    padding-right: 32px;
+    transition: all 200ms ease;
+    &:focus{
+      
+
+            border-color: $primary-brand-color !important;
+            background-color: white;
+            box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+            +.search-icon {
+                color: $primary-brand-color;
+            }
+            
+        
+       
+    }
+    
+
+    }
+    .search-icon {
+        position: absolute;
+        font-size: 16px;
+        right: 16px;
+        top: 9px;
+        -webkit-text-stroke: 1px;
+        color: #979696;
+    }
+}
+
+//vehicle select dropdown
+@mixin veh-select-option($image,$image-white) {
+    padding-left: 50px;
+    background-image: $image;
+    background-repeat: no-repeat !important;
+    background-position: 14px !important;
+    background-size: 22px !important;
+    &.mat-active{
+        background-image: $image-white;
+    }
+    &:hover{
+        background-image: $image-white;
+    }
+
+}
+
+.gb-veh-select-panel {
+    .mat-option:nth-child(2) {
+
+        @include veh-select-option(url('../../img/icons/crane-truck.svg'),url('../../img/icons/crane-truck-white.png'));
+        
+    }
+    .mat-option:nth-child(3) {
+
+        @include veh-select-option(url('../../img/icons/trailer-head.svg'),url('../../img/icons/trailer-head-white.png'));
+        
+    }
+    
+
+    .mat-option:nth-child(4)  {
+        @include veh-select-option(url('../../img/icons/awp.svg'),url('../../img/icons/awp-white.png'))
+    }
+
+    .mat-option:nth-child(5) {
+        @include veh-select-option(url('../../img/icons/truck-vehicle.svg'),url('../../img/icons/truck-vehicle-white.png'))
+    }
+
+
+}
+.gb-back-btn{
+    
+        box-sizing: border-box;
+        padding: 7px;
+        border-radius: 7px;
+        border: 1px dotted transparent;
+      
+
+        &:hover {
+            border-color: gainsboro;
+        }
+
+        .bi-chevron-left {
+            -webkit-text-stroke: 1px;
+            color: $text-color;
+            font-size: 15px;
+        }
+   
+}
+
+
+
+.gb-border-table-wrap {
+    color: $text-color;
+    overflow: auto;
+    margin: 0px 4px;
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        border-left: 1px solid #dee2e6;
+        border-right: 1px solid #dee2e6;
+        min-width: 900px;
+
+        
+        
+        
+
+        th {
+            border-left: 1px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+           
+            padding: 15px 10px;
+            font-size: 13px;
+            position: sticky;
+            background-color: #fff;
+            top: 0px;
+            z-index: 10;
+            position: sticky;
+            &::before{
+                content: "";
+                display: block;
+                width: 100%;
+                border: 0.5px solid #dee2e6;
+                position: absolute;
+                top: 0px;
+                left: 0px;
+
+            }
+            &::after{
+                content: "";
+                display: block;
+                width: 100%;
+                border: 0.5px solid #dee2e6;
+                position: absolute;
+                bottom: 0px;
+                left: 0px;
+
+            }
+            
+        }
+        tbody>tr:first-child>td{
+            border-top: 0px;
+        }
+        td{
+            border: 1px solid #dee2e6;
+            padding: 13px 10px;
+        }
+      
+
+        
+       
+        
+    }
+}

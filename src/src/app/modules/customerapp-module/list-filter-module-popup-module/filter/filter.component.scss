@@ -1,0 +1,160 @@
+@import "../../../../../assets/styles/helpers/variable";
+@import "../../../../../assets/styles/helpers/placeholder";
+@import "../../../../../assets/styles/helpers/mixins";
+
+
+.mobile-filter{
+	display:none;
+}
+.desktop-filter{
+	display:block
+}
+.filter-popup {
+	position: absolute;
+	background: white;
+	width: 300px;
+	height: 250px;
+	right: 0;
+	z-index: 1;
+	top: 50px;
+	box-shadow: 0 0 3px 3px rgba(0, 0, 0, 0.5);
+
+	.left-content {
+		display: inline-block;
+		width: 30%;
+		vertical-align: top;
+	}
+
+	.right-content {
+		display: inline-block;
+		width: 70%;
+		vertical-align: top;
+		min-height: 210px;
+
+		input[type=checkbox] {
+			display: inline-block;
+			width: auto;
+		}
+		label {
+			display: inline-block;
+			width: auto;
+		}
+	}
+
+	.btn-wrapper {
+		text-align: right;
+
+		button {
+			margin: 5px;
+		}
+	}
+}
+
+.bullet{
+	font-size: 17px;
+    float: right;
+    color: #595fab;
+    position:  inherit;;
+    right: 0;
+}
+
+@media (max-width:768px){
+	.desktop-filter{
+		display:none;
+	}
+
+	.mobile-filter{
+		display:block;
+		top:40px;
+		position:absolute;
+		right:0;
+		z-index:7;
+			.check-box-m {
+
+        display: inline-block;
+		 margin:5px 0 0 11px;    width: auto;
+     max-width: 80%;
+
+		}
+
+	/* 	.checkParent{
+			width: 16px;
+			height: 16px;
+
+			margin: 0;
+		} */
+				.filter-dropdown{
+		    width: 100%;
+    position: relative;
+    top: 7px;
+
+		}
+	    .filter-dropdown__body{
+			display:block;
+		}
+		.filter-dropdown__menu-items{
+			min-height:auto !important;
+			max-height:300px;
+			overflow:auto;
+      width: 100%;
+		}
+	}
+}
+
+
+
+@media (max-width: 639px){
+
+	/* .filter-dropdown-wrap .filter-dropdown__menu li.active  {
+		background: none;
+		color: unset;
+		width: calc((100%) + 1px);
+		z-index: 5;
+		position: relative;
+	} */
+
+
+   .filter-dropdown-wrap {
+
+      .filter-dropdown__menu{
+      min-width:270px;
+    }
+    /*  .filter-dropdown {
+
+
+      top: 10px !important;
+      left: 0;
+      right: 0;
+      margin: auto;
+    } */
+
+    .filter-dropdown__menu-items{
+
+      padding:15px 5px 10px 15px !important;
+
+      input{
+        // width:65% !important;
+        // min-width:70px;
+      }
+      .check-box
+
+      {
+        display:flex;
+
+
+        .label-text
+        {
+        font-size:13px;
+        top:2px !important;
+        }
+      }
+    }
+}
+  }
+
+.checkBox{
+	opacity: 1 !important;
+    width: 15px !important;
+    height: 15px !important;
+    display: inline !important;
+}

@@ -1,0 +1,9 @@
+  <div class="inspectionType-wraper " [ngClass]="{'box-inspectionType':true,'showInvalid':inspectionTypeControl.hasError('required') && inspectionTypeControl.touched}">
+    <ng-multiselect-dropdown  *ngIf="isItemAdded" [formControl]="inspectionTypeControl"  [placeholder]="inspectionTypeControl.value?.length ? '&nbsp;' : 'Select Inspection Type'"  [settings]="dropdownSettings" [data]="inspectionType">
+    </ng-multiselect-dropdown>
+    <div *ngIf="inspectionTypeControl.value">
+      <p class="inspectionType-name">{{ formattedNames}}</p>    
+      <p *ngIf="inspectionTypeControl.value?.length" class="inspectionType-count">{{inspectionTypeControl.value?.length}} Inspection Type</p>
+    </div>
+    <button class="material-add-btn" (click)="addNewInspectionType()">+</button>
+</div>

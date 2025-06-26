@@ -1,0 +1,433 @@
+<div class="right-section__header">
+  <h1 *ngIf="!expenseID" class="heading">Add Petty  Expense</h1>
+  <h1 *ngIf="expenseID" class="heading">Edit Petty  Expense</h1>
+  <button class="gb-video-play float-right"  (click)="openGothrough()">
+    <i class="bi bi-play-circle-fill"></i>
+  </button>
+</div>
+<div class="alert-msg" *ngIf="apiError">
+  <span class="icon-wrap"></span>
+  <p class="message-cont">{{ apiError }}</p>
+</div>
+
+<div class="error-msg-list" *ngIf="globalFormErrorList.length > 0">
+  <p class="message-head">{{ errorHeaderMessage }}</p>
+  <span class="icon-wrap"></span>
+  <ul *ngFor="let error of globalFormErrorList">
+    <li class="message-cont">{{ error }}</li>
+  </ul>
+</div>
+<!-- Header Title -->
+<!-- Add Petty Expense Form  -->
+<form [formGroup]="editPettyExpense">
+  <div class="form-body shadow-inset-top-lg form-layout form-layout--pd">
+    <div class="form-layout__card active formResponsiveTable">
+        <div class="form-body">
+          <div class="row">
+
+            <!-- Top sub-fields -->
+            <div class="col-lg-3 col-md-6 col-sm-6">
+              <div class="input-wrap clearfix error" [ngClass]="addErrorClass(editPettyExpense.controls.bill_date)">
+                  <label for="" class="input--required">Date of Purchase</label>
+                  <mat-form-field>
+                      <input matInput [matDatepicker]="bill_date" (focus)="bill_date.open()" formControlName="bill_date"
+                          placeholder="DD/MM/YYYY">
+                      <mat-datepicker-toggle matSuffix [for]="bill_date"></mat-datepicker-toggle>
+                      <mat-datepicker #bill_date></mat-datepicker>
+                  </mat-form-field>
+                  <app-error [controlName]="editPettyExpense.controls.bill_date"></app-error>
+              </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-6">
+              <div class="input-wrap">
+                <label for="">Employee In Charge</label>
+                <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="initialValues?.employee" [addBlank]="true">
+                    <select #customSelect formControlName="employee" class="no-style select--modify">
+                        <option *ngFor="let employee of employeeDetails" value="{{ employee.id }}">
+                            {{ employee.display_name }}</option>
+                    </select>
+                  </material-dropdown>
+              </div>
+            </div>
+         </div>
+
+         <!-- Item expenses section -->
+         <div class="form-layout__header mg-top-30">
+          <h2 class="sub-heading">Item Expenses</h2>
+          <span class="collapse-line"></span>
+         </div>
+
+         <div action="" class="form-body" formArrayName="expense_items">
+          <div class="mg-bottom-30">
+            <div class="table-wrapper table-wrapper--type1 table-wrapper--type2 table--bd table--nobg dropDownOverflow">
+              <table class="table-container item-table">
+              <thead>
+                <tr class="desktop_th">
+                  <th width="20%">Item</th>
+                  <th width="20%">Expense Account</th>
+                  <th width="13%">Quantity</th>
+                  <th width="13%">Unit Cost ({{ currency_type?.symbol}})</th>
+                  <th width="13%">Total ({{ currency_type?.symbol}})</th>
+                  <th width="20%">Description</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody *ngFor="let advance of editPettyExpense['controls']['expense_items']['controls']; let i = index;"
+              [formGroupName]="i">
+                <tr class="mobile-flex">
+                  <td class="max-wd-120">
+                    <h5 class="th_h5_mobile">Item </h5>
+                    <div>
+                    <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth" [addBlank]="false"
+                    [addErrorClass]="addErrorClass(advance.controls.item)" [maxLength]="20"
+                    [selectedOption]="initialValues?.item[i]" [addNewOptions]="true"
+                    (addNewOption)="addNewAdditionalCharge($event,i)">
+                    <select #customSelect formControlName="item" class="no-style select--modify" (change)="onMaterialSelected(advance,i);">
+                        <option *ngFor="let option of  staticOptions.materialList" value="{{ option?.id }}">
+                          {{ option.name }}
+                        </option>
+                    </select>
+                  </material-dropdown>
+                    </div>
+                  </td>
+
+                  <td class="w-120">
+                    <h5 class="th_h5_mobile">Expense Account </h5>
+                    <div class="select-wrap w-initial">
+                        <material-dropdown [searchable]="true" [addable]="true"
+                        [chartOfAccount]="true" (addChartOfAccount)="openAddCoaModal($event, i)"
+                        [selectedOption]="initialValues.expenseAccount[i]"
+                        [params]="coaParams" (addValueToList)="addParamsCoaItem($event)"
+                        class="dropDownWidth" [addErrorClass]="addErrorClass(editPettyExpense.controls.expense_items.controls[i].controls.expense_account)"
+                        >
+                            <select #customSelect formControlName="expense_account"
+                                class="no-style select--modify">
+                                <option *ngFor="let account of accountList" value="{{ account.id }}">
+                                    {{ account.name }}</option>
+                            </select>
+                          </material-dropdown>
+                    </div>
+                  </td>
+
+                  <td class="max-wd-120">
+                    <h5 class="th_h5_mobile">Quantity </h5>
+                      <div>
+                          <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="0" formControlName="quantity"
+                          (change)="calculateItemExpenseAmount(i)">
+                      </div>
+                  </td>
+                  <td class="max-wd-120">
+                    <h5 class="th_h5_mobile">Unit Cost   ({{ currency_type?.symbol}})</h5>
+                      <div>
+                          <input positiveThreeDigitDecimalNumber type="text" placeholder="0" formControlName="unit_cost"
+                          (change)="calculateItemExpenseAmount(i)">
+                      </div>
+                  </td>
+                  <td class="max-wd-120">
+                    <h5 class="th_h5_mobile">Total  ({{ currency_type?.symbol}}) </h5>
+                      <div class="input-wrap disabled" [ngClass]="addErrorClass(advance.controls.total)">
+                          <input positiveThreeDigitDecimalNumber type="text" disabled class="error-box" placeholder="0" formControlName="total"
+                          (change)="calculateItemExpenseAmount(i)">
+                      </div>
+                  </td>
+                  <td>
+                    <h5 class="th_h5_mobile">Description </h5>
+                    <input type="text" class="no-style input--bd" placeholder="Narration" value=""
+                    formControlName="description">
+                </td>
+                <td class="text-center mobile-remove-add-position">
+                  <span class="material-icons drop-down" (click)="advance.controls.additionalDetails.setValue(!advance.controls.additionalDetails.value) " *ngIf="!advance.controls.additionalDetails.value ">arrow_drop_down</span>
+                  <span class="material-icons drop-down" (click)="advance.controls.additionalDetails.setValue(!advance.controls.additionalDetails.value) " *ngIf="advance.controls.additionalDetails.value ">arrow_drop_up</span>
+                  <span class="material-icons clear" (click)="resetItemExpense(advance, i)" >remove_circle_outline</span>
+                  <span class="material-icons delete" (click)="removeItemExpense(i)"
+                      *ngIf="editPettyExpense.controls.expense_items.controls.length !== 1">add_circle_outline</span>
+                  <span class="material-icons add"
+                      (click)="addItemExpenses()">add_circle_outline</span>
+              </td>
+
+                </tr>
+                <tr class="border-top-0" [ngClass]="{show:advance.controls.additionalDetails.value}">
+                  <td  class="fs-12 pt-0 max-wd-120 error input-wrap " [ngClass]="addErrorClass(advance.controls.hsn_code)">
+
+                    HSN Code: <input type="text" class="error-box" placeholder="HSN Code" formControlName="hsn_code" [readonly]="!advance.controls.isEditable.value">
+                    <app-error [controlName]="advance.controls.hsn_code"></app-error>
+                  </td>
+                  <td class="fs-12  pe-2">
+                      <span *ngIf="!advance.controls.isEditable.value" class="table-footer-actions"><a class="clear-item" (click)="advance.controls.isEditable.setValue(!advance.controls.isEditable.value)">Edit</a></span>
+                      <span *ngIf="advance.controls.isEditable.value" class="table-footer-actions"><a class="clear-item" (click)="advance.controls.isEditable.setValue(!advance.controls.isEditable.value)">Update</a></span>
+                  </td>
+
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="gst-table-wrapper mg-top-30">
+
+<div class="gst-main">
+    <div class="text-end fw-bold gst-left"> Subtotal: </div>
+    <div class="px-0  text-end fw-bold gst-right"> {{ currency_type?.symbol}} {{ itemExpenseTotals.subtotal | numberFormat}}</div>
+  </div>
+
+  <div class="gst-main">
+      <div class="text-end pt-0 gst-left">
+          <span> Discount</span>
+          <div class="input" [ngClass]="addErrorClass(editPettyExpense.controls.discount)">
+            <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="0.00"
+            formControlName="discount"
+            (change)="onCalcuationsChanged()">
+          </div>
+          <div class="select-wrap dropdown">
+            <select name="" class="no-style select--modify custom-select"
+                formControlName="discount_type"
+                (change)="onCalcuationsChanged()">
+                <option value="0">%</option>
+                <option value="1">{{ currency_type?.symbol}}</option>
+            </select>
+          </div>
+       </div>
+       <div class="px-0  text-end gst-right"> {{ currency_type?.symbol}} {{ itemExpenseTotals.discountTotal | numberFormat}}</div>
+  </div>
+  <div class="gst-main">
+    <div class="text-start pt-0 gst-left">
+
+        <div class="dropdown select-wrap">
+            <material-dropdown
+                [selectedOption]="initialValues.adjustmentAccount">
+                <select #customSelect formControlName="adjustment_account"
+                    class="no-style select--modify">
+                    <option  *ngFor="let option of expenseAccountList"
+                        value="{{ option.id }}">{{ option.name }}
+                    </option>
+                </select>
+            </material-dropdown>
+          </div>
+
+          <div class="input" [ngClass]="addErrorClass(editPettyExpense.controls.adjustment)">
+            <input twoDigitDecimalNumber type="text" class="error-box" placeholder="0.00"
+            formControlName="adjustment"
+            (change)="onCalcuationsChanged()">
+          </div>
+          <div class="select-wrap dropdown">
+                <select name="" class="no-style select--modify custom-select"
+                    formControlName="adjustment_type"
+                    (change)="onCalcuationsChanged()">
+                    <option value="0">% &nbsp;</option>
+                    <option value="1">{{ currency_type?.symbol}}</option>
+                </select>
+          </div>
+        </div>
+        <div class="px-0  text-end gst-right">
+        {{ currency_type?.symbol}} {{ itemExpenseTotals.adjustmentAmount | numberFormat}}
+        </div>
+  </div>
+  <div class="text-end gst-main">
+    <div class="text-end h5"> <strong> Total: </strong></div>
+    <div class="px-0 text-end ms-3 h5"><strong> {{ currency_type?.symbol}} {{ itemExpenseTotals.total | numberFormat}} </strong></div>
+  </div>
+</div>
+
+<hr>
+   <!--  <div class="form-layout__card mg-top-30">
+      <div class="table-wrapper table--nobg table-wrapper--mobile overflow-initial">
+        <table class="table-container respinsiveTable">
+            <tbody>
+                <tr class="border-top-0 border-bottom-0">
+                    <td    class="p-0 disp-none"></td>
+                    <td    class="p-0">
+                        <div class="table-wrapper table-wrapper--type1 table--nobg mc-expenses-wrap">
+                            <table class="table-container mg-bottom-30 mc-expenses">
+                                <tbody>
+                                    <tr class="border-top-0 mobile-inline">
+                                        <td    class=" text-end bill-item">
+                                            Subtotal:
+                                        </td>
+                                        <td    class="rupee-symbol rupee-symbol--sm px-0  text-end bill-value">
+                                          {{ currency_type?.symbol}} {{ itemExpenseTotals.subtotal }}
+                                        </td>
+                                    </tr>
+                                    <tr class="border-top-0 mobile-inline">
+                                        <td    class=" text-end pt-0">
+                                              <div class="gst">
+                                                <span class="mobileBlock">Discount</span>
+                                                      <div class="input-wrap width-100" [ngClass]="addErrorClass(editPettyExpense.controls.discount)">
+                                                          <input positiveThreeDigitDecimalNumber type="text" class="mg-left-10 error-box" placeholder="0.00"
+                                                          formControlName="discount"
+                                                          (change)="onCalcuationsChanged()">
+                                                      </div>
+                                                      <div class="select-wrap d-inline-block">
+                                                          <select name="" class="no-style select--modify custom-select"
+                                                              formControlName="discount_type"
+                                                              (change)="onCalcuationsChanged()">
+                                                              <option value="0">%</option>
+                                                              <option value="1">{{ currency_type?.symbol}}</option>
+                                                          </select>
+                                                      </div>
+                                                  </div>
+                                        </td>
+                                        <td    class="rupee-symbol rupee-symbol--sm px-0  text-end">
+                                          {{ currency_type?.symbol}} {{ itemExpenseTotals.discountTotal }}
+                                        </td>
+                                    </tr>
+                                    <tr class="border-top-0 mobile-inline">
+                                      <td width=100% class="text-start pt-0">
+                                          <div class="gst">
+                                            <div id="other-option" class="mb-2">
+                                                <material-dropdown
+                                                    [selectedOption]="initialValues.adjustmentAccount">
+                                                    <select #customSelect formControlName="adjustment_account"
+                                                        class="no-style select--modify">
+                                                        <option  *ngFor="let option of expenseAccountList"
+                                                            value="{{ option.id }}">{{ option.name }}
+                                                        </option>
+                                                    </select>
+                                                </material-dropdown>
+                                            </div>
+                                              <div class="input-wrap width-100" [ngClass]="addErrorClass(editPettyExpense.controls.adjustment)">
+                                                <input twoDigitDecimalNumber type="text" class="error-box" placeholder="0.00"
+                                                formControlName="adjustment"
+                                                (change)="onCalcuationsChanged()">
+                                              </div>
+                                              <div class="select-wrap d-inline-block">
+                                                    <select name="" class="no-style select--modify custom-select"
+                                                        formControlName="adjustment_type"
+                                                        (change)="onCalcuationsChanged()">
+                                                        <option value="0">% &nbsp;</option>
+                                                        <option value="1">{{ currency_type?.symbol}}</option>
+                                                    </select>
+                                              </div>
+                                        </div>
+                                    </td>
+                                      <td    class="rupee-symbol rupee-symbol--sm px-0  text-end">
+                                        {{ currency_type?.symbol}} {{ itemExpenseTotals.adjustmentAmount }}
+                                      </td>
+                                  </tr>
+
+                                    <tr class="border-top-0">
+                                        <td colspan="2" class="pt-0"></td>
+                                    </tr>
+                                    <tr class="mobile-inline">
+                                        <td class=" text-end bill-total disp-w-50">
+                                            Total:
+                                        </td>
+                                        <td    class="rupee-symbol px-0  text-end bill-total">
+                                          {{ currency_type?.symbol}} {{ itemExpenseTotals.total }} </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+  </div> -->
+
+    <!-- Bottom Sub-fields -->
+      <div class="form-layout__card">
+        <div class="row">
+            <div class="col-lg-3 col-sm-6">
+                <div class="input-wrap"  [ngClass]="addErrorClass(editPettyExpense.controls.payment_mode)">
+                    <label for=" " class="input--required">Payment Mode</label>
+                    <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="initialValues?.paymentMode"
+                    >
+                    <select #customSelect formControlName="payment_mode" class="no-style select--modify"
+                        (change)="onPaymentModeSelected()">
+                        <option value="paid_By_Driver">Paid By Employee</option>
+                        <option *ngFor="let account of paymentAccountList" value="{{ account.id }}">
+                            {{ account.name }}</option>
+                    </select>
+                </material-dropdown>
+                <app-error [controlName]="editPettyExpense.controls.payment_mode"></app-error>
+
+                </div>
+            </div>
+            <div class="col-20 col-lg-3 col-sm-6 max-width-180"  *ngIf="editPettyExpense.get('payment_mode').value==='paid_By_Driver'" >
+              <div class="input-wrap" >
+                  <div class="input-wrap error" [ngClass]="addErrorClass(editPettyExpense.controls.paid_employee)">
+                      <label for="" class="input--required">Paid By</label>
+                      <material-dropdown [searchable]="true" [selectedOption]="initialValues.paid_employee"  [addable]="false" class="dropDownWidth">
+                          <select #customSelect formControlName="paid_employee" class="no-style select--modify" >
+                              <option *ngFor="let account of activeEmpList" value="{{ account.id }}">
+                                  {{ account.display_name }}</option>
+                          </select>
+                        </material-dropdown>
+                      <app-error [controlName]="editPettyExpense.controls.paid_employee"></app-error>
+                  </div>
+              </div>
+          </div>
+
+            <div class="col-lg-3 col-sm-6">
+                <div class="input-wrap">
+                    <label for="" class="input">Transaction Date</label>
+                    <mat-form-field>
+                      <input matInput [matDatepicker]="transaction_date" formControlName="transaction_date" (focus)="transaction_date.open()" placeholder="DD/MM/YYYY">
+                      <mat-datepicker-toggle matSuffix [for]="transaction_date"></mat-datepicker-toggle>
+                      <mat-datepicker #transaction_date></mat-datepicker>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="col-lg-3 col-sm-6">
+                <div class="input-wrap" [ngClass]="{disabled: !bankingChargeRequired}">
+                    <label for="" class="input">Banking Charges ({{ currency_type?.symbol}})</label>
+                    <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="2000"
+                    formControlName="bank_charges"
+                    [attr.disabled]="!bankingChargeRequired ? '' : null">
+                    <span class="border-anim"></span>
+                </div>
+              </div>
+
+              <div class="col-lg-3 col-sm-6">
+                <div class="input-wrap">
+                    <label for="" class="input">Optional Comment</label>
+                    <input type="text" class="no-style input--bd" placeholder="Comments" formControlName="comments">
+                    <span class="border-anim"></span>
+                </div>
+              </div>
+
+
+
+
+
+        </div>
+      </div>
+
+      <div class="form-layout__card mg-top-30">
+        <file-uploader (onFileUploaded)="fileUploader($event)"
+        (onFileDeleted)="fileDeleted($event)" [multiple]="true"
+        [accept]="'capture=camera, image/jpeg,image/x-jpg,image/png, application/pdf'"
+        [showFileName]="false" [patchFileUrls]="patchFileUrls">
+        </file-uploader>
+     </div>
+
+
+
+
+  </div>
+
+  
+
+</form>
+
+<div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end" >
+ 
+    <button class="btn btn--sm me-2" type="button" [routerLink]="[prefixUrl+'/expense/petty-expense/list']"
+      routerLinkActive="router-link-active">Cancel</button>
+    <button *ngIf="expenseID" class="btn  btn--primary " type="button"  (click)="updateExpense()">Update Expense </button>
+    <button *ngIf="!expenseID" class="btn btn--primary " type="button"  (click)="saveExpense()">Save Expense </button>
+
+ 
+</div>
+  <add-new-coa [popDetail]="showAddCoaPopup" [isExpenseType]="true" (closeModal)="closeCoaPopup" (coaAdded)="addExpenseToOption($event)">
+  </add-new-coa>
+
+<!-- video-popup -->
+  <app-go-through  [goThroughDetais]="goThroughDetais"></app-go-through>

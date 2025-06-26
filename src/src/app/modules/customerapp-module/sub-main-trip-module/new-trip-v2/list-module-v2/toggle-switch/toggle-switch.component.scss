@@ -1,0 +1,91 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 82px;
+  height: 35px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  border: 2px solid #ACB5BD !important;
+  -webkit-transition: all 200ms ease-in-out;
+  transition: all 200ms ease-in-out;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 35px;
+  left: 4px;
+  bottom: 3px;
+  background-color: $primary-brand-color;
+  -webkit-transition: all 200ms ease-in-out;
+  transition: all 200ms ease-in-out;
+  border-radius: 35px;
+
+}
+
+.square-icon {
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 14px;
+}
+
+.square-icon::before {
+  content: "";
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background-image: url("../../../../../../../assets/img/icons/four-square-white.png");
+  background-size: cover;
+
+}
+
+.ham-burger-icon {
+
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 11px;
+  -webkit-text-stroke: 1px;
+
+  .bi-list {
+    font-size: 20px;
+    color: #B8B8B8;
+  }
+
+}
+
+input:checked+.slider:before {
+  -webkit-transform: translateX(36px);
+  -ms-transform: translateX(36px);
+  transform: translateX(36px);
+
+}
+
+input:checked~.ham-burger-icon>.bi-list {
+  color: $layout-bg ;
+}
+
+input:checked~.square-icon::before {
+  background-image: url("../../../../../../../assets/img/icons/four-square-gray.png") !important;
+}

@@ -1,0 +1,124 @@
+<aside class="aside-bar form-layout float-start">
+  <nav class="menu-item-wrapper"  [ngClass]="{'menu--collapsed': collapse}">
+    <ul>
+      <li class="menu-items list-icon list-icon--vehicle-trip" [ngClass]="{active: sideBar.onBoarding}"
+      (click)=" sideBar.onBoarding = !sideBar.onBoarding; resetSlideBar('onBoarding');">
+      <div class="item-wrapper">
+          <p class="menu-content">Onboarding</p>
+          <div class="menu-arrow">
+              <i class="material-icons drop-down">arrow_drop_down</i>
+          </div>
+      </div> 
+      <div class="sub-menu">
+        <ul>
+          <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngxPermissionsOnly="vehicle"  routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='vehicle'}" [routerLink]="['vehicle/prefrence']">Vehicle</li>  
+          <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngxPermissionsOnly="party"  routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='party'}" [routerLink]="['party/prefrence']">Parties</li>  
+          <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngxPermissionsOnly="assets"  routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='asset'}" [routerLink]="['vehicle/prefrence']">Own Assets</li>  
+      
+        </ul>
+      </div>
+    </li>
+      <li class="menu-items list-icon list-icon--vehicle-trip" [ngClass]="{active: sideBar.trips}"
+        (click)=" sideBar.trips = !sideBar.trips; resetSlideBar('trips');">
+        <div class="item-wrapper">
+            <p class="menu-content">Trip</p>
+            <div class="menu-arrow">
+                <i class="material-icons drop-down">arrow_drop_down</i>
+            </div>
+        </div>
+        <div class="sub-menu">
+          <ul>
+            <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngxPermissionsOnly="quotation"  routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='quotation'}" [routerLink]="['quotation/prefrence']">Quotation</li>
+            <li *ngxPermissionsOnly="workOrder" class="sub-menu-items"[routerLink]="['work-order/prefrence']" routerLinkActive="active" [ngClass]="{'active-route':activeRoute =='work-order'}" (click)="$event.stopPropagation();">Sales Order</li>
+            <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngxPermissionsOnly="vehicleTrip" routerLinkActive="active" [ngClass]="{'active-route':activeRoute =='vehicle-trip'}" [routerLink]="['vehicle-trip/prefrence']">Trips</li>
+            <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngIf="vehicleCategories.includes(1) || vehicleCategories.includes(1)"  routerLinkActive="active" [ngClass]="{'active-route':activeRoute =='site-inspection'}" [routerLink]="['site-inspection/prefrence']">Site Inspection</li>
+            
+          </ul>
+        </div>
+      </li>
+      
+        <li class="menu-items list-icon list-icon--vehicle-trip" [ngClass]="{active: sideBar.income}"
+        (click)=" sideBar.income = !sideBar.income; resetSlideBar('income');">
+        <div class="item-wrapper">
+            <p class="menu-content">Income</p>
+            <div class="menu-arrow">
+                <i class="material-icons drop-down">arrow_drop_down</i>
+            </div>
+        </div>
+        <div class="sub-menu">
+          <ul>
+            <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngxPermissionsOnly="invoice" routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='preforma-invoice'}" [routerLink]="['preforma-invoice/prefrence']">Proforma Invoice</li>
+            <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngxPermissionsOnly="invoice" routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='invoice'}" [routerLink]="['invoice/prefrence']">Invoice</li>
+            <li (click)="$event.stopPropagation()" class="sub-menu-items"  *ngxPermissionsOnly="debitNote" routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='debit-note'}" [routerLink]="['debit-note/prefrence']">Debit Note</li>
+            <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngxPermissionsOnly="creditNote" routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='credit-note'}" [routerLink]="['credit-note/prefrence']">Credit Note</li>
+            <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngxPermissionsOnly="bos" routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='billofsupply'}" [routerLink]="['billofsupply/prefrence']">Bill Of Supply</li>
+            <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngxPermissionsOnly="paymentStatement" routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='payment-settlement'}" [routerLink]="['payment-settlement/prefrence']">Payment Received</li>
+            <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngxPermissionsOnly="paymentAdvance" routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='payment-advance'}" [routerLink]="['payment-advance/prefrence']">Advance</li>
+            <li (click)="$event.stopPropagation()" class="sub-menu-items" *ngxPermissionsOnly="paymentRefund"  routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='payment-refund'}" [routerLink]="['payment-refund/prefrence']">Refund</li>
+            <!-- <li  class="sub-menu-items" routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='online-bilty'}" [routerLink]="['online-bilty/prefrence']">Online Bilty</li>
+            <li  class="sub-menu-items" routerLinkActive="active"  [ngClass]="{'active-route':activeRoute =='market-vehicle-slip'}" [routerLink]="['market-vehicle-slip/prefrence']">Market Vehicle Slip</li> -->
+          </ul>
+        </div>
+      </li>
+
+      <li class="menu-items list-icon list-icon--vehicle-trip" [ngClass]="{active: sideBar.expense}"
+      (click)="resetSlideBar('expense');sideBar.expense = !sideBar.expense">
+      <div class="item-wrapper">
+        <p class="menu-content">Expense</p>
+          <div class="menu-arrow">
+              <i class="material-icons drop-down">arrow_drop_down</i>
+          </div>
+      </div>
+      <div class="sub-menu">
+        <ul>
+          <!-- <li  class="sub-menu-items"
+          routerLinkActive="active" (click)="$event.stopPropagation()" [ngClass]="{'active-route':activeRoute =='purchase-order'}"  [routerLink]="['purchase-order/prefrence']">Purchase Order</li> -->
+          <li  class="sub-menu-items"
+              routerLinkActive="active" (click)="$event.stopPropagation()" [ngClass]="{'active-route':activeRoute =='jobcard'}"  [routerLink]="['jobcard/prefrence']">Job Card</li>
+        </ul>
+      </div>
+    </li>
+
+    <li class="menu-items list-icon list-icon--vehicle-trip" [ngClass]="{active: sideBar.payments}"
+    (click)="resetSlideBar('payments'); sideBar.payments = !sideBar.payments">
+    <div class="item-wrapper">
+      <p class="menu-content">Payments</p>
+        <div class="menu-arrow">
+            <i class="material-icons drop-down">arrow_drop_down</i>
+        </div>
+    </div>
+    <div class="sub-menu">
+      <ul>
+          <li  class="sub-menu-items" (click)="$event.stopPropagation()"
+          routerLinkActive="active" [ngClass]="{'active-route':activeRoute =='payment-against-bill'}"  [routerLink]="['payment-against-bill/prefrence']">Pay Later</li>
+          <li  class="sub-menu-items" (click)="$event.stopPropagation()"
+          routerLinkActive="active" [ngClass]="{'active-route':activeRoute =='payment-vendor-advance'}"  [routerLink]="['payment-vendor-advance/prefrence']">Vendor Advance</li>
+         
+      </ul>
+    </div>
+  </li> 
+
+        <li class="menu-items list-icon list-icon--vehicle-trip" [ngClass]="{active: sideBar.report}"
+        (click)="resetSlideBar('report');sideBar.report = !sideBar.report">
+        <div class="item-wrapper">
+          <p class="menu-content">Reports</p>
+            <div class="menu-arrow">
+                <i class="material-icons drop-down">arrow_drop_down</i>
+            </div>
+        </div>
+        <div class="sub-menu">
+          <ul>
+            <li (click)="$event.stopPropagation()" class="sub-menu-items"
+              routerLinkActive="active" *ngxPermissionsOnly="['journal_entry__view']"  [ngClass]="{'active-route':activeRoute =='journal-entry'}" [routerLink]="['journal-entry/prefrence']">Journal Entry</li>
+
+            <li (click)="$event.stopPropagation()" class="sub-menu-items"
+              routerLinkActive="active" *ngxPermissionsOnly= "['bank_activity__view']"  [ngClass]="{'active-route':activeRoute =='bank-activity'}" [routerLink]="['bank-activity/prefrence']">Bank Activity</li>
+
+          </ul>
+        </div>
+      </li>
+      <div >
+    </div>
+    </ul>
+  </nav>
+</aside>

@@ -1,0 +1,19 @@
+<div>
+    <app-party-details-header [partInfoDetails]="partInfoDetails" [partyId]="partyId" (updatedParty)="updatedParty($event)"></app-party-details-header>
+</div>
+    <div class="custom-fake-tab custom-fake-tab-sticky calc-height">
+        <p (click)="selectedTab=1 "matRipple  class="tab" [ngClass]="{'active-tab':selectedTab==1}">Party Info.</p>
+        <p (click)="selectedTab=2" matRipple class="tab" [ngClass]="{'active-tab':selectedTab==2}">Transactions</p>
+        <p (click)="selectedTab=5" matRipple class="tab" [ngClass]="{'active-tab':selectedTab==5}">Statement of Account</p>
+        <p (click)="selectedTab=3" matRipple class="tab" [ngClass]="{'active-tab':selectedTab==3}">Job Summary</p>
+        <p (click)="selectedTab=4" matRipple class="tab" [ngClass]="{'active-tab':selectedTab==4}">Rate Card</p>
+    </div>
+    <div class=" shadow-inset-top tab-content ">
+        <app-party-details-party-info [partInfoDetails]="partInfoDetails" [partyId]="partyId" *ngIf="selectedTab==1"></app-party-details-party-info>
+        <app-party-details-party-transactions [partyId]="partyId" *ngIf="selectedTab==2"></app-party-details-party-transactions>
+        <app-party-details-party-trip-summary  [partInfoDetails]="partInfoDetails" [partyId]="partyId" *ngIf="selectedTab==3"></app-party-details-party-trip-summary>
+        <app-rate-card *ngIf="selectedTab==4" [partyId]="partyId"></app-rate-card>
+        <app-party-statement-of-client *ngIf="selectedTab==5" [partyId]="partyId"></app-party-statement-of-client>
+    </div>
+   
+ 

@@ -1,0 +1,1415 @@
+@import "../../../../assets/styles/helpers/variable";
+@import "../../../../assets/styles/helpers/placeholder";
+@import "../../../../assets/styles/helpers/mixins";
+$asideImagesX-axis: center;
+$asidePositionY-axis:center;
+$background-size:17px;
+$hover-bg-color:#F8F7FF;
+
+.aside-bar {
+  color: $secondary-text-color;
+  width: 240px;
+  box-sizing: content-box;
+  position: fixed;
+  top: 61px;
+  bottom: 42px;
+  z-index: 5;
+  max-height: 100%;
+  line-height: 1.3;
+  overflow-y: auto;
+  background: #fff;
+
+  &.main-content-demo-aside {
+
+
+    @media (max-width:900px) {
+      nav {
+        max-height: 83%;
+      }
+    }
+
+    @media (max-width:767px) {
+      top: 170px;
+
+      nav {
+        max-height: 80%;
+      }
+    }
+
+    @media (max-width:475px) {
+      top: 185px;
+
+      nav {
+        max-height: 75%;
+      }
+    }
+  }
+
+  nav {
+    // max-height: calc(100% - 32px);
+    // overflow: auto;
+  }
+
+  .list-tab {
+    display: block;
+    padding: 8px 10px 8px 55px;
+  }
+
+  .main-active {
+    &::before {
+      content: "";
+      width: 6px;
+      height: 25px;
+      border-radius: 5px;
+      position: absolute;
+      left: 1px;
+      background: #595FAB;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .list-tab {
+      background-color: $hover-bg-color;
+      color: #595FAB;
+      font-weight: 600;
+
+      +.add-icon {
+        display: flex;
+        font-size: 17px;
+        opacity: 1;
+      }
+    }
+  }
+
+  .nav-padding {
+    cursor: pointer;
+    position: relative;
+    min-height: 32px;
+
+    &:hover {
+      background-color: $hover-bg-color;
+      color: #595FAB;
+      font-weight: 600;
+
+      .add-icon {
+        display: flex;
+        font-size: 17px;
+        opacity: 1;
+      }
+
+      .material-bg {
+        color: #595FAB;
+      }
+    }
+
+    .active,
+    &.active {
+      background-color: $hover-bg-color;
+      color: #595FAB;
+      font-weight: 600;
+
+      &::before {
+        content: "";
+        width: 6px;
+        height: 25px;
+        border-radius: 5px;
+        position: absolute;
+        left: 1px;
+        background: #595FAB;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+      }
+
+      +.add-icon {
+        display: flex;
+        font-size: 17px;
+        opacity: 1;
+      }
+    }
+
+    .list-tab {
+
+      &:hover,
+      &.active {
+        background-color: $hover-bg-color;
+        color: #595FAB;
+        font-weight: 600;
+      }
+
+      &:hover+.add-icon {
+        display: flex;
+        font-size: 17px;
+        opacity: 1;
+      }
+    }
+  }
+
+  .sub-menu {
+    height: 105px;
+    position: relative;
+    overflow: hidden;
+
+    &.active-sub-menu {
+      height: auto;
+    }
+
+    &.trip-menu {
+      height: 140px;
+
+      >div {
+        &:nth-child(3) {
+          pointer-events: all;
+        }
+        &:nth-child(4) {
+          pointer-events: none;
+        }
+      }
+    }
+
+    >div {
+      &:nth-child(3) {
+        pointer-events: none;
+      }
+    }
+
+    &.trip-menu .trips-pointer {
+      pointer-events: unset;
+    }
+
+    >div {
+      &:nth-child(4) {
+        pointer-events: none;
+      }
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 12px;
+      width: 100%;
+      box-shadow: 0 2px 13px 22px #fefefe;
+      pointer-events: none;
+      background: rgba(254, 254, 254, 0.9);
+    }
+  }
+
+  .active {
+    .sub-menu {
+      >div {
+        &:nth-child(3) {
+          pointer-events: unset;
+        }
+      }
+
+      &.trip-menu .trips-icon {
+        pointer-events: unset;
+      }
+
+      >div {
+        &:nth-child(4) {
+          pointer-events: unset;
+        }
+      }
+    }
+  }
+
+  .menu-main-toggle {
+    // padding-bottom: 30px;
+  }
+
+  .module-heading {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 5px 15px 7px 15px;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      position: absolute;
+      height: 1px;
+      width: 100%;
+      background: #6B71B554;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: 15px;
+    }
+  }
+
+  .menu-main {
+    font-size: 13px;
+    position: relative;
+    font-weight: 400;
+
+    .menu-main-text {
+      display: block;
+    }
+  }
+
+  .add-icon {
+    position: absolute;
+    opacity: 0;
+    right: 5px;
+    color: #595FAB;
+    font-weight: 800;
+    top: 50%;
+    transform: translateY(-50%);
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .active {
+    .sub-menu {
+
+      height: auto;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+
+      &::after {
+        display: none;
+      }
+    }
+
+    .toggle-main {
+      bottom: -10px;
+    }
+  }
+
+  .toggle-main {
+    position: absolute;
+    width: 100%;
+    height: 18px;
+    bottom: 0;
+
+    .menu-toggle {
+      cursor: pointer;
+      max-width: 12px;
+      border-top: 7px solid #5a6b7b;
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+      margin: auto;
+      text-align: center;
+      display: flex;
+      position: relative;
+      top: 8px;
+    }
+
+    &.activatedToggle {
+      .menu-toggle {
+        border-top: none;
+        border-bottom: 7px solid #595FAB;
+      }
+    }
+  }
+
+
+  .material-bg {
+    position: absolute;
+    left: $asideImagesX-axis;
+    font-size: $background-size;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .icon {
+
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    width: 30px;
+    transform: translateY(-50%);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+
+
+  @mixin get-started-icon {
+
+    background: url('/assets/img/aside/get-started-icon.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin get-started-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/get-started-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+
+  @mixin vehicles-icon {
+
+    background: url('/assets/img/icons/vehicles-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin vehicles-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/vehicles-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+  @mixin assets-icon {
+
+    background: url('/assets/img/icons/asset.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin assets-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/asset-active.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+  @mixin container-icon {
+
+    background: url('/assets/img/icons/container-gray.png') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: 27px;
+  }
+
+  @mixin container-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/container-active.png') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: 27px;
+  }
+
+  @mixin parties-icon {
+    background: url('/assets/img/icons/parties-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin parties-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/parties-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+  @mixin zone-icon{
+    background: url('../../../../assets/img/icons/zone.png') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+  @mixin zone-icon-active {
+    background: $hover-bg-color url('../../../../assets/img/icons/zone-hover.png') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin rate-card-common-icon {
+    background: url('../../../../assets/img/icons/rate-card-side-nav.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+  
+  @mixin rate-card-common-active {
+    background: $hover-bg-color url('../../../../assets/img/icons/rate-card-side-nav-active.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+  
+
+  @mixin employee-icon {
+    background: url('/assets/img/icons/employee-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin employee-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/employee-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin bank-icon {
+    background: url('/assets/img/icons/bank-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin bank-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/bank-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin trip-code-icon {
+    background: url('/assets/img/aside/trip-code.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin trip-code-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/trip-code-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin tyre-master-icon {
+    background: url('/assets/img/icons/tyre-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+  @mixin item-master-icon {
+    background: url('/assets/img/icons/services-goods.png') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin tyre-master-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/tyre-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+  @mixin item-master-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/services-goods-active.png') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin opening-balance-icon {
+    background: url('/assets/img/aside/opening-balance.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin opening-balance-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/opening-balance-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin quotation-icon {
+    background: url('/assets/img/icons/quick-action-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin quotation-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/quick-action-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin work-order-icon {
+    background: url('/assets/img/aside/work-order.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin work-order-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/work-order-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin trips-icon {
+    background: url('/assets/img/aside/trip.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin trips-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/trip-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin vehicle-payment-icon {
+    background: url('/assets/img/aside/vehicle-payment.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin vehicle-payment-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/vehicle-payment-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin trip-expense-icon {
+    background: url('/assets/img/icons/trip-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin trip-expense-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/trip-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin employee-others-icon {
+    background: url('/assets/img/aside/employee-other.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin employee-others-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/employee-other-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin invoice-icon {
+    background: url('/assets/img/aside/invoice.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin invoice-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/invoice-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin payment-received-icon {
+    background: url('/assets/img/aside/payment-received.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin payment-received-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/payment-received-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin debit-note-icon {
+    background: url('/assets/img/icons/debit-note-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin debit-note-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/debit-note-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin credit-note-icon {
+    background: url('/assets/img/icons/vendor-credit-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin credit-note-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/vendor-credit-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin bill-of-supply-icon {
+    background: url('/assets/img/icons/bill-supply-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin bill-of-supply-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/bill-supply-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin advance-icon {
+    background: url('/assets/img/aside/advance.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin advance-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/advance-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin refund-icon {
+    background: url('/assets/img/aside/refund.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin refund-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/refund-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin cheque-payment-icon {
+    background: url('/assets/img/aside/cheque-payment.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin cheque-payment-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/cheque-payment-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin maintenance-icon {
+    background: url('/assets/img/aside/maintenance.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin maintenance-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/maintenance-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin salaries-icon {
+    background: url('/assets/img/aside/salaries.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin salaries-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/salaries-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin other-bills-icon {
+    background: url('/assets/img/aside/other-bills.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin other-bills-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/other-bills-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin petty-expense-icon {
+    background: url('/assets/img/aside/petty-expense.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin petty-expense-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/petty-expense-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin pay-later-icon {
+    background: url('/assets/img/aside/pay-later.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin pay-later-icon-active {
+    background: $hover-bg-color url('/assets/img/aside/pay-later-hover.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin vendor-advance-icon {
+    background: url('/assets/img/icons/payments-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin vendor-advance-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/payments-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin vendor-credits-icon {
+    background: url('/assets/img/icons/invoices-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin vendor-credits-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/invoices-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin purchase-order-icon {
+    background: url('/assets/img/icons/trip-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin purchase-order-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/trip-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin inventory-new-icon {
+    background: url('/assets/img/icons/activities-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin inventory-new-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/activities-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin adjustment-icon {
+    background: url('/assets/img/icons/activities-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin adjustment-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/activities-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin reports-icon {
+    background: url('/assets/img/icons/reports-bw.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+  @mixin reports-icon-active {
+    background: $hover-bg-color url('/assets/img/icons/reports-cl.svg') no-repeat $asideImagesX-axis $asidePositionY-axis;
+    background-size: $background-size;
+  }
+
+
+  .nav-padding {
+    .get-started-icon {
+      @include get-started-icon();
+    }
+
+    &:hover .get-started-icon {
+      @include get-started-icon-active()
+    }
+
+    &.main-active {
+      .get-started-icon {
+        @include get-started-icon-active()
+      }
+    }
+
+
+    .vehicles-icon {
+      @include vehicles-icon();
+    }
+
+    &:hover .vehicles-icon {
+      @include vehicles-icon-active()
+    }
+
+    &.main-active {
+      .vehicles-icon {
+        @include vehicles-icon-active()
+      }
+    }
+    .assets-icon {
+      @include assets-icon();
+    }
+
+    &:hover .assets-icon {
+      @include assets-icon-active()
+    }
+
+    &.main-active {
+      .assets-icon {
+        @include assets-icon-active()
+      }
+    }
+    .container-icon {
+      @include container-icon();
+    }
+
+    &:hover .container-icon {
+      @include container-icon-active()
+    }
+
+    &.main-active {
+      .container-icon {
+        @include container-icon-active()
+      }
+    }
+
+    .parties-icon {
+      @include parties-icon();
+    }
+
+    &:hover .parties-icon {
+      @include parties-icon-active()
+    }
+
+    &.main-active {
+      .parties-icon {
+        @include parties-icon-active()
+      }
+    }
+
+    .employee-icon {
+      @include employee-icon();
+    }
+
+    &:hover .employee-icon {
+      @include employee-icon-active()
+    }
+    .zone-icon {
+      @include zone-icon();
+    }
+
+    &:hover .zone-icon {
+      @include zone-icon-active()
+    }
+    &.main-active {
+      .zone-icon {
+        @include zone-icon-active()
+      }
+    }
+    .rate-card-common-icon {
+      @include rate-card-common-icon();
+    }
+    
+    &:hover .rate-card-common-icon {
+      @include rate-card-common-active();
+    }
+    
+    &.main-active {
+      .rate-card-common-icon{
+          @include rate-card-common-active();
+      }
+    }
+
+    &.main-active {
+      .employee-icon {
+        @include employee-icon-active()
+      }
+    }
+
+    .bank-icon {
+      @include bank-icon();
+    }
+
+    &:hover .bank-icon {
+      @include bank-icon-active()
+    }
+
+    &.main-active {
+      .bank-icon {
+        @include bank-icon-active()
+      }
+    }
+
+    .trip-code-icon {
+      @include trip-code-icon();
+    }
+
+    &:hover .trip-code-icon {
+      @include trip-code-icon-active()
+    }
+
+    &.main-active {
+      .trip-code-icon {
+        @include trip-code-icon-active()
+      }
+    }
+
+    .tyre-master-icon {
+      @include tyre-master-icon();
+    }
+
+    &:hover .tyre-master-icon {
+      @include tyre-master-icon-active()
+    }
+
+    &.main-active {
+      .tyre-master-icon {
+        @include tyre-master-icon-active()
+      }
+    }
+    .item-master-icon {
+      @include item-master-icon();
+    }
+
+    &:hover .item-master-icon {
+      @include item-master-icon-active()
+    }
+
+    &.main-active {
+      .item-master-icon {
+        @include item-master-icon-active()
+      }
+    }
+
+    .opening-balance-icon {
+      @include opening-balance-icon()
+    }
+
+    &:hover .opening-balance-icon {
+      @include opening-balance-icon-active()
+    }
+
+    &.main-active {
+      .opening-balance-icon {
+        @include opening-balance-icon-active()
+      }
+    }
+
+    .quotation-icon {
+      @include quotation-icon();
+    }
+
+    &:hover .quotation-icon {
+      @include quotation-icon-active()
+    }
+
+    &.main-active {
+      .quotation-icon {
+        @include quotation-icon-active()
+      }
+    }
+
+    .work-order-icon {
+      @include work-order-icon();
+    }
+
+    &:hover .work-order-icon {
+      @include work-order-icon-active()
+    }
+
+    &.main-active {
+      .work-order-icon {
+        @include work-order-icon-active()
+      }
+    }
+
+    .trips-icon {
+      @include trips-icon();
+    }
+
+    &:hover .trips-icon {
+      @include trips-icon-active()
+    }
+
+    &.main-active {
+      .trips-icon {
+        @include trips-icon-active()
+      }
+    }
+
+    .vehicle-payment-icon {
+      @include parties-icon();
+    }
+
+    &:hover .vehicle-payment-icon {
+      @include parties-icon-active()
+    }
+
+    &.main-active {
+      .vehicle-payment-icon {
+        @include parties-icon-active()
+      }
+    }
+
+    .trip-expense-icon {
+      @include trip-expense-icon();
+    }
+
+    &:hover .trip-expense-icon {
+      @include trip-expense-icon-active()
+    }
+
+    &.main-active {
+      .trip-expense-icon {
+        @include trip-expense-icon-active()
+      }
+    }
+
+    .employee-others-icon {
+      @include employee-others-icon();
+    }
+
+    &:hover .employee-others-icon {
+      @include employee-others-icon-active()
+    }
+
+    &.main-active {
+      .employee-others-icon {
+        @include employee-others-icon-active()
+      }
+    }
+
+    .invoice-icon {
+      @include invoice-icon();
+    }
+
+    &:hover .invoice-icon {
+      @include invoice-icon-active()
+    }
+
+    &.main-active {
+      .invoice-icon {
+        @include invoice-icon-active()
+      }
+    }
+
+    .payment-received-icon {
+      @include payment-received-icon();
+    }
+
+    &:hover .payment-received-icon {
+      @include payment-received-icon-active()
+    }
+
+    &.main-active {
+      .payment-received-icon {
+        @include payment-received-icon-active()
+      }
+    }
+
+    .debit-note-icon {
+      @include debit-note-icon();
+    }
+
+    &:hover .debit-note-icon {
+      @include debit-note-icon-active()
+    }
+
+    &.main-active {
+      .debit-note-icon {
+        @include debit-note-icon-active()
+      }
+    }
+
+    .credit-note-icon {
+      @include credit-note-icon();
+    }
+
+    &:hover .credit-note-icon {
+      @include credit-note-icon-active()
+    }
+
+    &.main-active {
+      .credit-note-icon {
+        @include credit-note-icon-active()
+      }
+    }
+
+    .bill-of-supply-icon {
+      @include bill-of-supply-icon();
+    }
+
+    &:hover .bill-of-supply-icon {
+      @include bill-of-supply-icon-active()
+    }
+
+    &.main-active {
+      .bill-of-supply-icon {
+        @include bill-of-supply-icon-active()
+      }
+    }
+
+    .advance-icon {
+      @include advance-icon();
+    }
+
+    &:hover .advance-icon {
+      @include advance-icon-active()
+    }
+
+    &.main-active {
+      .advance-icon {
+        @include advance-icon-active()
+      }
+    }
+
+    .refund-icon {
+      @include refund-icon();
+    }
+
+    &:hover .refund-icon {
+      @include refund-icon-active()
+    }
+
+    &.main-active {
+      .refund-icon {
+        @include refund-icon-active()
+      }
+    }
+
+    .cheque-payment-icon {
+      @include cheque-payment-icon();
+    }
+
+    &:hover .cheque-payment-icon {
+      @include cheque-payment-icon-active()
+    }
+
+    &.main-active {
+      .cheque-payment-icon {
+        @include cheque-payment-icon-active()
+      }
+    }
+
+    .maintenance-icon {
+      @include maintenance-icon();
+    }
+
+    &:hover .maintenance-icon {
+      @include maintenance-icon-active()
+    }
+
+    &.main-active {
+      .maintenance-icon {
+        @include maintenance-icon-active()
+      }
+    }
+
+    .salaries-icon {
+      @include salaries-icon();
+    }
+
+    &:hover .salaries-icon {
+      @include salaries-icon-active()
+    }
+
+    &.main-active {
+      .salaries-icon {
+        @include salaries-icon-active()
+      }
+    }
+
+    .other-bills-icon {
+      @include other-bills-icon();
+    }
+
+    &:hover .other-bills-icon {
+      @include other-bills-icon-active()
+    }
+
+    &.main-active {
+      .other-bills-icon {
+        @include other-bills-icon-active()
+      }
+    }
+
+    .petty-expense-icon {
+      @include petty-expense-icon();
+    }
+
+    &:hover .petty-expense-icon {
+      @include petty-expense-icon-active()
+    }
+
+    &.main-active {
+      .petty-expense-icon {
+        @include petty-expense-icon-active()
+      }
+    }
+
+    .pay-later-icon {
+      @include pay-later-icon();
+    }
+
+    &:hover .pay-later-icon {
+      @include pay-later-icon-active()
+    }
+
+    &.main-active {
+      .pay-later-icon {
+        @include pay-later-icon-active()
+      }
+    }
+
+    .vendor-advance-icon {
+      @include vendor-advance-icon();
+    }
+
+    &:hover .vendor-advance-icon {
+      @include vendor-advance-icon-active()
+    }
+
+    &.main-active {
+      .vendor-advance-icon {
+        @include vendor-advance-icon-active()
+      }
+    }
+
+    .vendor-credits-icon {
+      @include vendor-credits-icon();
+    }
+
+    &:hover .vendor-credits-icon {
+      @include vendor-credits-icon-active()
+    }
+
+    &.main-active {
+      .vendor-credits-icon {
+        @include vendor-credits-icon-active()
+      }
+    }
+
+    .purchase-order-icon {
+      @include purchase-order-icon();
+    }
+
+    &:hover .purchase-order-icon {
+      @include purchase-order-icon-active()
+    }
+
+    &.main-active {
+      .purchase-order-icon {
+        @include purchase-order-icon-active()
+      }
+    }
+
+    .inventory-new-icon {
+      @include inventory-new-icon();
+    }
+
+    &:hover .inventory-new-icon {
+      @include inventory-new-icon-active()
+    }
+
+    &.main-active {
+      .inventory-new-icon {
+        @include inventory-new-icon-active()
+      }
+    }
+
+    .adjustment-icon {
+      @include adjustment-icon();
+    }
+
+    &:hover .adjustment-icon {
+      @include adjustment-icon-active()
+    }
+
+    &.main-active {
+      .adjustment-icon {
+        @include adjustment-icon-active()
+      }
+    }
+
+
+    .reports-icon {
+      @include reports-icon();
+    }
+
+    &:hover .reports-icon {
+      @include reports-icon-active()
+    }
+
+    &.main-active {
+      .reports-icon {
+        @include reports-icon-active()
+      }
+    }
+  }
+.aside-collapse{
+  padding: 10px 0 0 0;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+}
+  //closed nav
+  &.menu-closed {
+
+    width: 105px;
+
+
+    .aside-collapse{
+      padding: 0px 0 10px 0px;
+      transform: rotate(180deg);
+      text-align: left;
+      display: flex;
+      justify-content: flex-end;
+
+    }
+
+   /*  *{
+      overflow: visible;
+    } */
+
+    // &::-webkit-scrollbar {
+
+    //   display: none;
+    // }
+
+    .nav-padding {
+      opacity: 1;
+
+      &:hover {
+        .list-tab {
+
+          transform: translate(116px, 0);
+          background: rgba(241, 241, 241, 0.9411764706);
+          border-radius: 5px;
+          left: 8px;
+          letter-spacing: 0.6px;
+          color: #A09EB4;
+          font-size: 12px;
+          padding: 10px 20px;
+          display: none;
+        }
+      }
+    }
+
+    .menu--collapsed {
+      // overflow: inherit;
+
+      .nav-padding{
+        margin: 10px auto;
+      }
+      .icon{
+        background-size: 24px ;
+      }
+      .add-icon{
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #C3BBF8;
+        display: none !important;
+
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        position: relative;
+        top: unset;
+        transform: unset;
+        left: 90px;
+      }
+
+      .list-tab {
+        font-size: 0;
+        background-size: 21px;
+        padding: 0;
+        background-position: center center;
+        display: none;
+      }
+
+      .module-heading {
+        text-align: center;
+        padding-top: 12px;
+        margin: 5px 0 0 0;
+
+        &::after {
+          visibility: hidden;
+        }
+      }
+
+      .toggle-main {
+        height: 25px;
+      }
+
+      .menu-toggle {
+        max-width: unset;
+        border: none;
+
+
+        &::before {
+          content: "\f078";
+          font-size: 12px;
+          color: #595FAB;
+
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 20px;
+          height: 20px;
+          margin: auto;
+          border-radius: 50%;
+          right: 0;
+          background: #C3BBF8;
+          font-family: 'FontAwesome';
+          line-height: 1.6;
+
+        }
+      }
+
+      .icon {
+        margin: auto;
+        left: 0;
+        right: 0;
+      }
+
+      .material-bg {
+        font-size: 21px;
+        left: 0;
+        right: 0;
+        margin: auto;
+        text-align: center;
+
+      }
+      .active{
+        .menu-toggle {
+          &::before{
+            transform: rotate(180deg);
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width:1100px) {
+  .aside-bar {
+    position: fixed;
+
+    background: #fefefe;
+    // height: 87%;
+    top: 61px;
+
+    left: 0;
+    max-width: 400px;
+
+
+    &::after {
+      content: '';
+    }
+
+    .aside-collapse {
+      display: none;
+    }
+  }
+}
+
+@media(max-width:800px) {
+  .add-icon {
+    display: none !important;
+  }
+}

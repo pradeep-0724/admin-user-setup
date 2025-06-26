@@ -1,0 +1,125 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+
+.transaction-wrap {
+    background-color: $layout-bg;
+}
+
+.box-110px {
+    width: 150px;
+}
+
+
+
+
+.create-btn,
+.pay-btn {
+    border: 1px solid #2BB741;
+    padding: 8px 12px;
+    color: #2BB741;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 100ms ease-in-out;
+
+    &:hover {
+
+        transform: scale(1.04);
+
+    }
+
+    .bi {
+        margin-right: 10px;
+
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        color: $text-color;
+        border-color: $text-color;
+    }
+}
+
+.edit-btn {
+    border: 1px solid #ACB5BD;
+    height: 30px;
+    width: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #676A6E;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 100ms ease-in-out;
+
+    &:hover {
+
+        transform: scale(1.04);
+
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        color: $text-color;
+        border-color: $text-color;
+    }
+
+    .bi-pencil-fill {
+        margin-right: 10px;
+
+    }
+}
+
+.del-btn {
+    border: 1px solid #ACB5BD;
+    height: 30px;
+    width: 30px;
+    border-radius: 4px;
+    transition: all 100ms ease-in-out;
+
+    .material-icons {
+        font-size: 20px;
+    }
+
+    &:hover {
+
+        transform: scale(1.04);
+
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        color: $text-color;
+        border-color: $text-color;
+    }
+
+
+}
+
+.label {
+    font-weight: 600;
+    color: #676A6E;
+    font-size: 14px;
+}
+
+.warning {
+    color: #FF0000;
+}
+
+.green-label {
+    color: #2BB741;
+}
+
+.primary-label {
+    color: $primary-brand-color;
+    font-size: 15px;
+}
+
+
+
+
+
+p {
+    color: $text-color
+}

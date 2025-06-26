@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="18px" viewBox="0 0 22 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53 (72520) - https://sketchapp.com -->
+    <title>Group 7</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="0 17.28 21.6 17.28 21.6 0 0 0"></polygon>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon/sub-nav/payment" transform="translate(-1.000000, -3.000000)">
+            <g id="Group-7" transform="translate(1.200000, 3.600000)">
+                <polygon id="Fill-1" fill="#FFFFFF" points="2.16 2.16 19.44 2.16 19.44 4.32 2.16 4.32"></polygon>
+                <polygon id="Fill-3" fill="#EAEAEA" points="2.16 15.12 19.44 15.12 19.44 8.64 2.16 8.64"></polygon>
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <g id="Clip-6"></g>
+                <path d="M2.16,4.32 L19.44,4.32 L19.44,2.16 L2.16,2.16 L2.16,4.32 Z M2.16,15.12 L19.44,15.12 L19.44,8.64 L2.16,8.64 L2.16,15.12 Z M19.44,0 L2.16,0 C0.9612,0 0.0108,0.9612 0.0108,2.16 L0,15.12 C0,16.3188 0.9612,17.28 2.16,17.28 L19.44,17.28 C20.6388,17.28 21.6,16.3188 21.6,15.12 L21.6,2.16 C21.6,0.9612 20.6388,0 19.44,0 L19.44,0 Z" id="Fill-5" fill="#939BA4" mask="url(#mask-2)"></path>
+            </g>
+        </g>
+    </g>
+</svg>

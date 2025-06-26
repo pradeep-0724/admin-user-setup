@@ -1,0 +1,90 @@
+<div class="add-fuel-popup">
+  <div class="popup-header ">
+    <h6 class="d-inline">Fuel &nbsp;</h6>
+    <span><app-tool-tip class="tool-tip-position trip-no" [totalSlides]="fuelInfo.content.length" position="right"
+        [toolTipContent]="fuelInfo"></app-tool-tip></span>
+  </div>
+  <div class="popup-body">
+    <form [formGroup]="addFuelPopUpForm">
+      <div class="container-fluid">
+        <div class="row">
+
+          <div class="input-wrap error col-lg-3" [ngClass]="addErrorClass(addFuelPopUpForm.controls.fuel_quantity)">
+
+
+            <label class="input--required">Fuel Usage</label>
+            <input positiveThreeDigitDecimalNumber type="text" class="input--bd error-box"
+              formControlName="fuel_quantity" placeholder="0.000" value="" (change)="populateFuelRate()">
+          </div>
+          <div class=" input-wrap error col-lg-3" [ngClass]="addErrorClass(addFuelPopUpForm.controls.fuel_rate)">
+            <label>Fuel Rate   ({{ currency_type?.symbol}})</label>
+
+            <input positiveThreeDigitDecimalNumber type="text" placeholder="0.000" class="input--bd error-box"
+              formControlName="fuel_rate" value="" (change)="calculateFuelAmount()">
+          </div>
+
+          <div class=" input-wrap error col-lg-3" [ngClass]="addErrorClass(addFuelPopUpForm.controls.amount)">
+            <label>Amount  ({{ currency_type?.symbol}})</label>
+
+            <input positiveThreeDigitDecimalNumber type="text" placeholder="0.000" class=" input--bd error-box"
+              formControlName="amount" value="" readonly>
+          </div>
+          <div class="input-wrap col-lg-3">
+            <label for="" class="input--required" >Vehicle No.</label>
+            <material-dropdown [searchable]="true"
+              [addErrorClass]="addErrorClass(addFuelPopUpForm.controls.vehicle_no)"
+              [selectedOption]="initialDetails.vehicle" [addable]="false">
+              <select formControlName="vehicle_no" #customSelect class="no-style select--modify">
+                <option *ngFor="let option of vehiclesList" value="{{ option?.id }}">
+                  {{ option?.reg_number }}
+                </option>
+              </select>
+            </material-dropdown>
+          </div>
+
+          <div class="col-12 input-wrap d-flex align-items-center check-box">
+            <input type="checkbox" (change)="fuelSlipChecked(true)" formControlName="has_slip" class="w-auto me-3"
+              id="myCheckbox" name="myCheckbox">
+              <span  class="check-mark d-inline-block align-middle me-2"></span>
+            <label for="myCheckbox" class="m-0 d-inline">Create a fuel purchase slip</label>
+            <span>&nbsp;&nbsp;<app-tool-tip class="tool-tip-position trip-no d-inline-block mt-2"
+                [totalSlides]="fuelSlipInfo.content.length" position="right"
+                [toolTipContent]="fuelSlipInfo"></app-tool-tip></span>
+          </div>
+          <ng-container *ngIf="addFuelPopUpForm.controls.has_slip.value">
+
+            <div class="input-wrap col-3">
+              <label for="" [ngClass]="{'input--required':addFuelPopUpForm.controls.has_slip.value}" class="input">Party Name
+                 </label>
+              <material-dropdown [searchable]="true"
+                [addErrorClass]="addErrorClass(addFuelPopUpForm.controls.party_name)"
+                [selectedOption]="initialDetails.customer" [addable]="true"
+                [disabled]="!addFuelPopUpForm.controls.has_slip.value" [party]="true"
+                (addPartyPopup)="openAddPartyModal($event)" (addValueToList)="addValueToPartyPopup($event)"
+                [params]="partyNamePopup">
+                <select formControlName="party_name" #customSelect class="no-style select--modify">
+                  <option *ngFor="let option of partyListVendor" value="{{ option?.id }}">
+                    {{ option?.party_display_name }}
+                  </option>
+                </select>
+              </material-dropdown>
+            </div>
+          </ng-container>
+
+          <div class="d-flex justify-content-space-between m-1 ">
+            <button class="btn w-auto " (click)="cancel()">Cancel</button>
+            <button class="btn btn--primary w-auto" (click)="save()">Save</button>
+          </div>
+
+
+        </div>
+      </div>
+
+    </form>
+
+
+  </div>
+</div>
+
+<app-add-party-popup *ngIf="showAddPartyPopup.status" [popDetail]="showAddPartyPopup" [isVendor]="true"
+  (closeModal)="closePartyPopup()" (partyAdded)="addPartyToOption($event)"></app-add-party-popup>

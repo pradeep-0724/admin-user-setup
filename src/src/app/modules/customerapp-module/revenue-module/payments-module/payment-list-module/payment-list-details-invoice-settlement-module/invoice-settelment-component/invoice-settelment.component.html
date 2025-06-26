@@ -1,0 +1,115 @@
+<div class="calc-height" [ngClass]="{'border-bottom':routeToDetail}">
+  <app-list-widget [isFilter]="true" [isDateRangeText]="true" [isDateRange]="false" [isDropDown]="true"
+    [isAddButton]="true" [filterUrl]="filterUrl" [isDateDropDown]="true" [subtractDays]="30" [end_date]="end_date"
+    [tabSelectionList]="tabSelectionList" (listWidgetData)="listWidgetData($event)" [buttonData]="buttonData">
+    <button class="gb-video-play me-2" id="custom-button-left" (click)="openGothrough()">
+      <i class="bi bi-play-circle-fill"></i>
+    </button>
+  </app-list-widget>
+  <div class="alert-msg" *ngIf="apiError">
+    <span class="icon-wrap"></span>
+    <p class="message-cont">{{ apiError }}</p>
+  </div>
+</div>
+
+<div class="row mx-0">
+
+  <div class="custom-table-container fuel-list-height bg-white  fuel-list-wrap  p-0"
+    [ngClass]="routeToDetail?'col-lg-4':'col-lg-12'" (scroll)="onScroll($event)" id="payment-received-table">
+    <table [ngClass]="{'h-100':paymentReceivedList.length==0}">
+
+      <thead *ngIf="!routeToDetail">
+        <tr>
+          <th>DATE</th>
+          <th>PAYMENT NO</th>
+          <th>CUSTOMER</th>
+          <th>ACCOUNT </th>
+          <th>PAYMENT MODE</th>
+          <th>AMOUNT RECEIVED({{currency_type.symbol}})</th>
+          <th>TOTAL ADJUSTMENT ({{currency_type.symbol}})</th>
+          <th>STATUS</th>
+          <th class="icon-box"></th>
+        </tr>
+      </thead>
+      <tbody *ngIf="paymentReceivedList.length == 0">
+        <tr class="border-0">
+          <td class="bg-white" colspan="30">
+            <div class="no-list-data-wrap">
+              <figure>
+                <img src="assets/img/no-content.png" alt="">
+              </figure>
+              <h5 class="mt-3 primary-brand-text">No data found!</h5>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+
+      <tbody>
+        <tr *ngFor="let data of paymentReceivedList" [ngClass]="{'activated-row':selectedId==data.id && routeToDetail}">
+          <ng-container *ngIf="routeToDetail">
+            <td (click)="createQueryParems(data.id)" class="cursor-pointer">
+              <div class=" mb-3 fs-6 fw-semibold ">{{data.party.display_name}}</div>
+              <div>
+                <span class="link fw-medium ">{{data.payment_number}}</span>
+                <span class="detail-date"> {{data.date}}</span>
+              </div>
+            </td>
+            <td (click)="createQueryParems(data.id)" class="cursor-pointer">
+              <div class=" mb-3 fs-6 fw-semibold text-end">{{currency_type.symbol}} {{data.amount_received | numberFormat}}</div>
+              <div class=" text-end">
+                {{data.status}}
+              </div>
+
+            </td>
+          </ng-container>
+          <ng-container *ngIf="!routeToDetail">
+            <td>{{data.date}}</td>
+            <td><a class="custom-link" (click)="createQueryParems(data.id)">{{data.payment_number}}</a>
+            </td>
+            <td class="td-2l"><div class="text-2l"><a class="custom-link " target="_blank"
+                [routerLink]="[prefixUrl+'/onboarding/party/details/client/'+data.party.id]">{{data.party.display_name}}</a></div>
+            </td>
+            <td>{{data.account}}</td>
+            <td>{{data.payment_choice}}</td>
+            <td>{{data.amount_received | numberFormat}}</td>
+            <td>{{data.adjustment | numberFormat}}</td>
+            <td>{{data.status}}</td>
+            <td class="icon-box  tabIndexActive">
+              <div class="d-flex justify-content-center align-items-center">
+                <div class="position-relative">
+                  <i class="material-icons more-icon" (click)="optionsList(data.id)"
+                    *ngxPermissionsOnly="[invoiceSettlementPermissions[1],invoiceSettlementPermissions[2]]">more_vert</i>
+                  <ul class="more-actions__menu table-popup" [ngClass]="{show: showOptions === data.id}">
+                    <li class="more-actions__item" *ngxPermissionsOnly="invoiceSettlementPermissions[1]"
+                      [routerLink]="[prefixUrl+'/income/payments/invoice/edit', data.id]"><i
+                        class="material-icons">edit</i>Edit</li>
+                    <ng-container>
+                      <li *ngxPermissionsOnly="invoiceSettlementPermissions[2]" class="more-actions__item"
+                        (click)="popupFunction(data, i)"><i class="material-icons">delete</i>Delete</li>
+                    </ng-container>
+                  </ul>
+                </div>
+              </div>
+
+            </td>
+          </ng-container>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-lg-8 p-0  pdf-viewer">
+    <app-detail-invoice-settelment [defaultDownload]="defaultDownload" *ngIf="routeToDetail"
+      [routeToDetail]="routeToDetail"
+      (openDetailsEmitter)="openListDetailsData($event)"></app-detail-invoice-settelment>
+  </div>
+
+</div>
+
+
+
+
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>
+
+<app-go-through [goThroughDetais]="goThroughDetais"></app-go-through>

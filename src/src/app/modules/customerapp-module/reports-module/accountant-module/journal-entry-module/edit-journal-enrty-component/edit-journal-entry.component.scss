@@ -1,0 +1,17 @@
+.alert-msg {
+    min-width: 600px !important;
+    max-width: 800px !important;
+    //margin-bottom: 25px !important;
+}
+
+.select-wrap{
+    &.error{
+        .add-hsn{
+            border: 1px solid #eb1e4a;
+            &::placeholder{
+                color: #eb1e4a;
+            }
+        }
+    }
+} 
+

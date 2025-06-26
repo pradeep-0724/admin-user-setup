@@ -1,0 +1,273 @@
+<div class="form-layout__card formResponsiveTable  bill">
+    <div action="" [formGroup]="billingForm">
+            <div class="row mx-0 px-3 pt-4 " >
+              <div class="custom-box-input-wrap  col-lg-3 col-md-6 mg-bottom-30" [ngClass]="{'disable':isDisableBillingTypes}" >
+                <label for="" >Invoicing Mode <app-tool-tip class="tool-tip-position lower" [totalSlides]="1"
+                  position="right" [toolTipContent]="locationToolTip"></app-tool-tip></label>
+                  <material-dropdown [searchable]="true"  [disabled]="isDisableBillingTypes" [selectedOption]="initialValues.billingType">
+                    <select #customSelect formControlName="billing_type" class="no-style select--modify" (change)="onInvoiceModeChange()">
+                      <option *ngFor="let option of billingTypes" [value]="option?.value">
+                        {{ option?.label }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+              
+            </div>
+            <div class="custom-box-input-wrap  col-lg-3 col-md-6 mg-bottom-30" *ngIf="billingForm.get('billing_type').value=='10'">
+              <label for="" >Container Handling</label>
+              <material-dropdown [searchable]="true"  [selectedOption]="initialValues.jobType">
+                <select #customSelect formControlName="job_type" class="no-style select--modify">
+                  <option *ngFor="let option of containerJobType" [value]="option?.id">
+                    {{ option?.label }}
+                  </option>
+                </select>
+              </material-dropdown>
+      
+            </div>
+              <ng-container *ngIf="billingForm.get('billing_type').value=='10'" formGroupName="job">
+                <div class="custom-box-input-wrap col-lg-3 col-md-6 mg-bottom-30">
+                 <label for=""> Rate Per Job ({{ currency_type?.symbol}})</label>
+                 <input  positiveThreeDigitDecimalNumber type="text" class="box-input"[ngClass]="{
+                  'error':
+                  billingForm.get('job').get('rate').invalid &&
+                  billingForm.get('job').get('rate').touched
+                  }" placeholder="123456" value="" formControlName="rate" (change)="onCalculationChange()" />
+                </div>
+      
+                <div class="custom-box-input-wrap col-lg-3 col-md-6 mg-bottom-30" >
+                <label for="">Total Jobs</label>
+                <input [ngClass]="{
+                  'error':
+                  billingForm.get('job').get('est_jobs').invalid &&
+                  billingForm.get('job').get('est_jobs').touched
+                  }" positiveThreeDigitDecimalNumber  type="text" class="box-input" placeholder="123456" value="" formControlName="est_jobs" (change)="onCalculationChange()" />
+              </div>
+      
+              <div class="custom-box-input-wrap col-lg-3 col-md-6 mg-bottom-30" >
+                <label for="">Total Amount  ({{ currency_type?.symbol}})</label>
+                <input positiveThreeDigitDecimalNumber type="text" readonly class="box-input" placeholder="123456" value="" formControlName="est_total"/>
+            </div>
+          </ng-container>
+            </div>
+
+       
+        <ng-container *ngIf="billingForm.get('billing_type').value=='11'">
+            <div class="px-4 pt-1 pb-3">
+                <div class="addable-row-table overflow-visible">
+                    <table>
+                        <thead>
+                            <tr>
+          
+                              <th>Type</th>
+                              <th formGroupName="regular">
+                                <mat-checkbox formControlName="is_selected" color="primary"  (change)="makeRequired('regular');oncheckBoxChange('regular')">Regular</mat-checkbox>
+                              </th>
+                              <th formGroupName="couple">
+                                <mat-checkbox formControlName="is_selected" color="primary" (change)="makeRequired('couple');oncheckBoxChange('couple')">Couple</mat-checkbox>
+
+                              </th>
+                              <th formGroupName="boggy">
+                                <mat-checkbox formControlName="is_selected" color="primary" (change)="makeRequired('boggy');oncheckBoxChange('boggy')">Boggy</mat-checkbox>
+                              </th>
+                              <th formGroupName="sideLoader">
+                                <mat-checkbox formControlName="is_selected" color="primary" (change)="makeRequired('sideLoader');oncheckBoxChange('sideLoader')">Side Loader</mat-checkbox>
+                               </th>
+                              <th formGroupName="lowBed">
+                                <mat-checkbox formControlName="is_selected" color="primary" (change)="makeRequired('lowBed');oncheckBoxChange('lowBed')">Low Bed</mat-checkbox>
+                              </th>
+                            </tr>
+          
+                        </thead>
+                        <tbody>
+          
+                            <ng-container>
+          
+          
+                            <tr>
+                                <td>
+                                    <div>
+                                      Rate Per Movement ({{ currency_type?.symbol}})
+                                    </div>
+                                </td>
+                                <td formGroupName="regular" [ngClass]="{'disableTable':!billingForm.get('regular').get('is_selected').value}"><input [ngClass]="{'error':
+                                  billingForm.get('regular').get('rate').invalid &&
+                                  billingForm.get('regular').get('rate').touched,
+                                  'disableTable':!billingForm.get('regular').get('is_selected').value
+                                  }" [readonly]="!billingForm.get('regular').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="rate" (change)="onCalculationChange()"></td>
+                                <td formGroupName="couple" [ngClass]="{
+                                  'disableTable':!billingForm.get('couple').get('is_selected').value}" ><input [ngClass]="{'error':
+                                  billingForm.get('couple').get('rate').invalid &&
+                                  billingForm.get('couple').get('rate').touched,
+                                  'disableTable':!billingForm.get('couple').get('is_selected').value}" [readonly]="!billingForm.get('couple').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="rate" (change)="onCalculationChange()"></td>
+                                <td formGroupName="boggy" [ngClass]="{
+                                  'disableTable':!billingForm.get('boggy').get('is_selected').value}" ><input [ngClass]="{
+                                    'error':
+                                   billingForm.get('boggy').get('rate').invalid &&
+                                   billingForm.get('boggy').get('rate').touched,
+                                   'disableTable':!billingForm.get('boggy').get('is_selected').value
+                                   }"   [readonly]="!billingForm.get('boggy').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="rate" (change)="onCalculationChange()"></td>
+                                <td formGroupName="sideLoader" [ngClass]="{
+                                  'disableTable':!billingForm.get('sideLoader').get('is_selected').value}" ><input [ngClass]="{'error':
+                                  billingForm.get('sideLoader').get('rate').invalid &&
+                                  billingForm.get('sideLoader').get('rate').touched,
+                                  'disableTable':!billingForm.get('sideLoader').get('is_selected').value}" [readonly]="!billingForm.get('sideLoader').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="rate" (change)="onCalculationChange()"></td>
+                                <td formGroupName="lowBed" [ngClass]="{
+                                  'disableTable':!billingForm.get('lowBed').get('is_selected').value}" ><input [ngClass]="{'error':
+                                  billingForm.get('lowBed').get('rate').invalid &&
+                                  billingForm.get('lowBed').get('rate').touched,
+                                  'disableTable':!billingForm.get('lowBed').get('is_selected').value}" [readonly]="!billingForm.get('lowBed').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="rate" (change)="onCalculationChange()"></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div>
+                                      Estimated Jobs
+                                    </div>
+                                </td>
+                                <td formGroupName="regular" [ngClass]="{
+                                  'disableTable':!billingForm.get('regular').get('is_selected').value
+                                  }" >
+                                  <input [ngClass]="{'error':
+                                  billingForm.get('regular').get('est_jobs').invalid &&
+                                  billingForm.get('regular').get('est_jobs').touched,
+                                  'disableTable':!billingForm.get('regular').get('is_selected').value}" [readonly]="!billingForm.get('regular').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="est_jobs" (change)="onCalculationChange()"></td>
+                                <td formGroupName="couple" [ngClass]="{
+                                  
+                                  'disableTable':!billingForm.get('couple').get('is_selected').value
+                                  }" ><input [ngClass]="{'error':
+                                  billingForm.get('couple').get('est_jobs').invalid &&
+                                  billingForm.get('couple').get('est_jobs').touched,
+                                  'disableTable':!billingForm.get('couple').get('is_selected').value}" [readonly]="!billingForm.get('couple').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="est_jobs" (change)="onCalculationChange()"></td>
+                                <td formGroupName="boggy" [ngClass]="{
+                                  
+                                  'disableTable':!billingForm.get('boggy').get('is_selected').value}" ><input [ngClass]="{'error':
+                                  billingForm.get('boggy').get('est_jobs').invalid &&
+                                  billingForm.get('boggy').get('est_jobs').touched,
+                                  'disableTable':!billingForm.get('boggy').get('is_selected').value}" [readonly]="!billingForm.get('boggy').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="est_jobs" (change)="onCalculationChange()"></td>
+                                <td formGroupName="sideLoader" [ngClass]="{
+                                   
+                                  'disableTable':!billingForm.get('sideLoader').get('is_selected').value}" ><input [ngClass]="{'error':
+                                  billingForm.get('sideLoader').get('est_jobs').invalid &&
+                                  billingForm.get('sideLoader').get('est_jobs').touched,
+                                  'disableTable':!billingForm.get('sideLoader').get('is_selected').value}" [readonly]="!billingForm.get('sideLoader').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="est_jobs"(change)="onCalculationChange()"></td>
+                                <td formGroupName="lowBed" [ngClass]="{
+                                   
+                                  'disableTable':!billingForm.get('lowBed').get('is_selected').value}" ><input [ngClass]="{'error':
+                                  billingForm.get('lowBed').get('est_jobs').invalid &&
+                                  billingForm.get('lowBed').get('est_jobs').touched,
+                                  'disableTable':!billingForm.get('lowBed').get('is_selected').value}" [readonly]="!billingForm.get('lowBed').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="est_jobs" (change)="onCalculationChange()"></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div>
+                                       Estimated Total ({{ currency_type?.symbol}})
+                                    </div>
+                                </td>
+                                <td formGroupName="regular"[ngClass]="{'disableTable':!billingForm.get('regular').get('is_selected').value}"><input [ngClass]="{'disableTable':!billingForm.get('regular').get('is_selected').value}"  readonly positiveThreeDigitDecimalNumber type="text" formControlName="est_total"></td>
+                                <td formGroupName="couple" [ngClass]="{'disableTable':!billingForm.get('couple').get('is_selected').value}"><input [ngClass]="{'disableTable':!billingForm.get('couple').get('is_selected').value}"  readonly positiveThreeDigitDecimalNumber type="text" formControlName="est_total"></td>
+                                <td formGroupName="boggy" [ngClass]="{'disableTable':!billingForm.get('boggy').get('is_selected').value}"><input [ngClass]="{'disableTable':!billingForm.get('boggy').get('is_selected').value}" readonly positiveThreeDigitDecimalNumber type="text" formControlName="est_total"></td>
+                                <td formGroupName="sideLoader" [ngClass]="{'disableTable':!billingForm.get('sideLoader').get('is_selected').value}"><input [ngClass]="{'disableTable':!billingForm.get('sideLoader').get('is_selected').value}"  readonly positiveThreeDigitDecimalNumber type="text" formControlName="est_total"></td>
+                                <td formGroupName="lowBed" [ngClass]="{'disableTable':!billingForm.get('lowBed').get('is_selected').value}"><input [ngClass]="{'disableTable':!billingForm.get('lowBed').get('is_selected').value}" readonly positiveThreeDigitDecimalNumber type="text" formControlName="est_total"></td>
+                            </tr>
+                            <tr *ngIf="false">
+                              <td colspan="5">
+                                <div class="fw-bold">
+                                  Consideration Amount to analyse each job P/L
+                                </div>
+                              </td>
+                            </tr>
+                            <tr *ngIf="false">
+                              <td>
+                                <div>
+                                  Pullout Consideration
+                                </div>
+                            </td>
+                            <td formGroupName="regular" [ngClass]="{'disableTable':!billingForm.get('regular').get('is_selected').value}"> <input [ngClass]="{
+                              'disableTable':!billingForm.get('regular').get('is_selected').value}" [readonly]="!billingForm.get('regular').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="pullout_consideration"></td>
+                            <td formGroupName="couple" [ngClass]="{'disableTable':!billingForm.get('couple').get('is_selected').value}"> 
+                              <input [ngClass]="{
+                              'disableTable':!billingForm.get('couple').get('is_selected').value}" [readonly]="!billingForm.get('couple').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="pullout_consideration">
+                            </td>
+                            <td formGroupName="boggy" [ngClass]="{'disableTable':!billingForm.get('boggy').get('is_selected').value}"
+                            > <input [ngClass]="{'disableTable':!billingForm.get('boggy').get('is_selected').value}" [readonly]="!billingForm.get('boggy').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="pullout_consideration"></td>
+
+                            <td formGroupName="sideLoader" [ngClass]="{'disableTable':!billingForm.get('sideLoader').get('is_selected').value}">
+                            <input [ngClass]="{'disableTable':!billingForm.get('sideLoader').get('is_selected').value}" [readonly]="!billingForm.get('sideLoader').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="pullout_consideration"></td>
+                            <td formGroupName="lowBed" [ngClass]="{'disableTable':!billingForm.get('lowBed').get('is_selected').value}">
+                            <input [ngClass]="{'disableTable':!billingForm.get('lowBed').get('is_selected').value}" [readonly]="!billingForm.get('lowBed').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="pullout_consideration"></td>
+                            </tr>
+                            <tr *ngIf="false">
+                              <td>
+                                <div>
+                                  Deposit Consideration
+                                </div>
+                            </td>
+                            <td formGroupName="regular" [ngClass]="{'disableTable':!billingForm.get('regular').get('is_selected').value}"> <input [ngClass]="{
+                              'disableTable':!billingForm.get('regular').get('is_selected').value}" [readonly]="!billingForm.get('regular').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="deposit_consideration"></td>
+                            <td formGroupName="couple" [ngClass]="{'disableTable':!billingForm.get('couple').get('is_selected').value}"> 
+                              <input [ngClass]="{
+                              'disableTable':!billingForm.get('couple').get('is_selected').value}" [readonly]="!billingForm.get('couple').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="deposit_consideration">
+                            </td>
+                            <td formGroupName="boggy" [ngClass]="{'disableTable':!billingForm.get('boggy').get('is_selected').value}"
+                            > <input [ngClass]="{'disableTable':!billingForm.get('boggy').get('is_selected').value}" [readonly]="!billingForm.get('boggy').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="deposit_consideration"></td>
+
+                            <td formGroupName="sideLoader" [ngClass]="{'disableTable':!billingForm.get('sideLoader').get('is_selected').value}">
+                            <input [ngClass]="{'disableTable':!billingForm.get('sideLoader').get('is_selected').value}" [readonly]="!billingForm.get('sideLoader').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="deposit_consideration"></td>
+                            <td formGroupName="lowBed" [ngClass]="{'disableTable':!billingForm.get('lowBed').get('is_selected').value}">
+                            <input [ngClass]="{'disableTable':!billingForm.get('lowBed').get('is_selected').value}" [readonly]="!billingForm.get('lowBed').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="deposit_consideration"></td>
+                        
+                            </tr>
+                            <tr *ngIf="false&& scopeOfWork==2">
+                              <td>
+                                <div>
+                                  Live Loading Consideration
+                                </div>
+                              </td>
+                              <td formGroupName="regular" [ngClass]="{'disableTable':!billingForm.get('regular').get('is_selected').value}"> <input [ngClass]="{
+                                'disableTable':!billingForm.get('regular').get('is_selected').value}" [readonly]="!billingForm.get('regular').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="liveLoading_consideration"></td>
+                              <td formGroupName="couple" [ngClass]="{'disableTable':!billingForm.get('couple').get('is_selected').value}"> 
+                                <input [ngClass]="{
+                                'disableTable':!billingForm.get('couple').get('is_selected').value}" [readonly]="!billingForm.get('couple').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="liveLoading_consideration">
+                              </td>
+                              <td formGroupName="boggy" [ngClass]="{'disableTable':!billingForm.get('boggy').get('is_selected').value}"
+                              > <input [ngClass]="{'disableTable':!billingForm.get('boggy').get('is_selected').value}" [readonly]="!billingForm.get('boggy').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="liveLoading_consideration"></td>
+  
+                              <td formGroupName="sideLoader" [ngClass]="{'disableTable':!billingForm.get('sideLoader').get('is_selected').value}">
+                              <input [ngClass]="{'disableTable':!billingForm.get('sideLoader').get('is_selected').value}" [readonly]="!billingForm.get('sideLoader').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="liveLoading_consideration"></td>
+                              <td formGroupName="lowBed" [ngClass]="{'disableTable':!billingForm.get('lowBed').get('is_selected').value}">
+                              <input [ngClass]="{'disableTable':!billingForm.get('lowBed').get('is_selected').value}" [readonly]="!billingForm.get('lowBed').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="liveLoading_consideration"></td>
+            
+                            </tr>
+
+                            <tr *ngIf="false">
+                              <td>
+                                <div>
+                                  Local Consideration
+                                </div>
+                              </td>
+                              <td formGroupName="regular" [ngClass]="{'disableTable':!billingForm.get('regular').get('is_selected').value}"> <input [ngClass]="{
+                                'disableTable':!billingForm.get('regular').get('is_selected').value}" [readonly]="!billingForm.get('regular').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="local_consideration"></td>
+                              <td formGroupName="couple" [ngClass]="{'disableTable':!billingForm.get('couple').get('is_selected').value}"> 
+                                <input [ngClass]="{
+                                'disableTable':!billingForm.get('couple').get('is_selected').value}" [readonly]="!billingForm.get('couple').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="local_consideration">
+                              </td>
+                              <td formGroupName="boggy" [ngClass]="{'disableTable':!billingForm.get('boggy').get('is_selected').value}"
+                              > <input [ngClass]="{'disableTable':!billingForm.get('boggy').get('is_selected').value}" [readonly]="!billingForm.get('boggy').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="local_consideration"></td>
+  
+                              <td formGroupName="sideLoader" [ngClass]="{'disableTable':!billingForm.get('sideLoader').get('is_selected').value}">
+                              <input [ngClass]="{'disableTable':!billingForm.get('sideLoader').get('is_selected').value}" [readonly]="!billingForm.get('sideLoader').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="local_consideration"></td>
+                              <td formGroupName="lowBed" [ngClass]="{'disableTable':!billingForm.get('lowBed').get('is_selected').value}">
+                              <input [ngClass]="{'disableTable':!billingForm.get('lowBed').get('is_selected').value}" [readonly]="!billingForm.get('lowBed').get('is_selected').value" positiveThreeDigitDecimalNumber type="text" formControlName="local_consideration"></td>
+                            </tr>
+                          
+                
+                    </ng-container>
+        
+                  </tbody>
+                </table>
+            </div>
+            </div>
+        </ng-container>
+       
+     
+    </div>
+  </div>

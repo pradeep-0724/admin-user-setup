@@ -1,0 +1,199 @@
+<div *ngIf="!showUnloading" class="form-layout__card formResponsiveTable tabIndexActive">
+  <div action=""  [formGroup]="daysForm">
+      <div class="mg-bottom-30">
+      <div
+        class="table-wrapper table--bd table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow">
+        <table class="table-container" formArrayName="days">
+          <thead>
+            <tr class="desktop_th">
+              <th>Rate Per days</th>
+              <th *ngIf="showTotal">total days</th>
+              <th>Charged days</th>
+              <th>Freight Amount</th>
+              <th *ngIf="showMaterial">Material</th>
+              <!-- <th></th> -->
+            </tr>
+          </thead>
+          <tbody *ngFor="let item of daysForm['controls'].days['controls']; let i = index;"
+          [formGroupName]="i">
+            <tr  class="mobile-flex">
+              <td class="max-wd-120">
+                <h5 class="th_h5_mobile">Rate Per days </h5>
+                <div>
+                  <input  [ngClass]="{'showInvalid':item.controls.rate.invalid&&item.controls.rate.touched}" positiveThreeDigitDecimalNumber type="text" class="no-style " placeholder="123456" (change)="calculateFreightAmount(item)" value="" formControlName="rate">
+                </div>
+              </td>
+              <td class="max-wd-120" *ngIf="showTotal">
+                <h5 class="th_h5_mobile">total days </h5>
+                <div>
+                  <input [ngClass]="{'showInvalid':item.controls.total_units.invalid&&item.controls.total_units.touched}" positiveThreeDigitDecimalNumber type="text" class="no-style " placeholder="123456" (change)="onChangeLoadingWeight(item)" value="" formControlName="total_units">
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <h5 class="th_h5_mobile">Charged days </h5>
+                <div>
+                  <input [ngClass]="{'showInvalid':item.controls.charged_units.invalid&&item.controls.charged_units.touched}" positiveThreeDigitDecimalNumber type="text" class="no-style " placeholder="123456" value="" (change)="calculateFreightAmount(item)" formControlName="charged_units">
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <h5 class="th_h5_mobile">Freight Amount </h5>
+                <div>
+                  <input [ngClass]="{'showInvalid':item.controls.freight_amount.invalid&&item.controls.freight_amount.touched}" positiveThreeDigitDecimalNumber type="text" class="no-style " placeholder="123456" value="" formControlName="freight_amount" readonly>
+                </div>
+              </td>
+              <td *ngIf="showMaterial" class="min-height-96 mobile-width-100  max-wd-120">
+                <h5 class="th_h5_mobile">Material </h5>
+                  <div  class="d-flex mat-dropdowwn-with-add">
+                  <button class="btn btn--primary add-material-icon material-icons"  (click)="addNewMaterial(i)">add</button>
+                  </div>
+                  <span *ngFor="let selected of selectedMaterialList[i]" >
+                    {{selected.display}},
+                  </span>
+              </td>
+            <!-- <td>
+              <span class="material-icons delete" *ngIf="daysForm['controls'].days['controls'].length>1"
+                (click)="removeItem(i)">add_circle_outline</span>
+              <span class="material-icons add" (click)="addMoreItem()"
+                *ngIf="i === ( daysForm['controls'].days['controls'].length - 1)">add_circle_outline</span>
+          </td> -->
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row row_margin_left_right">
+        <div class="col-md-6 padding_left_0  pe-0 col-4">
+          <div class="table-footer-actions mg-top-20">
+            <button class="clear-item p-0" (click)="clearAllClient()">Remove all</button>
+          </div>
+        </div>
+        <div class="col-md-6 mg-top-20 padding_left_0  text-end  pe-0 col-8">
+          <p><strong>Total days: </strong> <span class="h6"> {{total.days}}</span> days | <strong>Total Freight: </strong> <span class="h6"> {{total.freight}}</span></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showUnloading" class="form-layout__card formResponsiveTable tabIndexActive" [formGroup]="daysForm">
+  <div  action="" class="form-body show" formArrayName="days">
+    <div class="mg-bottom-30" *ngFor="let item of daysForm['controls'].days['controls']; let i = index;"
+    [formGroupName]="i">
+      <div class="table-wrapper table--bd table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow">
+        <table class="table-container">
+          <thead>
+            <tr class="desktop_th">
+              <th>Material</th>
+              <th>Rate per Day</th>
+              <th>Est. Days</th>
+              <th>Charged Days</th>
+              <th>Final Days</th>
+              <th>Extra</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="mobile-flex">
+              <td class="max-wd-120  ps-2">
+                <h5 class="th_h5_mobile">Material </h5>
+                <div  class="mat-dropdowwn-with-add">
+                  <mat-select-autocomplete [placeholder]="'Select material'" [options]="materialOptionsList"
+                  [multiple]='true' name="optionsSelector" ngDefaultControl
+                  [formControl]="item.controls.material" (selectionChange)="changedMaterial($event,i)" >
+                  </mat-select-autocomplete>
+                  <button class="btn btn--primary add-material-icon material-icons" (click)="addNewMaterial(i)">add</button>
+
+                </div>
+                <span *ngFor="let selected of selectedMaterialList[i]" >
+                  {{selected.display}},
+                </span>
+              </td>
+
+              <td class="max-wd-120">
+                <h5 class="th_h5_mobile">Rate per Day </h5>
+                <div>
+                  <input positiveThreeDigitDecimalNumber type="text" class="no-style " placeholder="123456" (change)="calculateFreightAmount(item)" value="" [ngClass]="{'showInvalid':item.controls.rate.invalid&&item.controls.rate.touched}"  formControlName="rate">
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <h5 class="th_h5_mobile">Est. Days </h5>
+                <div>
+                  <input positiveThreeDigitDecimalNumber type="text" class="no-style " placeholder="123456" (change)="addTotalUnitsToChargedAndUnloading(item);calculateFreightAmount(item)" value="" [ngClass]="{'showInvalid':item.controls.total_units.invalid&&item.controls.total_units.touched}"  formControlName="total_units">
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <h5 class="th_h5_mobile">Charged Days </h5>
+                <div>
+                  <input positiveThreeDigitDecimalNumber type="text" class="no-style " placeholder="123456" value="" (change)="calculateFreightAmount(item)" [ngClass]="{'showInvalid':item.controls.charged_units.invalid&&item.controls.charged_units.touched}"  formControlName="charged_units">
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <h5 class="th_h5_mobile">Final Days </h5>
+                <div>
+                  <input positiveThreeDigitDecimalNumber type="text" class="no-style " placeholder="123456" value="" (change)="calculateFreightAmount(item)" [ngClass]="{'showInvalid':item.controls.unloading_units.invalid&&item.controls.unloading_units.touched}"  formControlName="unloading_units">
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <h5 class="th_h5_mobile">Extra </h5>
+                <div>
+                  <input positiveThreeDigitDecimalNumber type="text" class="no-style " placeholder="123456" value="" (change)="calculateOnShortageChange(item)" [ngClass]="{'showInvalid':item.controls.extra_or_shortage_units.invalid&&item.controls.extra_or_shortage_units.touched}"  formControlName="extra_or_shortage_units">
+                </div>
+              </td>
+            </tr>
+            <tr class="no-border mobile-flex">
+              <td class="max-wd-120  ps-2">
+                <div class="input-wrap clearfix">
+                  <label for="" class="">Trip Freight</label>
+                  <input type="text" class="no-style " placeholder="" value="" formControlName="freight_amount" readOnly>
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <div class="input-wrap clearfix"
+                [ngClass]="item.controls.is_editable.value ? '':'is-disabled'">
+                  <label for="" class="">Days Extra Rate</label>
+                  <input positiveThreeDigitDecimalNumber type="text" class="no-style " placeholder="" value=""
+                  [attr.disabled]="!item.controls.is_editable.value ? '' : null"
+                    formControlName="extra_or_shortage_rate" (change)="calculateOnShortageChange(item)">
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <div class="input-wrap clearfix disabled">
+                  <label for="" class="">Extra Amount</label>
+                  <input type="text" class="no-style " placeholder="" value="" formControlName="extra_or_shortage_amount" readOnly>
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <div class="input-wrap clearfix"
+                [ngClass]="item.controls.is_editable.value ? '':'is-disabled'">
+                  <label for="" class="">Adjustment</label>
+                  <input twoDigitDecimalNumber type="text" class="no-style " value=""
+                  [attr.disabled]="!item.controls.is_editable.value ? '' : null"
+                    formControlName="adjustment_amount" (change)="calculateFreightAmount(item);">
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <div class="input-wrap clearfix disabled" [ngClass]="addErrorClass(item.controls.net_receivable)">
+                  <label for="" class="">Net Receivable</label>
+                  <input positiveThreeDigitDecimalNumber type="text" class="no-style error-line" placeholder="" value=""
+                    formControlName="net_receivable" readonly>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer-actions mg-top-20">
+        <button class="clear-item p-0" (click)="clearAllClient()">Remove all</button>
+        <!-- <span>
+          <a class="remove-item" (click)="removeItem(i)"
+          *ngIf="daysForm['controls'].days['controls'].length>1">Remove</a>
+          <a class="link-1 addEstimate" *ngIf="i === ( daysForm['controls'].days['controls'].length - 1)"
+            (click)="addMoreItem()">Add New</a>
+        </span> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-add-item *ngIf="showAddItemPopup.status" [itemPopDetail]="showAddItemPopup" (closeModal)="closeItemPopup()" [units]="unitDetails"
+    (itemAdded)="addDropDownMaterial($event)"></app-add-item>

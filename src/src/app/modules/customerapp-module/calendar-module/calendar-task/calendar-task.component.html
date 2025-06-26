@@ -1,0 +1,464 @@
+<div class="calendar-task" [ngClass]="classes">
+  <div class="task-wrap ">
+    <div class="task" (click)="openTask()" type="button"
+      [ngClass]="{'task-disabled':jobsTask.length==0 && bookedTask.length==0}" cdkOverlayOrigin
+      #trigger="cdkOverlayOrigin">
+      <!-- Jobs -->
+      <ng-container *ngIf="jobsTask.length==1 && bookedTask.length==0">
+        <span>{{jobsTask[0]?.number}}</span>
+      </ng-container>
+
+      <!-- Multi -->
+      <ng-container *ngIf="(jobsTask.length>1 && bookedTask.length>=1) || (jobsTask.length>=1 && bookedTask.length>1) ">
+        <span>Multi Tasks</span>
+      </ng-container>
+
+      <ng-container *ngIf="bookedTask.length==1 && jobsTask.length==1 ">
+        <span>Multi Tasks</span>
+      </ng-container>
+
+      <ng-container *ngIf="jobsTask.length>1 && bookedTask.length==0 ">
+        <span>Multi Jobs</span>
+      </ng-container>
+
+      <ng-container *ngIf="jobsTask.length==0 && bookedTask.length>1 ">
+        <span>Multi Blocked</span>
+      </ng-container>
+
+      <!-- Blocked -->
+      <ng-container *ngIf="bookedTask.length==1 && jobsTask.length==0">
+        <span>{{bookedTask[0]?.booked_for}}</span>
+      </ng-container>
+
+    </div>
+    <div class="icon-btn-wrap">
+      <button class="maintenance-btn" (click)="isOpenMaintenance=true" [disabled]="maintenanceTask.length==0"
+        cdkOverlayOrigin #triggerMaintenance="cdkOverlayOrigin" mat-ripple> <span class="material-icons">
+          construction
+        </span></button>
+      <button class="expired-doc-btn" (click)="openDoc()" cdkOverlayOrigin #triggerDocument="cdkOverlayOrigin"
+        [disabled]="documentsTask.length==0" mat-ripple>
+        <span class="material-icons">
+          insert_drive_file
+        </span>
+        
+      </button>
+    </div>
+  </div>
+</div>
+
+<ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="isOpenTask"
+  (overlayOutsideClick)="isOpenTask=false" [cdkConnectedOverlayPositions]="[
+  {
+    originX: 'start',
+    originY: 'bottom',
+    overlayX: 'start',
+    overlayY: 'top'
+  },
+  {
+    originX: 'end',
+    originY: 'bottom',
+    overlayX: 'end',
+    overlayY: 'top'
+  },
+  {
+    originX: 'end',
+      originY: 'top',
+      overlayX: 'end',
+      overlayY: 'bottom'
+  }
+ 
+  
+  ]">
+  <div class="task-overlay">
+    <!-- Jobs -->
+    <ng-container *ngIf="jobsTask.length==1 && bookedTask.length==0">
+      <div class="d-flex justify-content-between border-bottom  fw-semibold align-items-center ">
+        <span class="mx-3 primary-brand-text ">{{taskDetails?.no}}</span>
+        <button mat-icon-button (click)="isOpenTask=false">
+          <span class="material-icons ">close</span>
+        </button>
+      </div>
+      <div class="row mx-0 pt-3 pb-1 def-color">
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px">Job No</p>
+          <p class="fw-semibold ">
+            <a class="custom-link" target="_blank" [routerLink]="[prefixUrl+'/trip/new-trip/details/'+taskDetails?.id]">{{taskDetails?.no}}</a>
+          </p>
+        </div>
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px text-end">Customer</p>
+          <p class="fw-semibold text-end">{{taskDetails?.customer}}</p>
+        </div>
+      
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px">Location</p>
+          <p class="fw-semibold line-height-normal">{{taskDetails?.location}}</p>
+        </div>
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px text-end">Driver</p>
+          <p class="fw-semibold text-end ">{{taskDetails?.driver}}</p>
+
+        </div>
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px ">Start</p>
+          <p class="fw-semibold ">{{taskDetails?.start_date|formateDate}}</p>
+
+        </div>
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px text-end">End Date</p>
+          <p class="fw-semibold text-end">{{taskDetails?.end_date|formateDate}}</p>
+
+        </div>
+        <div class="col-lg-12 mb-3">
+          <p class="mb-2 fs-12px ">Status</p>
+          <p class="fw-semibold " [ngStyle]="{'color':getJobStatusClass(taskDetails?.status)}">
+            {{taskDetails?.status}}</p>
+        </div>
+      </div>
+
+
+
+    </ng-container>
+
+    <!-- Multi -->
+    <ng-container *ngIf="(jobsTask.length>1 || bookedTask.length>1 )||(jobsTask.length==1&&bookedTask.length==1 ) ">
+      <div class="d-flex justify-content-between border-bottom  fw-semibold align-items-center ">
+        <div class="d-flex align-items-center">
+          <button mat-icon-button *ngIf="isMultiTaskDetails" (click)="isMultiTaskDetails=false">
+            <span class="material-icons">
+              chevron_left
+            </span>
+          </button>
+          <span class="me-3 primary-brand-text" *ngIf="!isMultiTaskDetails">
+            <ng-container *ngIf="(jobsTask.length>1 && bookedTask.length>=1)||(jobsTask.length>=1 && bookedTask.length>1) ||(jobsTask.length==1&&bookedTask.length==1 )  ">
+              <span>Multi Tasks</span>
+            </ng-container>
+
+            <ng-container *ngIf="jobsTask.length>1 && bookedTask.length==0 ">
+              <span>Multi Jobs</span>
+            </ng-container>
+
+            <ng-container *ngIf="jobsTask.length==0 && bookedTask.length>1 ">
+              <span>Multi Blocked</span>
+            </ng-container>
+          </span>
+          <span class="me-3 primary-brand-text" *ngIf="isMultiTaskDetails">
+            <ng-container *ngIf="detailType=='job'">
+              {{taskDetails?.no}}
+            </ng-container>
+            <ng-container *ngIf="detailType=='blocked'">
+              Blocked
+            </ng-container>
+          
+          </span>
+        </div>
+        <button mat-icon-button (click)="isOpenTask=false">
+          <span class="material-icons ">close</span>
+        </button>
+      </div>
+
+      <ng-container *ngIf="isMultiTaskDetails">
+        <div *ngIf="detailType=='job'" class="row mx-0 pt-3 pb-1 def-color">
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px">Job No</p>
+            <p class="fw-semibold ">
+              <a class="custom-link" target="_blank" [routerLink]="[prefixUrl+'/trip/new-trip/details/'+taskDetails?.id]">{{taskDetails?.no}}</a>
+            </p>
+          </div>
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px text-end">Customer</p>
+            <p class="fw-semibold text-end">{{taskDetails?.customer}}</p>
+          </div>
+        
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px">Location</p>
+            <p class="fw-semibold line-height-normal">{{taskDetails?.location}}</p>
+          </div>
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px text-end">Driver</p>
+            <p class="fw-semibold text-end ">{{taskDetails?.driver}}</p>
+
+          </div>
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px ">Start</p>
+            <p class="fw-semibold ">{{taskDetails?.start_date|formateDate}}</p>
+
+          </div>
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px text-end">End Date</p>
+            <p class="fw-semibold text-end">{{taskDetails?.end_date|formateDate}}</p>
+
+          </div>
+          <div class="col-lg-12 mb-3">
+            <p class="mb-2 fs-12px ">Status</p>
+            <p class="fw-semibold " [ngStyle]="{'color':getJobStatusClass(taskDetails?.status)}">
+              {{taskDetails?.status}}</p>
+          </div>
+        </div>
+        <div class="row mx-0 pt-3 pb-1 def-color"  *ngIf="detailType=='blocked'">
+          <div class="col-lg-8 mb-3">
+            <p class="mb-2 fs-12px">Vehicle Blocked for</p>
+            <p class="fw-semibold ">{{taskDetails?.booked_for}}</p>
+          </div>
+          <div class="col-lg-4 mb-3 text-end">
+            <button (click)="editVehicleBook(taskDetails?.id)" > <span class="material-icons gb-btn-hover def-color fs-6 me-3"> create</span></button>
+          <button (click)="deleteVehicleBook(taskDetails?.id)"><span class="material-icons gb-btn-hover error-text fs-6"> delete</span></button>
+          </div>
+        </div>
+
+      </ng-container>
+
+      <ng-container *ngIf="!isMultiTaskDetails">
+        <!-- Jobs -->
+        <ng-container *ngIf="(jobsTask.length>1 || bookedTask.length>1) ||(jobsTask.length==1&&bookedTask.length==1 ) ">
+          <div class="row  mx-0 pt-3 pb-1 def-color g-2">
+            <ng-container *ngFor="let job of jobsTask ">
+              <div class="col-6" (click)="getCalendarTaskDetails(job?.id,'job');isMultiTaskDetails=true">
+                <div matRipple class="multi-task-view strip" [ngClass]="getStatusCalss(job)">
+                  <span>Job</span>
+                  <span>{{job?.number}}</span>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngFor="let blocked of bookedTask ">
+              <div class="col-6" (click)="getCalendarTaskDetails(blocked?.id,'blocked');isMultiTaskDetails=true">
+                <div matRipple class="multi-task-view strip strip-booked">
+                  <span>Blocked</span>
+                  <span>{{blocked?.booked_for}}</span>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </ng-container>
+      </ng-container>
+
+
+    </ng-container>
+
+    <!-- blocked -->
+    <ng-container *ngIf="bookedTask.length==1 && jobsTask.length==0">
+      <div class="d-flex justify-content-between border-bottom  fw-semibold align-items-center ">
+        <span class="mx-3 primary-brand-text ">Blocked</span>
+        <button mat-icon-button (click)="isOpenTask=false">
+          <span class="material-icons ">close</span>
+        </button>
+      </div>
+      <div class="row mx-0 pt-3 pb-1 def-color">
+        <div class="col-lg-8 mb-3">
+          <p class="mb-2 fs-12px">Vehicle Blocked for</p>
+          <p class="fw-semibold ">{{taskDetails?.booked_for}}</p>
+        </div>
+        <div class="col-lg-4 mb-3 text-end">
+          <button (click)="editVehicleBook(taskDetails?.id)" > <span class="material-icons gb-btn-hover def-color fs-6 me-3"> create</span></button>
+        <button (click)="deleteVehicleBook(taskDetails?.id)"><span class="material-icons gb-btn-hover error-text fs-6"> delete</span></button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</ng-template>
+
+
+<!-- maintenance -->
+<ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="triggerMaintenance"
+  [cdkConnectedOverlayOpen]="isOpenMaintenance" (overlayOutsideClick)="isOpenMaintenance=false"
+  [cdkConnectedOverlayPositions]="[
+  {
+    originX: 'start',
+    originY: 'bottom',
+    overlayX: 'start',
+    overlayY: 'top'
+  },
+  {
+    originX: 'end',
+    originY: 'bottom',
+    overlayX: 'end',
+    overlayY: 'top'
+  },
+  {
+    originX: 'end',
+      originY: 'top',
+      overlayX: 'end',
+      overlayY: 'bottom'
+  }
+ 
+  
+  ]">
+  <ul class="example-list">
+    <li (click)="isOpenMaintenance=false">Close</li>
+    <p>maintenance</p>
+
+  </ul>
+</ng-template>
+
+<!-- documnet -->
+<ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="triggerDocument"
+  [cdkConnectedOverlayOpen]="isOpenDocument" (overlayOutsideClick)="isOpenDocument=false"
+  [cdkConnectedOverlayPositions]="[
+  {
+    originX: 'start',
+    originY: 'bottom',
+    overlayX: 'start',
+    overlayY: 'top'
+  },
+  {
+    originX: 'end',
+    originY: 'bottom',
+    overlayX: 'end',
+    overlayY: 'top'
+  },
+  {
+    originX: 'end',
+      originY: 'top',
+      overlayX: 'end',
+      overlayY: 'bottom'
+  }
+ 
+  
+  ]">
+  <div class="task-overlay">
+    <ng-container *ngIf="documentsTask.length==1">
+      <div class="d-flex justify-content-between border-bottom  fw-semibold align-items-center ">
+        <span class="mx-3 primary-brand-text ">{{taskDetails?.name}}</span>
+        <button mat-icon-button (click)="isOpenDocument=false">
+          <span class="material-icons ">close</span>
+        </button>
+      </div>
+      <div class="row mx-0 pt-3 pb-1 def-color" *ngIf="taskDetails?.document_type!='tyre'">
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px">Document No.</p>
+          <p class="fw-semibold ">{{taskDetails?.no}}</p>
+        </div>
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px text-end">Issue Date</p>
+          <p class="fw-semibold line-height-normal text-end">{{taskDetails?.issue_date|formateDate}}</p>
+        </div>
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px">Expiry Date</p>
+          <p class="fw-semibold ">{{taskDetails?.expiry_date|formateDate}}</p>
+
+        </div>
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px text-end">Vendor</p>
+          <p class="fw-semibold text-end">{{taskDetails?.vendor?taskDetails?.vendor:'-'}}</p>
+
+        </div>
+      </div>
+      <div class="row mx-0 pt-3 pb-1 def-color" *ngIf="taskDetails?.document_type=='tyre'">
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px">Tyre Position</p>
+          <p class="fw-semibold ">{{taskDetails?.position}}</p>
+        </div>
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px text-end">Tyre No</p>
+          <p class="fw-semibold line-height-normal text-end">{{taskDetails?.no?taskDetails?.no:'-'}}</p>
+        </div>
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px">Date of Installation</p>
+          <p class="fw-semibold ">{{taskDetails?.install_date|formateDate}}</p>
+        </div>
+        <div class="col-lg-6 mb-3">
+          <p class="mb-2 fs-12px">Permitted Date</p>
+          <p class="fw-semibold ">{{taskDetails?.per_date|formateDate}}</p>
+
+        </div>
+      </div>
+
+
+    </ng-container>
+
+    <ng-container *ngIf="documentsTask.length>1">
+      <div class="d-flex justify-content-between border-bottom  fw-semibold align-items-center ">
+        <div class="d-flex align-items-center">
+          <button mat-icon-button *ngIf="isMultiDocDetails" (click)="isMultiDocDetails=false">
+            <span class="material-icons">
+              chevron_left
+            </span>
+          </button>
+          <span class="me-3 primary-brand-text" *ngIf="!isMultiDocDetails">Multi Documents Expiry</span>
+          <span class="me-3 primary-brand-text" *ngIf="isMultiDocDetails">
+            <ng-container *ngIf="taskDetails?.document_type!='tyre'" >
+              {{taskDetails?.name}}
+            </ng-container>
+            <ng-container *ngIf="taskDetails?.document_type=='tyre'" >
+              Tyre Expiry
+            </ng-container>
+          </span>
+
+        </div>
+        <button mat-icon-button (click)="isOpenDocument=false">
+          <span class="material-icons ">close</span>
+        </button>
+      </div>
+
+      <ng-container *ngIf="!isMultiDocDetails">
+        <div class="row  mx-0 pt-3 pb-1 def-color g-2">
+          <ng-container *ngFor="let doc of documentsTask ">
+            <div class="col-6" (click)="getCalendarTaskDetails(doc?.id,'doc');isMultiDocDetails=true">
+              <ng-container *ngIf="doc?.document_type!='tyre'" >
+                <div matRipple class="multi-task-view strip">
+                  <span>Document Expiry</span>
+                  <span>{{doc?.name}}</span>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="doc?.document_type=='tyre'" >
+                <div matRipple class="multi-task-view strip">
+                  <span>Tyre Expiry</span>
+                  <span>{{doc?.name}}</span>
+                </div>
+              </ng-container>
+            
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+
+
+      <ng-container *ngIf="isMultiDocDetails">
+        <div class="row mx-0 pt-3 pb-1 def-color" *ngIf="taskDetails?.document_type!='tyre'">
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px">Document No.</p>
+            <p class="fw-semibold ">{{taskDetails?.no}}</p>
+          </div>
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px text-end">Issue Date</p>
+            <p class="fw-semibold line-height-normal text-end">{{taskDetails?.issue_date|formateDate}}</p>
+          </div>
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px">Expiry Date</p>
+            <p class="fw-semibold ">{{taskDetails?.expiry_date|formateDate}}</p>
+
+          </div>
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px text-end">Vendor</p>
+            <p class="fw-semibold text-end">{{taskDetails?.vendor?taskDetails?.vendor:'-'}}</p>
+
+          </div>
+        </div>
+        <div class="row mx-0 pt-3 pb-1 def-color" *ngIf="taskDetails?.document_type=='tyre'">
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px">Tyre Position</p>
+            <p class="fw-semibold ">{{taskDetails?.position}}</p>
+          </div>
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px text-end">Tyre No</p>
+            <p class="fw-semibold line-height-normal text-end">{{taskDetails?.no?taskDetails?.no:'-'}}</p>
+          </div>
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px">Date of Installation</p>
+            <p class="fw-semibold ">{{taskDetails?.install_date|formateDate}}</p>
+          </div>
+          <div class="col-lg-6 mb-3">
+            <p class="mb-2 fs-12px text-end">Permitted Date</p>
+            <p class="fw-semibold text-end">{{taskDetails?.per_date|formateDate}}</p>
+
+          </div>
+        </div>
+      </ng-container>
+
+
+    </ng-container>
+
+  </div>
+
+</ng-template>

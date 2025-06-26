@@ -1,0 +1,23 @@
+
+
+**** ONLY IN CURRENCY*****
+
+in HTML we need to add pipe in this way 
+
+{{quotationDetail?.total_amount |numberFormat}}
+
+make sure shared module is imported in that module 
+
+
+**** ONLY IN CURRENCY*****
+
+
+
+now in ts mainly in pdf we need to call the function to change the number format 
+we  need to import formatNumber() // this function takes number to convert and type of format 'american'|'indian'  by default it is 'american' so no need to pass any argument
+`${this.currency_type.symbol} ${formatNumber(data['subtotal_other_before_tax'])}`
+
+
+for now we need to use in all the pdf start from job module and income module 
+
+**** ONLY IN CURRENCY*****

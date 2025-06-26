@@ -1,0 +1,139 @@
+<div class="right-section__header">
+    <h1 class="heading">Journal Entry</h1>
+</div>
+<div class="alert-msg" *ngIf="apiError">
+    <span class="icon-wrap"></span>
+    <p class="message-cont">{{ apiError }}</p>
+</div>
+<form [formGroup] = "addJournalentry" (ngSubmit)="submitForm(addJournalentry)" (keydown.enter)="$event.preventDefault();">
+<div class="form-layout form-layout--pd">
+    <div class="form-layout__card active">
+        <div class="form-body">
+            <div class="row">
+                <div class="col-lg-2 col-sm-6">
+                    <div class="input-wrap" [ngClass]="addErrorClass(addJournalentry.controls.date)">
+                        <label for="" class="input--required">Date</label>
+                        <mat-form-field>
+                            <input matInput [matDatepicker]="picker1" (focus)="picker1.open()"  formControlName="date" placeholder="DD/MM/YYYY">
+                            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                            <mat-datepicker #picker1></mat-datepicker>
+                          </mat-form-field>
+                        <span class="border-anim"></span>
+                        <app-error [controlName]="addJournalentry.controls.date"></app-error>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-sm-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(addJournalentry.controls.journal_no)">
+                        <label for="" class="input--required">Journal#</label>
+                        <input type="text" class="no-style input--bd" placeholder="Enter Number"
+                            value="" formControlName="journal_no">
+                        <span class="border-anim"></span>
+                        <app-error [controlName]="addJournalentry.controls.journal_no"></app-error>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-sm-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(addJournalentry.controls.reference_no)">
+                        <label for="" class="input--required">Reference#</label>
+                        <input type="text" class="no-style input--bd" placeholder="Enter Number"
+                            value="" formControlName="reference_no">
+                        <span class="border-anim"></span>
+                        <app-error [controlName]="addJournalentry.controls.reference_no"></app-error>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <div class="input-wrap">
+                        <label for="" class="">Narration</label>
+                        <input type="text" class="no-style input--bd" placeholder="Comments"
+                            value="" formControlName="narration">
+                        <span class="border-anim"></span>
+                        <span class="error-message">Error messge!</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-layout__card">
+                <div>
+                    <div class="table-box">
+                        <div
+                            class="table-wrapper table-wrapper--type1 table-wrapper--type2  table--bd table--nobg">
+                            <table class="table-container">
+                                <thead>
+                                    <tr>
+                                        <th width=22%>Accounts</th>
+                                        <th width=36%>Reference#</th>
+                                        <th width=15%>Debit ({{ currency_type?.symbol}})</th>
+                                        <th width=15%>Credit ({{ currency_type?.symbol}})</th>
+                                        <th width=9%></th>
+                                    </tr>
+                                </thead>
+                                <tbody formArrayName="entries">
+                                    <tr *ngFor="let otherItem of addJournalentry.controls.entries['controls']; let i = index;"
+                                    [formGroupName]="i">
+                                        <td>
+                                            <div class="select-wrap">
+                                                <material-dropdown [selectedOption]="selectedAccountList[i]"
+                                                [addErrorClass]="addErrorClass(addJournalentry.controls.entries.controls[i].controls.account)">
+                                                    <select #customSelect name="" class="no-style select--modify add-hsn"
+                                                            formControlName="account">
+                                                    <option *ngFor="let option of accountsList" value="{{ option.id }}">{{option.name }}</option>
+                                                </select>
+                                            </material-dropdown>
+                                                <!-- <app-error [controlName]="addJournalentry.controls.entries.controls[i].controls.account"></app-error> -->
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="text" placeholder="Reference#" formControlName="reference_no">
+                                        </td>
+                                        <td>
+                                            <input positiveThreeDigitDecimalNumber type="text" placeholder="1000"  formControlName="debit" (change)="debitValueChange(otherItem)">
+                                        </td>
+                                        <td>
+                                            <input positiveThreeDigitDecimalNumber type="text" placeholder="1000"  formControlName="credit" (change)="creditValueChange(otherItem)">
+                                        </td>
+                                        <td class="text-center">
+                                            <span
+                                                class="material-icons drop-down">arrow_drop_down</span>
+                                            <span class="material-icons add" (click)="addMoreEntries()">add_circle_outline</span>
+                                            <span
+                                                class="material-icons delete" (click)="removeOtherItem(i)" *ngIf="addJournalentry.controls.entries.controls.length !== 1">add_circle_outline</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tr class="foot-bg">
+                                    <td></td>
+                                    <td class=" text-end fw-bold">Total:</td>
+                                    <td
+                                        class="rupee-symbol rupee-symbol--sm  text-end fw-bold">
+                                        {{ currency_type?.symbol}} {{ totals.subtotal_debit }}</td>
+                                    <td
+                                        class="rupee-symbol rupee-symbol--sm  text-end fw-bold">
+                                        {{ currency_type?.symbol}} {{ totals.subtotal_credit }}</td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="table-footer-actions mg-top-20">
+                        <a class="clear-item" (click)="clearAllCells()">Clear all cells</a>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="form-layout__card notes mg-top-15">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <file-uploader (onFileRead)="onFileUpload($event)" (onFileUploaded)="fileUploader($event)"
+                        (onFileDeleted)="fileDeleted($event)" [multiple]="true" [accept]="'image/*, capture=camera, image/jpeg,image/x-jpg,image/png, application/pdf'"
+                        [showFileName]="false" [uploaderId]="present">
+                    </file-uploader>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </div>
+</div>
+<div class="mg-top-30 section-footer mg-bottom-30">
+    <div class="btn-wrap mg-bottom-100">
+        <button class="btn btn-back" [routerLink]="[prefixUrl+'/reports/accountant/journal-entry/list']">Cancel</button>
+        <button class="btn btn--primary" type="submit">Save</button>
+    </div>
+</div>
+</form>

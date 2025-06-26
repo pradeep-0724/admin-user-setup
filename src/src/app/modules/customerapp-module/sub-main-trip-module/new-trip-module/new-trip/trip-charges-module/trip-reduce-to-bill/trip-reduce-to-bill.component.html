@@ -1,0 +1,333 @@
+<div>
+  <div action="" [formGroup]="reduceBillForm">
+    <div formArrayName="reduce_array">
+      <ng-container *ngFor="let item of reduceBillForm['controls'].reduce_array['controls']; let i = index;"
+        [formGroupName]="i">
+        <div>
+          <div class="row mx-0 def-color">
+            <div class="col-lg-4 col-md-6">
+              <div class="input-wrap" [ngClass]="addErrorClass(item.controls.type)">
+                <label for="">
+                  Job Deduction
+                </label>
+                <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth" [addBlank]="false"
+                  [maxLength]="20" [selectedOption]="initialDetails?.chargeType[i]" [addNewOptions]="true"
+                  (addNewOption)="addNewAdditionalCharge($event,i)">
+                  <select #customSelect formControlName="type" class="no-style select--modify">
+                    <option *ngFor="let option of expenseTypeList" value="{{ option?.name?.id }}">
+                      {{ option?.name?.name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="input-wrap">
+                <label for="">
+                  Deduction Amount
+                </label>
+                <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456"
+                  value="" [ngClass]="{'showInvalid':item.controls.amount.invalid&&item.controls.amount.touched}"
+                  formControlName="amount_before_tax" (change)="onCalculationChange()">
+              </div>
+            </div>
+            <ng-container *ngIf="false">
+              <div class="col-lg-4 col-md-6">
+                <div class="input-wrap" [ngClass]="addErrorClass(item.controls.tax)">
+                  <label for="">
+                    Tax
+                  </label>
+                  <material-dropdown [searchable]="true" class="dropDownWidth"
+                    [selectedOption]="initialDetails?.tax[i]">
+                    <select #customSelect formControlName="tax" class="no-style select--modify"
+                      (change)="onCalculationChange()">
+                      <option *ngFor="let option of taxOptions" value="{{ option?.id }}">
+                        {{ option?.label }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </div>
+              <div class="col-lg-4 col-md-6">
+                <div class="input-wrap">
+                  <label for="">
+                    Total Amount
+                  </label>
+                  <input positiveThreeDigitDecimalNumber readonly type="text" class="no-style input--bd"
+                    placeholder="123456" value="" formControlName="amount">
+                </div>
+              </div>
+            </ng-container>
+            <div class="col-lg-4 col-md-6" *ngIf="!isTripCode">
+              <div class="input-wrap">
+                <label for="">
+                  Deduction Date
+                </label>
+                <mat-form-field>
+                  <input matInput [matDatepicker]="transactionDate" (focus)="transactionDate.open()"
+                    formControlName="date" placeholder="DD/MM/YYYY">
+                  <mat-datepicker-toggle matSuffix [for]="transactionDate">
+                  </mat-datepicker-toggle>
+                  <mat-datepicker #transactionDate></mat-datepicker>
+                </mat-form-field>
+
+              </div>
+            </div>
+            <div class="col-lg-12  mb-4" *ngIf="isAddExpense" [ngClass]="{disableInput:isDisableExpenses}">
+
+
+              <mat-radio-group formControlName="expense_type" (change)="addExpense(item,i)">
+                <mat-radio-button [value]="1" color="primary" class="me-3">N/A</mat-radio-button>
+                <mat-radio-button [value]="2" color="primary" class="me-3">Add Vendor-Linked Expenses</mat-radio-button>
+                <mat-radio-button [value]="3" color="primary" class="me-3">Add Petty Expense</mat-radio-button>
+              </mat-radio-group>
+
+
+
+            </div>
+          </div>
+
+
+
+
+
+
+          <ng-container *ngIf="item.controls.expense_type.value==2">
+
+            <div class="row mx-0" [ngClass]="{disableInput:isDisableExpenses}">
+              <div class="col-lg-4 col-md-6">
+                <div class="input-wrap">
+                  <label for="">Amount</label>
+                  <input positiveThreeDigitDecimalNumber type="text"
+                    (change)="changePaymentAmount(item,i);onExpenseCalculationChange()" class="no-style input--bd"
+                    placeholder="123456" value=""
+                    [ngClass]="{'showInvalid':item.controls.expense_amount_before_tax.invalid&&item.controls.expense_amount_before_tax.touched}"
+                    formControlName="expense_amount_before_tax">
+
+                </div>
+              </div>
+              <ng-container *ngIf="isTax">
+                <div class="col-lg-4 col-md-6">
+                  <div class="input-wrap" [ngClass]="addErrorClass(item.controls.expense_tax)">
+                    <label for="">
+                      Tax
+                    </label>
+                    <material-dropdown [searchable]="true" class="dropDownWidth"
+                      [selectedOption]="initialDetails?.expenseTax[i]">
+                      <select #customSelect formControlName="expense_tax" class="no-style select--modify"
+                        (change)="onExpenseCalculationChange()">
+                        <option *ngFor="let option of taxOptions" value="{{ option?.id }}">
+                          {{ option?.label }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="input-wrap">
+                    <label for="">
+                      Total Amount
+                    </label>
+                    <input positiveThreeDigitDecimalNumber readonly type="text" class="no-style input--bd"
+                      placeholder="123456" value="" formControlName="expense_amount">
+                  </div>
+                </div>
+              </ng-container>
+              <div class="col-lg-4 col-md-6">
+                <div class="input-wrap" [ngClass]="addErrorClass(item.controls.expense_party)">
+                  <label for="">Party Name</label>
+                  <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth"
+                    [selectedOption]="initialDetails?.vendor[i]" [party]="true"
+                    (addPartyPopup)="openAddPartyModal($event,i)" (addValueToList)="addValueToPartyPopup($event)"
+                    [params]="partyNamePopup">
+                    <select #customSelect formControlName="expense_party" class="no-style select--modify">
+                      <option *ngFor="let vendor of vendorList" value="{{ vendor?.id }}">
+                        {{ vendor.party_display_name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+
+
+                </div>
+              </div>
+              <div class="col-lg-4 col-md-6">
+                <div class="input-wrap">
+                  <label for="">Payment Status</label>
+                  <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                    [selectedOption]="initialDetails.paymentStatus[i]">
+                    <select #customSelect formControlName="expense_status" class="no-style select--modify"
+                      (change)="changePaymentAmount(item,i)">
+                      <option *ngFor="let option of paymentStatusList" value="{{option.id}}">{{option.label}}</option>
+                    </select>
+                  </material-dropdown>
+
+
+                </div>
+              </div>
+            </div>
+
+
+
+
+          </ng-container>
+
+        </div>
+        <ng-container *ngIf="item.controls.expense_type.value==2">
+          <div [ngClass]="{disableInput:isDisableExpenses}" *ngIf="item.controls.expense_status.value=='3'">
+            <div class="row mx-0">
+              <div class="col-lg-4 col-md-6">
+                <div class="input-wrap" [ngClass]="addErrorClass(item.controls.expense_payment_mode)">
+                  <label for="" class="input--required">Payment mode</label>
+                  <material-dropdown [searchable]="true" [addable]="false"
+                    [selectedOption]="initialDetails?.advanceClientAccount[i]">
+                    <select #customSelect formControlName="expense_payment_mode"
+                      class="no-style select--modify border p-2" (change)="paymentmodeChanged(item)">
+                      <option value="paid_By_Driver">Paid By Employee</option>
+                      <option *ngFor="let option of advanceClientAccountList" value="{{ option?.id }}">
+                        {{ option?.name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </div>
+
+              <div class=" col-lg-4 col-md-6" *ngIf="item.controls.expense_payment_mode.value==='paid_By_Driver'">
+                <div [ngClass]="{disableInput: isDisableExpenses}">
+                  <div class="input-wrap" [ngClass]="addErrorClass(item.controls.employee)">
+                    <label for="" class="input--required">Paid By</label>
+                    <material-dropdown [searchable]="true" [addable]="false"
+                      [selectedOption]="initialDetails?.employee[i]">
+                      <select #customSelect formControlName="employee" class="no-style select--modify border p-2">
+                        <option *ngFor="let option of driverList" value="{{ option?.id }}">
+                          {{ option?.first_name }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div class="input-wrap">
+                  <label for="" class="input--required">Bill No</label>
+                  <input type="text"
+                    [ngClass]="{'showInvalid':item.controls.expense_bill_no.invalid&&item.controls.expense_bill_no.touched}"
+                    class="no-style input--bd" placeholder="123456" value="" formControlName="expense_bill_no">
+                </div>
+              </div>
+              <div class="col-lg-4 col-md-6">
+                <div class="input-wrap">
+                  <label for="" class="input--required">Bill Date</label>
+                  <mat-form-field>
+                    <input matInput [matDatepicker]="bill_date" (focus)="bill_date.open()" [readOnly]="true"
+                      formControlName="expense_bill_date" placeholder="DD/MM/YYYY" class="">
+                    <mat-datepicker-toggle matSuffix [for]="bill_date"
+                      [disabled]="isDisableExpenses"></mat-datepicker-toggle>
+                    <mat-datepicker #bill_date></mat-datepicker>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="item.controls.expense_type.value==3">
+
+          <div class="" [ngClass]="{disableInput:isDisableExpenses}">
+            <div class="row mx-0">
+
+              <div class="col-lg-4 col-md-6">
+                <div class="input-wrap">
+                  <label for="" class="input--required">Amount</label>
+                  <input type="text" positiveThreeDigitDecimalNumber (change)="onExpenseCalculationChange()"
+                    [ngClass]="{'showInvalid':item.controls.expense_amount_before_tax.invalid&&item.controls.expense_amount_before_tax.touched}"
+                    class="no-style input--bd " placeholder="123456" value=""
+                    formControlName="expense_amount_before_tax">
+                </div>
+              </div>
+              <ng-container *ngIf="isTax">
+                <div class="col-lg-4 col-md-6">
+                  <div class="input-wrap" [ngClass]="addErrorClass(item.controls.expense_tax)">
+                    <label for="">
+                      Tax
+                    </label>
+                    <material-dropdown [searchable]="true" class="dropDownWidth"
+                      [selectedOption]="initialDetails?.expenseTax[i]">
+                      <select #customSelect formControlName="expense_tax" class="no-style select--modify"
+                        (change)="onExpenseCalculationChange()">
+                        <option *ngFor="let option of taxOptions" value="{{ option?.id }}">
+                          {{ option?.label }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="input-wrap">
+                    <label for="">
+                      Total Amount
+                    </label>
+                    <input positiveThreeDigitDecimalNumber readonly type="text" class="no-style input--bd"
+                      placeholder="123456" value="" formControlName="expense_amount">
+                  </div>
+                </div>
+              </ng-container>
+
+              <div class="col-lg-4 col-md-6">
+                <div class="input-wrap" [ngClass]="addErrorClass(item.controls.expense_payment_mode)">
+                  <label for="" class="input--required">Payment mode</label>
+                  <material-dropdown [searchable]="true" [addable]="false"
+                    [selectedOption]="initialDetails?.advanceClientAccount[i]">
+                    <select #customSelect formControlName="expense_payment_mode"
+                      class="no-style select--modify border p-2" (change)="paymentmodeChanged(item)">
+                      <option value="paid_By_Driver">Paid By Employee</option>
+                      <option *ngFor="let option of advanceClientAccountList" value="{{ option?.id }}">
+                        {{ option?.name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </div>
+
+              <div class=" col-lg-4 col-md-6" *ngIf="item.controls.expense_payment_mode.value==='paid_By_Driver'">
+                <div [ngClass]="{disableInput: isDisableExpenses}">
+                  <div class="input-wrap" [ngClass]="addErrorClass(item.controls.employee)">
+                    <label for="" class="input--required">Paid By</label>
+                    <material-dropdown [searchable]="true" [addable]="false"
+                      [selectedOption]="initialDetails?.employee[i]">
+                      <select #customSelect formControlName="employee" class="no-style select--modify border p-2">
+                        <option *ngFor="let option of driverList" value="{{ option?.id }}">
+                          {{ option?.first_name }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4 col-md-6">
+                <div class="input-wrap">
+                  <label for="" class="input--required">Transaction date</label>
+                  <mat-form-field>
+                    <input matInput [matDatepicker]="bill_date" (focus)="bill_date.open()" [readOnly]="true"
+                      formControlName="expense_bill_date" placeholder="DD/MM/YYYY" class="">
+                    <mat-datepicker-toggle matSuffix [for]="bill_date"
+                      [disabled]="isDisableExpenses"></mat-datepicker-toggle>
+                    <mat-datepicker #bill_date></mat-datepicker>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<add-new-coa [popDetail]="showAddCoaPopup" *ngIf="showAddCoaPopup.status" (closeModal)="closeCoaPopup"
+  (coaAdded)="addExpenseToOption($event)">
+</add-new-coa>
+
+<app-add-party-popup [popDetail]="showAddPartyPopup" [isVendor]="true" (closeModal)="closePartyPopup()"
+  (partyAdded)="addPartyToOption($event)"></app-add-party-popup>

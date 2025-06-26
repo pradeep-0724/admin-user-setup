@@ -1,0 +1,50 @@
+
+
+<div class="d-flex justify-content-between align-items-center py-2 px-3">
+  
+    <div class="d-flex align-items-center">
+      <button (click)="historyBack()" class="gb-back-btn"><i
+          class="bi bi-chevron-left"></i></button>
+      <span class="fw-semibold primary-brand-text ms-2 fs-6">{{vehPaymentData?.bill_number}}</span>
+            <div class="header-chip header-chip-green ms-3" >
+                Total Purchase: {{vehPaymentData?.total|numberFormat}}
+              
+            </div>
+            <div class="header-chip header-chip-grey ms-2" >
+              Status: {{vehPaymentData?.status}}
+            </div>
+            <div  class="header-chip header-chip-sky-blue ms-2" *ngIf="vehPaymentData?.balance">
+              Balance Amount: {{vehPaymentData?.balance|numberFormat}}
+            </div>
+    </div>
+
+    <div class="d-flex align-items-center" >  
+      <button class="gb-btn gb-btn-icon gb-btn-blue ms-2"(click)="openPdf()" >
+          <span class="material-icons">  remove_red_eye  </span>View PDF</button>     
+        <button class="gb-edit-btn-secondary ms-2"  *ngxPermissionsOnly="vehicleProviderPermission[1]" [routerLink]="[preFixUrl+'/trip/vehicle-payment/edit/'+vehPaymentId]">
+          <span class="material-icons"> create </span>Edit</button>
+       
+    </div>
+  </div>
+
+
+  <div >
+    <div class=" row mx-0   px-4 py-3  details shadow-inset-top def-color">
+      <p class="col-lg-4 col-md-6"><b>Vendor: </b><a class="custom-link" [routerLink]="[preFixUrl+'/onboarding/party/details/vendor/'+ vehPaymentData?.vendor?.id ]" target="_blank"  >{{vehPaymentData?.vendor?.name}}</a></p>
+      <p class="col-lg-4 col-md-6 "><b>Bill Number: </b>{{vehPaymentData?.bill_number}}</p>
+      <p class="col-lg-4 col-md-6 "><b>Bill Date: </b>{{vehPaymentData?.bill_date}}</p>
+      <p class="col-lg-4 col-md-6 "><b>Employee In Charge: </b>{{vehPaymentData?.employee ? vehPaymentData?.employee : '-'}}</p>
+      <p class="col-lg-4 col-md-6 "><b>Payment Term: </b>{{vehPaymentData?.payment_term ? vehPaymentData?.payment_term : '-'}}</p>
+      <p class="col-lg-4 col-md-6 "><b>Due Date: </b>{{vehPaymentData?.due_date ? vehPaymentData?.due_date : '-'}}</p>
+      <p class="col-lg-4 col-md-6 "><b>Reference No.: </b>{{vehPaymentData?.reference_no ? vehPaymentData?.reference_no : '-'}}</p>
+      <p class="col-lg-4 col-md-6 "><b>Point of Contact (Name): </b>{{vehPaymentData?.contact_person_name ? vehPaymentData?.contact_person_name : '-'}}</p>
+      <p class="col-lg-4 col-md-6 "><b>Point of Contact (Mobile): </b> {{vehPaymentData?.contact_person_no?.no ? vehPaymentData?.contact_person_no?.code +' '+vehPaymentData?.contact_person_no?.no : '-'  }}</p>
+      <p class="col-lg-4 col-md-6 "><b>Transaction Includes tax.:  </b> {{vehPaymentData?.is_transaction_includes_tax ? 'Yes' : 'No'  }}</p>
+
+      
+
+    </div>
+
+    
+  </div>
+

@@ -1,0 +1,97 @@
+<div class="modal fade" [ngClass]="{'show':maintence.show}" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog screen-center modal--xls" style="max-width: 900px;" role="document">
+    <div class="modal-content py-2">
+      <div class="row mx-0 align-items-start mb-3 top-header py-2 px-3">
+       <div>
+        <h1 class="heading fw-normal col-9 ps-0">Add Maintenance
+
+        <button class="gb-video-play text-end ms-3"  (click)="openGothrough()">
+          <i class="bi bi-play-circle-fill"></i>
+        </button></h1>
+      
+       </div>
+        <div class="tabIndexActive text-end col-3"><button class="close-icon p-0 material-icons" (click)="onClickCancel()"> highlight_off </button></div>
+     </div>
+      <form [formGroup]="maintenanceForm" class=" px-3">
+        <div class="alert alert-warning" *ngIf="maintenanceForm.controls.error_message.value">
+          {{maintenanceForm.controls.error_message.value}} 
+         </div>
+         <div class="alert alert-warning" *ngIf="maintenanceForm.controls.error_message_hour.value">
+          {{maintenanceForm.controls.error_message_hour.value}} 
+         </div>
+        <div class="row" >
+          <div class="col-sm-6">
+            <div class="input-wrap error" [ngClass]="addErrorClass(maintenanceForm.controls.vehicle)">
+                <label for="" class="input--required   position-relative">Vehicle No</label>
+                <material-dropdown [searchable]="true" class="dropDownWidth" [addErrorClass]="addErrorClass(maintenanceForm.controls.vehicle)">
+                    <select #customSelect formControlName="vehicle" class="no-style select--modify" (change)="setOdmeter();setHour()">
+                        <option *ngFor="let vehicle of vehicleList" value="{{ vehicle.id }}">
+                          {{ vehicle?.reg_number }}</option>
+                    </select>
+                </material-dropdown>
+                <app-error [controlName]="maintenanceForm.controls.vehicle"></app-error>
+              </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="input-wrap clearfix error" [ngClass]="addErrorClass(maintenanceForm.controls.job_card_no)">
+              <label for="" class="input--required">Job Card No.</label>
+              <input  type="text" class="no-style input--bd" placeholder="123456" value=""  readonly formControlName="job_card_no">
+              <app-error [controlName]="maintenanceForm.controls.job_card_no"></app-error>
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="input-wrap clearfix error" [ngClass]="addErrorClass(maintenanceForm.controls.start_date)">
+                <label for="" class="input--required">Date</label>
+                <mat-form-field>
+                    <input matInput [matDatepicker]="start_date" (focus)="start_date.open()" formControlName="start_date"
+                        placeholder="DD/MM/YYYY" (dateChange)="setOdmeter();setHour()">
+                    <mat-datepicker-toggle matSuffix [for]="start_date"></mat-datepicker-toggle>
+                    <mat-datepicker #start_date></mat-datepicker>
+                </mat-form-field>
+                <app-error [controlName]="maintenanceForm.controls.start_date"></app-error>
+            </div>
+          </div>
+
+
+          <div class="col-sm-6">
+            <div class="input-wrap">
+                <label for="" class="input--required   position-relative">Vehicle Status</label>
+                <material-dropdown [searchable]="true" class="dropDownWidth" [selectedOption]="vehicleStatus[0]">
+                    <select #customSelect formControlName="job_card_status" class="no-style select--modify">
+                        <option *ngFor="let status of vehicleStatus" value="{{ status.id }}">
+                            {{ status.label}}</option>
+                    </select>
+                </material-dropdown>
+                </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="input-wrap clearfix error" [ngClass]="addErrorClass(maintenanceForm.controls.kms)">
+              <label for="" class="input">KMS</label>
+              <input  type="text" class="no-style input--bd" positiveDigitNumber placeholder="123456" value=""  formControlName="kms" (change)="onKmsChange()">
+              <app-error [controlName]="maintenanceForm.controls.kms"></app-error>
+            </div>
+          </div>
+
+          <div class="col-sm-6" formGroupName="hour_min">
+            <div class="input-wrap clearfix error" [ngClass]="addErrorClass(maintenanceForm.controls.hour_min['controls'].hour)">
+              <label for="" class="input">Time</label>
+              <input  positiveDigitNumber type="text" class="no-style input--bd" placeholder="Hours" value=""  formControlName="hour" (change)="onHourChange()">
+              <app-error [controlName]="maintenanceForm.controls.hour_min['controls'].hour"  class="w-100 desktop-position"></app-error>
+            </div>
+          </div>
+
+      </div>
+      </form>
+       <div class="tabIndexActive row mx-0 justify-content-between px-3">
+        <button class="btn btn-primary" (click)="onClickCancel()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveMaintenance()">Save</button>
+       </div>
+  </div>
+</div>
+</div>
+<div *ngIf="maintence.show" class="modal-backdrop fade show"></div>
+
+<app-go-through  [goThroughDetais]="goThroughDetais"></app-go-through>

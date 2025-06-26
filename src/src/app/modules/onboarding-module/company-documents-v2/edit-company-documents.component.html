@@ -1,0 +1,150 @@
+<form [formGroup]="employee_details" >
+    <div class=" upload-id-wrap container-fluid">
+        <div class="row layout-bg">
+
+            <div class="col-xl-3 col-lg-3 px-0">
+                <aside class="upload-menu-wrapper h-auto  sub-window-height ">
+                    <div class="add-doc mt-0 mt-2 d-block ps-3 pe-1">
+                        <button class="w-100 py-3 fs-6 fw-semibold primary-brand-text" type="button"
+                            (click)="showModal = true">
+                            <b>+ &nbsp;</b>Add  Document
+                        </button>
+                        <ng-container *ngIf="showModal">
+                            
+                            <div class="d-flex justify-content-between align-items-center py-3">
+                     <div class="input-wrap mb-0 flex-grow-1">
+                            <input type="text" class="no-style  input--bd" [(ngModel)]="newlyAddedDoc"  [ngModelOptions]="{standalone: true}">
+                        </div>
+                            <button (click)="submitAddMoreForm()" class="mx-2 green-text"><span class="material-icons">
+                                check_circle_outline
+                                </span></button>
+                                <button (click)="showModal = false;newlyAddedDoc=''" class="warn-text"><span class="material-icons">
+                                highlight_off
+                                </span></button>
+                            
+                        </div>
+                        </ng-container>
+                    </div>
+                    <nav class="upload-menu border-bottom-0 ps-2">
+                        <div class="overflow-auto flex-lg-wrap flex-nowrap row mx-0  ">
+                            <button
+                                class="upload-menu__item  text-start d-inline-flex align-items-center justify-content-lg-between"
+                                *ngFor="let document of documentsList; let i = index;"
+                                [ngClass]="{'active': i==activeDoc, 'error': employee_details.controls.documents.controls[i]?.invalid && employee_details.controls.documents.controls[i]?.touched}"
+                                (click)="changeDocument(i)">
+                                <a class=" ">{{document?.name }}</a>
+                                <span class="no-style px-2"  (click)="deleteDocuments(i)">
+                                    <i class="material-icons text-danger del-icon">delete</i>
+                                </span>
+                            </button>
+                        </div>
+                    </nav>
+                    
+                </aside>
+            </div>
+            <div class="col-xl-9 col-lg-9 sub-window-height" formArrayName="documents">
+                <div class="mt-5" *ngIf="documentsList.length==0">
+                    <div class="no-list-data-wrap">
+                        <figure>
+                            <img src="assets/img/no-content.png" alt="">
+                        </figure>
+                        <h5 class="mt-3 primary-brand-text">No documents added !</h5>
+                    </div>
+                </div>
+                <div class="upload-id-content " *ngFor="let document of documentsList; let i = index;"
+                    [formGroupName]="i" [ngClass]="{'active': i==activeDoc}">
+                    <div class="form-layout__card" [ngClass]="{'active': i==activeDoc}">
+                        
+                        <div class="row tabIndexActiveFields align-items-center">
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="input-wrap error"
+                                    [ngClass]="addErrorClass(employee_details.controls.documents.controls[i].controls.number)">
+                                    <label for="" class="input">{{ document?.name ? document?.name :document}} number</label>
+                                    <input type="text" class="no-style input--bd" formControlName="number"
+                                        placeholder="11/22/30945" value="" appUpperCase>
+                                    <app-error
+                                        [controlName]="employee_details.controls.documents.controls[i].controls.number"></app-error>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="input-wrap error error--type-1"
+                                    [ngClass]="addErrorClass(employee_details.controls.documents.controls[i].controls.expiry_date)">
+                                    <label for="" class="">{{ document?.name ? document?.name :document }} Expiry Date</label>
+                                    <mat-form-field class="width--100">
+                                        <input matInput placeholder="DD/MM/YYYY" [matDatepicker]="iii"
+                                            (focus)="iii.open()" formControlName="expiry_date" readonly >
+                                        <mat-datepicker-toggle matSuffix [for]="iii"></mat-datepicker-toggle>
+                                        <mat-datepicker #iii startView="multi-year"></mat-datepicker>
+                                    </mat-form-field>
+                                    <app-error
+                                        [controlName]="employee_details.controls.documents.controls[i].controls.expiry_date"></app-error>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xl-4 col-lg-4 col-sm-6">
+                                <div class="input-wrap error"
+                                    [ngClass]="addErrorClass(employee_details.controls.documents.controls[i].controls.amount)">
+                                    <label for="" class="input"
+                                        [ngClass]="{'input--required':employee_details.controls.documents.controls[i].controls.pass_journal_entry.value==true}">Amount
+                                        ({{ currency_type?.symbol}})</label>
+                                    <input type="number" class="no-style input--bd" placeholder="" value=""
+                                        formControlName="amount" positiveThreeDigitDecimalNumber>
+                                    <app-error
+                                        [controlName]="employee_details.controls.documents.controls[i].controls.amount">
+                                    </app-error>
+                                </div>
+                            </div>
+                            <div class="col-xl-4 col-lg-4 col-sm-6"
+                                *ngIf="employee_details.get('documents').at(i).get('pass_journal_entry').value==true">
+                                <div class="input-wrap error"
+                                    [ngClass]="addErrorClass(employee_details.controls.documents.controls[i].controls.bank)">
+                                    <label for="" class="input"
+                                        [ngClass]="{'input--required':employee_details.get('documents').at(i).get('pass_journal_entry').value==true}">Bank</label>
+                                    <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                                        [selectedOption]="initialValues.bank[i]">
+                                        <select #customSelect formControlName="bank" class="no-style select--modify">
+                                            <option *ngFor="let account of paymentAccountList" value="{{ account.id }}">
+                                                {{ account.name }}</option>
+                                        </select>
+                                    </material-dropdown>
+                                    <app-error
+                                        [controlName]="employee_details.controls.documents.controls[i].controls.bank"></app-error>
+                                </div>
+                            </div>
+                            <div class="col-xl-4 col-lg-3 col-md-6 col-sm-6">
+                                <div>
+                                    <label for="pass_journal_entry{{i}}"
+                                        class="d-inline-block cursor-pointer check-box">
+                                        <input type="checkbox" placeholder="123456" value=""
+                                            class="w-auto d-inline-block" formControlName="pass_journal_entry"
+                                            id="pass_journal_entry{{i}}" (change)="passJournalEntryChange(i)" />
+                                        <span class="check-mark"></span>
+                                        <span class="label-text check-label">Pass Journal Entry</span> </label>
+
+                                </div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-4 pt-4 mt-4 border-top">
+                                        
+                                <file-uploader-v2 (onFileUploaded)="fileUploader($event,i)" [uploaderId]="'document-'+i"
+                                [isShowOnlyUpload]="false"></file-uploader-v2>
+                         
+                            <div  *ngFor="let document of employee_details.controls.documents.controls[i].controls.files.value">
+                                <app-file-delete-view [showInlineEdit]="false" [fileData]="document" 
+                                (fileDeleted)="fileDeleted($event,i)"></app-file-delete-view>
+                            </div>
+                          
+                        </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<alert-popup [inputData]="popupInputData" *ngIf="popupInputData.show" [documetType]="'Employees'"
+    (outputData)="confirmButton($event)"></alert-popup>
+<alert-popup [inputData]="popupInputDataDelete" *ngIf="popupInputDataDelete.show"
+    (outputData)="confirmButtonForDelete($event)"></alert-popup>

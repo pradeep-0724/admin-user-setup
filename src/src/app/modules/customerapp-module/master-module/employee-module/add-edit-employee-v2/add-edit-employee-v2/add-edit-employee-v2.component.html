@@ -1,0 +1,357 @@
+<div class="add-screen-wrap">
+<div class="def-color px-4 py-3 layout-bg">
+    <h6 class="fs-5" *ngIf="!employee_id">Add Employee</h6>
+    <h6 class="fs-5" *ngIf="employee_id">Edit Employee</h6>
+</div>
+<form [formGroup]="employeeDetails">
+    <div class="form-layout ">
+        <div class="form-layout__card px-4 pt-4 shadow-inset-top-bottom">
+            <div class="alert-msg" *ngIf="apiError">
+                <span class="icon-wrap"></span>
+                <p class="message-cont">{{ apiError }}</p>
+            </div><br>
+            <div class='form-body' style="display: block;">
+                <div class="row align-items-center">
+                    <div class="col-lg-3 col-md-6">
+                        <profile-pic (onFileRead)="onImageUploaded($event)" (onFileUploaded)="imageUpload($event,0)"
+                            [accept]="'image/jpeg,image/x-jpg,image/png, capture=camera'"
+                            [uploaderId]="'employee_pro_pic'" [imagePreview]="profile_img_url">
+                        </profile-pic>
+                    </div>
+                    <div class="col-lg-3  col-md-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(employeeDetails.controls.first_name)">
+                            <label for="" class="input--required">Full Name</label>
+                            <input formControlName="first_name" type="text" class="no-style input--bd"
+                                placeholder="Name" value="" (change)="setDisplayName()">
+                            <app-error [controlName]="employeeDetails.controls.first_name"></app-error>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(employeeDetails.controls.display_name)">
+                            <label for="" class="input--required">Display Name</label>
+                            <input formControlName="display_name" type="text" class="no-style input--bd"
+                                placeholder="Display Name" value="">
+                            <app-error [controlName]="employeeDetails.controls.display_name"></app-error>
+                            <span *ngIf="display_name_error" class="error-reg">{{display_name_error}}</span>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 country-filed-height">
+                        <div class="input-wrap mb-0"><label for="" class="input--required">Contact number</label></div>
+
+
+                        <div class="row mx-0">
+                            <div class="col-4 px-0">
+                                <div class="width-country-code custom-margin me-0">
+                                    <material-dropdown class="dropDownWidth px-0"
+                                        [selectedOption]="initialValues.contact_country_code">
+                                        <select #customSelect formControlName="contact_country_code"
+                                            class="no-style select--modify" (change)="checkMobileNumber()">
+                                            <option *ngFor="let phone_code of countryPhoneCode"
+                                                value="{{ phone_code }}">
+                                                {{phone_code}}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                </div>
+                            </div>
+
+
+                            <div class="px-0 number-grow col-7 px-0">
+                                <div class="ms-3">
+
+                                    <div class="input-wrap error px-0 col-8 w-100"
+                                        [ngClass]="addErrorClass(employeeDetails.controls.contact)">
+
+                                        <input type="text"  formControlName="contact" maxlength="10"
+                                            pattern="^[0-9]*$" class="no-style input--bd" placeholder="9900000000"
+                                            (change)="checkMobileNumber()">
+                                        <span *ngIf="contact_error" class="error-reg">{{contact_error}}</span>
+                                        <span *ngIf="uniqueMobileerr" class="error-reg">{{uniqueMobileerr}}</span>
+                                        <app-error [controlName]="employeeDetails.controls.contact"></app-error>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap" [ngClass]="addErrorClass(employeeDetails.controls.joining_date)">
+                            <label for="" class="input">Date of Joining</label>
+                            <mat-form-field class="width--100">
+                                <input matInput placeholder="DD/MM/YYYY" [matDatepicker]="picker1"
+                                    (focus)="picker1.open()" formControlName="joining_date"
+                                    (dateChange)="onDateChange($event)">
+                                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                                <mat-datepicker #picker1></mat-datepicker>
+                            </mat-form-field>
+                            <app-error [controlName]="employeeDetails.controls.joining_date"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap clearfix">
+                            <label for="">Employee Department</label>
+                            <material-dropdown [searchable]="true" class="dropDownWidth"
+                                [postApiUrl]="employeeDesignationApi" [params]="designationParams"
+                                (postApiResponse)="getNewDesignations ($event)"
+                                (addValueToList)="addParamsToDesignation ($event)"
+                                [selectedOption]="initialValues.designation">
+                                <select #customSelect formControlName="designation" class="no-style select--modify">
+                                    <option *ngFor="let option of designationList" value="{{ option?.id }}">
+                                        {{ option?.label }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap error"
+                            [ngClass]="addErrorClass(employeeDetails.controls.email_address)">
+                            <label for="">Email ID</label>
+                            <input  appLowerCase type="email" formControlName="email_address" class="no-style input--bd"
+                                placeholder="name@gmail.com">
+                            <app-error [controlName]="employeeDetails.controls.email_address"></app-error>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap error"
+                            [ngClass]="addErrorClass(employeeDetails.controls.employee_no)">
+                            <label for="">Employee ID</label>
+                            <input pattern="^[A-Za-z0-9]+$" type="text" formControlName="employee_no" class="no-style input--bd"
+                                placeholder="">
+                            <app-error [controlName]="employeeDetails.controls.employee_no"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap error"
+                            [ngClass]="addErrorClass(employeeDetails.controls.salary)">
+                            <label for="">Salary Per Month ({{ currency_type?.symbol}}) </label>
+                            <input  type="number" value="" type="text" positiveThreeDigitDecimalNumber formControlName="salary" class="no-style input--bd"
+                                placeholder="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div >
+            <button class="add-del-toggle px-4 pb-3 pt-1  " type="button" (click)="showAssignVehicleSectioon = !showAssignVehicleSectioon;">
+                <span *ngIf="!showAssignVehicleSectioon"><i class="bi bi-caret-right-fill "></i></span>
+                <span *ngIf="showAssignVehicleSectioon"><i class="bi bi-caret-down-fill "></i></span>
+                <span class="ms-3">Assign Vehicle</span>
+            </button>
+        </div>
+        <ng-container *ngIf="showAssignVehicleSectioon">
+            <div class="def-color p-4 pb-0 ">
+                <p class=" fw-semibold">Do you want to assign a particular vehicle category to this operator?
+                </p>
+                <div class="pt-4 row mx-0 g-3">
+                    <ng-container *ngFor="let data of vehicleTypeSelection;let i = index">
+                        <div class="col-lg-3 col-md-6" *ngIf="vehicleCategories.includes(data.type)">
+                        <div class="veh-type h-100 specification-multi-select-wrap" (click)="vehicleTypeSelected(i,data.index,false)"  matRipple [class.active]="data.isSelected">
+                            <span class="material-icons def-color check-icon"  *ngIf="!data.isSelected">
+                                radio_button_unchecked
+                                </span>
+                                <span class="material-icons primary-brand-text check-icon" *ngIf="data.isSelected">
+                                    check_circle
+                                 </span>
+                            <img src="{{data.image}}" 
+                                alt="truck image">
+                            <p class="text-center my-2 fw-semibold fw-12px"> {{data.vehicle_type}}</p>   
+                           
+
+                             <div (click)="data.isSelected ? $event.stopPropagation() : null">
+                            <ng-multiselect-dropdown  class="multi-dropdown"  [ngClass]="{'disabled': !data.isSelected}" [ngModelOptions]="{standalone: true}"  [placeholder]=" 'Select your specification '" [settings]="dropdownSettings"
+                            [data]="data.specificationList" [(ngModel)]="data.specification" (ngModelChange)="onModelChange($event)" >
+                            </ng-multiselect-dropdown>
+                            </div>
+
+                              <span *ngIf="data.errorMsg.length >0" class="text-danger">{{data.errorMsg}}</span>
+    
+                            
+                        </div>
+                    </div>
+                    </ng-container>
+
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap input-wrap-multi-select-dropdown">
+                            <label for="">Vehicle Assigned</label>
+                            <ng-multiselect-dropdown   (onDeSelectAll)="dataSelected($event)"  [formControl]="employeeDetails.controls.vehicles_assigned"  [placeholder]="'Select Vehicles'"  [settings]="dropdownSettingsForVehicle" [data]="vehicleData">
+                            </ng-multiselect-dropdown>
+                    
+                        </div>
+                    </div>
+    
+                </div>
+
+
+            </div>
+            
+        </ng-container>
+
+    </div>
+
+    <div class="gb-tab-wrapper">
+        <mat-tab-group mat-stretch-tabs="false" [selectedIndex]="selectedTabIndex" 
+            animationDuration="0ms" mat-align-tabs="start">
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <span class="fw-semibold"  [ngClass]="{taberror:isCertificateTabError}" >Certificate</span>
+                </ng-template>
+                <edit-emloyee-document [isValid]="isCertificateValid"  [newPartyDetails]="newPartyDetails"  (addNewParty)="addNewParty($event)" [employee_details]="employeeDetails" [isEdit]="employee_id?true:false"
+                    [editValues]="editDocsData"></edit-emloyee-document>
+
+            </mat-tab>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <span >Bank</span>
+                </ng-template>
+                <div formGroupName="bank" class="pt-3 px-4">
+                    <div class="row tabIndexActiveFields">
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error"
+                                [ngClass]="addErrorClass(employeeDetails.controls['bank'].get('account_holder_name'))">
+                                <label for="" class="input" [ngClass]="{'input--required':isRequiedForm}">Account Holder
+                                    Name</label>
+                                <input type="text" class="no-style input--bd" placeholder="Name"
+                                    formControlName="account_holder_name" (change)="valueChange()">
+
+                                <app-error
+                                    [controlName]="employeeDetails.get('bank').get('account_holder_name')"></app-error>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error"
+                                [ngClass]="addErrorClass(employeeDetails.get('bank').get('bank_name'))">
+                                <label for="" class="input" [ngClass]="{'input--required':isRequiedForm}">Bank</label>
+                                <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth"
+                                    [selectedOption]="initialValues.bankName" [postApiUrl]="addBankApi"
+                                    [params]="addBankParams" (postApiResponse)="getNewBank($event)"
+                                    (addValueToList)="addNewBank($event)">
+                                    <select #customSelect formControlName="bank_name" class="no-style select--modify"
+                                        (change)="valueChange()">
+                                        <option *ngFor="let option of bankList" value="{{ option?.id }}">
+                                            {{ option?.label }}
+                                        </option>
+                                    </select>
+                                </material-dropdown>
+                                <app-error [controlName]="employeeDetails.get('bank').get('bank_name')"></app-error>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error"
+                                [ngClass]="addErrorClass(employeeDetails.get('bank').get('account_number'))">
+                                <label for="" class="input" [ngClass]="{'input--required':isRequiedForm}">Account
+                                    Number</label>
+                                <input type="text" class="no-style input--bd" placeholder="234123455623"
+                                    formControlName="account_number" (change)="valueChange()" onpaste="return false;">
+                                <app-error
+                                    [controlName]="employeeDetails.get('bank').get('account_number')"></app-error>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error"
+                                [ngClass]="addErrorClass(employeeDetails.get('bank').get('account_type'))">
+                                <label for="" class="input" [ngClass]="{'input--required':isRequiedForm}">Account
+                                    Type</label>
+                                <material-dropdown [searchable]="true" [addable]="true"
+                                    [selectedOption]="initialValues.accountType" class="dropDownWidth"
+                                    [params]="accountTypeParams" (addValueToList)="addParamsToAccountType ($event)"
+                                    [postApiUrl]="accountTypePostApi"
+                                    (postApiResponse)="getNewAccountTypesTypes($event)">
+                                    <select #customSelect formControlName="account_type" class="no-style select--modify"
+                                        (change)="valueChange()">
+                                        <option *ngFor="let option of accountTypeList" value="{{ option?.id }}">
+                                            {{ option?.label }}
+                                        </option>
+                                    </select>
+                                </material-dropdown>
+                                <app-error [controlName]="employeeDetails.get('bank').get('account_type')"></app-error>
+                            </div>
+                        </div>
+                        <ng-container *ngIf="isTax&&!isTDS">
+                            <div class="col-xl-3 col-lg-4 col-sm-6">
+                                <div class="input-wrap error"
+                                    [ngClass]="addErrorClass(employeeDetails.get('bank').get('ifsc_code'))">
+                                    <label for="" class="input">IFSC Code</label>
+                                    <input appUpperCase type="text" class="no-style input--bd" placeholder="IFSC Code"
+                                        formControlName="ifsc_code" (change)="valueChange()">
+                                    <app-error
+                                        [controlName]="employeeDetails.get('bank').get('ifsc_code')"></app-error>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="isTax&&isTDS">
+                            <div class="col-xl-3 col-lg-4 col-sm-6">
+                                <div class="input-wrap error"
+                                    [ngClass]="addErrorClass(employeeDetails.get('bank').get('swift_code'))">
+                                    <label for="" class="input">Swift Code</label>
+                                    <input appUpperCase type="text" class="no-style input--bd" placeholder="Swift Code"
+                                        formControlName="swift_code">
+                                    <app-error
+                                        [controlName]="employeeDetails.get('bank').get('swift_code')"></app-error>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="!isTax">
+                            <div class="col-xl-3 col-lg-4 col-sm-6">
+                                <div class="input-wrap error"
+                                    [ngClass]="addErrorClass(employeeDetails.get('bank').get('swift_code'))">
+                                    <label for="" class="input">Swift Code</label>
+                                    <input appUpperCase type="text" class="no-style input--bd" placeholder="Swift Code"
+                                        formControlName="swift_code">
+                                    <app-error
+                                        [controlName]="employeeDetails.get('bank').get('swift_code')"></app-error>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error"
+                                [ngClass]="addErrorClass(employeeDetails.get('bank').get('iban_code'))">
+                                <label for="" class="input">IBAN No</label>
+                                <input appUpperCase type="text" class="no-style input--bd" placeholder="IBN No"
+                                    formControlName="iban_code">
+                                <app-error [controlName]="employeeDetails.get('bank').get('iban_code')"></app-error>
+                            </div>
+                        </div>
+
+
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error"
+                                [ngClass]="addErrorClass(employeeDetails.get('bank').get('branch'))">
+                                <label for="" class="input">Branch</label>
+                                <input type="text" class="no-style input--bd" placeholder="Branch"
+                                    formControlName="branch">
+                                <app-error [controlName]="employeeDetails.get('bank').get('branch')"></app-error>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+
+</form>
+</div>
+<div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end">
+
+    <button class="btn  btn--sm me-2" type="button"
+        [routerLink]="[prefixUrl+'/onboarding/employee/view']">Cancel</button>
+    <button class="btn btn--primary btn--sm" type="button" (click)="checkQualificationofEmp()">{{employee_id?'Update':'Save'}}</button>
+
+</div>
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>
+<app-add-party-popup *ngIf="showAddPartyPopup.status" [popDetail]="showAddPartyPopup" (closeModal)="closePartyPopup()"
+  (partyAdded)="addPartyToOption($event)" [isVendor]="true"></app-add-party-popup>

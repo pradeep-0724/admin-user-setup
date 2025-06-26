@@ -1,0 +1,152 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+p {
+    color: $text-color;
+}
+
+b {
+    font-size: 13px;
+    margin-right: 8px;
+}
+
+.fs-10px {
+    font-size: 10px;
+}
+
+.bg-light-blue {
+    background-color: #06A3F4;
+}
+
+.bg-dark-green {
+    background-color: #64B164;
+}
+
+.bg-dark-blue {
+    background-color: #146ADB;
+}
+.bg-yellow{
+    background-color: #FFB900;
+}
+
+.bg-purple {
+    background-color: #16b4c9;
+}
+
+.bg-red {
+    background-color: #f54747;
+}
+.bg-pink{
+    background-color: #e04aeb;
+}
+
+
+.edit-btn {
+    border: 1px solid $gray-500;
+    padding: 10px;
+    color: #676A6E;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+
+
+    transition: all 60ms ease-in-out;
+
+    &:hover {
+
+        transform: scale(1.1);
+
+    }
+
+
+}
+.disable{
+    background-color: #c7c9cc;
+    opacity: 0.4;
+  }
+
+
+.static-progress {
+
+    height: 50px;
+    position: relative;
+
+    .progress-total-amount {
+        position: absolute;
+        right: 0;
+        top: 30%;
+    }
+
+
+    .static-value-wrap {
+        height: 4px;
+
+        position: absolute;
+        top: 75%;
+        border-radius: 10px;
+
+        .statis-progress-value {
+            position: relative;
+
+            .progress-current-amount {
+                position: absolute;
+                right: 0px;
+                bottom: 8px;
+                color: #06A3F4;
+            }
+
+            &::before {
+                content: "";
+                display: block;
+                height: 10px;
+                width: 10px;
+                position: absolute;
+                right: 0;
+                border-radius: 50%;
+                top: 0;
+                background-color: #06A3F4;
+                transform: translateY(-3px);
+
+
+            }
+        }
+
+    }
+
+    &::before {
+        content: "";
+        display: block;
+        height: 4px;
+        width: 100%;
+        background-color: #B3B3B3;
+        position: absolute;
+        top: 75%;
+        border-radius: 10px;
+
+    }
+}
+
+.small-card {
+    width: 25px;
+    height: 25px;
+    border-radius: 8px;
+}
+
+// .circle-progress-wrapper {
+//     box-shadow: inset 0px 0px 3px 1px #f9f4f4;
+//     min-height: 100%;
+// }
+
+// .expected-tenure-wrapper {
+//     box-shadow: inset 0px 0px 2px 1px #f9f4f4;
+// }
+
+.chart {
+    position: relative;
+}
+
+.chart-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -40%);
+}

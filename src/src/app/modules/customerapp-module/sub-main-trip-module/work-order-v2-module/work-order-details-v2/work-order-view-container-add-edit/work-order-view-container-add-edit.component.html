@@ -1,0 +1,344 @@
+<div class="d-flex justify-content-between pe-4 ps-2 align-items-center">
+  <div>
+    <div class="alert alert-success mb-0 updated-alert" role="alert" *ngIf="isUpdated">
+      Container info table updated !
+    </div>
+
+  </div>
+  <!-- <div class="d-flex justify-content-end align-items-center py-2">
+    <div class=" ms-3">
+    </div>
+    <ng-container>
+      <div class="ms-2">
+        <button class="gb-icon-btn settings-icon" matRipple [ngClass]="{'mat-icon-animation':isOpenSettings }">
+          <span (click)="isOpenSettings=!isOpenSettings" class="material-icons">settings</span>
+        </button>
+      </div>
+      <app-list-widget-list-view-settings [settingsUrl]="settingsUrl" [visible]="isOpenSettings" 
+        (listViewSettingsData)="listViewSettingsData($event)"></app-list-widget-list-view-settings>
+    </ng-container>
+
+
+
+
+
+
+  </div> -->
+  <app-list-widget  [isSearch]="false" [settingsUrl]="settingsUrl" (listWidgetData)="listWidgetData($event)"
+   (settingsApplied)="listViewSettingsData($event)" [filterUrl]="filterUrl"  [isFilter]="true" [isSettings]="true">
+  </app-list-widget>
+
+</div>
+<div class="alert alert-danger mb-2 mx-2" role="alert" *ngIf="apiError">
+  {{apiError}}
+</div>
+<div class="bordered-table-wrap mx-2 mb-2 ">
+  <div class="bordered-table " [formGroup]="salesOrderForm" cdkScrollable>
+    <table>
+      <thead>
+        <tr>
+          <th *ngFor="let header of headerList;let i=index"
+            [ngClass]="{'sticky-left':i==0,'sticky-right':i==headerList?.length-1}">{{header}}</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="salesOrderForm.controls.salesOrderContainersDetailsList['controls'].length==0">
+        <tr class="border-0">
+          <td colspan="30" class="bg-white border-bottom-0">
+            <div class="no-list-data-wrap">
+              <figure>
+                <img src="assets/img/no-content.png" alt="" />
+              </figure>
+              <h5 class="mt-3 primary-brand-text">No data found!</h5>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      <tbody formArrayName="salesOrderContainersDetailsList">
+        <tr *ngFor="let group of salesOrderForm.controls.salesOrderContainersDetailsList['controls']; let i = index"
+          [formGroupName]="i">
+          <ng-container *ngFor="let item of structureList;let j=index">
+            <td [ngClass]="{'sticky-left':j==0,'sticky-right':j==structureList?.length-1}">
+              <ng-container *ngIf="item?.field_type === 'string'">
+                <ng-container *ngIf="item?.id != 'status'">
+                  <ng-container *ngIf="['pullout_job_no', 'deposit_job_no'].includes(item?.id)">
+                    <ng-container *ngIf="group.value[item.id]">
+                      <a class="custom-link ws-nowrap"
+                        (click)="gotoJob(item.id,i)">{{group.value[item.id]}}</a>
+                    </ng-container>
+                    <ng-container *ngIf="!group.value[item.id]">
+                      <div [ngClass]="{'disabled':!isContainerRowEditable[i]}"
+                        [tabindex]="isContainerRowEditable[i]?0:1">
+                        <div [ngClass]="{'disabled':!item?.is_editable}">
+                          <input [readOnly]="!item?.is_editable" appRemoveSpaces (change)="editContainerRowData(i)"
+                            [formControlName]="item.id" type="text" placeholder="Enter" />
+                        </div>
+                      </div>
+                    </ng-container>
+
+                  </ng-container>
+                  <ng-container *ngIf="!['pullout_job_no', 'deposit_job_no'].includes(item?.id)">
+                    <div [ngClass]="{'disabled':!isContainerRowEditable[i]}" [tabindex]="isContainerRowEditable[i]?0:1">
+                      <div [ngClass]="{'disabled':!item?.is_editable}">
+                        <input [readOnly]="!item?.is_editable" (change)="editContainerRowData(i)"
+                          [formControlName]="item.id" type="text" placeholder="Enter" />
+                      </div>
+                    </div>
+                  </ng-container>
+
+                </ng-container>
+
+                <ng-container *ngIf="item?.id == 'status'">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <p *ngIf="item?.id == 'status'">{{group.controls.status.value}} </p>
+                    <button class="gb-icon-btn ms-3" [matMenuTriggerFor]="rowOptions" matRipple
+                      (click)="selectedOrder=i">
+                      <span class="material-icons">more_vert</span>
+                    </button>
+                  </div>
+                </ng-container>
+              </ng-container>
+              <div [ngClass]="{'disabled':!isContainerRowEditable[i]}" [tabindex]="isContainerRowEditable[i]?0:1">
+                <ng-container *ngIf="item?.field_type === 'decimal'">
+                  <ng-container *ngIf="item?.id=='gross_weight'">
+                    <div class="d-flex align-items-center">
+                      <input (change)="editContainerRowData(i)"  [readOnly]="!item?.is_editable"
+                        [formControlName]="item.id" positiveTwoDigitDecimalNumber placeholder="1234" type="text" />
+                      <button *ngIf="group['controls'][item.id].value && !isFilterApplied" (click)="cloumnClone(item.id,i)"
+                        class="clone-column" [matTooltip]="'Clone columns below'" matTooltipClass="mat-normal-tooltip">
+                        <span class="material-icons">content_copy</span>
+                      </button>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="item?.id!='gross_weight'">
+                    <input (change)="editContainerRowData(i)" positiveTwoDigitDecimalNumber [readOnly]="!item?.is_editable"
+                      [formControlName]="item.id" placeholder="1234" type="text" />
+                  </ng-container>
+                </ng-container>
+                <ng-container *ngIf="item?.field_type === 'location_dropdown'">
+                  <div style="min-width: 300px;" class="app-location position-relative"
+                    [ngClass]="{'disabled':!item?.is_editable}">
+                      <material-dropdown [searchable]="true" [addable]="true"
+                      [postApiUrl]="areaApi"
+                      [params]="areaParams"
+                      (postApiResponse)="getNewArea($event,group['controls'][item.id],group,i)"
+                      (addValueToList)="addNewArea($event,i)" [selectedOption]="{label:group['controls'][item.id].value,value:''}">
+                        <select #customSelect [formControlName]="item.id" class="no-style select--modify" (change)="editContainerRowData(i)">
+                          <option *ngFor="let option of areaList" value="{{ option?.label }}">
+                            {{ option?.label }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="item?.field_type === 'datetime'">
+                  <div class="date-time-input-wrap" [ngClass]="{'disabled':!item?.is_editable}">
+                    <ng-container  *ngIf="item?.id === 'storage_from' || item?.id === 'storage_to' ">
+                      <div class="d-flex justify-content-between align-items-center">
+                      <app-date-and-time-picker [disabled]="!item?.is_editable" (dateTimeSelected)="dateTimeSelected($event,i)"
+                      [control]="group['controls'][item.id]"></app-date-and-time-picker>
+                      <button *ngIf="group['controls'][item.id].value && !isFilterApplied" (click)="cloumnClone(item.id,i)"
+                      class="clone-column" [matTooltip]="'Clone columns below'" matTooltipClass="mat-normal-tooltip">
+                      <span class="material-icons">content_copy</span>
+                      </button>
+                    </div>
+                    </ng-container>
+                    <ng-container *ngIf="item?.id != 'storage_from' && item?.id != 'storage_to' " >
+                      <app-date-and-time-picker [disabled]="!item?.is_editable" (dateTimeSelected)="dateTimeSelected($event,i)"
+                      [control]="group['controls'][item.id]"></app-date-and-time-picker>
+                    </ng-container>
+                    
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="item?.field_type === 'date'">
+                  
+                    <ng-container  *ngIf="item?.id != 'cutoff'">
+                      <div class="date-input" [ngClass]="{'disabled':!item?.is_editable}">
+                      <mat-form-field>
+                        <input matInput [matDatepicker]="date" [formControlName]="item.id" placeholder="DD/MM/YYYY"
+                          (focus)="date.open()" readonly (dateChange)="editContainerRowData(i)">
+                        <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                        <mat-datepicker #date></mat-datepicker>
+                      </mat-form-field>
+                    </div>
+                    </ng-container>
+                    <ng-container  *ngIf="item?.id == 'cutoff'">
+                      <div class="d-flex justify-content-between align-items-center">
+                      <div class="date-input" [ngClass]="{'disabled':!item?.is_editable}">
+                      <mat-form-field>
+                        <input matInput [matDatepicker]="date" [formControlName]="item.id" placeholder="DD/MM/YYYY"
+                          (focus)="date.open()" readonly (dateChange)="editContainerRowData(i)">
+                        <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                        <mat-datepicker #date></mat-datepicker>
+                      </mat-form-field>
+                    </div>
+                      <button *ngIf="group['controls'][item.id].value && !isFilterApplied" (click)="cloumnClone(item.id,i)"
+                      class="clone-column" [matTooltip]="'Clone columns below'" matTooltipClass="mat-normal-tooltip">
+                      <span class="material-icons">content_copy</span>
+                      </button>
+                    </div>
+                      
+                    </ng-container>
+
+                  
+                </ng-container>
+                <ng-container *ngIf="item?.field_type === 'container_type_dropdown'">
+                  <div class="d-flex align-items-center" [ngClass]="{'disabled':!item?.is_editable}">
+                    <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                      [selectedOption]="initialValues.containerType[i]"
+                      [params]="containerParam"
+                      [addable]="true"
+                      [disabled]="!item?.is_editable"
+                      [postApiUrl]="postApiUrl" 
+                      (postApiResponse)="getNewContainerType($event,i)" (addValueToList)="addNewContainerType($event)">
+                      <select #customSelect [formControlName]="item.id" class="no-style select--modify"
+                        (change)="editContainerRowData(i)">
+                        <option *ngFor="let option of containerTypeList" value="{{ option.id }}">
+                          {{ option?.label }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                    <button *ngIf="group['controls'][item.id].value && !isFilterApplied" (click)="cloumnClone(item.id,i)"
+                      [matTooltip]="'Clone columns below'" matTooltipClass="mat-normal-tooltip" class="clone-column">
+                      <span class="material-icons">content_copy</span>
+                    </button>
+
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="item?.field_type === 'terminal_dropdown'">
+                  <div class="d-flex align-items-center" [ngClass]="{'disabled':!item?.is_editable}">
+                    <material-dropdown [searchable]="true" [disabled]="!item?.is_editable" [addable]="true" class="dropDownWidth"
+                      [selectedOption]="{label:group['controls'][item.id].value,value:''}">
+                      <select #customSelect [formControlName]="item.id" class="no-style select--modify"
+                        (change)="editContainerRowData(i)">
+                        <option *ngFor="let option of terminalDropDown" value="{{ option.label }}">
+                          {{ option?.label }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="item?.field_type === 'container_dropdown'">
+                  <div class="d-flex align-items-center" [ngClass]="{'disabled':!item?.is_editable}">
+
+                    <material-dropdown [searchable]="true"  [disabled]="!item?.is_editable" [addBlank]="true" [addable]="false" class="dropDownWidth"
+                      [selectedOption]="initialValues.containerName[i]">
+                      <select #customSelect [formControlName]="item.id" class="no-style select--modify"
+                        (change)="onContainerNameSelection(i)">
+                        <option *ngFor="let option of containerList" value="{{ option.id }}">
+                          {{ option?.name }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                    <button *ngIf="group['controls'][item.id].value && !isFilterApplied" [matTooltip]="'Clone columns below'"
+                      matTooltipClass="mat-normal-tooltip" (click)="cloumnClone(item.id,i)" class="clone-column">
+                      <span class="material-icons">content_copy</span>
+                    </button>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="item?.field_type === 'handling_type_dropdown'">
+                  <div class="d-flex align-items-center" [ngClass]="{'disabled':!item?.is_editable}">
+                    <material-dropdown [searchable]="true" [disabled]="!item?.is_editable" class="dropDownWidth"
+                      [selectedOption]="initialValues.handlingType[i]">
+                      <select #customSelect [formControlName]="item.id" class="no-style select--modify"
+                        (change)="editContainerRowData(i)">
+                        <option *ngFor="let option of containerJobType" value="{{ option.id }}">
+                          {{ option?.label }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                    <button *ngIf="group['controls'][item.id].value && !isFilterApplied" (click)="cloumnClone(item.id,i)"
+                      class="clone-column" [matTooltip]="'Clone columns below'" matTooltipClass="mat-normal-tooltip">
+                      <span class="material-icons">content_copy</span>
+                    </button>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="item?.field_type === 'container_size_dropdown'">
+                  <div class="d-flex align-items-center" [ngClass]="{'disabled':!item?.is_editable}">
+                    <material-dropdown [searchable]="true"  [disabled]="!item?.is_editable" [addable]="true" class="dropDownWidth"
+                      [selectedOption]="initialValues.containerSize[i]" [postApiUrl]="postApiUrl" 
+                      [params]="sizeParam" (postApiResponse)="getNewContainerSize($event,i)" (addValueToList)="addNewContainerSize($event)">
+                      <select #customSelect [formControlName]="item.id" class="no-style select--modify"
+                        (change)="editContainerRowData(i)">
+                        <option *ngFor="let option of sizeOptions" value="{{ option.label}}">
+                          {{ option?.label }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                    <button *ngIf="group['controls'][item.id].value && !isFilterApplied" (click)="cloumnClone(item.id,i)"
+                      class="clone-column" [matTooltip]="'Clone columns below'" matTooltipClass="mat-normal-tooltip">
+                      <span class="material-icons">content_copy</span>
+                    </button>
+
+                  </div>
+
+                </ng-container>
+                <ng-container *ngIf="item.field_type === 'duration'" formGroupName="{{item.id}}">
+                  <div class="halt-time-wrap d-flex align-items-center" [ngClass]="{'disabled':!item?.is_editable}">
+                    <div class="time-input-field">
+                      <input formControlName="days" positiveDigitNumber type="text" [readOnly]="!item?.is_editable"
+                        placeholder="Days" (change)="editContainerRowData(i)" />
+                      <span class="time-input-label">Days</span>
+                    </div>
+                    <span class="mx-1 fw-semibold">:</span>
+                    <div class="time-input-field">
+                      <input formControlName="hours" positiveDigitNumber [readOnly]="!item?.is_editable" [max]="23"
+                        placeholder="Hours" type="text" (change)="editContainerRowData(i)" />
+                      <span class="time-input-label">Hours</span>
+                    </div>
+                    <span class="mx-1 fw-semibold">:</span>
+                    <div class="time-input-field">
+                      <input formControlName="minutes" positiveDigitNumber [readOnly]="!item?.is_editable" [max]="59"
+                        placeholder="Minutes" type="text" (change)="editContainerRowData(i)" />
+                      <span class="time-input-label">Minutes</span>
+                    </div>
+                  </div>
+
+                </ng-container>
+              </div>
+            </td>
+          </ng-container>
+        </tr>
+      </tbody>
+
+
+    </table>
+  </div>
+</div>
+
+
+<mat-menu #addJobMenu="matMenu">
+  <button mat-menu-item>
+    <mat-icon class=" me-2 def-color">add</mat-icon>
+    <span class="def-color">Add Pullout Job</span>
+  </button>
+  <button mat-menu-item>
+    <mat-icon class=" me-2 def-color">add</mat-icon>
+    <span class="def-color">Add Deposit Job</span>
+  </button>
+  <button mat-menu-item>
+    <mat-icon class=" me-2 def-color">add</mat-icon>
+    <span class="def-color">Add Single Job</span>
+  </button>
+</mat-menu>
+
+<mat-menu #rowOptions="matMenu">
+  <button mat-menu-item (click)="deleteContainer()" *ngIf="isContainerRowEditable[this.selectedOrder] && salesOrderForm.controls.salesOrderContainersDetailsList['controls'].length!=1 ">
+    <mat-icon class=" me-2 def-color">delete</mat-icon>
+    <span class="def-color">Delete</span>
+  </button>
+  <button mat-menu-item (click)="cloneRowContainerData()" *ngIf="isContainerRowEditable[this.selectedOrder] && !isFilterApplied">
+    <mat-icon class=" me-2 def-color">content_copy</mat-icon>
+    <span class="def-color">Clone</span>
+  </button>
+  <button mat-menu-item (click)="removeContainerRowData()" *ngIf="isContainerRowEditable[this.selectedOrder] && !isFilterApplied">
+    <mat-icon class=" me-2 def-color">close</mat-icon>
+    <span class="def-color">Clear</span>
+  </button>
+  <button mat-menu-item (click)="addNewContainerRow()">
+    <mat-icon class=" me-2 def-color">add</mat-icon>
+    <span class="def-color">Add</span>
+  </button>
+</mat-menu>

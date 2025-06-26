@@ -1,0 +1,425 @@
+<div class="gb-tab-wrapper def-color">
+  <mat-tab-group
+    mat-stretch-tabs="false"
+    class="mat-group"
+    animationDuration="0ms"
+    mat-align-tabs="start"
+  >
+
+    
+
+
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span 
+          >Location Info.</span
+        >
+      </ng-template>
+      <div >
+        <div class="row mx-0 p-3 line-height-normal gy-3">
+          <p class=" col-lg-4 col-md-6">
+            <b class="me-2">Zone:</b>
+            {{vehObj?.location_details?.zone?.name ? vehObj?.location_details?.zone?.name : '-'}}
+            
+
+          </p>
+          <p class=" col-lg-4 col-md-6">
+            <b class="me-2">Location:</b>
+            {{vehObj?.location_details?.area?.name ? vehObj?.location_details?.area?.name : '-'}}
+            
+
+          </p>
+          <p class=" col-lg-4 col-md-6">
+            <b class="me-2">Map Coordinate:</b>
+            {{vehObj?.location_details?.location?.name ? vehObj?.location_details?.location?.name : '-'}}
+            
+
+          </p>
+          <p class=" col-lg-4 col-md-6">
+            <b class="me-2">Show In Invoice:</b>
+            {{vehObj?.location_details?.show_in_invoice? 'Yes' : 'No'}}
+            
+
+          </p>
+          <p class=" col-lg-4 col-md-6">
+            <b class="me-2">Point of Contact (Name):</b>
+            {{vehObj?.location_details?.contact_name ? vehObj?.location_details?.contact_name : '-'}}
+            
+
+          </p>
+          <!-- <p class=" col-lg-4 col-md-6">
+            <b class="me-2">Point of Contact (Designation):</b>
+            {{vehObj?.location_details?.designation ? vehObj?.location_details?.designation : '-'}}
+          </p> -->
+          <p class=" col-lg-4 col-md-6">
+            <b class="me-2">Point of Contact (Mobile):</b>
+            <span *ngIf="vehObj?.location_details?.contact_no?.number">{{vehObj?.location_details?.contact_no?.code}}{{vehObj?.location_details?.contact_no?.number}}</span><span *ngIf="!vehObj?.location_details?.contact_no?.number">-</span>
+            
+
+          </p>
+
+        </div>
+
+        <div class="custom-table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>JOB TASK NAME</th>
+                  
+                  <th>JOB TASK TYPE</th>
+                  <th class="text-center">MANDATORY TASK</th>
+                  <th class="text-center">DRIVER TASK</th>
+                 
+                  
+                </tr>
+              </thead>
+              <tbody *ngIf="vehObj?.location_details?.checklist.length == 0 ">
+                <tr class="border-0">
+                  <td colspan="30" class="bg-white">
+                    <div class="no-list-data-wrap">
+                      <figure>
+                        <img src="assets/img/no-content.png" alt="" />
+                      </figure>
+                      <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+              <tbody >
+                <tr *ngFor="let item of vehObj?.location_details?.checklist; index as i;">
+                  <td>{{item?.field_label}}</td>
+                  <td>{{convertTYpe(item?.field_type)}}</td>
+                  <td class="icon-box text-center "><span class="material-icons fs-6" style="color:#ACB5BD">{{item?.mandatory ? 'check_box':'check_box_outline_blank'}}</span></td>
+                  <td class="icon-box text-center "><span class="material-icons fs-6" style="color:#ACB5BD">{{item?.employee_app_show ? 'check_box':'check_box_outline_blank'}}</span></td>
+              
+                  
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span 
+          >Rental Charge</span
+        >
+      </ng-template>
+      <div class="row mx-0 p-3 line-height-normal gy-3">
+        <p class=" col-lg-2 col-md-6">
+          <b class="me-2">No. of Shift:</b>
+          {{vehObj?.rental_charge?.no_of_shifts == 0 ? 'Single ' : 'Double '}} Shift
+          
+
+        </p>
+        <p class=" col-lg-2 col-md-6">
+          <b class="me-2">Billing Unit:</b>
+          {{billingUnit}} 
+        </p>
+        <p class="col-lg-2  col-md--6">
+          <b class="me-2">Fuel Provision:</b>
+          {{vehObj?.rental_charge?.fuel_type == 0? 'With Fuel' : 'Without Fuel'}}
+
+        </p>
+        <p class="col-lg  col-md-6">
+          <b class="me-2">Working Duration:</b>
+          {{getWorkDuration(vehObj?.rental_charge?.working_duration)}}
+         
+          
+
+        </p>
+        <p class="col-lg-4  col-md-6">
+          <ng-container *ngIf="salesOrderBasedOn=='hour'">
+            <b class="me-2">Total Working Hours:</b>
+          </ng-container>
+          <ng-container *ngIf="salesOrderBasedOn=='day'">
+            <b class="me-2">Total Working Days:</b>
+          </ng-container>
+        
+          {{totalHours}}
+          
+          
+
+        </p>
+        
+
+      </div>
+      <div >
+
+        <div class="custom-table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>SPECIFICATION</th>
+                  
+                  <th>RENTAL CHARGE ({{ currency_type?.symbol}})</th>
+                  <th>TOTAL AMOUNT ({{ currency_type?.symbol}})</th>
+                  <th>
+                    <ng-container *ngIf="salesOrderBasedOn=='hour'">
+                      EXTRA HOURS ({{ currency_type?.symbol}})
+                    </ng-container>
+                    <ng-container *ngIf="salesOrderBasedOn=='day'">
+                      EXTRA DAYS ({{ currency_type?.symbol}})
+                    </ng-container>
+                  </th>
+                  <th>VEHICLE NO.</th>
+                  <th *ngIf="isMarketVehicle">VEHICLE PROVIDER</th>
+                  <th *ngIf="isMarketVehicle">LPO</th>
+                  <th>JOB START DATE</th>
+                  <th>JOB END DATE</th>
+                
+
+                </tr>
+              </thead>
+              <tbody *ngIf="vehObj?.rental_charge?.rental_charges?.length == 0 ">
+                <tr class="border-0">
+                  <td colspan="30" class="bg-white">
+                    <div class="no-list-data-wrap">
+                      <figure>
+                        <img src="assets/img/no-content.png" alt="" />
+                      </figure>
+                      <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+              <tbody >
+                <tr *ngFor="let item of vehObj?.rental_charge?.rental_charges; index as i;">
+                  <td>{{item?.specification?.specification}}</td>
+                  <td>{{item?.rental_charge|numberFormat}}</td>
+                  <td>{{item?.total_amount|numberFormat}}</td>
+                  <td>{{item?.extra_hours|numberFormat}}</td>
+                  <td>
+                    <ng-container *ngIf="item?.vehicle_no?.reg_no">
+                      <a class="custom-link" target="_blank" *ngIf="item?.vehicle_no['is_market']"
+                      [routerLink]="[prefix+'/onboarding/vehicle/market/details/',item?.vehicle_no?.id]">{{item?.vehicle_no?.reg_no}}</a>
+                      <a class="custom-link" target="_blank" *ngIf="!item?.vehicle_no['is_market']"
+                      [routerLink]="[prefix+'/onboarding/vehicle/own/details/',item?.vehicle_no?.id]">{{item?.vehicle_no?.reg_no}}</a>
+                    </ng-container>
+                    <ng-container *ngIf="!item?.vehicle_no?.reg_no" >
+                      -
+                    </ng-container>
+                  
+                  </td>
+                  <td *ngIf="isMarketVehicle">
+                    <ng-container *ngIf="item?.vehicle_provider">
+                      <a class="custom-link" target="_blank"
+                      [routerLink]="[prefix+'/onboarding/party/details/vendor/',item?.vehicle_provider?.id]">{{item?.vehicle_provider?.name}}</a>
+                    </ng-container>
+                    <ng-container *ngIf="!item?.vehicle_provider" >
+                      -
+                    </ng-container>
+                  </td>
+                  <td *ngIf="isMarketVehicle">
+                    <ng-container *ngIf="item?.lpo">
+                      <a class="custom-link" target="_blank"
+                      [routerLink]="[prefix+'/trip/local-purchase-order/view/',item?.lpo?.id]">{{item?.lpo?.name}}</a>
+                    </ng-container>
+                    <ng-container *ngIf="!item?.lpo" >
+                      -
+                    </ng-container>
+                  
+                  </td>
+                  <td>{{item?.job_start_date |date:'dd-MM-yyyy'}}</td>
+                  <td>{{item?.job_end_date |date:'dd-MM-yyyy'}}</td>
+              
+                  
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+      </div>
+      <app-work-order-balance-crane-details-v2 [workOrderDetail]="workOrderDetail" [workOrderId]="workOrderId"></app-work-order-balance-crane-details-v2>
+
+    </mat-tab>
+
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span 
+          >Additional Charge</span
+        >
+      </ng-template>
+      <div class="pt-1">
+
+        <div class="custom-table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ADDITIONAL CHARGE</th>
+                  <th *ngIf="isTax">TAX</th>
+                  
+                  <th>UNIT OF MEASUREMENT</th>
+                  <th>UNIT</th>
+                  <th>UNIT COST ({{ currency_type?.symbol}})</th>
+                 
+                  <th>TOTAL AMOUNT ({{ currency_type?.symbol}})</th>
+                </tr>
+              </thead>
+              <tbody *ngIf="vehObj?.additional_charge?.length == 0 ">
+                <tr class="border-0">
+                  <td colspan="30" class="bg-white">
+                    <div class="no-list-data-wrap">
+                      <figure>
+                        <img src="assets/img/no-content.png" alt="" />
+                      </figure>
+                      <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+              <tbody >
+                <tr *ngFor="let item of vehObj?.additional_charge; index as i;">
+                  <td>{{item?.name?.label}}</td>
+                  <td *ngIf="isTax">{{item?.tax?.label}}</td>
+                  <td>{{item?.unit_of_measurement?.label}}</td>
+                  <td>{{item?.quantity}}</td>
+                  <td>{{item?.unit_cost|numberFormat}}</td>
+                  <td>{{item?.total|numberFormat}}</td>
+              
+                  
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+      </div>
+      <app-work-order-balance-crane-details-v2 [workOrderDetail]="workOrderDetail" [workOrderId]="workOrderId"></app-work-order-balance-crane-details-v2>
+
+    </mat-tab>
+     <mat-tab>
+      <ng-template mat-tab-label>
+        <span >Job Info.</span>
+      </ng-template>
+      <div class="overflow-hidden">
+        <div >
+          <app-table-widget
+            [isSearch]="true"
+            [tableTitle]="tableTitleAWPorCrane"
+            [isSettings]="true"
+            [isExpanded]="true"
+            (settingAppliedEmitter)="settingsApplied($event)"
+            [settingsUrl]="'revenue/workorder/trip/crane/setting/'"
+            (searchedData)="searchJobList($event)"
+           
+          ></app-table-widget>
+          <div >
+           
+
+            <div class="custom-table-container job-class" (scroll)="onScrollJob($event)">
+              <table>
+                <thead>
+                  <tr>
+                    <ng-container *ngFor="let header of jobHeaderList">
+                    <th *ngIf="header == 'Rental charge' ||  header == 'Total Amount' || header == 'Extra hours'">{{header}} ({{ currency_type?.symbol}})</th>
+                    <th *ngIf="header != 'Rental charge' &&  header != 'Total Amount' && header != 'Extra hours'">{{header}}</th>
+                  </ng-container>
+                  </tr>
+                </thead>
+                <tbody *ngIf="jobHeaderList.length==0">
+                  <tr class="border-0">
+                    <td colspan="30" class="bg-white">
+                      <div class="no-list-data-wrap">
+                        <figure>
+                          <img src="assets/img/no-content.png" alt="" />
+                        </figure>
+                        <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody>
+                    <tr *ngFor="let jobs of jobList">
+                      <ng-container *ngFor="let jobObj of jobs" >
+                        <ng-container *ngIf="jobObj?.name!='Working duration' && jobObj?.name!='Vehicle no' && jobObj?.name!='Job No' && jobObj?.name!='Status' && jobObj?.name != 'Vehicle Provider' && jobObj?.name!='Lpo'" >
+                          <td class="ws-nowrap">{{jobObj?.value}}</td>
+                         </ng-container>
+
+                         <ng-container *ngIf="jobObj?.name=='Status'">
+                          <td class="ws-nowrap" *ngIf="jobObj?.status_int == 0 || jobObj?.status_int == 4" [style.color]="'#FFB900'">{{jobObj?.value}}</td>
+                          <td class="ws-nowrap" *ngIf="jobObj?.status_int == 1"  [style.color]="'#4CACFE'">{{jobObj?.value}}</td>
+                          <td class="ws-nowrap" *ngIf="jobObj?.status_int == 2"  [style.color]="'#2BB741'">{{jobObj?.value}}</td>
+                          <td class="ws-nowrap" *ngIf="jobObj?.status_int == 3 || jobObj?.status_int == 5"  [style.color]="'#dc3545'">{{jobObj?.value}}</td>
+                        </ng-container>
+
+                         
+                         <ng-container *ngIf="jobObj?.name=='Working duration'" >
+                          <td class="ws-nowrap">{{jobObj?.value['duration'] }}   {{jobObj?.value['working'] }}</td>
+                         </ng-container>
+                         <td *ngIf="jobObj?.name=='Vehicle Provider'" ><a *ngIf="isNotEmpty(jobObj?.id)" class="custom-link" [routerLink]="[prefix+'/onboarding/party/details/vendor/',jobObj?.id]"  target="_blank"  >{{jobObj?.value}}</a> <span *ngIf="!isNotEmpty(jobObj?.id)">-</span></td>
+        
+
+        <td  *ngIf="jobObj?.name=='Lpo'">
+          <a  *ngIf="isNotEmpty(jobObj?.id)" class=" custom-link"  [routerLink]="[prefix+'/trip/local-purchase-order/view',jobObj?.id]" target="_blank" > {{jobObj?.value}} </a>
+          <span *ngIf="!isNotEmpty(jobObj?.id)">-</span>
+        </td>
+        
+
+                         <ng-container *ngIf="jobObj?.name=='Vehicle no'" >
+                          <ng-container *ngIf="jobObj?.value['name']">
+                            <td class="ws-nowrap">
+                              <a class="custom-link" target="_blank" *ngIf="jobObj?.value['is_market']"
+                            [routerLink]="[prefix+'/onboarding/vehicle/market/details/',jobObj?.value?.id]">{{jobObj?.value?.name}}</a>
+                            <a class="custom-link" target="_blank" *ngIf="!jobObj?.value['is_market']"
+                            [routerLink]="[prefix+'/onboarding/vehicle/own/details/',jobObj?.value?.id]">{{jobObj?.value?.name}}</a>
+                            </td>
+                          </ng-container>
+                          <ng-container *ngIf="!jobObj?.value['name']">
+                            <td class="ws-nowrap">-</td>
+                          </ng-container>
+                        
+                         </ng-container>
+
+                         <ng-container *ngIf="jobObj?.name=='Job No'" >
+                          <td class="ws-nowrap"><a class="custom-link" target="_blank"
+                            [routerLink]="[prefix+'/trip/new-trip/details/',jobObj?.value?.id]">{{jobObj?.value?.name}}</a></td>
+                         
+                         </ng-container>
+
+
+                      </ng-container>
+                    </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab> 
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span  
+          >Custom Field</span
+        >
+      </ng-template>
+      <div class="row mx-0 p-4">
+        <p class="primary-brand-text fs-6 text-center p-5 fw-semibold" *ngIf="vehObj?.other_details.length == 0">No Custom Fields Added !!</p>
+        <div class="col-lg-4 py-2" *ngFor="let item of vehObj?.other_details">
+          <span class="fw-semibold me-2">{{item?.field_label}}:</span>
+          <span *ngIf="item.field_type.data_type!='date'" >{{item?.value}} </span>
+          <span *ngIf="item.field_type.data_type=='date'" >{{item?.value|formateDate}}</span>
+        </div>
+        
+      </div>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span>Upload Documents</span>
+        </ng-template>
+        <div>
+          <div class="fw-semibold px-4 mb-4 mt-3 def-color fs-6"> Upload Document</div>
+          <div class="d-flex flex-wrap gap-3 px-4" style="zoom:95%">
+            <file-uploader-v2 (onFileUploaded)="fileUploader($event)" fileName="Document Unknown" [uploaderId]="'1234'"
+              [isShowOnlyUpload]="false"></file-uploader-v2>
+            <app-file-delete-view [showInlineEdit]="true" [fileData]="document" *ngFor="let document of workOrderDocuments"
+              (fileDeleted)="fileDeleted($event)"></app-file-delete-view>
+          </div>
+        </div>
+      </mat-tab>
+
+  </mat-tab-group>
+</div>

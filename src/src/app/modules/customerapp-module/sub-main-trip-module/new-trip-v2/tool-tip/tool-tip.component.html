@@ -1,0 +1,44 @@
+<span (mouseenter)="hide=false" (mouseleave)="hide=true">
+    <div class="info-box">
+        <div class="info-icon" [innerHTML]="customIcon">
+            
+        </div>
+
+        <div class="info-popup"  *ngIf="!hide"[ngClass]="position" (mouseleave)="selectedTab=0">
+            <div class="info-content">
+                <h3>{{toolTipContent.title}}</h3>
+                <div [id]="'tooltip-'+tooltipId" class="carousel slide">
+                    <div class="carousel-buttons-wrap" *ngIf="totalSlides>=2">
+                        <div class="carousel-indicators">
+                            <ng-container *ngFor="let id of slidesId">
+                                <button type="button" (click)="selectedTab=id" [attr.data-bs-target]="'#tooltip-'+tooltipId"
+                                    [attr.data-bs-slide-to]="id" [class.active]="id === activeSlide"
+                                    aria-label="Slide {{id}}"></button>
+                            </ng-container>
+                        </div>
+                        <div class="d-flex">
+                            <button  (click)="selectedTab=selectedTab-1" *ngIf="selectedTab!=0" [attr.data-bs-target]="'#tooltip-'+tooltipId" class="prev-btn" data-bs-slide="prev">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button  *ngIf="selectedTab==0"  class="prev-btn" disabled>
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button *ngIf="selectedTab!=slidesId.length-1" (click)="selectedTab=selectedTab+1" [attr.data-bs-target]="'#tooltip-'+tooltipId" class="next-btn ms-2"
+                            data-bs-slide="next"><i class="bi bi-chevron-right"></i></button>
+                            <button *ngIf="selectedTab==slidesId.length-1" disabled  class="next-btn ms-2"><i class="bi bi-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="carousel-inner">
+                        <div class="carousel-item" [class.active]="i === activeSlide"
+                            *ngFor="let item of safeHtml ;let i=index">
+                            <div class="content-class" [innerHTML]="item">
+                            </div>
+                        </div>
+                    </div>
+               
+
+                </div>
+            </div>
+        </div>
+    </div>
+</span>

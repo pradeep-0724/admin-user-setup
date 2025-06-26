@@ -1,0 +1,646 @@
+<div class="right-section__header">
+  <h1 class="heading col-8" *ngIf="!inventaryId">Add Inventory</h1>
+  <h1 class="heading col-8" *ngIf="inventaryId">Edit Inventory</h1>
+</div>
+<form [formGroup]="editInventoryForm">
+  <div class="form-body form-layout form-layout--pd no-br-tl no-br-tr">
+    <div class="error-msg-list" *ngIf="globalFormErrorList.length > 0">
+      <p class="message-head">{{ errorHeaderMessage }}</p>
+      <span class="icon-wrap"></span>
+      <ul *ngFor="let error of globalFormErrorList">
+        <li class="message-cont">{{ error }}</li>
+      </ul>
+  </div><br>
+  <div class="alert-msg" *ngIf="apiError">
+    <span class="icon-wrap"></span>
+    <p class="message-cont">{{ apiError }}</p>
+  </div><br>
+    <div class="row">
+
+      <div *ngIf="!inventaryId" class="col-lg-3 col-sm-6">
+        <div class="input-wrap error" [ngClass]="addErrorClass(editInventoryForm.controls.vendor)">
+          <label for="" class="input--required position-relative">Vendor Name <span *ngIf="isTdsDecleration" class="blueTag">TDS Declaration Received</span></label>
+          <material-dropdown [searchable]="false" [addable]="true"
+          [selectedOption]="inventoryVariables.initialValues.vendor"
+          [party]="true" (addPartyPopup)="openAddPartyModal($event)"
+          (addValueToList)="addValueToPartyPopup($event)"
+          [params]="inventoryVariables.initialValues.partyNamePopup">
+          <select #customSelect formControlName="vendor" class="no-style select--modify"
+          (change)="onVendorSelected($event)">
+         <option *ngFor="let vendor of inventoryVariables.vendorList" value="{{ vendor.id }}">
+           {{ vendor.party_display_name }}</option>
+          </select>
+        </material-dropdown>
+        <span *ngIf="gstin" class="font-small-blue"> {{terminology.tax_no_type}}: {{gstin}} </span>
+        <app-error [controlName]="editInventoryForm.controls.vendor"></app-error>
+
+      </div>
+    </div>
+
+    <div *ngIf="inventaryId" class="col-lg-3 col-sm-6">
+      <div class="input-wrap disabled">
+          <label for="" class="input--required position-relative">Vendor Name <span *ngIf="isTdsDecleration" class="blueTag">TDS Declaration Received</span></label>
+          <div class="input--bd">{{ inventoryVariables.initialValues.vendor.label }}</div>
+          <span *ngIf="gstin" class="font-small-blue"> {{terminology.tax_no_type}}: {{gstin}} </span>
+
+      </div>
+  </div>
+
+  <div *ngIf="inventaryId" class="col-lg-3 col-sm-6">
+    <div class="input-wrap disabled" [ngClass]="addErrorClass(editInventoryForm.controls.po)">
+      <label for="" class="input">PO Number</label>
+      <material-dropdown [searchable]="false" [addable]="false" [addBlank]="true" [disabled]="true"  [selectedOption]="inventoryVariables.initialValues.po"  >
+      <select #customSelect formControlName="po" class="no-style select--modify">
+     <option *ngFor="let purchaseOrder of approvedPurchasedOrderData" value="{{ purchaseOrder.id }}">
+       {{ purchaseOrder.po_number }}</option>
+      </select>
+    </material-dropdown>
+    <app-error [controlName]="editInventoryForm.controls.po"></app-error>
+
+  </div>
+</div>
+
+<div *ngIf="!inventaryId" class="col-lg-3 col-sm-6">
+  <div class="input-wrap error" [ngClass]="addErrorClass(editInventoryForm.controls.po)">
+    <label for="" class="input--required" *ngIf="isPoNumberSelected">PO Number</label>
+    <label for="" class="input" *ngIf="!isPoNumberSelected">PO Number</label>
+    <material-dropdown [searchable]="false" [addable]="false" [addBlank]="true" [selectedOption]="inventoryVariables.initialValues.po">
+    <select #customSelect formControlName="po" class="no-style select--modify"
+    (change)="onPurchaseOrderNumberSelected($event.target.value)">
+   <option *ngFor="let purchaseOrder of approvedPurchasedOrderData" value="{{ purchaseOrder.id }}">
+     {{ purchaseOrder.po_number }}</option>
+    </select>
+  </material-dropdown>
+  <app-error [controlName]="editInventoryForm.controls.po"></app-error>
+
+</div>
+</div>
+
+
+  <div *ngIf="inventaryId" class="col-lg-3 col-sm-6">
+    <div class="input-wrap" [ngClass]="{disabled: 'true'}">
+      <label for=""> PO Date </label>
+      <mat-form-field>
+        <input matInput  [matDatepicker]="po_date" (focus)="po_date.open()"
+        formControlName="po_date"
+        placeholder="DD/MM/YYYY">
+        <mat-datepicker-toggle matSuffix [for]="po_date"></mat-datepicker-toggle>
+        <mat-datepicker #po_date></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div *ngIf="!inventaryId" class="col-lg-3 col-sm-6">
+    <div class="input-wrap">
+      <label for=""> PO Date </label>
+      <mat-form-field>
+        <input matInput readonly [matDatepicker]="po_date" (focus)="po_date.open()"
+        formControlName="po_date"
+        placeholder="DD/MM/YYYY">
+        <mat-datepicker-toggle matSuffix [for]="po_date"></mat-datepicker-toggle>
+        <mat-datepicker #po_date></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+
+
+
+
+
+        <div class="col-lg-3 col-sm-6">
+        <div class="input-wrap error " [ngClass]="addErrorClass(editInventoryForm.controls.bill_number)">
+          <label for="" class="input--required">Bill Number</label>
+          <input type="text" class="no-style input--bd" placeholder="Eg.:1234567" value="" formControlName="bill_number">
+          <span class="border-anim"></span>
+          <app-error [controlName]="editInventoryForm.controls.bill_number"></app-error>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-sm-6">
+        <div class="input-wrap error"  [ngClass]="addErrorClass(editInventoryForm.controls.bill_date)">
+          <label for="" class="input--required">Date Of Purchase</label>
+          <mat-form-field>
+            <input matInput readonly [matDatepicker]="bill_date" (focus)="bill_date.open()"
+            formControlName="bill_date" (dateChange)="onCalendarChangePTerm($event)"
+            placeholder="DD/MM/YYYY">
+            <mat-datepicker-toggle matSuffix [for]="bill_date"></mat-datepicker-toggle>
+            <mat-datepicker #bill_date></mat-datepicker>
+          </mat-form-field>
+          <app-error [controlName]="editInventoryForm.controls.bill_date"></app-error>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-sm-6">
+          <div class="input-wrap">
+              <label for="" class="input">Payment Term</label>
+              <material-dropdown [searchable]="true" [addable]="false"
+              class="dropDownWidth" [addBlank]="true"
+              [selectedOption]="inventoryVariables.initialValues.paymentTerm"
+                 >
+                  <select #customSelect formControlName="payment_term" class="no-style select--modify"
+                  (change)="onpaymentTermSelected($event.target.value)" >
+                      <option *ngFor="let option of inventoryVariables.staticOptions.paymentTermList" value="{{ option.id }}">
+                          {{ option.label }}</option>
+                  </select>
+                </material-dropdown>
+          </div>
+    </div>
+
+      <div class="col-lg-3 col-sm-6">
+        <div class="input-wrap error" [ngClass]="addErrorClass(editInventoryForm.controls.due_date)">
+          <label for="" *ngIf="!isDueDateRequired">Due Date</label>
+          <label for="" class="input--required" *ngIf="isDueDateRequired">Due Date</label>
+              <mat-form-field>
+                  <input matInput  [matDatepicker]="due_date"  [min]="inventoryVariables.minDate" (focus)="due_date.open()"
+                  formControlName="due_date" placeholder="DD/MM/YYYY">
+                  <mat-datepicker-toggle matSuffix [for]="due_date"></mat-datepicker-toggle>
+                  <mat-datepicker #due_date></mat-datepicker>
+                </mat-form-field>
+                <app-error [controlName]="editInventoryForm.controls.due_date"></app-error>
+              </div>
+          </div>
+
+          <div class="col-lg-3 col-sm-6">
+            <div class="input-wrap">
+                <label for="">Employee Name</label>
+                <material-dropdown [searchable]="false" [selectedOption]="inventoryVariables.initialValues.employee" [addable]="false" class="dropDownWidth" [addBlank]="true">
+                    <select #customSelect formControlName="employee" class="no-style select--modify">
+                        <option *ngFor="let employee of inventoryVariables.staticOptions.employeeList" value="{{ employee.id }}">
+                            {{ employee.first_name }} {{ employee.last_name }}</option>
+                    </select>
+                  </material-dropdown>
+            </div>
+        </div>
+      </div>
+      <app-header-input-field-box [ngClass]="{'hiddenContent':!isTax}" [partyDetailsData]="partyTaxDetails" [editData]="editData" [taxFormValid]="taxFormValid" (headerTaxDetails)="headerTaxDetails($event)"></app-header-input-field-box>
+    <div class="form-layout__card mg-top-30 w-100">
+      <div class="form-layout__header">
+          <h2 class="sub-heading">Billing Information</h2>
+          <span class="collapse-line"></span>
+      </div>
+  </div> 
+    <div class="form-layout__card mg-top-30 w-100">
+      <div class="form-layout__header">
+          <h2 class="sub-heading">New Spares</h2>
+          <span class="collapse-line"></span>
+      </div>
+  </div>
+
+  <div class="form-layout__card mg-top-30" style="
+  margin-right: 14px;">
+    <div
+        class="table-wrapper table-wrapper--type1 table-wrapper--type2  table--bd table--nobg dropDownOverflow">
+        <table class="table-container table-item">
+            <thead>
+                <tr>
+                    <th width=30%>Item Name</th>
+                    <th width=15%>Quantity</th>
+                    <th width=10%>Unit</th>
+                    <th width=9%>Unit Cost ({{ currency_type?.symbol}})</th>
+                    <th width=11% [ngClass]="{'hiddenContent':!isTax}">Tax</th>
+                    <th width=10%>Total ({{ currency_type?.symbol}})</th>
+                    <th width=15%></th>
+                </tr>
+                <!-- {{ !AreSparesPresent}} -->
+            </thead>
+            <tbody formArrayName="spares">
+              <ng-container *ngFor="let otherItem of editInventoryForm.controls.spares['controls']; let i = index;" [formGroupName]="i">
+                <tr>
+                        <td>
+                          <div class="select-wrap" [ngClass]="{disabled: !AreSparesPresent}">
+                            <material-dropdown [addable]="true" [disabled]="!AreSparesPresent" class="dropDownWidth" [item]="true" [maxLength]="36"
+                              [addErrorClass]="addErrorClass(otherItem.controls.item)"
+                              class="dropDownWidth" (addItemPopup)="openAddExpenseItemModal($event, i)"
+                              (addValueToList)="addParamsToNewSpareItem($event)"
+                              [params]="newSparesItemParams" [selectedOption]="initialValues?.item[i]"
+                                >
+                                    <select #customSelect formControlName="item"
+                                        class="no-style select--modify"  (change)="onMaterialSelected(otherItem,i)"
+                                        >
+                                        <option *ngFor="let option of materialList"
+                                            value="{{ option.id }}">
+                                            {{ option.name }}
+                                        </option>
+                                    </select>
+                                  </material-dropdown>
+                            </div>
+                        </td>
+                        <td class="w-150">
+                          <div class="input-wrap w-initial" [ngClass]="addErrorClass(otherItem.controls.quantity)">
+                                <input positiveThreeDigitDecimalNumber type="text" placeholder="Eg.: 1234567"
+                                formControlName="quantity" class="error-box" (change)="calculateItemAmount(i)">
+                          </div>
+                        </td>
+                        <td>
+                          <div class="select-wrap" [ngClass]="{disabled: !AreSparesPresent}">
+                                <material-dropdown [addable]="false" [disabled]="!AreSparesPresent" class="dropDownWidth" [selectedOption]="initialValues.units[i]"
+                                class="dropDownWidth">
+                                      <select #customSelect formControlName="unit"
+                                          class="no-style select--modify"
+                                          >
+                                          <option *ngFor="let option of staticOptions.itemUnits"
+                                              value="{{ option.id }}">
+                                              {{ option.label }}
+                                          </option>
+                                      </select>
+                                    </material-dropdown>
+                            </div>
+                                </td>
+                        <td>
+                            <input positiveThreeDigitDecimalNumber [readonly]="isQuantityEditable" type="text" placeholder="1000" formControlName="unit_cost" (change)="calculateItemAmount(i)">
+                        </td>
+                        <td [ngClass]="{'hiddenContent':!isTax}">
+                          <div [ngClass]="{disable: disableTax || !companyRegistered}">
+                            <div class="select-wrap">
+                              <material-dropdown [addable]="false" class="dropDownWidth" [selectedOption]="initialValues.taxPercent[i]"
+                              class="dropDownWidth">
+                                    <select #customSelect formControlName="tax"
+                                        class="no-style select--modify"
+                                        (change)="onCalcuationsChanged()">
+                                        <option *ngFor="let option of taxOptions"
+                                            value="{{ option.id }}">
+                                            {{ option.label }}
+                                        </option>
+                                    </select>
+                                  </material-dropdown>
+                            </div>
+                          </div>
+                      </td>
+
+                        <td>
+                            <div class="input-wrap" [ngClass]="addErrorClass(otherItem.controls.total)">
+                                <input formControlName="total_before_tax" type="hidden">
+                                <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="1000"
+                                    formControlName="total"
+                                   readonly >
+                            </div>
+                        </td>
+                            <td class="text-center align-middle" *ngIf="AreSparesPresent">
+                              <span class="material-icons drop-down " (click)="otherItem.controls.additionalDetails.setValue(!otherItem.controls.additionalDetails.value) "
+                              *ngIf="!otherItem.controls.additionalDetails.value ">arrow_drop_down</span>
+                              <span class="material-icons drop-down " (click)="otherItem.controls.additionalDetails.setValue(!otherItem.controls.additionalDetails.value) "
+                              *ngIf="otherItem.controls.additionalDetails.value ">arrow_drop_up</span>
+                            <span class="material-icons delete"
+                            (click)="removeOtherItem(i)" *ngIf="editInventoryForm.controls.spares.length !==1">add_circle_outline</span>
+                            <span class="material-icons add" *ngIf="editInventoryForm.controls.spares.length -1== i"
+                            (click)="addMoreOtherItem()">add_circle_outline</span>
+                            <span class="material-icons add" title="Clone" *ngIf="editInventoryForm.controls.spares.length -1== i" (click)="cloneSpareItem(otherItem)">file_copy</span>
+                        </td>
+                    </tr>
+                    <tr class="border-top-0" *ngIf="otherItem.controls.additionalDetails.value">
+                      <td colspan="4" class="fs-12 pt-0">
+                          <input type="text" placeholder="Description" formControlName="note" [readonly]="!AreSparesPresent">
+                      </td>
+                      <td class="fs-12  pe-2">
+                          <span class="table-footer-actions"><a class="clear-item" (click)="clearData(i)">Clear</a></span>
+                      </td>
+                  </tr>
+                  <tr class="border-top-0 input-wrap error" [ngClass]="addErrorClass(otherItem.controls.hsn_code)" >
+                    <td class="fs-12 pt-0 table-footer-actions ">
+                      <p  *ngIf="!otherItem.controls.isChangeHsn.value">HSN Code: {{otherItem.controls.hsn_code.value}} <span class="clear-item" style="cursor: pointer;" (click)="otherItem.controls.isChangeHsn.setValue(!otherItem.controls.isChangeHsn.value)">change</span></p>
+                        <input *ngIf="otherItem.controls.isChangeHsn.value" class="error-box" [readonly]="!AreSparesPresent" type="text" style="height:20px; width: 50%;" placeholder="HSN code" formControlName="hsn_code">
+                        <app-error [controlName]="otherItem.controls.hsn_code"></app-error>
+                    </td>
+                </tr>
+              </ng-container>
+            </tbody>
+        </table>
+    </div>
+    <div class="table-footer-actions mg-top-20" *ngIf="AreSparesPresent">
+        <a class="clear-item"  (click)="clearAllOtherItems()">Remove all</a>
+    </div>
+  </div>
+
+  <div class="form-layout__card mg-top-30 w-100">
+    <div class="form-layout__header">
+        <h2 class="sub-heading">New Tyres</h2>
+        <span class="collapse-line"></span>
+    </div>
+</div>
+
+<div class="form-layout__card mg-top-30" style=" margin-right: 14px;">
+  <div class="row" style="margin-right: 14px;">
+   <div class="challan-header p-0">
+        <div class="input-group input-group-sm mb-3 input-wrap error" [ngClass]="addErrorClass(editInventoryForm.controls.hsn_code)">
+               <div class="input-group-prepend">
+                   <span class="input-group-text" id="inputGroup-sizing-sm">HSN Code
+                   </span>
+               </div>
+                <input type="text" class="form-control error-box " aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="Add HSN Code"
+                formControlName="hsn_code">
+                <app-error [controlName]="editInventoryForm.controls.hsn_code"></app-error>
+        </div>
+    </div>
+
+  <div class="challan-header p-0" [ngClass]="{'hiddenContent':!isTax}">
+      <div class="input-group input-group-sm mb-3">
+             <div class="input-group-prepend">
+                 <span class="input-group-text" id="inputGroup-sizing-sm">{{terminology.tax_type}}%
+                 </span>
+             </div>
+             <material-dropdown [searchable]="false" [addable]="false"
+             [selectedOption]="initialValues.tax"  class="form-control " aria-label="Small" aria-describedby="inputGroup-sizing-sm"
+            [ngClass]="{disable:disableTax || !companyRegistered}">
+             <select #customSelect formControlName="tax"
+                     class="no-style select--modify"
+                     (change)="onCalcuationsChanged()">
+                       <option *ngFor="let option of taxOptions"
+                         value="{{ option.id }}">
+                       {{ option.label }}
+               </option>
+         </select>
+        </material-dropdown>
+      </div>
+  </div>
+</div>
+      <div class="table-wrapper table-wrapper--type1 table-wrapper--type2  table--bd table--nobg dropDownOverflow">
+
+        <div *ngIf="!isUniqueNumber">
+           <div class="alert-msg">
+               <span class="icon-wrap"></span>
+               <p class="message-cont">Unique number already exists</p>
+           </div>
+           <br>
+       </div>
+
+       <table class="table-container table-item">
+           <thead>
+               <tr>
+                   <th width=15%>Tyre Details</th>
+                   <th width=15%></th>
+                   <th width=15%></th>
+                   <th width=15%>Tyre Unique No.</th>
+                   <th width=10%>Amount ({{ currency_type?.symbol}})</th>
+                   <th width=15%>Total ({{ currency_type?.symbol}})</th>
+                   <th width=15%></th>
+               </tr>
+           </thead>
+           <tbody formArrayName="tyres">
+             <ng-container *ngFor="let otherItem of editInventoryForm.controls.tyres['controls']; let i = index;" [formGroupName]="i">
+               <tr>
+                       <td class="w-150">
+                           <div class="select-wrap" [ngClass]="{disabled:  itemsDisable[i] }">
+                                 <material-dropdown [searchable]="true" [addable]="true" [disabled]=" itemsDisable[i]" class="dropDownWidth"
+                                 [postApiUrl]="manufacturerApi"
+                                 [params]="manufacturerParams"
+                                 (postApiResponse)="getNewManufacturer($event, i)"
+                                 (addValueToList)="addNewManufacturer($event)"
+                                 [selectedOption]="initialValues.manufacturer[i]">
+                                 <select #customSelect formControlName="manufacturer" class="no-style select--modify" (change)="onMakeChange(otherItem,i)">
+                                     <option *ngFor="let option of staticOptions?.tyreManufacturer" value="{{ option?.id }}">
+                                         {{ option?.label }}
+                                     </option>
+                                 </select>
+                             </material-dropdown>
+                           </div>
+                       </td>
+                       <td class="w-150">
+                         <div  class="select-wrap" [ngClass]="{disabled: itemsDisable[i]}">
+                           <material-dropdown [searchable]="true" [addable]="true" [disabled]=" itemsDisable[i]"
+                                     [postApiUrl]="modelApi"
+                                     [params]="modelParams"
+                                     (postApiResponse)="getNewModel($event, i)"
+                                     (addValueToList)="addNewModel($event)"
+                                      [selectedOption]="initialValues.model[i]">
+                                         <select #customSelect formControlName="tyre_model" class="no-style select--modify">
+                                             <option *ngFor="let model of tyreModel[i]" value="{{model.id}}">
+                                                 {{ model.name}}
+                                             </option>
+                                         </select>
+                             </material-dropdown>
+                         </div>
+                       </td>
+                       <td class="w-150">
+                         <div  class="select-wrap" [ngClass]="{disabled:  itemsDisable[i] }">
+                           <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [disabled]="itemsDisable[i] "
+                                         [selectedOption]="initialValues.threadType[i]">
+                                         <select #customSelect formControlName="thread_type" class="no-style select--modify">
+                                             <option *ngFor="let option of staticOptions?.threadType" value="{{ option?.id }}">
+                                                 {{ option?.label }}
+                                             </option>
+                                         </select>
+                             </material-dropdown>
+                         </div>
+                       </td>
+                       <td class="w-150">
+                         <input type="text" [readonly]="isUniqueNumberEditable" [ngClass]="{'unique_number_error':!otherItem.controls.unique_number_status.value ||(otherItem.controls.unique_no.hasError('required') && otherItem.controls.unique_no.touched) }" placeholder="1000" formControlName="unique_no" (focusout)="checkUnique(otherItem)">
+                       </td>
+                       <td>
+                           <div class='input-wrap' [ngClass]="addErrorClass(otherItem.controls.amount)">
+                               <input positiveThreeDigitDecimalNumber type="text" placeholder="1000"
+                               class="error-box"
+                               formControlName="amount" (change)="populateTotal(i)">
+                           </div>
+                       </td>
+                       <td class="w-150">
+                           <div class="input-wrap">
+                               <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="1000"
+                                   formControlName="total"
+                                  readonly >
+                           </div>
+                       </td>
+                           <td class="text-center align-middle">
+                             <span class="material-icons drop-down " (click)="otherItem.controls.additionalDetails.setValue(!otherItem.controls.additionalDetails.value) "
+                             *ngIf="!otherItem.controls.additionalDetails.value ">arrow_drop_down</span>
+                             <span class="material-icons drop-down " (click)="otherItem.controls.additionalDetails.setValue(!otherItem.controls.additionalDetails.value) "
+                             *ngIf="otherItem.controls.additionalDetails.value ">arrow_drop_up</span>
+                           <span class="material-icons delete"
+                           (click)="removeTyreItem(i)" *ngIf="editInventoryForm.controls.tyres.length !== 1">add_circle_outline</span>
+                           <span class="material-icons add"
+                           (click)="addMoreTyreItem()" *ngIf="editInventoryForm.controls.tyres.length -1== i">add_circle_outline</span>
+                           <span class="material-icons add"  title="Clone"  *ngIf="editInventoryForm.controls.tyres.length -1== i" (click)="cloneTyreItem(otherItem)">file_copy</span>
+                       </td>
+                   </tr>
+                   <tr class="border-top-0" *ngIf="otherItem.controls.additionalDetails.value">
+                     <td colspan="4" class="fs-12 pt-0">
+                         <input type="text" placeholder="Description" formControlName="note" [readonly]="!AreTyrePresent || itemsDisable[i] ">
+                     </td>
+                     <td class="fs-12  pe-2">
+                         <span class="table-footer-actions"><a class="clear-item" (click)="clearTyreData(i)">Clear</a></span>
+                     </td>
+                 </tr>
+             </ng-container>
+           </tbody>
+       </table>
+   </div>
+   <div class="table-footer-actions mg-top-20" *ngIf="AreTyrePresent">
+       <a class="clear-item"  (click)="clearAllTyreItems()">Remove all</a>
+   </div>
+ </div>
+
+ <div class="gst-table-wrapper mg-top-30">
+
+   <div class="gst-main">
+      <div class="text-end fw-bold gst-left"> Subtotal </div>
+      <div class="px-0  text-end fw-bold gst-right"> {{ currency_type?.symbol}}  {{ inventoryNewTotal.subtotal }}</div>
+   </div>
+
+    <div class="gst-main">
+        <div class="text-end pt-0 gst-left">
+              <span> Discount</span>
+              <div class="input">
+                  <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="0.00"
+                  formControlName="discount"
+                  (change)="onCalcuationsChanged()">
+              </div>
+              <div class="select-wrap dropdown">
+                          <select name="" class="no-style select--modify custom-select"
+                              formControlName="discount_type"
+                              (change)="onCalcuationsChanged()">
+                              <option value="0">%</option>
+                              <option value="1">{{ currency_type?.symbol}} </option>
+                          </select>
+              </div>
+         </div>
+         <div class="px-0  text-end gst-right">{{ currency_type?.symbol}}  {{ inventoryNewTotal.discountTotal }} </div>
+      </div>
+      <div class="gst-main"  *ngFor="let percentageTotal of inventoryNewTotal.taxes;" [ngClass]="{'hiddenContent':!isTax}">
+        <ng-container *ngIf="percentageTotal.total">
+          <div class="text-end gst-left"> Include {{terminology.tax_type}} @{{ percentageTotal.value }}% on
+                <span>{{ percentageTotal.total }}</span>
+          </div>
+          <div class="px-0  text-end gst-right"> {{ currency_type?.symbol}}   {{ percentageTotal.taxAmount }}</div>
+        </ng-container>
+      </div>
+
+      <div class="gst-main" [ngClass]="{'hiddenContent':!isTax}"> <div class="gst-left text-end pt-0">
+        <span>Discount after Tax </span>
+        <div class="input"  [class.disabled]="disableTax || !companyRegistered" >
+            <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="0.00"
+            formControlName="discount_after_tax"
+            [attr.disabled]="disableTax || !companyRegistered ? '': null"
+            (change)="onCalcuationsChanged()">
+        </div>
+        <div class="select-wrap dropdown">
+            <select name="" class="no-style select--modify custom-select"
+                formControlName="discount_after_tax_type"
+                (change)="onCalcuationsChanged()">
+                <option value="0">%</option>
+                <option value="1">{{ currency_type?.symbol}}</option>
+            </select>
+        </div>
+      </div>
+      <div class="px-0 gst-right text-end">{{ currency_type?.symbol}}   {{ inventoryNewTotal.discountAfterTaxTotal }}
+      </div>
+    </div>
+    <div class="gst-main">
+        <div class="text-start pt-0 gst-left">
+
+              <div class="dropdown select-wrap">
+                    <material-dropdown
+                        [selectedOption]="inventoryVariables.initialValues.adjustmentAccount">
+                        <select #customSelect formControlName="adjustment_account"
+                            class="no-style select--modify">
+                            <option  *ngFor="let option of expenseAccountList"
+                                value="{{ option.id }}">{{ option.name }}
+                            </option>
+                        </select>
+                    </material-dropdown>
+                </div>
+                <div class="input">
+                    <input twoDigitDecimalNumber type="text" class="error-box" placeholder="0.00"
+                    formControlName="adjustment"
+                    (change)="onCalcuationsChanged()">
+                </div>
+                <div class="select-wrap dropdown">
+                        <select name="" class="no-style select--modify custom-select"
+                            formControlName="adjustment_choice"
+                            (change)="onCalcuationsChanged()">
+                            <option value="0">%</option>
+                            <option value="1">{{ currency_type?.symbol}} </option>
+                        </select>
+                </div>
+              </div>
+              <div class="px-0  text-end gst-right"> {{ currency_type?.symbol}}  {{ inventoryNewTotal.adjustmentAmount }}</div>
+            </div>
+
+
+
+            <div class="text-end gst-main">
+                <div class="text-end h5"> <strong> Total </strong></div>
+                <div class="px-0 text-end ms-3 h5"><strong> {{ currency_type?.symbol}}  {{ inventoryNewTotal.total }} </strong></div>
+              </div>
+
+              <div class="gst-main" [ngClass]="{'hiddenContent':!isTax||isTds}" >
+                <div class="text-end pt-0 gst-left">
+
+                                <app-last-section-inputfield-box  [lastSectionTaxDetails]="lastSectionTaxDetails" [lastSectionEditData]="lastSectionEditData" (lastSectionOutPut)="lastSectionOutPut($event)"></app-last-section-inputfield-box>
+                  </div>
+                <div class="px-0 gst-right text-end">  {{ currency_type?.symbol}} {{ inventoryNewTotal.tdsAmount }}</div>
+              </div>
+
+
+              <div class="text-end gst-main">
+                  <div class="text-end h5"><strong> Balance </strong></div>
+                  <div class="px-0 text-end ms-3 h5"> <strong>{{ currency_type?.symbol}}  {{ inventoryNewTotal.balance }} </strong></div>
+              </div>
+
+</div>
+<hr>
+
+<app-payment-status [vendorId]="editInventoryForm.get('vendor').value"
+      [balanceAmount]="inventoryNewTotal.balance"
+      [billDate]="editInventoryForm.get('bill_date').value"
+       [vendorList]="inventoryVariables.vendorList"
+       [$paymentStatusValid]="$paymentStatusValid"
+       [editPayemntStatusData]="inventoryDetails"
+       (paymentStatusData)="paymentStatusData($event)"
+       >
+
+  </app-payment-status>
+<div class="col-sm-12">
+  <div class="row">
+      <div class="col-sm-6">
+          <div class="row">
+              <div class="col-sm-8">
+                  <div class="input-wrap mb-0 pb-3">
+                      <label for="">Remind Date</label>
+                      <mat-form-field>
+                          <input matInput [matDatepicker]="reminder" formControlName="reminder" (focus)="reminder.open()" placeholder="DD/MM/YYYY">
+                          <mat-datepicker-toggle matSuffix [for]="reminder"></mat-datepicker-toggle>
+                          <mat-datepicker #reminder></mat-datepicker>
+                      </mat-form-field>
+                      <span class="error-message">Error messge!</span>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="col-sm-6">
+          <div class="input-wrap mb-0 pb-3">
+              <label for="" class="">Optional Comment</label>
+              <input type="text" class="no-style input--bd" placeholder="Comments" formControlName="comments">
+          </div>
+      </div>
+  </div>
+</div>
+
+  <div class="form-layout__card mg-top-30">
+    <file-uploader (onFileUploaded)="fileUploader($event)"
+    (onFileDeleted)="fileDeleted($event)" [multiple]="true"
+    [accept]="'capture=camera, image/jpeg,image/x-jpg,image/png, application/pdf'"
+    [showFileName]="false" [patchFileUrls]="patchFileUrls">
+    </file-uploader>
+ </div>
+
+</div>
+<div class="mg-top-30 section-footer mg-bottom-30">
+  <div class="btn-wrap mg-bottom-100">
+      <button class="btn w-auto px-4"
+          routerLinkActive="active" [routerLink]="[prefixUrl+'/inventory/list/inventory-new']">Cancel</button>
+          <button class="btn btn--primary btn--default btn-mg-left btn--dropdown w-auto px-4" (click)="$event.stopPropagation();saveButton=! saveButton">
+            Save<i class="material-icons">arrow_drop_down</i>
+            <ul class="more-actions__menu" [ngClass]="{ 'show': saveButton}">
+                <li class="more-actions__item" type="button" (click)="saveExpense(false)">Save & Submit</li>
+                <li class="more-actions__item" type="button" (click)="saveExpense(true)">Save as Draft</li>
+            </ul>
+        </button>
+  </div>
+</div>
+</form>
+
+<app-add-expense-item [expenseItemPopDetail]="showAddExpenseItemPopup" (closeModal)="closeNewSparesItemPopup()" [units]="staticOptions.itemUnits"
+(itemAdded)="addDropDownNewSapre($event)" [isSpare]="true"></app-add-expense-item>
+
+
+<app-add-party-popup [popDetail]="inventoryVariables.showAddPartyPopup" (closeModal)="closePartyPopup()"
+(partyAdded)="addPartyToOption($event)" [isVendor]="true"></app-add-party-popup>

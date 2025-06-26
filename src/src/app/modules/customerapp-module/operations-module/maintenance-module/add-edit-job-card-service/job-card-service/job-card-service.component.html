@@ -1,0 +1,187 @@
+<div class=" layout-bg" >
+  <div class="row g-0">
+    <div class="d-flex col-12 mx-0 align-items-start   py-3 px-3 ps-4 justify-content-between">
+
+      <h1 class="heading ">{{jobCardServiceId?'Edit':'Add'}} Services</h1>
+
+      
+    </div>
+
+  </div>
+  <div class="container-fluid">
+    <div class="alert alert-danger" role="alert" *ngIf="!isTotalGreaterThenZero">
+     Service total should be greater then {{ currency_type?.symbol}} 0.00
+    </div>
+  <div class="row shadow-inset-top-lg  ">
+    <div class="col-lg-6 px-0">
+      <div class="  h-100 ">
+        <app-services-list (serviceDetails)="serviceDetails($event)" [vehicleId]="vehicleId" ></app-services-list>
+      </div>
+    </div>
+    <div class="col-lg-6 px-0">
+      <div class=" h-100 ">
+        <div class=" def-color px-3 py-3 list-head">
+          <span class="fw-semibold fs-6 ">Selected Services</span>
+          
+        </div>
+        <form class="px-0" [formGroup]="addServiceForm" >
+          
+            <div class=" table-wrapper  table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow"id="table-height">
+                <table class="table-container">
+                  <thead>
+                    <tr class="desktop_th">
+                      <th>Service Name</th>
+                      <th>Service Amount ({{currency_type.symbol}})</th>
+                      <th>Labour Amount ({{currency_type.symbol}})</th>
+                      <th>Total Amount ({{currency_type.symbol}})</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody >
+                    
+                   <tr>
+                      <td colspan="5" class="py-2">
+                        <div class="d-flex flex-wrap align-items-center py-1">
+                          <div class="w-auto " [ngClass]="{'hiddenContent':!isTax}" >
+                            
+                              <div class="input-wrap clearfix d-inline-flex align-items-end  mb-0 removeBorder">
+                                <label for="" class="input" style="height: 39px;">Tax</label>
+                                <material-dropdown [searchable]="true"  [selectedOption]="initialValues.tax">
+                                  <select #customSelect formControlName="tax" class="no-style select--modify " (change)="onCalculationChange();taxValueChange()">
+                                      <option *ngFor="let status of taxOptions" value="{{ status.id }}">
+                                          {{ status.label}}</option>
+                                  </select>
+                              </material-dropdown>
+                              </div>
+                            </div>
+                              
+                                  <label class="check-box d-flex "[ngClass]="{'hiddenContent':!isTax}">
+                                    <input type="checkbox" formControlName="is_tax_included" (change)="onCalculationChange()">
+                                    <span class="check-mark"></span>
+                                    <span class="label-text">Item rates are tax inclusive</span>
+                                </label>
+                                
+                        </div>
+                      </td>
+                    </tr>
+                      
+                    <ng-container  formArrayName="services">
+                      <tr class="mobile-flex" *ngFor="let item of addServiceForm['controls'].services['controls']; let i = index;"
+                      [formGroupName]="i">
+                        
+                        <td class="max-wd-120 ">
+                          <h5 class="th_h5_mobile">Service Name</h5>
+                          <div>
+                            <input type="text" readonly value="{{initialValues.serviceType[i].label}}"/>
+                          </div>
+                        </td>
+                        <td class="max-wd-120">
+                          <h5 class="th_h5_mobile">Service Amount ({{currency_type.symbol}})</h5>
+                          <div>
+                          <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456" (change)="serviceTotalCalculation(item)"  value=""  [ngClass]="{'uniqueNumbererror':item.controls.service_amount.invalid&&item.controls.service_amount.touched}"  formControlName="service_amount">
+                          </div>
+                        </td>
+                        <td class="max-wd-120">
+                          <h5 class="th_h5_mobile">Labour Amount ({{currency_type.symbol}})</h5>
+                          <div>
+                            <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" (change)="serviceTotalCalculation(item)" placeholder="123456" value=""   [ngClass]="{'uniqueNumbererror':item.controls.labour_amount.invalid&&item.controls.labour_amount.touched}"  formControlName="labour_amount">
+                          </div>
+                        </td>
+                        <td class="max-wd-120">
+                          <h5 class="th_h5_mobile">Total Amount ({{currency_type.symbol}})</h5>
+                          <div>
+                            <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456"  [ngClass]="{'uniqueNumbererror':item.controls.total_amount.invalid&&item.controls.total_amount.touched}" value="" formControlName="total_amount"  readonly>
+                          </div>
+                        </td>
+    
+                      <td>
+                        <span class="material-icons delete" (click)="removeService(i)">add_circle_outline</span>
+                    </td>
+                      </tr>
+                    </ng-container>
+                  
+                  </tbody>
+                </table>
+              </div>
+
+
+
+        </form>
+      </div>
+
+
+
+    </div>
+  </div>
+</div>
+  <div class="row border-top def-color">
+    <div class="col-md-6 px-0">
+        <app-job-card-payments [paymentForm]="addServiceForm" [paymentEditData]="paymentEditData"></app-job-card-payments>
+    </div>
+    <div class="col-md-6 p-4">   
+      
+      <ng-container [formGroup]="addServiceForm"  >
+
+        <!-- claculation part -->
+        <div class="d-flex justify-content-between" >
+          <p >Service Total:<span  class="fw-semibold ms-1 fs-6">{{currency_type.symbol}} {{ addServiceForm.controls.service_total.value | numberFormat}}</span></p>
+          <p >Labour Total: <span class="fw-semibold ms-1 fs-6">{{currency_type.symbol}} {{ addServiceForm.controls.labour_total.value | numberFormat}}</span></p>
+          <p >SubTotal: <span  class="fw-semibold ms-1 fs-6">{{currency_type.symbol}} {{ addServiceForm.controls.subtotal.value | numberFormat}}</span></p>
+        </div>
+  
+                 
+  
+                  
+                    <div class="text-end pt-0 gst-left gst-table-wrapper d-flex justify-content-end align-items-center mt-4" *ngIf="false">
+                        <span class="me-2"> Discount: </span>
+                        <div class="input me-2" [ngClass]="addErrorClass(addServiceForm.controls.discount)">
+                          <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="0.00"
+                          formControlName="discount"
+                          (change)="onCalculationChange()">
+                        </div>
+                        <div class="select-wrap dropdown me-3">
+                          <select name="" class="no-style select--modify custom-select"
+                              formControlName="discount_choice"
+                              (change)="onCalculationChange()">
+                              <option value="0">%</option>
+                              <option value="1">{{ currency_type?.symbol}}</option>
+                          </select>
+                        </div>
+                        <div class="px-0  text-end gst-right fw-semibold fs-6"> {{ currency_type?.symbol}} {{addServiceForm.controls.discount_choice_value.value  | numberFormat}}</div>
+
+                     </div>
+               
+  
+                  <div class="row mx-0 justify-content-end align-items-center " [ngClass]="{'hiddenContent':!isTax}"
+                            *ngFor="let percentageTotal of addServiceTotal.taxes;">
+                      <ng-container *ngIf="percentageTotal.total">
+                      <p class="ps-0 w-auto mt-4"> Include {{terminology.tax_type}} &#64; {{ percentageTotal.value }}% on  {{ percentageTotal.total  | numberFormat}}
+                      </p>
+                      <p class="pe-0 w-auto fw-semibold fs-6 mt-4">{{currency_type.symbol}} {{ percentageTotal.taxAmount  | numberFormat}}</p>
+                    </ng-container>
+                  </div>
+                  <div class="row mx-0 justify-content-end align-items-center  mt-4">
+                    <p class="ps-0 w-auto">
+                      <mat-checkbox [disableRipple]="true" (change)="onRoundOffEvent($event)"
+                        formControlName="is_roundoff">Round Off</mat-checkbox>
+                    </p>
+                    <p class="pe-0 w-auto fw-semibold fs-6"> {{currency_type.symbol}} {{ addServiceForm.controls.roundoff_amount.value  | numberFormat}}</p>
+                  </div>
+  
+  
+            <div class="row mx-0 justify-content-end align-items-center mt-4  ">
+              <h5 class="ps-0 w-auto">Total</h5>  <h5 class="pe-0 w-auto"> {{currency_type.symbol}} {{ addServiceForm.controls.total_amount.value  | numberFormat}}</h5>
+            </div>
+          </ng-container>
+    </div>
+
+</div>
+  <div class="row">
+    <div  class="bottom-btn-wrap py-2 px-4">
+      <div  class="d-flex justify-content-end ">
+        <button  type="button"class="btn  btn--sm me-3" (click)="cancel()" >Cancel</button>
+        <button  type="button" class="btn btn--primary btn--sm" (click)="saveService()" >{{jobCardServiceId?'Update':'Create'}}</button></div>
+    </div>
+  </div>
+
+</div>

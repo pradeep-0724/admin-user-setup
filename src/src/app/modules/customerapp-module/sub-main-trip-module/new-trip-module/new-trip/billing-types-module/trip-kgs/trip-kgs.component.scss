@@ -1,0 +1,30 @@
+
+
+mat-select-autocomplete{
+  width: 100%;
+  border: 1px solid #bcc7d1;
+  border-radius: 3px;
+  padding: 4px 4px 4px 4px;
+  height: 40px;
+  margin-left: 5px;
+  display: block;
+}
+.showInvalid{
+  border: 1px solid red !important;
+
+}
+
+:host ::ng-deep{
+  .mat-form-field-underline{
+    height: 0;
+    background: none;
+  }
+  mat-select-autocomplete{
+    padding: 6px 4px 12px 4px;
+  }
+  .mat-form-field-appearance-standard .mat-form-field-flex{
+    padding-top: 0;
+  }
+}
+.min-height-96{height: 100px;vertical-align: top;}
+

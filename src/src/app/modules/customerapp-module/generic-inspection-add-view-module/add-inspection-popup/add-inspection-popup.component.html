@@ -1,0 +1,116 @@
+<div class="bg-white rounded-3 def-color overflow-hidden">
+    <div class="py-3 px-4 gb-popup-header ">
+        <p class="fw-semibold primary-brand-text">{{isAdd?'Add':'Edit'}} Inspection</p>
+    </div>
+    <div class="alert alert-danger" role="alert" *ngIf="apiError">
+      {{apiError}}
+      </div>
+      <div class="alert alert-danger" role="alert" *ngIf="isImageSizeReached">
+        Please Attach upto 3 images to show in the details
+      </div>
+    
+    <div>
+        <div class="popup-scroll-body">
+            <form [formGroup]="addInspectionForm">
+                <div class="row mx-0 p-3">
+
+                    <div class=" col-lg-4 col-md-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(addInspectionForm.controls.name)">
+                            <label for="" class="input--required">
+                                Inspection Type</label>
+                            <input type="text" class="no-style input--bd" placeholder="AA00-1122" value=""
+                                formControlName="name">
+                            <app-error [controlName]="addInspectionForm.controls.name">
+                            </app-error>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-12 mb-3"><b class="fs-6">Attach Image&nbsp;</b></div>
+                    <div class="col-12 d-flex flex-wrap gap-4 mb-3">
+                        <file-uploader-v2 (onFileUploaded)="fileUploader($event)" [uploaderId]="'site-inspection'"
+                            [isShowOnlyUpload]="false"></file-uploader-v2>
+                        <app-file-delete-view [showInlineEdit]="false" [fileData]="document"
+                            *ngFor="let document of addInspectionForm.controls.documents.value"
+                            (fileDeleted)="fileDeleted($event)"></app-file-delete-view>
+                    </div>
+                    <div class="col-12   py-3"><b class="fs-6">Fields Details&nbsp;</b></div>
+                    <div class="border mb-3 mx-2"></div>
+                    <div class="col-12 mb-2">
+                        <div class="addable-row-table ">
+                            <table>
+                                <thead>
+                                    <tr>
+
+                                        <th class="input">
+                                            FIELDS NAME
+                                        </th>
+                                        <th>FIELDS TYPE</th>
+                                        <th class="text-center">MANDATORY</th>
+                                        <th></th>
+
+                                    </tr>
+
+                                </thead>
+                                <tbody formArrayName="checklist">
+
+                                    <tr *ngFor="let control of addInspectionForm.controls['checklist']['controls'];let i=index "
+                                        [formGroupName]="i">
+                                        <td [ngClass]="{'invalid-input':control.get('field_label').invalid && control.get('field_label').touched }">
+                                            <div>
+                                                <input type="text" formControlName="field_label" class="error-box"
+                                                    placeholder="Heading Name">
+                                            </div>
+                                        </td>
+                                        <td [ngClass]="{'invalid-input':control.get('field_type').invalid && control.get('field_type').touched }">
+                                            <material-dropdown [searchable]="true" [selectedOption]="fieldType[i]"> 
+                                                <select #customSelect formControlName="field_type">
+                                                    <option *ngFor="let option of contentTypeList"
+                                                        value="{{ option?.value }}">
+                                                        {{ option?.label }}
+                                                    </option>
+                                                </select>
+                                            </material-dropdown>
+                                        </td>
+                                        <td>
+                                            
+                                            <div class="d-flex justify-content-center">
+                                                <mat-checkbox formControlName="mandatory"
+                                                    color="primary"></mat-checkbox>
+                                            </div>
+                                        </td>
+                                        <td class="rc-row-btn-wrap border-start-0 border-end-0">
+                                            <div class="d-flex justify-content-end">
+                                                <button (click)="removeFields(i)" *ngIf="addInspectionForm.controls['checklist']['controls'].length-1 !=0"
+                                                    class="  row-btn row-btn-delete "><span class="material-icons">
+                                                        close
+                                                    </span></button>
+                                                <button (click)="addFields()" *ngIf="addInspectionForm.controls['checklist']['controls'].length-1 ==i" class=" row-btn row-btn-add "><span
+                                                        class="material-icons">
+                                                        add
+                                                    </span></button>
+
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </form>
+        </div>
+        <div class="d-flex justify-content-space-between pt-0 px-3 py-4 ">
+            <button class="btn w-auto " (click)="cancel()">Cancel</button>
+            <button class="btn btn--primary w-auto" (click)="save()">{{isAdd?'Save':'Update'}}</button>
+        </div>
+    </div>
+</div>

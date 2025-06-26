@@ -1,0 +1,90 @@
+<div class="modal fade" [ngClass]="{'show':showModal}" id="exampleModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal--wd" role="document">
+    <div class="modal-content">
+      <form [formGroup]="editChartOfAccountForm" (ngSubmit)="submitForm(editChartOfAccountForm)"
+        (keydown.enter)="$event.preventDefault();">
+
+        <div class="modal-header">
+          <h6 class="modal-title" id="exampleModalLabel">Edit Account</h6>
+          <button type="button" class="close" data-dismiss="modal" (click)="close(false)" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="alert-msg" *ngIf="apiError">
+          <span class="icon-wrap"></span>
+          <p class="message-cont">{{ apiError }}</p>
+        </div>
+        <div class="modal-body pd-20">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="input-wrap error clearfix"
+                [ngClass]="addErrorClass(editChartOfAccountForm.get('account_type'))">
+                <label for="" class="input--required">Account Type</label>
+                <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialValues.account_type">
+                  <select #customSelect formControlName="account_type" class="no-style select--modify"
+                    (change)="onAccountTypeSelection(editChartOfAccountForm.controls.account_type.value)">
+                    <option *ngFor="let option of accountTypes" value="{{ option?.id }}">
+                      {{ option?.name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="editChartOfAccountForm.get('account_type')"></app-error>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="row">
+                <div class="col-2">
+                  <label for="tick" class="check-box mt-3">
+                    <input type="checkbox" id="tick" [ngModelOptions]="{standalone: true}"
+                      [(ngModel)]="parent_account_editable" (change)="disableParentAccount(parent_account_editable)">
+                    <span class="check-mark"></span>
+                  </label>
+                </div>
+                <div class="col-10">
+                  <div class="input-wrap" [ngClass]="{disabled:disableParentAcc}">
+                    <div class="input-wrap error clearfix"
+                      [ngClass]="addErrorClass(editChartOfAccountForm.controls.account)">
+                      <label for="" class="input--required">Add Parent
+                        Account</label>
+                      <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialValues.account">
+                        <select #customSelect formControlName="account" class="no-style select--modify">
+                          <option *ngFor="let option of parentAccounts" value="{{ option?.id }}">
+                            {{ option?.name }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                      <app-error [controlName]="editChartOfAccountForm.controls.account"></app-error>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <div class="input-wrap error clearfix" [ngClass]="addErrorClass(editChartOfAccountForm.get('name'))">
+                <label for="" class="input--required">Account Name</label>
+                <input type="text" class="no-style input--bd" formControlName="name" placeholder="Name" value=""
+                  required>
+                <span class="border-anim"></span>
+                <app-error [controlName]="editChartOfAccountForm.get('name')"></app-error>
+              </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="input-wrap clearfix">
+                <label for="">Description</label>
+                <input type="text" class="no-style input--bd" formControlName="description" placeholder="Max 500 Characters" value="">
+                <span class="border-anim"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer no-border">
+          <button type="button" class="btn" data-dismiss="modal" (click)="close(false)">Close</button>
+          <button type="submit" class="btn btn--primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div *ngIf="showModal" class="modal-backdrop fade show"></div>

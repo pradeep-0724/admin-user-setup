@@ -1,0 +1,26 @@
+<div class="container-fluid ">
+    <div class="row px-5 py-4 border-bottom ">
+        <div class="col-12 "><b style="color: #2BB741;" class="fs-6">Job Document &nbsp;</b> <app-tool-tip
+                class="tool-tip-position trip-no" [totalSlides]="tripToolTip.content.length" position="right"
+                [toolTipContent]="tripToolTip"></app-tool-tip></div>
+        <div class="col-12 d-flex flex-wrap gap-4 py-4 ">
+            <file-uploader-v2 (onFileUploaded)="fileUploader($event)" fileName="Document Unknown" [uploaderId]="'1234'"
+                [isShowOnlyUpload]="false"></file-uploader-v2>
+            <app-file-delete-view [showInlineEdit]="true" [fileData]="document" *ngFor="let document of tripDocuments"
+                (fileDeleted)="fileDeleted($event)"></app-file-delete-view>
+        </div>
+
+    </div>
+    <div class="row px-5 py-4" *ngIf="isDriverApp">
+        <div class="col-12 "><b style="color: #0583D7;">Driver Job Document  &nbsp;</b>
+        <app-tool-tip
+                class="tool-tip-position driver-tool-tip" [totalSlides]="driverToolTip.content.length" position="right"
+                [toolTipContent]="driverToolTip"></app-tool-tip>
+        </div>
+        <div class="col-12 d-flex flex-wrap gap-4 py-4 ">
+            <app-file-delete-view [fileData]="document" [driverInput]="true" *ngFor="let document of driverAppDocs"
+                (fileDeleted)="driverDocDeleted($event)"></app-file-delete-view>
+        </div>
+
+    </div>
+</div>

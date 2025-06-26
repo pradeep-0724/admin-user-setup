@@ -1,0 +1,42 @@
+<div class="pt-4 def-color fw-semibold pb-0 border-top mt-3">
+    <div class="px-5 fs-6">
+    <div class="d-flex justify-content-between mb-3" *ngIf="quotationDetail?.subtotal_freight_before_tax">
+        <span>Subtotal Freight</span>
+        <span>{{ currency_type?.symbol}} {{quotationDetail?.subtotal_freight_before_tax}}</span>
+
+    </div>
+    <div class="d-flex justify-content-between mb-3" *ngIf="quotationDetail?.subtotal_other_before_tax">
+        <span>Subtotal Additional Charges</span>
+        <span>{{ currency_type?.symbol}} {{quotationDetail?.subtotal_other_before_tax}}</span>
+
+    </div>
+    <ng-container *ngIf="isTax">
+        <ng-container *ngFor="let data of quotationDetail.tax_summary">
+            <div class="d-flex justify-content-between mb-3">
+                <p >Include {{terminology?.tax_type}} &#64; {{data.tax_percent}}% on {{data.amount}}</p>
+                <p >{{ currency_type?.symbol}} {{data.tax_amount}} </p>
+            </div>
+        </ng-container>
+    </ng-container>
+    <div class="  d-flex justify-content-between mb-3" *ngIf="isTax && quotationDetail?.discount_amount_after_tax >0">
+        <p class=""> Discount after Tax&nbsp;<span class="fw-bolder">
+            {{quotationDetail[findCategory(quotationDetail?.vehicle_category)].discount_choice_after_tax==1?currency_type?.symbol+' ':''}}{{ quotationDetail[findCategory(quotationDetail?.vehicle_category)].discount_value_after_tax }}{{quotationDetail[findCategory(quotationDetail?.vehicle_category)].discount_choice_after_tax==0?'%':''}}
+        </span></p>
+        <p class="">{{ currency_type?.symbol}} {{quotationDetail?.discount_amount_after_tax}} </p>
+    </div>
+   
+    
+    <div class="d-flex  justify-content-between mb-3" *ngIf="quotationDetail[findCategory(quotationDetail?.vehicle_category)]?.is_roundoff">
+        <p > Round Off </p>
+        <p >{{ currency_type?.symbol}} {{quotationDetail?.roundoff_amount}}</p>
+    </div>
+    </div>
+<div class="px-5 border-top">
+    <div class="d-flex  justify-content-between py-3  fs-5">
+        <span>Total</span>
+        <span>{{ currency_type?.symbol}} {{quotationDetail?.total_amount}}</span>
+
+    </div>
+</div>
+
+</div>

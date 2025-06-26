@@ -1,0 +1,15 @@
+<div class="right-section__header">
+  <h1 class="heading">Inventory Adjustment List</h1>
+  <button class="add-button btn--rounded" *ngxPermissionsOnly="inventory_adjustment[0]"  [routerLink]="[prefixUrl+'/inventory/add/inventory-adjustment']"
+  routerLinkActive="router-link-active">Add Inventory Adjustment</button>
+</div>
+<div class="form-layout" id="form-height">
+  <nav class="table-nav">
+      <ul class="table-nav__list">
+          <li class="table-nav__item" [routerLink]="[prefixUrl+'/inventory/list/inventory-adjustment-spare']" routerLinkActive="active">Inventory Adjustment (spare)</li>
+          <li class="table-nav__item" [routerLink]="[prefixUrl+'/inventory/list/inventory-adjustment-tyre']" routerLinkActive="active">Inventory Adjustment (tyre)</li>
+      </ul>
+  </nav>
+  <router-outlet></router-outlet>
+</div>
+

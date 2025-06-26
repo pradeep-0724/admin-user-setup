@@ -1,0 +1,8 @@
+<div class="edit-material-wrapper">
+  <h5 class="th_h5_mobile">Material</h5>
+  <div class="d-flex position-relative">
+    <ng-multiselect-dropdown [formControl]="materialItem" [placeholder]="'Select Material'"  [settings]="dropdownSettings" [data]="materialList">
+  </ng-multiselect-dropdown>
+    <button class="material-add-btn" (click)="addNewMaterial()">+</button>
+  </div>
+</div>

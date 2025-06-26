@@ -1,0 +1,31 @@
+<div class="modal fade" [ngClass]="{'show':show}" id="exampleModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body text-center py-md-5 py-3">
+            <div class="trip-expired-block">
+              <img src="../../../../assets/img/trip-experienced.png" alt="Home">
+            </div>
+            <div *ngIf="!isContactUsClicked;else thankYou">
+              <h3 class="trip-expired" *ngIf="isAccessible&&trialPeriodEnded">
+                 Your trial has expired<span>Contact the sales team for assistance.</span>
+              </h3>
+              <h3 class="trip-expired" *ngIf="!isAccessible">
+                 Your Account is inactive <span>Contact the sales team for assistance.</span>
+              </h3>
+            </div>
+            <ng-template #thankYou>
+              <h3 class="trip-expired">
+                Thank you <span>We will be in touch with you shortly.</span>
+              </h3>
+
+            </ng-template>
+            <div class="okButton text-center mt-1 row mx-0 justify-content-center">
+              <button class="btn  log-out" (click)="cancel()" type="submit">Log Out</button>
+              <button class="btn btn--primary " *ngIf="!isContactUsClicked" (click)="onOkButtonClick()" type="submit">Contact Us</button>
+          </div>
+          </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="show" class="modal-backdrop fade show"></div>

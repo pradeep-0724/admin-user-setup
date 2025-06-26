@@ -1,0 +1,48 @@
+.balance-font{
+    font-weight: 700;
+}
+.in-out-btn{
+    position: relative;
+    display: block;
+    
+    padding: 7px 12px;
+    color: white;
+    font-size: 14px;
+    line-height: 18px;
+    background-color: transp;
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .3s ease-in-out;
+    margin-right: 7px;
+}
+.in{
+    background-color: #2BB741;
+    border: 1px solid #2BB741; 
+}
+.out{
+    background-color: #CE0411;
+    border: 1px solid #CE0411; 
+}
+.reset{
+    background-color: #15A4F6;
+    border: 1px solid #15A4F6; 
+}
+
+.save-file,
+.edit-button,
+.filter-btn,
+.setting-button {
+    color: #979696;
+    height: 35px;
+    border: 1px solid #B8B8B8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 38px;
+    border-radius: 6px;
+    margin-right: 5px;
+    .material-icons {
+        font-size: 20px;
+    }
+}

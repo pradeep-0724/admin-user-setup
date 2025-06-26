@@ -1,0 +1,2197 @@
+import { Component, Inject, OnInit } from '@angular/core';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
+import PDFMerger from 'pdf-merger-js';
+import { BehaviorSubject, forkJoin } from 'rxjs';
+import { CommonService } from 'src/app/core/services/common.service';
+import { CurrencyService } from 'src/app/core/services/currency.service';
+import { FileDownLoadAandOpen } from 'src/app/core/services/file-download-service';
+import { MaterialService } from 'src/app/core/services/material.service';
+import { TaxService } from 'src/app/core/services/tax.service';
+import { TerminologiesService } from 'src/app/core/services/terminologies.service';
+import { SettingSeviceService } from 'src/app/modules/customerapp-module/api-services/orgainzation-setting-module-services/setting-service/setting-sevice.service';
+import { InvoiceService } from 'src/app/modules/customerapp-module/api-services/revenue-module-service/invoice-service/invoice.service';
+import { normalDate } from 'src/app/shared-module/utilities/date-utilis';
+import { doChunk, isReverseMechanism, checkEmptyDataKey, checkEmpty, isValidValue } from 'src/app/shared-module/utilities/helper-utils';
+import { addDocumentColumn, pdfGenerateWOHeaderFooter, pdfGenerate, addressToText, addImageColumn, addFonts, reorderMixedText } from 'src/app/shared-module/utilities/pdfmake-uitls';
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import htmlToPdfmake from 'html-to-pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+import { DialogRef, DIALOG_DATA } from '@angular/cdk/dialog';
+import { CommonLoaderService } from 'src/app/core/services/common_loader_service.service';
+import { cloneDeep } from 'lodash';
+import { RateCardBillingBasedOn } from 'src/app/core/constants/constant';
+import { pdfTemplate1 } from 'src/app/shared-module/utilities/pdftemplate-utils';
+function BlobToBase64(blob, cb) {
+  let reader = new FileReader();
+  reader.readAsDataURL(blob);
+  reader.onloadend = function () {
+    cb(reader.result)
+  }
+}
+
+function base64ToBlob(base64String, contentType = '') {
+  const byteCharacters = atob(base64String);
+  const byteArrays = [];
+
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteArrays.push(byteCharacters.charCodeAt(i));
+  }
+
+  const byteArray = new Uint8Array(byteArrays);
+  return new Blob([byteArray], { type: contentType });
+}
+
+async function generateBlobfromBlobs(blobs, pdfBlobs) {
+  let merger = new PDFMerger();
+
+  for (const temp of blobs) {
+    await merger.add(temp)
+  }
+
+  for (const temp of pdfBlobs) {
+    await merger.add(temp)
+  }
+
+  let mergedBlobs = new Blob([await merger.saveAsBuffer()], { type: 'application/pdf' })
+  return mergedBlobs;
+}
+
+@Component({
+  selector: 'app-invoice-pdf-view',
+  templateUrl: './invoice-pdf-view.component.html',
+  styleUrls: ['./invoice-pdf-view.component.scss']
+})
+export class InvoicePdfViewComponent implements OnInit {
+  terminology: any;
+  invoiceData: any;
+  address: any = {};
+  company_logo: any = '';
+  invoiceId = '';
+  defaultDownload: boolean = false;
+  createCopySeleted: Number = 0;
+  isTPEmpty: boolean = false;
+  isMaterialEmpty: boolean = false;
+  isNewTPEmpty: boolean = false;
+  currency_symbol;
+  isOpen = false;
+  filebyteCode = new BehaviorSubject(null);
+  isTax: boolean = false;
+  isAdvanceGreaterThenZero: boolean = false;
+  isMoneyReceived: boolean = false;
+  isFuelReceived: boolean = false;
+  isBataReceivaed: boolean = false;
+  chargeDetailExists: boolean = false;
+  chargeDetailAnnexureExists: boolean = false;
+  deductionDetailsExist: boolean = false;
+  deductionDetailsAnnextureExist: boolean = false;
+  timeSheetExists: boolean = false;
+  woAnnexureExists: boolean = false;
+  tripDataExists: boolean = false;
+  tripContainerDataExists: boolean = false;
+  isNewAdvanceGreaterThenZero: boolean = false;
+  pdfSrc = "";
+  digitalSignature = '';
+  isLRNoEmpty = false;
+  isFixedQty = false;
+  isMaterial = true;
+  challanLength = 0
+  addToOthers = false;
+  isTds = false;
+  companyHeaderDetails: any;
+  footerDetails: any;
+  isPlaceOfSupply: boolean = false;
+  commentData = {
+    key: 'invoice',
+    object_id: ''
+  }
+  isGotComment: boolean = false;
+  tripChallanDocumentList = [];
+  pdfBlobs = [];  
+  invoiceHeading='';
+  rateCardBilling = new RateCardBillingBasedOn();
+  rateCardBillingList = this.rateCardBilling.RateCardbillingUnitsList
+
+
+  constructor(
+    private _terminologiesService: TerminologiesService,
+    private _invoiceService: InvoiceService,
+    private _commonService: CommonService,
+    private ngxService: NgxUiLoaderService,
+    private currency: CurrencyService,
+    private _tax: TaxService,
+    private _material: MaterialService,
+    private _advances: SettingSeviceService,
+    private _fileDownload: FileDownLoadAandOpen,
+    private dialogRef: DialogRef<boolean>, @Inject(DIALOG_DATA) private dialogData: any,
+    private _lodaer: CommonLoaderService
+
+  ) {
+    pdfMake.vfs = pdfFonts.pdfMake.vfs;
+    this.isTax = this._tax.getTax();
+    this.isTds = this._tax.getVat();
+    this.isMaterial = this._material.getMaterial();
+    this.isPlaceOfSupply = this._tax.isPlaceOfSupply();
+    addFonts(pdfMake)
+    
+  }
+
+  ngOnInit() {
+    const pdfDocGenerator = pdfMake.createPdf(pdfTemplate1());
+    pdfDocGenerator.getDataUrl((dataUrl) => {
+      this.pdfSrc = dataUrl
+    });
+    // pdfDocGenerator.getBlob((blob) => {
+    //   this._fileDownload.writeAndOpenFile(blob, '2 font size test').then(data => {
+    //   });
+    // });
+    return
+    this.invoiceId = this.dialogData
+    this.terminology = this._terminologiesService.terminologie;
+    this.currency_symbol = this.currency.getCurrency().symbol;
+    let logo=this._commonService.fetchCompanyLogo();
+    let advance=this._advances.getAdvances('invoice');
+    let pdfHeading=this._commonService.getPdfHeading('invoice')
+    forkJoin([logo,advance,pdfHeading]).subscribe((response)=>{
+      this.company_logo = response[0].result.image_blob;
+      this.isMoneyReceived = response[1].result.cash_view;
+      this.isFuelReceived = response[1].result.fuel_view;
+      this.isBataReceivaed = response[1].result.batta_view;
+       this.invoiceHeading=response[2].result['tax_head_in_eng']
+        if(response[2].result['tax_head_in_native']){
+          this.invoiceHeading+=` | ${reorderMixedText(cloneDeep(response[2].result['tax_head_in_native']))}`
+        }
+      this.invoiceDetails();
+    });
+  }
+  openDetails(): void {
+    this.dialogRef.close(true)
+  }
+
+
+  generateInvoiceTripDocumentPDF() {
+    let documentList = [];
+    this.tripChallanDocumentList.forEach((doc, index) => {
+      let image = {
+        margin: 2,
+        columns: []
+      }
+      image.columns.push({
+        table: {
+          widths: ["100%"],
+          body: [[addDocumentColumn(doc.image_blob)]]
+        },
+        layout: {
+          border: [false, false, false, true]
+        }
+      })
+      documentList.push(image)
+    });
+
+    if (documentList.length > 0) {
+      return pdfMake.createPdf(pdfGenerateWOHeaderFooter(documentList))
+    }
+  }
+
+  invoiceDetails() {
+    this.isGotComment = false;
+    this.commentData.object_id = this.invoiceId;
+    this._lodaer.getShow();
+    let invoiceData=this._invoiceService.getInvoicePrintView(this.invoiceId);
+    let invoiceDoc=this._invoiceService.getTripDocumentChallan(this.invoiceId);
+    forkJoin([invoiceData,invoiceDoc]).subscribe((response)=>{
+      this.tripChallanDocumentList = [];
+      this.pdfBlobs = [];
+      this.invoiceData = response[0]['result'];
+      response[1]['result'].forEach(item => {
+        if (item.ct == 'application/pdf') {
+          this.pdfBlobs.push(base64ToBlob(item.image_blob, item.ct))
+        } else {
+          this.tripChallanDocumentList.push(item)
+
+        }
+      })
+      if (this.tripChallanDocumentList.length) {
+        this.generateInvoiceTripDocumentPDF();
+      }
+      this.isGotComment = this.invoiceData.party.has_portal_access;
+      if (this.invoiceData.signature) {
+        this.digitalSignature = this.invoiceData.signature.document
+      }
+
+      this.isTPEmpty = this.evaluateEmptyTP(this.invoiceData.challan.challans_v1.annexure)
+      this.isNewTPEmpty = this.evaluateEmptyNewTP(this.invoiceData.challan.challans_v2.annexure)
+      this.isLRNoEmpty = this.evaluateEmptyLRNo(this.invoiceData.challan.challans_v2.annexure)
+      this.isMaterialEmpty = this.evaluateEmptyMaterial(this.invoiceData.challan.challans_v2.annexure)
+      this.isFixedQty = this.evaluateFixedQty(this.invoiceData.challan.challans_v2.annexure)
+      this.convertItemCustomFieldsToChunks(this.invoiceData);
+
+      if (this.defaultDownload) {
+        setTimeout(() => { this.downloadPdf(this.invoiceData, false); }, 100);
+      }
+      setTimeout(() => {
+        // const pdf = this.pdfGenerateView(this.invoiceData)
+        const pdfDocGenerator = pdfMake.createPdf(pdfTemplate1());
+        pdfDocGenerator.getDataUrl((dataUrl) => {
+          this.pdfSrc = dataUrl
+        });
+        this._lodaer.getHide();
+      }, 100);
+
+      this.checkAdvanceValue();
+      this.checkToShowNewAdvanceValue()
+      this.initializeExistence()
+    })
+  
+  }
+
+  initializeExistence() {
+    this.chargeDetailExists = false;
+    this.tripDataExists = false;
+    this.timeSheetExists = false;
+    this.deductionDetailsExist = false;
+    this.chargeDetailAnnexureExists = false;
+    if (this.invoiceData['charges'].length > 0) {
+      this.chargeDetailExists = true;
+    }
+    if (this.invoiceData['deductions'].length > 0) {
+      this.deductionDetailsExist = true;
+    }
+
+    if (this.invoiceData['annexure_charges'].length > 0) {
+      this.chargeDetailAnnexureExists = true
+    }
+
+    if (this.invoiceData['annexure_deductions'].length > 0) {
+      this.deductionDetailsAnnextureExist = true;
+    }
+
+    if (this.invoiceData['timesheets'].length > 0) {
+      this.timeSheetExists = true;
+    }
+
+    if (this.invoiceData['wos'].length > 0) {
+      this.woAnnexureExists = true;
+    }
+
+    if (this.invoiceData['challan']['challans_v2']['challan_data'].length > 0) {
+      this.tripDataExists = true;
+    }
+
+    if (this.invoiceData['container_info'].length > 0) {
+      this.tripContainerDataExists = true;
+    }
+  }
+
+  convertItemCustomFieldsToChunks(data) {
+    data.challan.challans_v1.annexure.forEach(element => {
+      element.challans.forEach(inner_element => {
+        let extras = inner_element.extras;
+        inner_element.extras = doChunk(extras, 4);
+      });
+    });
+  }
+
+
+  transactionStatus(status: boolean) {
+    return isReverseMechanism(status);
+  }
+
+
+  evaluateEmptyTP(data) {
+    let flag: boolean = false;
+    for (let index in data) {
+      flag = checkEmptyDataKey(data[index].challans, "work_order_no")
+      if (!flag) {
+        return false
+      }
+    }
+    return true
+  }
+
+  evaluateEmptyNewTP(data) {
+    let flag: boolean = false;
+    for (let index in data) {
+      flag = data[index].work_order_no || data[index].tp_no
+      if (flag) {
+        return false
+      }
+    }
+    return true
+  }
+
+  evaluateEmptyLRNo(data) {
+    let flag: boolean = false;
+    for (let index in data) {
+      flag = data[index].estimate.cn_no
+      if (flag) {
+        return false
+      }
+    }
+    return true
+  }
+
+  evaluateEmptyMaterial(data) {
+    let flag: boolean = false;
+    for (let index in data) {
+      flag = data[index].estimate.material
+      if (flag) {
+        return false
+      }
+    }
+    return true
+  }
+
+  evaluateFixedQty(data) {
+    let flag: boolean = false;
+    for (let index in data) {
+      flag = data[index].estimate.qty == 'Jobs'
+      if (!flag) {
+        return false
+      }
+    }
+    return true
+  }
+
+  getRowSpanValue(index_value: number) {
+    let annexure_array = this.invoiceData.challan.challan_v1.annexure[index_value].challans as Array<any>;
+    return annexure_array.length
+  }
+
+  dateChange(date) {
+    return normalDate(date);
+  }
+
+  emptyState(data) {
+    if (data) {
+      return data;
+    }
+    return '0';
+  }
+
+  nullState(data) {
+    if (data) {
+      return data;
+    }
+    return '-';
+  }
+
+  downloadPdf(data, print: boolean = false) {
+    this.processPdf(data, print);
+  }
+
+  parseAddress(address) {
+    let resp = {};
+    if (address) {
+      address.filter(data => {
+        if (data.address_type_index === 0) {
+          resp['billingAddress'] = data;
+        } else {
+          resp['shippingAddress'] = data;
+        }
+      });
+    }
+    return resp;
+  }
+
+  addDigitalSignatureColumn() {
+    const digitalSignature = this.digitalSignature;
+
+    let no_img_col = [{ text: '', style: 'logo', width: 100 }, { text: '', style: 'logo', width: 100 }];
+
+    let img_col = [{ text: '', style: 'logo', width: 10 }, { image: '', style: 'logo', width: 140, alignment: "right", height: 30, margin: [0, 0, 10, 0] }];
+
+    if (digitalSignature) {
+      img_col[1].image = 'data:image/png;base64,' + digitalSignature
+      return img_col
+    }
+    return no_img_col
+  }
+
+  createPdfDownload(data, fileTitleAnnexure, fileNameAnnexure, fileTitle, fileName, annexure = true) {
+    if (this.createCopySeleted == 1) {
+      setTimeout(() => {
+        let filenameC = fileNameAnnexure + "_" + this.generateFileName() + ".pdf";
+        const pdfDocGenerator = pdfMake.createPdf(this.generatePDFAnnexure(data, fileTitleAnnexure));
+        pdfDocGenerator.getBlob((blob) => {
+          this._fileDownload.writeAndOpenFile(blob, filenameC).then(data => {
+          });
+        });
+      }, 500);
+    } else if (this.createCopySeleted == 0) {
+      setTimeout(() => {
+        let filenameB = fileName + "_" + this.generateFileName() + ".pdf";
+        const pdfDocGenerator = pdfMake.createPdf(this.pdfGenerateOriginal(data, fileTitle));
+        pdfDocGenerator.getBlob((blob) => {
+          this._fileDownload.writeAndOpenFile(blob, filenameB).then(data => {
+          });
+        });
+      }, 500);
+    } else {
+      setTimeout(() => {
+        let filenameB = 'CONSOLIDATED INVOICE' + "_" + this.generateFileName() + ".pdf";
+        const pdfDocGenerator = pdfMake.createPdf(this.pdfGenerateOriginalWOAnnexure(data, fileTitle));
+        pdfDocGenerator.getBlob((blob) => {
+          this._fileDownload.writeAndOpenFile(blob, filenameB).then(data => {
+          });
+        });
+      }, 500);
+    }
+  }
+
+  downloadAttachements() {
+    let filenameA = 'All Attachemnts' + "_" + this.generateFileName() + ".pdf";
+    const pdfDocGenerator2 = this.generateInvoiceTripDocumentPDF();
+    if (pdfDocGenerator2) {
+      pdfDocGenerator2.getBlob(blob2 => {
+        generateBlobfromBlobs([blob2], this.pdfBlobs).then(res => {
+          this._fileDownload.writeAndOpenFile(res, filenameA).then(data => { });
+        });
+      })
+    }
+  }
+
+
+  processPdf(data, print: Boolean = false) {
+    this.ngxService.start();
+    let fileTitleAnnexure = 'ANNEXURE'
+    let fileNameAnnexure = 'ANNEXURE'
+    if (print) {
+      pdfMake.createPdf(this.pdfGenerateOriginal(data, this.invoiceHeading)).print({}, window.frames['printPdf']);
+      pdfMake.createPdf(this.generatePDFAnnexure(data, fileTitleAnnexure)).print({}, window.frames['printPdf']);
+    } else {
+      this.createPdfDownload(data, fileTitleAnnexure, fileNameAnnexure,  this.invoiceHeading,'INVOICE')
+
+    }
+    setTimeout(() => {
+      this.ngxService.stop();
+    }, 500);
+  }
+
+  pdfGenerateView(data) {
+    const content1 = this.pdfDataGenerationV2(data, "Annexure", 'annexure')
+    const content2 = this.pdfDataGenerationV2(data, this.invoiceHeading, 'original')
+    if (data['terms_and_condition']) {
+      if (data['terms_and_condition'].content && !data['terms_and_condition'].same_page_display) {
+        const content3 = [{ fontSize: 7, stack: [{ bold: true, text: "Terms And Conditions:\n" }, { stack: htmlToPdfmake(data['terms_and_condition'].content) }], margin: [20, 20, 20, 20] }]
+        return this.pdfPageCreation([content2, content3, content1])
+      }
+    }
+
+
+    return this.pdfPageCreation([content2, content1])
+  }
+
+  generatePDFAnnexure(data, title) {
+    const content = this.pdfDataGenerationV2(data, title, 'annexure')
+    return this.pdfPageCreation([content])
+  }
+
+  pdfGenerateOriginal(data, title) {
+    const content = this.pdfDataGenerationV2(data, title, 'original')
+    if (data['terms_and_condition']) {
+      if (data['terms_and_condition'].content && !data['terms_and_condition'].same_page_display) {
+        const content2 = [{ fontSize: 7, stack: [{ bold: true, text: "Terms And Conditions:\n" }, { stack: htmlToPdfmake(data['terms_and_condition'].content) }], margin: [20, 20, 20, 20] }]
+        return this.pdfPageCreation([content, content2])
+      }
+    }
+
+    return this.pdfPageCreation([content])
+  }
+
+  pdfGenerateOriginalWOAnnexure(data, title) {
+    const content = this.pdfDataGenerationV2(data, title, 'invoice_annexure')
+    if (data['terms_and_condition']) {
+      if (data['terms_and_condition'].content && !data['terms_and_condition'].same_page_display) {
+        const content2 = [{ fontSize: 7, stack: [{ bold: true, text: "Terms And Conditions:\n" }, { stack: htmlToPdfmake(data['terms_and_condition'].content) }], margin: [20, 20, 20, 20] }]
+        return this.pdfPageCreation([content, content2])
+      }
+    }
+    return this.pdfPageCreation([content])
+  }
+
+  pdfPageCreation(contents) {
+    let pdfContent = []
+    const outerContentLength = contents.length;
+    if (contents.length == 1) {
+      pdfContent = contents
+    } else {
+      contents.forEach((element, index) => {
+        if (index + 1 != outerContentLength) {
+          element[element.length - 1]['pageBreak'] = "after"
+        }
+        element.forEach(innerElement => {
+          pdfContent.push(innerElement)
+        });
+      });
+    }
+    var dd = pdfGenerate(pdfContent, this.companyHeaderDetails, this.footerDetails)
+    return dd
+  }
+
+  generateFileName() {
+    let partyName = this.invoiceData['party']['display_name'];
+    let invoiceNumber = this.invoiceData['invoice_number'];
+    return `${partyName}_${invoiceNumber}`;
+  }
+
+  createCopySelect(i) {
+    this.createCopySeleted = i;
+  }
+
+
+  createAnnexureTripData(data, showTax: boolean = true) {
+    let GSTTYPE = 'IGST';
+    if (this.isTds) {
+      GSTTYPE = 'VAT'
+    }
+    let sectionData = [];
+    let borderAdd = [];
+    let totalColumns = 0
+    let totalCommonRow = 1
+    let qtyPosition = 3
+    let ratePosition = 3
+    let taxPosition = 5
+    let materialPosition = 2
+
+    sectionData.push([
+      { text: "Date", bold: true, border: [true, true, false, true] },
+      { text: "Vehicle No.", bold: true, border: [false, true, false, true] },
+
+      { text: "Start - End", bold: true, border: [false, true, false, true] },
+      { text: "Freight" + '(' + this.currency_symbol + ')', bold: true, border: [false, true, false, true] },
+      { text: "Charges/Deductions" + '(' + this.currency_symbol + ')', bold: true, border: [false, true, false, true] },
+      { text: "Amount" + '(' + this.currency_symbol + ')', bold: true, border: [false, true, true, true] }])
+
+    if (!(this.isMaterial && this.isFixedQty) && !this.isMaterialEmpty) {
+      qtyPosition += 1
+      taxPosition += 1
+      ratePosition += 1
+      sectionData[0].splice(materialPosition, 0, { text: "Material", bold: true, border: [false, true, false, true] })
+    }
+
+    if (!this.isFixedQty) {
+      taxPosition += 3
+      sectionData[0].splice(qtyPosition, 0, { text: "Charged QTY", bold: true, border: [false, true, false, true] })
+      sectionData[0].splice(qtyPosition, 0, { text: "QTY", bold: true, border: [false, true, false, true] })
+
+      ratePosition += 2
+      sectionData[0][ratePosition].text = "Rate" + '(' + this.currency_symbol + ')'
+      sectionData[0].splice(ratePosition + 1, 0, { text: "Shortage/Extra", bold: true, border: [false, true, false, true] })
+
+    }
+
+    if (this.isTax && showTax) {
+      if (!this.invoiceData.tax_detail.is_intrastate) {
+        sectionData[0].splice(taxPosition, 0, { text: GSTTYPE + '(' + this.currency_symbol + ')', bold: true, border: [false, true, false, true] })
+      } else {
+        sectionData[0].splice(taxPosition, 0, { text: 'CGST' + '(' + this.currency_symbol + ')', bold: true, border: [false, true, false, true] })
+        sectionData[0].splice(taxPosition, 0, { text: 'SGST' + '(' + this.currency_symbol + ')', bold: true, border: [false, true, false, true] })
+      }
+    }
+
+    totalColumns = sectionData[0].length
+
+    if (!this.isNewTPEmpty) totalCommonRow += 1
+
+    if (this.isNewAdvanceGreaterThenZero) totalCommonRow += 1
+    const equalAllotment = Math.floor(totalColumns / totalCommonRow)
+    const extraAllotment = totalColumns % totalCommonRow
+
+    for (let i = 0; i < data.length; i++) {
+      let tripData = data[i].estimate
+      const innerRow = [
+        { text: tripData['date'], border: [true, false, false, false] },
+        { text: tripData['vehicle'], border: [false, false, false, false] },
+        { text: tripData['from-to'], border: [false, false, false, false] },
+        { text: tripData['rate'], border: [false, false, false, false] },
+        { text: tripData['adjustment'], border: [false, false, false, false] },
+        { text: tripData['amount'], border: [false, false, true, false] }]
+
+      if (!(this.isMaterial && this.isFixedQty) && !this.isMaterialEmpty) {
+        innerRow.splice(materialPosition, 0, { text: tripData['material'], border: [false, false, false, false] },)
+      }
+
+      if (!this.isFixedQty) {
+        innerRow.splice(qtyPosition, 0, { text: tripData['charged_qty'], border: [false, false, false, false] })
+        innerRow.splice(qtyPosition, 0, { text: tripData['qty'], border: [false, false, false, false] })
+        innerRow.splice(ratePosition + 1, 0, { text: tripData['s_qty'], border: [false, false, false, false] },)
+      }
+
+      if (this.isTax && showTax) {
+        if (!this.invoiceData.tax_detail.is_intrastate) {
+          let taxStack=[];
+          data[i].line_item_tax.forEach(element => {
+            taxStack.push({ text:`(${element['tax_str']})\n`, border: [false, false, false, false] })
+          })
+          const igst = {
+            text:
+              [
+                { text: '' + checkEmpty(data[i], ['tax_description', 'IGST_amount'], true) +'\n' },
+                 ...taxStack
+              
+              ],
+                 border: [false, false, false, false]
+                 
+             }
+            innerRow.splice(taxPosition, 0, igst)
+         
+        } else {
+          const cgst = {
+            text:
+              [
+                { text: '' + checkEmpty(data[i], ['tax_description', 'CGST_amount'], true) }],
+                border: [false, false, false, false]
+          }
+          innerRow.splice(taxPosition, 0, cgst)
+
+          const sgst = {
+            text:
+              [
+                { text: '' + checkEmpty(data[i], ['tax_description', 'SGST_amount'], true) }],
+            border: [false, false, false, false]
+          }
+          innerRow.splice(taxPosition, 0, sgst)
+        }
+      }
+
+      sectionData.push(innerRow)
+
+      let commonRow = []
+      let nextSplice = 0
+      for (let i = 0; i < totalColumns; i++) { commonRow.push({}) }
+      if (!this.isNewTPEmpty) {
+        commonRow.splice(nextSplice, 1, {
+          text: [{ text: `Work Order No: ${data[i].work_order_no}` }],
+          colSpan: equalAllotment, bold: true, alignment: 'left'
+        })
+        nextSplice = equalAllotment
+      }
+
+
+      let charges = data[i].charges_deductions
+      let chargesSection = []
+      for (let j = 0; j < charges.length; j++) {
+        if (j + 1 % 2 == 0) this.challanLength += 2
+        chargesSection.push({ text: `${charges[j].name}: ${charges[j].amount}\n` })
+      }
+      commonRow.splice(nextSplice, 1, {
+        columns: [{ width: "40%", text: "Charges and Deductions:", bold: true },
+        { width: "60%", margin: [0, 0, 10, 0], alignment: 'right', text: chargesSection }],
+        colSpan: equalAllotment + extraAllotment
+      })
+      nextSplice += equalAllotment + extraAllotment
+
+      if (this.isNewAdvanceGreaterThenZero) {
+        if (charges.length == 0) this.challanLength += 1;
+        const advances = data[i].advances
+        let advanceSection = []
+        if (this.isFuelReceived && advances.fuel > 0) {
+          advanceSection.push({ text: `Fuel: ${advances.fuel}\n` })
+        }
+
+        if (this.isBataReceivaed && advances.batta > 0) {
+          advanceSection.push({ text: `Batta: ${advances.batta}\n` })
+        }
+
+        if (this.isMoneyReceived && advances.advance > 0) {
+          advanceSection.push({ text: `Advance: ${advances.advance}\n` })
+        }
+
+        commonRow.splice(nextSplice, 1, {
+          columns: [{ width: "40%", text: "Advances:", bold: true },
+          { width: "60%", margin: [0, 0, 10, 0], alignment: 'right', text: advanceSection }], colSpan: equalAllotment
+        })
+      }
+
+      sectionData.push(commonRow);
+      borderAdd.push(sectionData.length - 1)
+
+      let customFieldData = data[i].custom_fields_data;
+      if (customFieldData.length > 0 && customFieldData[0].length > 0) {
+        let customFieldRow = []
+        let customFieldNextSplice = 0
+        const customFieldEqualAllotment = Math.floor(totalColumns / 4)
+        const customFieldExtraAllotment = totalColumns % 4
+        let customFieldExtraAlloted = 0
+        for (let i = 0; i < totalColumns; i++) { customFieldRow.push({ text: "", border: [false, true, false, true] }) }
+
+
+        // Transporse 2D Array
+        customFieldData = customFieldData[0].map((_, colIndex) => customFieldData.map(row => row[colIndex]));
+
+        for (let i = 0; i < customFieldData.length; i++) {
+          let customFieldCol = []
+          for (let j = 0; j < customFieldData[i].length; j++) {
+            if (customFieldData[i][j] != undefined) {
+              customFieldCol.push({ text: customFieldData[i][j]['key'] + ':' + customFieldData[i][j]['value'] + '\n' })
+            }
+          }
+
+          let colSpan = customFieldEqualAllotment
+          if (customFieldExtraAlloted < customFieldExtraAllotment) {
+            colSpan += 1
+            customFieldExtraAlloted += 1
+          }
+
+          customFieldRow.splice(customFieldNextSplice, 1, {
+            columns: [{ alignment: 'left', text: customFieldCol }], colSpan: colSpan, border: [false, true, false, true]
+          })
+
+          if (customFieldData.length - 1 == i) {
+            customFieldRow[customFieldNextSplice].border = [false, true, false, true]
+          }
+          customFieldNextSplice += colSpan
+        }
+
+        customFieldRow[0].border = [true, true, false, true]
+        customFieldRow[totalColumns - 1].border = [false, true, true, true]
+        sectionData.push(customFieldRow);
+        borderAdd.push(sectionData.length - 1)
+      }
+
+    }
+
+    const oldLength = sectionData.length
+    this.challanLength += sectionData.length;
+    if (!this.addToOthers) {
+      for (let i = 0; i < 10 - this.challanLength; i++) {
+        let arr = Array(sectionData[0].length).fill({ text: "\n\n" })
+        arr[0].colSpan = sectionData[0].length
+        sectionData.push(arr)
+      }
+    }
+    const widthString = (100 / sectionData[0].length).toFixed(3);
+    const itemChallanWidths = Array(sectionData[0].length).fill(widthString + "%");
+    if (this.addToOthers) return [sectionData, borderAdd, itemChallanWidths, 10000]
+    return [sectionData, borderAdd, itemChallanWidths, oldLength]
+  }
+
+  createAnnexureLooseCargoData(data) {
+    let sectionData = [];
+    sectionData.push(
+      [
+        { text: "SO No", bold: true },
+        { text: "Vehicle No (Operator Name)", bold: true },
+        { text: "Job Date", bold: true },
+        { text: "Job Start - End Location", bold: true },
+        { text: "Type Of movement", bold: true },
+        { text: "DO / Booking No", bold: true },
+        { text: "DO / Booking Date", bold: true },
+        { text: "QTY", bold: true },
+        { text: "Rate" + '(' + this.currency_symbol + ')', bold: true },
+        { text: "Tax Applicable", bold: true },
+        { text: "Total Amount " + '(' + this.currency_symbol + ')', bold: true }
+      ])
+    if (!this.isTax) {
+      sectionData.splice(9, 0)
+    }
+    data.forEach(item => {
+      let rowData = [];
+      rowData.push({ text: item['work_order_no'] ? item['work_order_no'] : '-', bold: false })
+      rowData.push({ text: `${item['vehicle']} \n (${item['operator']})`, bold: false })
+      rowData.push({ text: item['date'] ? item['date'] : '-', bold: false })
+      rowData.push({ text: `${item['from_loc']} - ${item['to_loc']}`, bold: false })
+      rowData.push({ text: item['movement_type'], bold: false })
+      rowData.push({ text: item['movement_no'] ? item['movement_no'] : '-', bold: false })
+      rowData.push({ text: item['movement_date'] ? item['movement_date'] : '-', bold: false })
+      rowData.push({ text: item['total_units'], bold: false })
+      rowData.push({ text: item['rate'], bold: false })
+      if (this.isTax) {
+        rowData.push({ text: item['tax_str'], bold: false })
+      }
+      rowData.push({ text: item['total_amount'], bold: false })
+      sectionData.push(rowData)
+      if (item['materials'].length > 0) {
+        item['materials'].forEach(innerItem => {
+          let innerRow = [];
+          innerRow.push({
+            width: '*',
+            text: [{ text: 'Material: ', bold: true }, { text: `${innerItem['materials'] ? innerItem['materials'] : '-'}` }]
+          })
+          innerRow.push({
+            width: '*',
+            text: [{ text: 'Unit: ', bold: true }, { text: `${innerItem['unit'] ? innerItem['unit'] : '-'}` }]
+          })
+          innerRow.push({
+            width: '*',
+            text: [{ text: 'No of Items : ', bold: true }, { text: `${innerItem['no_of_items'] == null ? '-' : innerItem['no_of_items']}` }]
+
+          })
+          innerRow.push({
+            width: '*',
+            text: [{ text: 'Weight/Item : ', bold: true }, { text: `${innerItem['weight_per_item'] == null ? '-' : innerItem['weight_per_item']}` }]
+          })
+          innerRow.push({
+            width: '*',
+            text: [{ text: 'Volume/Item: ', bold: true }, { text: `${innerItem['volume'] ? innerItem['volume'] : '-'}` }]
+          })
+          innerRow.push({
+            width: '*',
+            text: [{ text: 'Total Quantity: ', bold: true }, { text: `${innerItem['total_quantity'] == null ? '-' : innerItem['total_quantity']}` }]
+          })
+          sectionData.push([{
+            colSpan: sectionData[0].length,
+            columns: innerRow,
+          }])
+        });
+
+      }
+    });
+
+
+
+
+    const widthString = (100 / sectionData[0].length).toFixed(3);
+    const widths = Array(sectionData[0].length).fill(widthString + "%");
+    return [sectionData, widths]
+  }
+
+  createTripData(data) {
+    let item_challans = []
+    let GSTTYPE = 'IGST';
+    if (this.isTds) {
+      GSTTYPE = 'VAT'
+    }
+    item_challans.push([{ text: "Job Count", bold: true }, { text: "Qty.", bold: true },
+    { text: "Unit Cost" + '(' + this.currency_symbol + ')', bold: true },
+    { text: "Final Amount" + '(' + this.currency_symbol + ')', bold: true }])
+
+    data.forEach(ele => {
+      item_challans.push([
+        { text: ele['trip_count'], bold: false }, { text: `${ele['qty']}`, bold: false },
+        { text: ele['rate'], bold: false },
+        { text: ele['final_amount'], bold: false }
+      ])
+    });
+
+    if (this.isTax) {
+      if (!this.invoiceData.tax_detail.is_intrastate) {
+        item_challans[0].splice(3, 0, { text: GSTTYPE   + '(' + this.currency_symbol + ')', bold: true })
+        data.forEach((ele, j) => {
+          item_challans[1 + j].splice(3, 0,
+            {
+              text:
+                [
+                  { text: ele['tax_str']}]
+            })
+        });
+      } else {
+        item_challans[0].splice(3, 0, { text: 'CGST' + '(' + this.currency_symbol + ')', bold: true })
+        item_challans[0].splice(3, 0, { text: 'SGST' + '(' + this.currency_symbol + ')', bold: true })
+        data.forEach((ele, j) => {
+          item_challans[1 + j].splice(3, 0,
+            {
+              text:
+                [
+                  { text: '' + checkEmpty(ele, ['tax_description', 'CGST_amount'], true) + ' ( '+checkEmpty(ele, ['tax_description', 'CGST'], true) + '% )' }]
+            })
+          item_challans[1 + j].splice(3, 0,
+            {
+              text:
+                [
+                  { text: '' + checkEmpty(ele, ['tax_description', 'SGST_amount'], true) + ' ( '+checkEmpty(ele, ['tax_description', 'SGST'], true) + '% )'}]
+            })
+        });
+      }
+    }
+
+
+    const oldLength = item_challans.length
+    this.challanLength += item_challans.length;
+    if (!this.addToOthers) {
+      for (let i = 0; i < 10 - this.challanLength; i++)
+        item_challans.push(Array(item_challans[0].length).fill({ text: "\n\n" }))
+    }
+
+    const widthString = (100 / item_challans[0].length).toFixed(3);
+    const itemChallanWidths = Array(item_challans[0].length).fill(widthString + "%");
+    if (this.addToOthers) return [item_challans, itemChallanWidths, 10000]
+    return [item_challans, itemChallanWidths, oldLength]
+  }
+
+
+  createChargesItemData(data) {
+    let chargesItem = [];
+    let rows = [];
+    rows.push({ text: 'Additional Charge', bold: true })
+    rows.push({ text: 'Unit of Measurement', bold: true })
+    rows.push({ text: 'No Of Units', bold: true })
+    rows.push({ text: 'Unit Cost' + '(' + this.currency_symbol + ')', bold: true })
+    rows.push({ text: 'Discount' + '(' + this.currency_symbol + ')', bold: true })
+    if (this.isTax) {
+      rows.push({ text: 'Tax Applicable', bold: true })
+    }
+    rows.push({ text: 'Total Amount' + '(' + this.currency_symbol + ')', bold: true })
+    chargesItem.push(rows)
+
+    data.forEach((ele, i) => {
+      let rows = [];
+      rows.push(checkEmpty(ele, ['name']))
+      rows.push(checkEmpty(ele, ['uom'], false))
+      rows.push(checkEmpty(ele, ['units'], true))
+      rows.push(checkEmpty(ele, ['rate'], true))
+      rows.push(checkEmpty(ele, ['discount'], true))
+      if (this.isTax) {
+        rows.push({ text: ele['tax_str'], bold: false })
+      }
+      rows.push(checkEmpty(ele, ['amount'], true))
+      chargesItem.push(rows)
+    });
+
+
+
+
+
+    const oldLength = chargesItem.length
+    this.challanLength += chargesItem.length;
+    for (let i = 0; i < 10 - this.challanLength; i++)
+      chargesItem.push(Array(chargesItem[0].length).fill({ text: "\n\n" }))
+
+    const widthString = (100 / chargesItem[0].length).toFixed(3);
+    const itemChallanWidths = Array(chargesItem[0].length).fill(widthString + "%");
+    return [chargesItem, itemChallanWidths, oldLength]
+  }
+
+  createChargesAnnexureItemData(data) {
+    let chargesItem = [];
+    let rows = [];
+    rows.push({ text: 'Charge Name', bold: true })
+    rows.push({ text: 'Unit of measurement', bold: true })
+    rows.push({ text: 'Units', bold: true })
+    rows.push({ text: 'Rate Per Unit' + '(' + this.currency_symbol + ')', bold: true })
+    rows.push({ text: 'Amount' + '(' + this.currency_symbol + ')', bold: true })
+    rows.push({ text: 'Discount' + '(' + this.currency_symbol + ')', bold: true })
+    if (this.isTax) {
+      rows.push({ text: 'Tax Applicable', bold: true })
+    }
+    rows.push({ text: 'Total Amount' + '(' + this.currency_symbol + ')', bold: true })
+    chargesItem.push(rows)
+
+    data.forEach((ele, i) => {
+      let rows = [];
+      rows.push(checkEmpty(ele, ['name']))
+      rows.push(checkEmpty(ele, ['uom'], false))
+      rows.push(checkEmpty(ele, ['units'], true))
+      rows.push(checkEmpty(ele, ['rate'], true))
+      rows.push(checkEmpty(ele, ['amount_before_tax'], true))
+      rows.push(checkEmpty(ele, ['discount'], true))
+      if (this.isTax) {
+        rows.push({ text: ele['tax_str'], bold: false })
+      }
+      rows.push(checkEmpty(ele, ['amount'], true))
+      chargesItem.push(rows)
+    });
+
+
+
+
+
+    const oldLength = chargesItem.length
+    this.challanLength += chargesItem.length;
+    for (let i = 0; i < 10 - this.challanLength; i++)
+      chargesItem.push(Array(chargesItem[0].length).fill({ text: "\n\n" }))
+
+    const widthString = (100 / chargesItem[0].length).toFixed(3);
+    const itemChallanWidths = Array(chargesItem[0].length).fill(widthString + "%");
+    return [chargesItem, itemChallanWidths, oldLength]
+  }
+
+  createDeductionsItemData(data) {
+    let deductionItem = [];
+    deductionItem.push([
+      { text: 'Deduction Name', bold: true },
+      { text: 'Discount' + '(' + this.currency_symbol + ')', bold: true },
+      { text: 'Total Amount' + '(' + this.currency_symbol + ')', bold: true }
+    ])
+    data.forEach((ele, i) => {
+      deductionItem.push([
+        checkEmpty(ele, ['name']),
+        checkEmpty(ele, ['discount'], true),
+        checkEmpty(ele, ['amount'], true)
+      ])
+    });
+    const oldLength = deductionItem.length
+    this.challanLength += deductionItem.length;
+    for (let i = 0; i < 10 - this.challanLength; i++)
+      deductionItem.push(Array(deductionItem[0].length).fill({ text: "\n\n" }))
+
+    const widthString = (100 / deductionItem[0].length).toFixed(3);
+    const itemChallanWidths = Array(deductionItem[0].length).fill(widthString + "%");
+    return [deductionItem, itemChallanWidths, oldLength]
+  }
+
+  createTripContainerRows(data) {
+    let otherItems = [];
+
+    otherItems.push([{ text: 'Container No', bold: true },
+    { text: 'Container Type', bold: true },
+    { text: 'Gross Weight (Tons)', bold: true },
+    { text: 'Tare Weight (Tons)', bold: true }])
+
+    data.forEach((ele, i) => {
+      otherItems.push([
+        checkEmpty(ele, ['name']), 
+        checkEmpty(ele, ['type']),
+        checkEmpty(ele, ['tare_weight'], true),
+        checkEmpty(ele, ['gross_weight'], true),
+      ]);
+    });
+
+    const oldLength = otherItems.length
+    this.challanLength += otherItems.length;
+    for (let i = 0; i < 10 - this.challanLength; i++)
+      otherItems.push(Array(otherItems[0].length).fill({ text: "\n\n" }))
+
+    const widthString = (100 / otherItems[0].length).toFixed(3);
+    const itemChallanWidths = Array(otherItems[0].length).fill(widthString + "%");
+    return [otherItems, itemChallanWidths, oldLength]
+  }
+
+  createTimeSheetData(data) {
+    let timesheetItems = [];
+    let unit='Hours'
+    if(data.length > 0){
+      unit=this.rateCardBillingList.find(ele=>ele.value==data[0].billing_unit).label
+    }
+    let rows = [];
+    rows.push({ text: 'No of Timesheets', bold: true });
+    rows.push({ text: `Billing ${unit}`, bold: true });
+    rows.push({ text: `Rate/${unit}` + '(' + this.currency_symbol + ')', bold: true });
+    rows.push({ text: `Extra ${unit}`, bold: true });
+    rows.push({ text: `Rate/${unit}` + '(' + this.currency_symbol + ')', bold: true })
+    if (this.isTax) {
+      rows.push({ text: 'Tax Applicable', bold: true })
+    }
+    rows.push({ text: 'Total Amount' + '(' + this.currency_symbol + ')', bold: true })
+    timesheetItems.push(rows);
+
+    data.forEach((ele, i) => {
+      let rows = [];
+      rows.push(checkEmpty(ele, ['no'], true));
+      rows.push(checkEmpty(ele, ['billing_hours'], true));
+      rows.push({ text: checkEmpty(ele, ['billing_rate'], true) })
+      rows.push({ text: checkEmpty(ele, ['extra_hours'], true) })
+      rows.push({ text: checkEmpty(ele, ['extra_rate'], true) })
+      if (this.isTax) {
+        rows.push({ text: checkEmpty(ele, ['tax_str'], false) })
+      }
+      rows.push({ text: checkEmpty(ele, ['amount'], true) })
+      timesheetItems.push(rows);
+    });
+    const oldLength = timesheetItems.length
+    this.challanLength += timesheetItems.length;
+    for (let i = 0; i < 10 - this.challanLength; i++)
+      timesheetItems.push(Array(timesheetItems[0].length).fill({ text: "\n\n" }))
+    const widthString = (100 / timesheetItems[0].length).toFixed(3);
+    const itemsWidth = Array(timesheetItems[0].length).fill(widthString + "%");
+    return [timesheetItems, itemsWidth, oldLength]
+  }
+
+  createWosAnnexureData(data) {
+    let timesheetItems = [];
+    let rows = [];
+    rows.push({ text: 'Sales Order No', bold: true });
+    rows.push({ text: 'Site Location', bold: true });
+    rows.push({ text: 'Site POC Name', bold: true });
+    rows.push({ text: 'Site POC No', bold: true });
+    rows.push({ text: 'Site POC Email', bold: true })
+    timesheetItems.push(rows);
+
+    data.forEach((ele, i) => {
+      let rows = [];
+      rows.push(checkEmpty(ele, ['work_order_no']));
+      rows.push(checkEmpty(ele, ['location']));
+      rows.push(checkEmpty(ele, ['contact_name']))
+      rows.push(checkEmpty(ele, ['contact_no']))
+      rows.push(checkEmpty(ele, ['contact_email']))
+      timesheetItems.push(rows);
+    });
+    const oldLength = timesheetItems.length
+    this.challanLength += timesheetItems.length;
+    for (let i = 0; i < 10 - this.challanLength; i++)
+      timesheetItems.push(Array(timesheetItems[0].length).fill({ text: "\n\n" }))
+    const widthString = (100 / timesheetItems[0].length).toFixed(3);
+    const itemsWidth = Array(timesheetItems[0].length).fill(widthString + "%");
+    return [timesheetItems, itemsWidth, oldLength]
+  }
+
+  createTimeSheetAnnexureData(data) {
+    let timesheetItems = [];
+    let rows = [];
+    let unit='Hours'
+    if(data.length > 0){
+      unit=this.rateCardBillingList.find(ele=>ele.value==data[0].billing_unit).label
+    }
+    rows.push({ text: 'Sales Order No.', bold: true });
+    rows.push({ text: 'Vehicle No' + '\n' + '(Operator Name)', bold: true });
+    rows.push({ text: 'Site Location', bold: true });
+    rows.push({ text: 'Timesheet No', bold: true });
+    rows.push({ text: 'Timesheet Start' + '\n' + 'Date & End Date', bold: true });
+    rows.push({ text: `Billing ${unit}` + '\n' + `(Rate/${unit}` + '(' + this.currency_symbol + '))', bold: true });
+    rows.push({ text: `Extra  ${unit}` + '\n' + `(Rate/${unit}` + '(' + this.currency_symbol + '))', bold: true });
+    if (this.isTax) {
+      rows.push({ text: 'Tax Applicable', bold: true })
+    }
+    rows.push({ text: 'Total Amount' + '(' + this.currency_symbol + ')', bold: true })
+    timesheetItems.push(rows);
+
+    data.forEach((ele, i) => {
+      let rows = [];
+      rows.push(checkEmpty(ele, ['work_order_no']));
+      if (ele['operator'] == "") {
+        rows.push({ text: ele['vehicle_no'] });
+      } else {
+        rows.push({ text: ele['vehicle_no'] + '\n' + `(${ele['operator']})` });
+      }
+      rows.push(ele['location']);
+      rows.push(checkEmpty(ele, ['timesheet_no']))
+      rows.push({ text: `${ele['start_date']} &` + "\n" + `${ele['end_date']}` })
+      rows.push({ text: `${ele['billing_hours']}  ${unit}` + "\n" + `(${ele['billing_rate']})` })
+      rows.push({ text: `${ele['extra_hours']}  ${unit}` + "\n" + `(${ele['extra_rate']})` })
+      if (this.isTax) {
+        rows.push(ele['tax_str'])
+      }
+      rows.push(ele['amount'])
+      timesheetItems.push(rows);
+    });
+    const oldLength = timesheetItems.length
+    this.challanLength += timesheetItems.length;
+    for (let i = 0; i < 10 - this.challanLength; i++)
+      timesheetItems.push(Array(timesheetItems[0].length).fill({ text: "\n\n" }))
+    const widthString = (100 / timesheetItems[0].length).toFixed(3);
+    const itemsWidth = Array(timesheetItems[0].length).fill(widthString + "%");
+    return [timesheetItems, itemsWidth, oldLength]
+  }
+
+  createOtherItemDataWoExtend(data) {
+    let otherItems = [];
+    let GSTTYPE = 'IGST';
+    if (this.isTds) {
+      GSTTYPE = 'VAT'
+    }
+    otherItems.push([{ text: 'Item', bold: true },
+    { text: 'Qty', bold: true },
+    { text: 'Unit Cost' + '(' + this.currency_symbol + ')', bold: true },
+    // { text: 'Amount' + '(' + this.currency_symbol + ')', bold: true },
+    { text: 'Discount' + '(' + this.currency_symbol + ')', bold: true },
+    { text: 'Total' + '(' + this.currency_symbol + ')', bold: true }])
+
+    data.forEach((ele, i) => {
+      otherItems.push([
+        checkEmpty(ele, ['item', 'name']), checkEmpty(ele, ['quantity'], true),
+        { text: checkEmpty(ele, ['unit_cost'], true) },
+        // { text:  checkEmpty(ele, ['amount'], true) },
+        { text: checkEmpty(ele, ['discount'], true) },
+        { text: checkEmpty(ele, ['total_amount'], true) }
+      ]);
+    });
+
+    if (this.isTax) {
+      if (!this.invoiceData.tax_detail.is_intrastate) {
+        otherItems[0].splice(4, 0, { text: GSTTYPE + '(' + this.currency_symbol + ')', bold: true })
+        data.forEach((ele, j) => {
+          otherItems[1 + j].splice(4, 0,
+            {
+              text:
+                [
+                  { text:ele['tax_str'] }]
+            })
+        });
+      } else {
+        otherItems[0].splice(4, 0, { text: 'CGST' + '(' + this.currency_symbol + ')', bold: true })
+        otherItems[0].splice(4, 0, { text: 'SGST' + '(' + this.currency_symbol + ')', bold: true })
+        data.forEach((ele, j) => {
+          otherItems[1 + j].splice(5, 0,
+            {
+              text:
+                [
+                  { text: '' + checkEmpty(ele, ['tax_description', 'CGST_amount'], true) }]
+            })
+          otherItems[1 + j].splice(4, 0,
+            {
+              text:
+                [
+                  { text: '' + checkEmpty(ele, ['tax_description', 'SGST_amount'], true) }]
+            })
+        });
+      }
+    }
+
+    const widthString = (100 / otherItems[0].length).toFixed(3);
+    const itemChallanWidths = Array(otherItems[0].length).fill(widthString + "%");
+    return [otherItems, itemChallanWidths]
+  }
+
+  addCalculations(data) {
+    const arr = []
+
+    arr.push(["Subtotal:", `${this.currency_symbol} ${data['subtotal']}`, true])
+    if (this.isTax) {
+      arr.push(["Tax Amount: ", `${this.currency_symbol} ${data.tax_detail.tax.total_amount}`, true])
+    }
+    if(this.isTax){
+      let taxType="GST"
+      if(this.isTds){
+        taxType="VAT"
+      }
+      data['tax_summary'].forEach(taxValues => {
+        arr.push([`(${taxValues['percent']} % ${taxType} on ${this.currency_symbol} ${taxValues['amount']} )\n`,
+        ``, false])
+      });
+     
+    }
+    if (data['adjustment_account'] && data['total_adjustment'] > 0) {
+      arr.push([`${data['adjustment_account']['name']}:`,
+      `${this.currency_symbol} ${data['total_adjustment']}`, false])
+    }
+    arr.push(["Round Off:", `${this.currency_symbol} ${data['roundoff_amount']}`, false])
+    arr.push(["Invoice Amount:", `${this.currency_symbol} ${data['total_amount']}`, true])
+    arr.push(["Total in Words:", data['due_amount_in_word'], true]);
+    for (let index = 0; index < 10; index++) {
+      arr.push(['', '', true])
+
+    }
+    arr.push(['For ' + data['company']['company_name'] + ':', '', true])
+    return arr
+  }
+
+  addCal(cals) {
+    const digitalSignature = this.addDigitalSignatureColumn();
+    let tempArr = []
+    for (let i = 0; i < cals.length; i++) {
+      tempArr.push([{ text: cals[i][0], alignment: "right", bold: cals[i][2] },
+      { text: cals[i][1], alignment: "right", bold: cals[i][2] }])
+
+    }
+    tempArr.push(digitalSignature);
+    return tempArr
+  }
+
+  pdfDataGenerationV2(data, fileTitle, type) {
+    this.challanLength = 0
+    this.addToOthers = false
+    const contactPerson = data['contact_person_name']
+    const customerName = data['party']['company_name']
+    const seqNo = data['invoice_number']
+    const companyName = data['company']['company_name']
+    const companyAddress = addressToText(data.company.address.filter((ele) => ele.address_type_index == 0)[data.company.address.length ? data.company.address.length / 2 - 1 : 0], 1, -1)
+    const companyMobileMail = `Mobile No: ${data['company']['primary_mobile_number']} | Mail: ${data['company']['email_address']}`
+    const companyGstPan = this.isTds ? 'TRN: ' + `${data['company']['gstin']}` + ' CRN: ' + `${data['company']['crn_no']}` : 'GSTIN | PAN' + `: ${data['company']['gstin']} | ${data['company']['pan']}`
+    const customerCRN = data['party']['tax_details']['crn_view']
+    const companyLogo = addImageColumn(this.company_logo)
+    const customerGstPan = data['party']['tax_details']['gstin_view'] ? data['party']['tax_details']['gstin_view'] : ''
+    const customerPos = data['place_of_supply']
+    const customerMob = data['contact_person_no'] ? data['country_code'] + " " + data['contact_person_no'] : ''
+    const customerBillingAdd = addressToText(data.party.address.filter((ele) => ele.address_type_index == 0)[0], 1, -1)
+    const customerShippingAdd = addressToText(data.party.address.filter((ele) => ele.address_type_index == 1)[0], 1, -1)
+    const customerCopyFor = fileTitle
+    const bosNumber = data['invoice_number']
+    const bosDate = data['invoice_date']
+    const empName = data['employee'] ? checkEmpty(data, ['employee', 'display_name']) : ''
+    const dueDate = data['due_date'] ? data['due_date'] : ""
+    // const isReverseCharge = data['is_transaction_under_reverse'] ? "Yes" : "No"
+    const term = checkEmpty(data, ['payment_term_meta', 'label'])
+    const accountNo = checkEmpty(data, ['bank_account', 'account_number'])
+    const accountHolder = checkEmpty(data, ['bank_account', 'account_holder_name'])
+    const ifscCode = checkEmpty(data, ['bank_account', 'ifsc_code']);
+    const swiftCode = checkEmpty(data, ['bank_account', 'swift_code']);
+    const ibanCode = checkEmpty(data, ['bank_account', 'iban_code']);
+    let termsConditionsData = { content: '', isSamePage: true };
+    const narrations = data['narrations'];
+    const arr = this.addCalculations(data);
+
+    if (data['charges'].length > 0) {
+      this.addToOthers = true;
+    }
+    const tripsAmount = this.createTripData(data['challan']['challans_v2']['challan_data'])
+    const annexureTripSectionData = this.createAnnexureTripData(data['challan']['challans_v2']['annexure'])
+    const annexureLooseCargo = this.createAnnexureLooseCargoData(data['annexure_cargo'])
+    const chargeItemRows = this.createChargesItemData(data['charges']);
+    const chargeAnnexure = this.createChargesAnnexureItemData(data['annexure_charges']);
+    const deductionItemRow = this.createDeductionsItemData(data['deductions']);
+    const deductionAnnexureItemRow = this.createDeductionsItemData(data['annexure_deductions']);
+    const timeSheetRows = this.createTimeSheetData(data['timesheets'])
+    const timeSheetAnnexureRows = this.createTimeSheetAnnexureData(data['annexure_timesheets'])
+    const wosAnnexureRows = this.createWosAnnexureData(data['wos'])
+    const tripContainerRows = this.createTripContainerRows(data['container_info'])
+    const companyNameNative = data['company']['company_native_name']
+
+    const annexureHeaderSection = {
+      width: "*",
+      table: {
+        widths: ["49.9%", "0.2%", "49.9%"],
+        body: [
+          [{
+            width: "*",
+            fontSize: 7,
+            stack: [{ text: `Customer: ${customerName}\n`, bold: true },
+            { text: `Invoice No: ${seqNo}\n` }]
+          },
+
+          { text: "", border: [false, false, false] },
+
+          {
+            width: "*",
+            alignment: 'center',
+            margin: [0, 0, 0, 0],
+            fontSize: 18,
+            bold: true,
+            text: "ANNEXURE\n"
+          }
+          ]]
+      }
+    }
+
+    const tripsContainerTable = {
+      margin: [0, 5, 0, 0],
+      width: "*",
+      headerRows: 1,
+      fontSize: 7,
+      alignment: 'center',
+      table: {
+        widths: tripContainerRows[1],
+        body: tripContainerRows[0]
+      },
+      layout: {
+        vLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 1 : 0;
+        },
+        hLineColor: function (i, node) {
+          return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
+        },
+        vLineColor: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+        },
+        paddingTop: function (i, node) { return 5 },
+        paddingBottom: function (i, node) { return 5 },
+      }
+    }
+
+    const annexureTripTable = {
+      margin: [0, 5, 0, 0],
+      width: "*",
+      headerRows: 1,
+      fontSize: 7,
+      alignment: 'center',
+      table: {
+        widths: annexureTripSectionData[2],
+        body: annexureTripSectionData[0]
+      },
+      layout: {
+
+        paddingTop: function (i, node) { return 5 },
+        paddingBottom: function (i, node) { return 5 },
+        hLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.body.length || (i <= Number(annexureTripSectionData[3]) && !this.addToOthers)) ? 1 : 0;
+        },
+        hLineStyle: function (i, node) {
+          if (i === 0 || i === node.table.body.length || (!Array(annexureTripSectionData[1]).includes(i) && !this.addToOthers)) {
+            return null;
+          }
+          return { dash: { length: 4, space: 3 } };
+        },
+        vLineStyle: function (i, node) {
+          if (i === 0 || i === node.table.widths.length) {
+            return null;
+          }
+          return { dash: { length: 4, space: 3 } };
+        },
+      }
+    }
+
+    this.companyHeaderDetails = {
+      companyLogo: companyLogo,
+      companyName: companyName,
+      companyAddress: companyAddress,
+      companyMobileMail: companyMobileMail,
+      companyGstPan: companyGstPan,
+      companyNative:companyNameNative
+
+    }
+    if (!this.isTax) {
+      this.companyHeaderDetails.companyGstPan = '';
+    }
+
+    this.footerDetails = {
+      companyName: companyName,
+      contactEmail: data['company']['email_address'],
+      contactNumber: data['company']['primary_mobile_number'],
+      companyNative:companyNameNative
+
+    }
+
+    const invoiceCopySection = {
+      text: `${customerCopyFor} \n`, fontSize: 11,
+      font:'Arial',
+      bold: true, alignment: 'center', margin: [10, 0, 10, 10]
+    }
+
+    const invoiceDetailSection = {
+      margin: [0, 5, 0, 0],
+      width: "*",
+      fontSize: 7,
+      table: {
+        widths: ["33.33%", "*", "33.33%"],
+        body: [
+          [{
+            margin: [5, 5, 5, 5],
+            border: [true, true, false, true],
+            stack: [{ text: `Invoice No: ${bosNumber}`, bold: false, margin: [0, 0, 0, 5] },
+            { text: `Invoice Date: ${bosDate}`, bold: false, margin: [0, 0, 0, 5] }]
+          },
+
+          {
+            margin: [5, 5, 5, 5],
+            border: [false, true, false, true],
+            stack: [{ text: `Terms: ${term}`, bold: false, margin: [0, 0, 0, 5] }]
+          },
+
+          {
+            margin: [5, 5, 5, 5],
+            border: [false, true, true, true],
+            stack: [
+              { text: `Due Date: ${dueDate}`, bold: false, margin: [0, 0, 0, 5] }]
+          },
+          ]
+        ]
+      }
+    }
+    if (empName) {
+      invoiceDetailSection.table.body[0][1].stack.push({ text: empName ? `Employee In Charge: ${empName}` : '', bold: false, margin: [0, 0, 0, 5] });
+    }
+    function toCapatalize(mySentence: string) {
+      if(!mySentence) return '';
+      const words = mySentence.split(" ");
+
+      for (let i = 0; i < words.length; i++) {
+        words[i] = words[i][0].toUpperCase() + words[i].slice(1).toLowerCase();
+      }
+      return words.join(" ");
+    }
+
+    if (data.customfields.length) {
+
+      if(empName){
+        data.customfields.forEach((value, index) => { 
+          if (index % 3 === 0) { invoiceDetailSection.table.body[0][2]['stack'].push({ text: `${ toCapatalize(value.label)}: ${ value.value ? value.value :'-'}`, bold: false, margin: [0, 0, 0, 5] }); } 
+          else if (index % 3 === 1) { invoiceDetailSection.table.body[0][0]['stack'].push({ text: `${toCapatalize(value.label)}: ${ value.value ? value.value :'-'}`, bold: false, margin: [0, 0, 0, 5] }); } 
+          else { invoiceDetailSection.table.body[0][1]['stack'].push({ text: `${toCapatalize(value.label)}: ${ value.value ? value.value :'-'}`, bold: false, margin: [0, 0, 0, 5] }); } });
+
+      }else{
+        data.customfields.forEach((value, index) => { 
+          if (index % 3 === 0) { invoiceDetailSection.table.body[0][1]['stack'].push({ text: `${ toCapatalize(value.label)}: ${value.value? value.value :'-'}`, bold: false, margin: [0, 0, 0, 5] }); } 
+          else if (index % 3 === 1) { invoiceDetailSection.table.body[0][2]['stack'].push({ text: `${toCapatalize(value.label)}: ${value.value? value.value :'-'}`, bold: false, margin: [0, 0, 0, 5] }); } 
+          else { invoiceDetailSection.table.body[0][0]['stack'].push({ text: `${toCapatalize(value.label)}: ${value.value? value.value :'-'}`, bold: false, margin: [0, 0, 0, 5] }); } });
+      }
+      
+    }
+
+    let firstCol = [];
+    let secondCol = [];
+    let thirdCol = [];
+    let countItems = 0
+    if (customerName) pushData({ text: `Customer: ${customerName}\n`, bold: true, margin: [0, 0, 0, 2] })
+    if (contactPerson) pushData({ text: `Point of Contact (Name): ${contactPerson}\n`, bold: false, margin: [0, 0, 0, 2] })
+    if (customerMob) pushData({ text: `Point of Contact (Mobile): ${customerMob}\n`, bold: false, margin: [0, 0, 0, 2] })
+    if (this.isTax) {
+      if (customerGstPan) pushData({ text: this.isTds ? 'TRN : ' + ` ${customerGstPan}\n` : 'GSTIN : ' + ` ${customerGstPan}\n`, margin: [0, 0, 0, 2], bold: false })
+    }
+    if (this.isPlaceOfSupply) {
+      if (customerPos) pushData({ text: `Place of Supply: ${customerPos}\n`, bold: false, margin: [0, 0, 0, 2] })
+
+    }
+    if (this.isTds) {
+      if (customerCRN) pushData({ text: `CRN: ${customerCRN ? customerCRN : ''}\n`, bold: false, margin: [0, 0, 0, 2] })
+    }
+
+    const partyDetailSection: any = {
+      margin: [0, 5, 0, 0],
+      width: "*",
+      fontSize: 7,
+      table: {
+        widths: "*",
+        body: [
+          [{
+            colSpan: 2,
+            border: [true, true, true, true],
+            margin: [0, 0, 0, 0],
+            width: "*",
+            fontSize: 7,
+            table: {
+              widths: ["33.33%", "*", "33.33%"],
+              body: [
+                [{
+                  border: [false, false, false, false],
+                  stack: firstCol
+                },
+                {
+                  border: [false, false, false, false],
+                  stack: secondCol
+                },
+
+                {
+                  border: [false, false, false, false],
+                  stack: thirdCol
+                },
+                ]
+              ]
+            }
+          }, {}
+          ],
+          [
+            {
+              text: `Billing Address: \n${customerBillingAdd}`, bold: false,
+              margin: [5, 5, 5, 5], border: [true, true, true, true]
+            },
+
+            {
+              text: `Shipping Address: \n${customerShippingAdd}`, bold: false,
+              margin: [5, 5, 5, 5], border: [true, true, true, true]
+            },
+          ]
+        ]
+      }
+    }
+    function pushData(item) {
+      if (countItems % 3 === 0) {
+        firstCol.push(item);
+      } else if (countItems % 3 === 1) {
+        secondCol.push(item);
+      } else {
+        thirdCol.push(item);
+      }
+      countItems++;
+    }
+
+
+    if (customerBillingAdd.trim() && !customerShippingAdd.trim()) {
+      partyDetailSection.table.body[1] = [
+        {
+          text: `Billing Address: \n${customerBillingAdd}`, bold: false,
+          margin: [5, 5, 5, 5], border: [true, true, false, true]
+        },
+
+        {
+          text: '', bold: false,
+          margin: [5, 5, 5, 5], border: [false, true, true, true]
+        },
+      ]
+    }
+
+    if (!customerBillingAdd.trim() && customerShippingAdd.trim()) {
+      partyDetailSection.table.body[1] = [
+        {
+          text: `Shipping Address:\n${customerShippingAdd}`, bold: false,
+          margin: [5, 5, 5, 5], border: [true, true, false, true]
+        },
+
+        {
+          text: ``, bold: false,
+          margin: [5, 5, 5, 5], border: [false, true, true, true]
+        },
+      ]
+    }
+
+    if (!customerBillingAdd.trim() && !customerShippingAdd.trim()) {
+      partyDetailSection.table.body.splice(1, 1);
+    }
+
+
+    const chargeItemTable = {
+      margin: [0, 5, 0, 0],
+      width: "*",
+      headerRows: 1,
+      fontSize: 7,
+      alignment: 'center',
+      table: {
+        widths: chargeItemRows[1],
+        body: chargeItemRows[0]
+      },
+      layout: {
+        hLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.body.length || (i <= Number(chargeItemRows[2]))) ? 1 : 0;
+        },
+        vLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 1 : 0;
+        },
+        hLineColor: function (i, node) {
+          return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
+        },
+        vLineColor: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+        },
+        paddingTop: function (i, node) { return 5 },
+        paddingBottom: function (i, node) { return 5 },
+      }
+    }
+
+    const chargeAnnexureItemTable = {
+      margin: [0, 5, 0, 0],
+      width: "*",
+      headerRows: 1,
+      fontSize: 7,
+      alignment: 'center',
+      table: {
+        widths: chargeAnnexure[1],
+        body: chargeAnnexure[0]
+      },
+      layout: {
+        hLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.body.length || (i <= Number(chargeAnnexure[2]))) ? 1 : 0;
+        },
+        vLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 1 : 0;
+        },
+        hLineColor: function (i, node) {
+          return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
+        },
+        vLineColor: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+        },
+        paddingTop: function (i, node) { return 5 },
+        paddingBottom: function (i, node) { return 5 },
+      }
+    }
+    const deductionItemTable = {
+      margin: [0, 5, 0, 0],
+      width: "*",
+      headerRows: 1,
+      fontSize: 7,
+      alignment: 'center',
+      table: {
+        widths: deductionItemRow[1],
+        body: deductionItemRow[0]
+      },
+      layout: {
+        hLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.body.length || (i <= Number(deductionItemRow[2]))) ? 1 : 0;
+        },
+        vLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 1 : 0;
+        },
+        hLineColor: function (i, node) {
+          return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
+        },
+        vLineColor: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+        },
+        paddingTop: function (i, node) { return 5 },
+        paddingBottom: function (i, node) { return 5 },
+      }
+    }
+
+    const deductionAnnextureItemTable = {
+      margin: [0, 5, 0, 0],
+      width: "*",
+      headerRows: 1,
+      fontSize: 7,
+      alignment: 'center',
+      table: {
+        widths: deductionAnnexureItemRow[1],
+        body: deductionAnnexureItemRow[0]
+      },
+      layout: {
+        hLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.body.length || (i <= Number(deductionAnnexureItemRow[2]))) ? 1 : 0;
+        },
+        vLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 1 : 0;
+        },
+        hLineColor: function (i, node) {
+          return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
+        },
+        vLineColor: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+        },
+        paddingTop: function (i, node) { return 5 },
+        paddingBottom: function (i, node) { return 5 },
+      }
+    }
+
+    const timeSheetTable = {
+      margin: [0, 5, 0, 0],
+      width: "*",
+      headerRows: 1,
+      fontSize: 7,
+      alignment: 'center',
+      table: {
+        widths: timeSheetRows[1],
+        body: timeSheetRows[0]
+      },
+      layout: {
+        hLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.body.length || (i <= Number(timeSheetRows[2]))) ? 1 : 0;
+        },
+        vLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 1 : 0;
+        },
+        hLineColor: function (i, node) {
+          return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
+        },
+        vLineColor: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+        },
+        paddingTop: function (i, node) { return 5 },
+        paddingBottom: function (i, node) { return 5 },
+      }
+    }
+
+    const timeSheetAnnexureTable = {
+      margin: [0, 5, 0, 0],
+      width: "*",
+      headerRows: 1,
+      fontSize: 7,
+      alignment: 'center',
+      table: {
+        widths: timeSheetAnnexureRows[1],
+        body: timeSheetAnnexureRows[0]
+      },
+      layout: {
+        hLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.body.length || (i <= Number(timeSheetAnnexureRows[2]))) ? 1 : 0;
+        },
+        vLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 1 : 0;
+        },
+        hLineColor: function (i, node) {
+          return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
+        },
+        vLineColor: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+        },
+        paddingTop: function (i, node) { return 5 },
+        paddingBottom: function (i, node) { return 5 },
+      }
+    }
+
+    const woAnnexureTable = {
+      margin: [0, 5, 0, 0],
+      width: "*",
+      headerRows: 1,
+      fontSize: 7,
+      alignment: 'center',
+      table: {
+        widths: wosAnnexureRows[1],
+        body: wosAnnexureRows[0]
+      },
+      layout: {
+        hLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.body.length || (i <= Number(wosAnnexureRows[2]))) ? 1 : 0;
+        },
+        vLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 1 : 0;
+        },
+        hLineColor: function (i, node) {
+          return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
+        },
+        vLineColor: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+        },
+        paddingTop: function (i, node) { return 5 },
+        paddingBottom: function (i, node) { return 5 },
+      }
+    }
+
+    const annexureLooseCargoTable = {
+      margin: [0, 5, 0, 0],
+      fontSize: 7,
+      headerRows: 1,
+      alignment: 'center',
+      table: {
+        widths: annexureLooseCargo[1],
+        body: annexureLooseCargo[0]
+      },
+      layout: {
+        hLineColor: function (i, node) {
+          return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
+        },
+        vLineColor: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+        },
+        paddingTop: function (i, node) { return 5 },
+        paddingBottom: function (i, node) { return 5 },
+      }
+    }
+
+
+    const tripsTable = {
+      margin: [0, 5, 0, 0],
+      width: "*",
+      headerRows: 1,
+      fontSize: 7,
+      alignment: 'center',
+      table: {
+        widths: tripsAmount[1],
+        body: tripsAmount[0]
+      },
+      layout: {
+        hLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.body.length || (i <= Number(tripsAmount[2]) && !this.addToOthers)) ? 1 : 0;
+        },
+        vLineWidth: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 1 : 0;
+        },
+        hLineColor: function (i, node) {
+          return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
+        },
+        vLineColor: function (i, node) {
+          return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+        },
+        paddingTop: function (i, node) { return 5 },
+        paddingBottom: function (i, node) { return 5 },
+      }
+    }
+
+    let bankDetails = [{ text: "Bank Detail:\n", fontSize: 7, bold: true, margin: [0, 0, 0, 2] },
+    { text: `Account No: ${accountNo}\n`, fontSize: 7, margin: [0, 0, 0, 2] },
+    { text: `Account Holder: ${accountHolder}\n`, fontSize: 7, margin: [0, 0, 0, 2] },
+    { text: `IBAN No: ${ibanCode}\n`, fontSize: 7, margin: [0, 0, 0, 2] }
+    ]
+
+    if (this.isTax) {
+      if (this.isTds) {
+        bankDetails.push({ text: `Swift Code: ${swiftCode}\n`, fontSize: 7, margin: [0, 0, 0, 2] })
+      } else {
+        bankDetails.push({ text: `IFSC Code: ${ifscCode}\n`, fontSize: 7, margin: [0, 0, 0, 2] });
+      }
+    } else {
+      bankDetails.push({ text: `Swift Code: ${swiftCode}\n`, fontSize: 7, margin: [0, 0, 0, 2] })
+    }
+    if (isValidValue(data['terms_and_condition'])) {
+      termsConditionsData.content = data['terms_and_condition'].content;
+      termsConditionsData.isSamePage = data['terms_and_condition'].same_page_display;
+    }
+    const bankTerms = {
+      width: "50%",
+      table: {
+        widths: ["*"],
+        body: [
+          [{
+            width: "*",
+            stack: bankDetails
+          }],
+
+          [{ text: "", border: [false, false, false] }],
+
+          [{
+            width: "*",
+            stack: [
+              { text: "Narration: ", fontSize: 7, bold: true, margin: [0, 0, 0, 2] },
+              { text: `${narrations}`, fontSize: 7, margin: [0, 0, 0, 2] },
+            ]
+          }]
+        ]
+      }
+    }
+    if (!isValidValue(data['bank_account'])) {
+      bankTerms.table.body.splice(0, 2);
+    }
+
+    if (termsConditionsData.isSamePage && termsConditionsData.content && bankTerms.table.body[2] && bankTerms.table.body[2][0]) {
+      bankTerms.table.body[2][0]['stack'].splice(0, 0, {
+        width: '*',
+        stack: [
+          { text: "Terms And Condition:\n", fontSize: 7, bold: true, margin: [0, 0, 0, 2] },
+          { fontSize: 7, stack: htmlToPdfmake(termsConditionsData.content) }]
+      })
+    }
+    if (termsConditionsData.isSamePage && termsConditionsData.content && !bankTerms.table.body[2]) {
+      bankTerms.table.body[0][0]['stack'].splice(0, 0, {
+        width: '*',
+        stack: [
+          { text: "Terms And Condition:\n", fontSize: 7, bold: true, margin: [0, 0, 0, 2] },
+          { fontSize: 7, stack: htmlToPdfmake(termsConditionsData.content) }]
+      })
+    }
+    const calculationArr = this.addCal(arr)
+    const calculations = {
+      width: "50%",
+      fontSize: 7,
+      table: {
+        widths: ["70%", "30%"],
+        body: calculationArr
+      },
+      layout: {
+        vLineWidth: function (i, node) { return 0; },
+        hLineWidth: function (i, node) { return 0; },
+        paddingTop: function (i, node) { return 2 },
+        paddingBottom: function (i, node) { return 2 },
+      }
+
+    }
+
+    const bankTermsCalTable = {
+      margin: [0, 10, 0, 0],
+      columnGap: 10,
+      columns: [
+        bankTerms,
+        calculations,
+      ]
+    }
+
+    let content = [];
+
+    if (type == 'annexure') {
+      content = [annexureHeaderSection]
+      if (data['challan']['challans_v2']['annexure'].length) content.push(annexureTripTable);
+      if (data['annexure_cargo'].length) {
+        content.push(annexureLooseCargoTable)
+      }
+      if (this.timeSheetExists) content.push(timeSheetAnnexureTable);
+      if (this.woAnnexureExists) content.push(woAnnexureTable);
+      if (this.chargeDetailAnnexureExists) content.push(chargeAnnexureItemTable);
+      if (this.deductionDetailsAnnextureExist) content.push(deductionAnnextureItemTable);
+    }
+    else if (type == 'invoice_annexure') {
+      content = [invoiceCopySection, invoiceDetailSection, partyDetailSection]
+      if (this.tripContainerDataExists) content.push(tripsContainerTable);
+      if (data['challan']['challans_v2']['annexure'].length) content.push(annexureTripTable);
+      if (data['annexure_cargo'].length) {
+        content.push(annexureLooseCargoTable)
+      }
+      if (this.timeSheetExists) content.push(timeSheetAnnexureTable);
+      if (this.woAnnexureExists) content.push(woAnnexureTable);
+      if (this.chargeDetailAnnexureExists) content.push(chargeAnnexureItemTable);
+      if (this.deductionDetailsAnnextureExist) content.push(deductionAnnextureItemTable);
+      content.push(bankTermsCalTable);
+    } else {
+      content = [invoiceCopySection, invoiceDetailSection, partyDetailSection]
+      if (this.tripContainerDataExists) content.push(tripsContainerTable);
+      if (this.tripDataExists) content.push(tripsTable);
+      if (this.timeSheetExists) content.push(timeSheetTable);
+      if (this.chargeDetailExists) content.push(chargeItemTable);
+      if (this.deductionDetailsExist) content.push(deductionItemTable);
+      content.push(bankTermsCalTable);
+    }
+    return content
+  }
+
+
+  closeDialog(e) {
+    if (e) {
+      this.isOpen = false;
+    }
+  }
+
+  downloadForEmailPdf(data, type) {
+    this._commonService.fetchCompanyLogo().subscribe((response: any) => {
+      this.company_logo = response.result.image_blob;
+      this.emailPopUps(data, type);
+    }, (err) => {
+      this.company_logo = null;
+      this.emailPopUps(data, type);
+    });
+  }
+
+  toTitleCase(str) {
+    if (str)
+      return str.replace(/\S+/g, str => str.charAt(0).toUpperCase() + str.substr(1).toLowerCase());
+  }
+
+  createEmailPdf(data, fileTitleAnnexure, fileTitle, fileName, type) {
+    let partyCompanyName = this.toTitleCase(data['party'].company_name);
+    let invoiceNumber = data.invoice_number;
+    let senderCompany = data.company.company_name;
+    let debitAmount = data.total_amount;
+    let subject = senderCompany + "| Invoice Number : " + invoiceNumber
+    let userName = this.toTitleCase(localStorage.getItem('TS_USER_NAME'))
+
+    let dataFormat = {
+      base64Code: "",
+      email: data['party']['email_address'],
+      content: "\nHi " + partyCompanyName + " ,\n\n I hope you're well! Please see attached invoice number " + invoiceNumber + " with a invoice amount of " + this.currency_symbol + " " + debitAmount + ". Don't hesitate to reach out if you have any questions.\n\nKind regards,\n\n" + userName + "\n\n" + senderCompany,
+      fileName: fileName + "_" + this.generateFileName(),
+      subject: subject, isOpen: true
+    }
+    let dataFormatAnnexure = {
+      base64Code: "",
+      content: "\nHi " + partyCompanyName + " ,\n\n I hope you're well! Please see attached invoice number " + invoiceNumber + " with a invoice amount of " + this.currency_symbol + " " + debitAmount + ". Don't hesitate to reach out if you have any questions.\n\nKind regards,\n\n" + userName + "\n\n" + senderCompany,
+      fileName: fileTitleAnnexure + "_" + this.generateFileName(),
+      subject: subject, isOpen: true
+    }
+
+    let dataFormatAttachments = {
+      base64Code: "",
+      content: "\nHi " + partyCompanyName + " ,\n\n I hope you're well! Please see documents attached to the invoice  number " + invoiceNumber + " with a invoice amount of " + this.currency_symbol + " " + debitAmount + ". Don't hesitate to reach out if you have any questions.\n\nKind regards,\n\n" + userName + "\n\n" + senderCompany,
+      fileName: 'All Attachemnts' + "_" + this.generateFileName(),
+      subject: subject, isOpen: true
+    }
+
+    let dataFormatConsolidated = {
+      base64Code: "",
+      content: "\nHi " + partyCompanyName + " ,\n\n I hope you're well! Please see documents attached to the invoice  number " + invoiceNumber + " with a invoice amount of " + this.currency_symbol + " " + debitAmount + ". Don't hesitate to reach out if you have any questions.\n\nKind regards,\n\n" + userName + "\n\n" + senderCompany,
+      fileName: 'Consolidated Invoice' + "_" + this.generateFileName(),
+      subject: subject, isOpen: true
+    }
+
+    if (type == 'invoice') {
+      setTimeout(() => {
+        pdfMake.createPdf(this.pdfGenerateOriginal(data, fileTitle)).getBase64(data => {
+          dataFormat.base64Code = data
+          this.filebyteCode.next(dataFormat);
+          this.isOpen = true;
+        })
+      }, 500);
+    }
+
+    if (type == 'invoice_annexure') {
+      setTimeout(() => {
+        pdfMake.createPdf(this.pdfGenerateOriginalWOAnnexure(data, fileTitle)).getBase64(data => {
+          dataFormatConsolidated.base64Code = data
+          this.filebyteCode.next(dataFormatConsolidated);
+          this.isOpen = true;
+        })
+      }, 500);
+    }
+
+    if (type == 'annexure') {
+      setTimeout(() => {
+        const pdfDocGenerator = pdfMake.createPdf(this.generatePDFAnnexure(data, fileTitleAnnexure));
+        pdfDocGenerator.getBlob((blob) => {
+          BlobToBase64(blob, cb => {
+            dataFormatAnnexure.base64Code = cb.split(',')[1];
+            this.filebyteCode.next(dataFormatAnnexure);
+            this.isOpen = true;
+          })
+        });
+      }, 500);
+    }
+
+    if (type == 'attachments') {
+      setTimeout(() => {
+        const pdfDocGenerator = this.generateInvoiceTripDocumentPDF();
+        if (pdfDocGenerator) {
+          pdfDocGenerator.getBlob(blob2 => {
+            generateBlobfromBlobs([blob2], this.pdfBlobs).then(res => {
+              BlobToBase64(res, cb => {
+                dataFormatAttachments.base64Code = cb.split(',')[1];
+                this.filebyteCode.next(dataFormatAttachments);
+                this.isOpen = true;
+              })
+            });
+          })
+        }
+      }, 500);
+    }
+
+    if (type == 'all') {
+      setTimeout(() => {
+        pdfMake.createPdf(this.pdfGenerateOriginal(data, fileTitle)).getBase64(data => {
+          dataFormat.base64Code = data
+          this.filebyteCode.next(dataFormat);
+          this.isOpen = true;
+        })
+      }, 50);
+
+      setTimeout(() => {
+        const pdfDocGenerator = pdfMake.createPdf(this.generatePDFAnnexure(data, fileTitleAnnexure));
+        pdfDocGenerator.getBlob((blob) => {
+          BlobToBase64(blob, cb => {
+            dataFormatAnnexure.base64Code = cb.split(',')[1];
+            this.filebyteCode.next(dataFormatAnnexure);
+            this.isOpen = true;
+          })
+        });
+      }, 100);
+
+      setTimeout(() => {
+        const pdfDocGenerator = this.generateInvoiceTripDocumentPDF();
+        if (pdfDocGenerator) {
+          pdfDocGenerator.getBlob(blob2 => {
+            generateBlobfromBlobs([blob2], this.pdfBlobs).then(res => {
+              BlobToBase64(res, cb => {
+                dataFormatAttachments.base64Code = cb.split(',')[1];
+                this.filebyteCode.next(dataFormatAttachments);
+                this.isOpen = true;
+              })
+            });
+          })
+        }
+      }, 200);
+
+      setTimeout(() => {
+        const pdfDocGenerator = pdfMake.createPdf(this.pdfGenerateOriginalWOAnnexure(data, fileTitle))
+        pdfDocGenerator.getBlob((blob) => {
+          BlobToBase64(blob, cb => {
+            dataFormatConsolidated.base64Code = cb.split(',')[1];
+            this.filebyteCode.next(dataFormatConsolidated);
+            this.isOpen = true;
+          })
+        });
+      }, 300);
+
+    }
+
+  }
+
+  emailPopUps(data, type) {
+    this.ngxService.start();   
+    let fileTitleAnnexure = 'ANNEXURE'
+    this.createEmailPdf(data, fileTitleAnnexure, this.invoiceHeading,'INVOICE', type)
+    setTimeout(() => {
+      this.ngxService.stop();
+    }, 500);
+  }
+
+  checkAdvanceValue() {
+    if (this.invoiceData.challan.challans_v1.annexure.length == 0) {
+      this.isAdvanceGreaterThenZero = false;
+    }
+    this.invoiceData.challan.challans_v1.annexure.forEach(item => {
+      if (item.advance > 0 || item.fuel > 0 || item.bata > 0) {
+        this.isAdvanceGreaterThenZero = true;
+      }
+    });
+    this.isAdvanceGreaterThenZero = this.isAdvanceGreaterThenZero &&
+      (this.isFuelReceived || this.isMoneyReceived || this.isBataReceivaed)
+  }
+
+  checkToShowNewAdvanceValue() {
+    if (this.invoiceData.challan.challans_v2.annexure.length == 0) {
+      this.isNewAdvanceGreaterThenZero = false;
+    }
+
+    this.invoiceData.challan.challans_v2.annexure.forEach(item => {
+      const advances = item.advances
+      if (advances.advance > 0 || advances.fuel > 0 || advances.bata > 0) {
+        this.isNewAdvanceGreaterThenZero = true;
+      }
+    });
+
+    this.isNewAdvanceGreaterThenZero = this.isNewAdvanceGreaterThenZero &&
+      (this.isFuelReceived || this.isMoneyReceived || this.isBataReceivaed)
+  }
+
+  downloadAll(data) {
+    this.downloadAttachements();
+    let fileTitleAnnexure = 'ANNEXURE'
+    let fileNameAnnexure = 'ANNEXURE'
+    setTimeout(() => {
+      this.createCopySeleted = 1
+      let filenameC = fileNameAnnexure + "_" + this.generateFileName() + ".pdf";
+      const pdfDocGenerator = pdfMake.createPdf(this.generatePDFAnnexure(data, fileTitleAnnexure));
+      pdfDocGenerator.getBlob((blob) => {
+        this._fileDownload.writeAndOpenFile(blob, filenameC).then(data => {
+        });
+      });
+    }, 500);
+    setTimeout(() => {
+      this.createCopySeleted = 0
+      let filenameB =  'INVOICE' + "_" + this.generateFileName() + ".pdf";
+      const pdfDocGenerator = pdfMake.createPdf(this.pdfGenerateOriginal(data,  this.invoiceHeading));
+      pdfDocGenerator.getBlob((blob) => {
+        this._fileDownload.writeAndOpenFile(blob, filenameB).then(data => {
+        });
+      });
+    }, 700);
+    setTimeout(() => {
+      this.createCopySeleted = 2
+      let filenameB = 'CONSOLIDATED INVOICE' + "_" + this.generateFileName() + ".pdf";
+      const pdfDocGenerator = pdfMake.createPdf(this.pdfGenerateOriginalWOAnnexure(data, this.invoiceHeading));
+      pdfDocGenerator.getBlob((blob) => {
+        this._fileDownload.writeAndOpenFile(blob, filenameB).then(data => {
+        });
+      });
+    }, 700);
+  }
+}

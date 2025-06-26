@@ -1,0 +1,46 @@
+<div class="add-screen-wrap">
+    <div class="right-section__header align-items-center justify-content-between ">
+        <h1 class="heading col-10">{{rateCardId?'Edit':'Add'}} Rate Card</h1>
+    </div>
+
+    <div class=" position-relative  add-edit-quotation-wrap">
+        <div class="def-color p-4 shadow-inset-top-bottom" *ngIf="vehicleCategiriesObj.hasMultipleCategories"
+        [ngClass]="{'disable':rateCardId!=''}">
+        <p class=" fw-semibold">Vehicle Category<span class="text-danger">*</span></p>
+        <div class="d-flex pt-4 gap-3 flex-wrap">
+            <div class="  veh-type" (click)="vehicleCatagoryChange('crane')"
+                [class.active]="categorySelected =='crane'"
+                *ngIf="vehicleCategiriesObj.categories.includes(1)">
+                <img src="../../../../../../../../assets/img/icons/crane-truck.svg" alt="truck image">
+
+                <p class="text-center mt-2">Crane</p>
+            </div>
+            <div class="  veh-type" (click)="vehicleCatagoryChange('awp')"
+                [class.active]="categorySelected =='awp'"
+                *ngIf="vehicleCategiriesObj.categories.includes(2)">
+                <img src="../../../../../../../../assets/img/icons/awp.svg" alt="truck image">
+
+                <p class="text-center mt-2">AWP</p>
+            </div>
+            <div class="veh-type" (click)="vehicleCatagoryChange('container')"
+            [class.active]="categorySelected =='container'"
+            *ngIf="vehicleCategiriesObj.categories.includes(3)||vehicleCategiriesObj.categories.includes(0)">
+            <img src="../../../../../../../assets/img/icons/container-black.png" alt="truck image">
+            <p class="text-center mt-2">Container</p>
+        </div> 
+        </div>
+      </div>
+    </div>
+    <ng-container *ngIf="categorySelected=='crane'">
+        <app-common-rate-card-crane-awp [rateCardId]="rateCardId" [rateCardDetails]="rateCardDetails"  [vehicleCategory]="categoryOptions[categorySelected]" ></app-common-rate-card-crane-awp>
+        </ng-container>
+     <ng-container *ngIf="categorySelected=='awp'">
+            <app-common-rate-card-crane-awp [rateCardId]="rateCardId" [rateCardDetails]="rateCardDetails" [vehicleCategory]="categoryOptions[categorySelected]"></app-common-rate-card-crane-awp>
+     </ng-container>
+     <ng-container *ngIf="categorySelected=='container'">
+        <app-common-rate-card-container [rateCardId]="rateCardId" [rateCardDetails]="rateCardDetails" [vehicleCategory]="categoryOptions[categorySelected]"> </app-common-rate-card-container>
+     </ng-container>
+</div>
+
+
+

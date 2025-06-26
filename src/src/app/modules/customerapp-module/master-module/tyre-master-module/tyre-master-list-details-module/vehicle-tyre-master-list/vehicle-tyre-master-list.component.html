@@ -1,0 +1,85 @@
+<div class="alert-msg" *ngIf="apiError">
+  <span class="icon-wrap"></span>
+  <p class="message-cont">{{ apiError }}</p>
+</div>
+<app-list-widget listTitle="Tyre Master List" [filterUrl]="filterUrl" [isFilter]="true" class="calc-height"
+[buttonData]="buttonData" [isAddButton]="true" (listWidgetData)="listWidgetData($event)">
+</app-list-widget>
+<div id="tyre-master-list" class="custom-table-container p-0 def-color "
+(scroll)="scrollEvent()">
+<table [ngClass]="{'h-100':tyreMasterData.length==0}">
+
+  <thead >
+    <tr>
+     
+            <th >Vehicle Brand</th>
+                    <th >Vehicle Model</th>
+                    <th>Total Axles</th>
+                    <th>Total Tyres</th>
+                    <th>Total Spares</th>
+                    <th class="icon-box">Layout</th>
+                    <th class="icon-box"></th>
+    </tr>
+  </thead>
+  <tbody *ngIf="tyreMasterData.length == 0">
+    <tr class="border-0">
+      <td class="bg-white" colspan="30">
+        <div class="no-list-data-wrap">
+          <figure>
+            <img src="assets/img/no-content.png" alt="">
+          </figure>
+          <h5 class="mt-3 primary-brand-text">No data found!</h5>
+        </div>
+      </td>
+    </tr>
+
+  </tbody>
+
+
+  <tbody>
+    <tr
+    *ngFor="let data of tyreMasterData">
+    <td>{{ data.vehicle_make.name }}</td>
+    <td >{{ data.vehicle_model.name }}</td>
+    <td >{{ data.axle_count }}</td>
+    <td >{{ data.tyre_count }}</td>
+    <td >{{ data.spare_count }}</td>
+    <td  class="icon-box">
+        <div class="d-flex justify-content-center align-items-center">
+        <span class="material-icons sky-blue-text cursor-pointer" (click)="openLayout(data)">
+        image
+        </span>
+    </div>
+</td>
+    
+    <td class="icon-box tabIndexActive" *ngxPermissionsOnly="[tyreMaster[1],tyreMaster[2]]" >
+        <div class="d-flex justify-content-center align-items-center"  *ngIf="data?.is_editable_deleteable">
+            <div class="position-relative">
+        <button class="p-0 material-icons more-icon justify-content-center "
+            (click)="optionsList($event, 'list_'+data.id)">more_vert</button>
+        <div class="more-actions__menu table-popup"
+            [ngClass]="{show: showOptions === 'list_'+data.id}" >
+            <button *ngxPermissionsOnly="[tyreMaster[1]]" class="more-actions__item w-100" [routerLink]="[prefixUrl+'/onboarding/vehicle/tyremaster/edit', data.id]"  ><i
+                    class="material-icons">edit</i>Edit</button>
+            <button *ngxPermissionsOnly="[tyreMaster[2]]" class="more-actions__item w-100"  (click)="popupFunction(data.id, i)"><i
+                    class="material-icons">delete</i>Delete</button>
+
+        </div>
+            </div>
+        </div>
+        
+    </td>
+</tr>
+
+
+
+    
+
+
+    
+  </tbody>
+</table>
+</div>
+ 
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>
+<app-tyre-layout-view [tyreLayout]="tyreLayout" *ngIf="tyreLayout.open"></app-tyre-layout-view>

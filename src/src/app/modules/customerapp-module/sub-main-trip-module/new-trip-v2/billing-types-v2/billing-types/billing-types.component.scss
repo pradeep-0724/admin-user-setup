@@ -1,0 +1,36 @@
+.showInvalid {
+  border: 1px solid red !important;
+}
+
+.table-wrapper.table--bd {
+  border: 0;
+}
+
+.table-wrapper th {
+  font-size: 13px;
+  color: #676A6E;
+}
+
+:host::ng-deep .bill{
+  .billing-section {
+    .table-wrapper tbody .input-wrap {
+      margin-right: 0px !important;
+    }
+
+    .table-wrapper th {
+      padding-top: 20px;
+      padding-bottom: 4px;
+    }
+
+    .table-wrapper tbody td {
+      padding-top: 4px;
+    }
+  }
+}
+
+.billing-type-tooltip {
+  position: absolute;
+  top: 20px;
+  left: 75px;
+  z-index: 2;
+}

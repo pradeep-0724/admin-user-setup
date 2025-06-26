@@ -1,0 +1,28 @@
+.col-20 {
+    max-width: 20% !important;
+}
+
+.input-wrap{
+    &.error{
+        .add-hsn{
+            border: 1px solid #eb1e4a;
+            &::placeholder{
+                color: #eb1e4a;
+            }
+        }
+    }
+}
+.disableInput{
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+.hiddenContent{
+  display: none;
+}
+// ::ng-deep{
+//     .removeLoader .ngx-overlay{
+//       display: none !important;
+//     }
+//   }

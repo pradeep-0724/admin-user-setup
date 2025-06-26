@@ -1,0 +1,14 @@
+.showInvalid {
+  border: 1px solid red !important;
+
+}
+
+::ng-deep.input-wrap.error .error-message{
+  position: relative;
+  bottom: unset;
+  padding: 8px 0;
+}
+.disabled {
+  opacity: 0.3; 
+  pointer-events: none; 
+}

@@ -1,0 +1,22 @@
+<form [formGroup]="emailForm" (submit)="sendEmailToResetPassword()">
+    <article class="login screen-height">
+    <section class="login-container">
+        <div class="login-header text-center">
+            <a class="logo-holder">
+                <img src="assets/img/trasport-simple-logo1.png" alt="logo" width="302" height="58">
+            </a>
+        </div>
+        <div class="login-body">
+            <h1 class="heading text-center">Enter your email<p class="sub-cont">and we'll send you a link to get back into your account</p></h1>
+            <h6 class="input-wrap error" *ngIf="apiError?.length>0">{{apiError}}</h6>
+            <div class="input-wrap error" [ngClass]="addErrorClass(emailForm.controls.email)">
+                <label>Email</label>
+                <input type="text" placeholder="Email" formControlName="email">
+                <app-error [controlName]="emailForm.controls.email"></app-error>
+            </div>
+            <button type="submit" class="btn btn--primary btn--login mg-bottom-30">Submit</button>
+        </div>
+    </section>
+    </article>
+</form>
+<alert-popup [inputData]="popupInputData"></alert-popup>

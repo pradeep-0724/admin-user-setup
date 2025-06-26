@@ -1,0 +1,16 @@
+<div class="row mg-top-20" [formGroup]="podForm">
+  <div class="col-md-3 input-wrap">
+    <label for="" class="input--required">PoD Received Date</label>
+    <mat-form-field>
+      <input matInput [matDatepicker]="podDate" [min]="mindate" [max]="maxdate" (focus)="podDate.open()" formControlName="pod_received_date" placeholder="DD/MM/YYYY">
+      <mat-datepicker-toggle matSuffix [for]="podDate"></mat-datepicker-toggle>
+      <mat-datepicker #podDate></mat-datepicker>
+    </mat-form-field>
+  </div>
+</div>
+
+<file-uploader (onFileUploaded)="fileUploader($event)"
+(onFileDeleted)="fileDeleted($event)" [multiple]="true"
+[accept]="'capture=camera, image/jpeg,image/x-jpg,image/png, application/pdf'"
+[showFileName]="false" [patchFileUrls]="patchFileUrls">
+</file-uploader>

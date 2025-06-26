@@ -1,0 +1,183 @@
+<div class="add-screen-wrap">
+<form [formGroup]="editBankForm" *ngIf="editBankForm">
+        <div class="right-section__header align-items-center justify-content-between ">
+            <h1 *ngIf="bankId" class="heading col-10">Edit Bank Information</h1>
+            <h1 *ngIf="!bankId" class="heading col-10">Add Bank Information </h1>
+            <button class="gb-video-play float-right"  (click)="openGothrough()">
+                <i class="bi bi-play-circle-fill"></i>
+            </button>
+            <!-- <span class="icon-wrapper"><img src="../assets/img/walkthrough.svg" alt="workflow-icon"></span> -->
+        </div>
+        <div class="form-layout shadow-inset-top-lg form-layout--pd">
+            <div class="form-layout__card bank-info active">
+                    <div *ngIf="bankId" class="info-msg mg-bottom-30">
+                            <p class="message-cont">Info: Editing balances are not allowed here. Change balance from Opening Balance Screen</p>
+                    </div>
+                <div class="alert-msg" *ngIf="apiError">
+                    <span class="icon-wrap"></span>
+                        <p class="message-cont">{{ apiError }}</p>
+                </div><br>
+              
+                <div class="form-body">
+                    <div class="row tabIndexActiveFields">
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                                <div class="input-wrap error" [ngClass]="addErrorClass(editBankForm.controls.account_holder_name)">
+                                        <label for="" class="input--required">Account Holder Name</label>
+                                <input type="text" class="no-style input--bd" placeholder="Name" formControlName="account_holder_name" (change)="setDisplayName()">
+
+                                <app-error [controlName]="editBankForm.controls.account_holder_name"></app-error>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error" [ngClass]="addErrorClass(editBankForm.controls.display_name)">
+                                    <label for="" class="input--required">Display Name</label>
+                            <input type="text" class="no-style input--bd" placeholder="Name" formControlName="display_name">
+
+                            <app-error [controlName]="editBankForm.controls.display_name"></app-error>
+                            <span *ngIf="display_name_error" class="error-reg">{{display_name_error}}</span>
+                        </div>
+                    </div>
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap" [ngClass]="addErrorClass(editBankForm.controls.bank_name)">
+                                <label for="" class="input--required">Bank</label>
+                                <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth" [selectedOption]="initialValues.bankName"
+                                    [postApiUrl]="addBankApi"
+                                    [params]="addBankParams"
+                                    (postApiResponse)="getNewBank($event)"
+                                    (addValueToList)="addNewBank($event)">
+                                        <select #customSelect formControlName="bank_name" class="no-style select--modify">
+                                            <option *ngFor="let option of bankList" value="{{ option?.id }}">
+                                                {{ option?.label }}
+                                            </option>
+                                        </select>
+                                </material-dropdown>
+                                <app-error [controlName]="editBankForm.controls.bank_name"></app-error>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                                <div class="input-wrap error" [ngClass]="addErrorClass(editBankForm.controls.account_number)">
+                                  <label for="" class="input--required">Account Number</label>
+                                  <input type="number" class="no-style input--bd" placeholder="234123455623" formControlName="account_number" onpaste="return false;">
+                                  <!-- <span *ngIf="accError" class="error-reg">{{accError}}</span> -->
+                                  <app-error [controlName]="editBankForm.controls.account_number"></app-error>
+                                </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                                <div class="input-wrap error" [ngClass]="addErrorClass(editBankForm.controls.confirm_account_number)">
+                                        <label for="" class="input--required">Re-enter Account Number</label>
+                                <input type="number" class="no-style input--bd" placeholder="234123455623" formControlName="confirm_account_number" onpaste="return false;">
+
+                                <app-error [controlName]="editBankForm.controls.confirm_account_number"></app-error>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                                <div class="input-wrap error" [ngClass]="addErrorClass(editBankForm.controls.account_type)">
+                                        <label for="" class="input--required">Account Type</label>
+                                        <material-dropdown [searchable]="true" [addable]="true" [selectedOption]="initialValues.accountType" class="dropDownWidth"
+                                        [params]="accountTypeParams" (addValueToList)="addParamsToAccountType ($event)" [postApiUrl]="accountTypePostApi"
+                                        (postApiResponse)="getNewAccountTypesTypes($event)" >
+                                            <select #customSelect formControlName="account_type" class="no-style select--modify">
+                                                <option *ngFor="let option of accountTypeList" value="{{ option?.id }}">
+                                                    {{ option?.label }}
+                                                </option>
+                                            </select>
+                                        </material-dropdown>
+                                <app-error [controlName]="editBankForm.controls.account_type"></app-error>
+                            </div>
+                        </div>
+                        <ng-container *ngIf="isTax&&!isTDS">
+                          <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error" [ngClass]="addErrorClass(editBankForm.controls.ifsc_code)">
+                                    <label for="" class="input">IFSC code</label>
+                            <input appUpperCase type="text" class="no-style input--bd" placeholder="IFSC code" formControlName="ifsc_code">
+                            <app-error [controlName]="editBankForm.controls.ifsc_code"></app-error>
+                           </div>
+                         </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="isTax&&isTDS">
+                          <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error" [ngClass]="addErrorClass(editBankForm.controls.swift_code)">
+                                    <label for="" class="input">Swift Code</label>
+                            <input appUpperCase type="text" class="no-style input--bd" placeholder="234123455623" formControlName="swift_code">
+                            <app-error [controlName]="editBankForm.controls.swift_code"></app-error>
+                            </div>
+                           </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="!isTax">
+                          <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error" [ngClass]="addErrorClass(editBankForm.controls.swift_code)">
+                                    <label for="" class="input">Swift Code</label>
+                            <input appUpperCase type="text" class="no-style input--bd" placeholder="234123455623" formControlName="swift_code">
+                            <app-error [controlName]="editBankForm.controls.swift_code"></app-error>
+                            </div>
+                           </div>
+                        </ng-container>
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error" [ngClass]="addErrorClass(editBankForm.controls.iban_code)">
+                                    <label for="" class="input">IBAN No</label>
+                            <input appUpperCase type="text" class="no-style input--bd" placeholder="IBAN No" formControlName="iban_code">
+                            <app-error [controlName]="editBankForm.controls.iban_code"></app-error>
+                        </div>
+                         </div>
+                        <div *ngIf="bankId" class="col-xl-3 col-lg-4 col-sm-6">
+                                <div class="input-wrap disabled">
+                                        <label for="" class="input">Opening Balance ({{ currency_type?.symbol}})</label>
+                                <div class="no-style input--bd">{{ bankDetails?.opening_balance }}</div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="!bankId" class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error" [ngClass]="addErrorClass(editBankForm.controls.opening_balance)" >
+                                    <label for="" class="input">Opening Balance ({{ currency_type?.symbol}})</label>
+                            <input type="number" class="no-style input--bd" placeholder="" formControlName="opening_balance"
+                            (change)="roundOffValue(editBankForm.controls.opening_balance)">
+                            <app-error [controlName]="editBankForm.controls.opening_balance"></app-error>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!bankId" class="col-xl-3 col-lg-4 col-sm-6">
+                        <div class="input-wrap error error--type-1" [ngClass]="addErrorClass(editBankForm.controls.opening_balance_date)" [class.disabled]="opening_balance_present">
+                        <label for="" class="input">Opening Balance as on</label>
+                        <mat-form-field>
+                            <input matInput [(ngModel)]="current_date" [matDatepicker]="picker1"(focus)="picker1.open()" formControlName="opening_balance_date" placeholder="DD/MM/YYYY">
+                            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                            <mat-datepicker #picker1 readOnly></mat-datepicker>
+                        </mat-form-field>
+                        <app-error [controlName]="editBankForm.controls.opening_balance_date"></app-error>
+                        </div>
+                    </div>
+
+                        <div *ngIf="bankId" class="col-xl-3 col-lg-4 col-sm-6">
+                                <div class="input-wrap disabled">
+                                        <label for="" class="input">Opening Balance as on</label>
+                                <div class="no-style input--bd">{{ bankDetails?.opening_balance_date }}</div>
+                            </div>
+                        </div>
+                        <div class="col-xl-8 col-sm-8">
+                            <div class="input-wrap">
+                                <label for="">Remarks</label>
+                                <input type="text" class="no-style input--bd" placeholder="Comments" formControlName="remarks">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+    </form>
+
+</div>
+<div class="custom-footer-bg py-2 px-4 d-flex justify-content-end">
+            
+    <button class="btn me-2 btn--sm" [routerLink]="[prefixUrl+'/onboarding/bank/list']">Cancel</button>
+
+        <button class="btn btn--primary btn--sm" type="button" (click)="submitForm(editBankForm)">{{bankId?'Update':'Save'}}</button>
+
+
+</div>
+
+    <!-- video-popup -->
+    <app-go-through  [goThroughDetais]="goThroughDetais"></app-go-through>

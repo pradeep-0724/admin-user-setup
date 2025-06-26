@@ -1,0 +1,57 @@
+div#table-height{
+    height:51vh;
+    @media only screen and (min-width: 1900px) {
+        height: 60vh;
+        }
+     }
+
+
+.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+}
+.settings-fields-class{
+
+      &tbody td{
+
+        padding:7px 5px;
+    }
+    select{
+        border: none;
+
+        font-size: 13px;
+        color: #595fab;
+        padding: 1px 0px 1px 8px;
+        border-radius: 15px;
+        background-color: rgba(89,95,171,0.1);
+        font-weight: 600;
+        text-align: left;
+    }
+    .toggle-switch .toggle-box{
+        height: 15px;
+        width:30px;
+        top: 0;
+        span{
+
+            top: 1px;
+            left: -2px;
+            width: 12px;
+            height: 12px;
+
+        }
+    }
+}
+.table-wrapper-list tbody td{
+    padding:7px 5px !important;
+
+    &:first-child{
+        padding-left:30px !important;
+    }
+}
+.border-thickness{
+    border: 3px solid #e3eaf0;
+}
+.invalid{
+  background-color: red !important;
+}

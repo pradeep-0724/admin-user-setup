@@ -1,0 +1,49 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+.create-multiple-trip {
+  background-color: $layout-bg;
+  border-radius: 8px;
+}
+
+.popup-header {
+  background-color: #F2F4F7;
+  border-radius: 8px 8px 0 0;
+  padding: 15px 20px;
+  color: $primary-brand-color;
+
+}
+
+.popup-body {
+  padding: 20px;
+  padding-bottom: 15px;
+
+}
+
+.input-wrap label {
+  font-weight: 600;
+  color: $text-color ;
+}
+
+
+.create-multiple-trip {
+  .input-wrap .input--bd {
+    padding: 8px 15px;
+    border: 1px solid $gray-400;
+    border-radius: 6px;
+    transition: border-color 200ms ease-in-out;
+    font-size: 13px;
+    &:focus {
+      border-color: $primary-brand-color;
+    }
+  }
+}
+
+.error
+{
+  .input--bd  {
+    border: 1px solid red !important;
+    &:focus {
+      border-color: red !important;
+    }
+  }
+}

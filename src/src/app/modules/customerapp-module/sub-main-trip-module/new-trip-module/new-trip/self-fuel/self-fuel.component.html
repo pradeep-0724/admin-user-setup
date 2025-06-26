@@ -1,0 +1,140 @@
+<div class="form-layout__card formResponsiveTable tabIndexActive">
+  <div action=""  [formGroup]="selfFuelForm">
+      <div>
+    <div formArrayName="self_fuel" >
+      <div *ngFor="let item of selfFuelForm['controls'].self_fuel['controls']; let i = index;" [formGroupName]="i" >
+        <div class="table-wrapper table--bd table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow mt-4">
+          <p *ngIf="!item.controls.valid_payment.value">Amount paid cannot be less than or more than the Total Amount</p>
+          <table class="table-container" >
+            <thead>
+              <tr class="desktop_th">
+                <th>Fuel quantity</th>
+                <th>fuel rate</th>
+                <th>amount</th>
+                <th>party name</th>
+                <th *ngIf="!isTripCode">payment status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="mobile-flex">
+                <td class="max-wd-120 tabIndexActive">
+                  <h5 class="th_h5_mobile"> Fuel quantity</h5>
+                  <div>
+                    <input [ngClass]="{'showInvalid':item.controls.fuel_quantity.invalid&&item.controls.fuel_quantity.touched }" positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456"  value="" formControlName="fuel_quantity"  (change)="calculateAmount(item)">
+                  </div>
+                </td>
+                <td class="max-wd-120 tabIndexActive">
+                  <h5 class="th_h5_mobile">fuel rate </h5>
+                  <div>
+                    <input [ngClass]="{'showInvalid':item.controls.fuel_rate.invalid&&item.controls.fuel_rate.touched}" positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456"  value="" formControlName="fuel_rate" (change)="calculateAmount(item)">
+                  </div>
+                </td>
+                <td class="max-wd-120 tabIndexActive">
+                  <h5 class="th_h5_mobile">amount </h5>
+                  <div>
+                    <input [ngClass]="{'showInvalid':item.controls.amount.invalid&&item.controls.amount.touched}" positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456" value="" readonly formControlName="amount">
+                  </div>
+                </td>
+                <td class="max-wd-120 tabIndexActiveFields">
+                  <h5 class="th_h5_mobile">party name </h5>
+                  <div [ngClass]="{disableInput: !item.controls.editable.value}">
+                      <material-dropdown [searchable]="true"
+                                [addErrorClass]="addErrorClass(item.controls.party_name)"
+                                [selectedOption]="initialDetails.party_name[i]"
+                                [disabled]="!item.controls.editable.value"
+                                [addable]="true"
+                                [party]="true" (addPartyPopup)="openAddPartyModal($event,i)"
+                                (addValueToList)="addValueToPartyPopup($event)"
+                                [params]="partyNamePopup">
+                        <select formControlName="party_name" #customSelect class="no-style select--modify" (change)="paymentStatus(item,i)">
+                          <option *ngFor="let option of partyListVendor" value="{{ option?.id }}">
+                            {{ option?.party_display_name }}
+                            </option>
+                        </select>
+                      </material-dropdown>
+                  </div>
+                </td>
+                <td class="max-wd-120 tabIndexActiveFields" *ngIf="!isTripCode">
+                  <h5 class="th_h5_mobile">payment status </h5>
+                  <div [ngClass]="{disableInput: item.controls.party_name.value == '' || !item.controls.editable.value || item.controls.is_driver_added.value}">
+                        <material-dropdown  [searchable]="true" [addable]="false" class="dropDownWidth"
+                        [addErrorClass]="addErrorClass(item.controls.payment_status)"
+                        [disabled]="item.controls.party_name.value == '' || !item.controls.editable.value || item.controls.is_driver_added.value"
+                        [selectedOption]="initialDetails.paymentStatus[i]">
+                                <select #customSelect formControlName="payment_status" class="no-style select--modify" (change)="paymentStatus(item,i)">
+                                        <option value="1">Unpaid</option>
+                                        <option value="3">Paid</option>
+                                </select>
+                        </material-dropdown >
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mg-top-20" *ngIf="!isTripCode">
+            <div class="row m-0 tabIndexActive mobile-flex-main">
+              <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 divtag">
+                <div class="input-wrap"  [ngClass]="{disableInput:!isPaymentStatusTrue[i]}">
+                  <label for="" class="input--required" *ngIf="isPaymentStatusTrue[i]">Payment Amount</label>
+                  <label for=""  *ngIf="!isPaymentStatusTrue[i]">Payment Amount</label>
+                  <input [ngClass]="{'showInvalid':item.controls.payment_amount.invalid&&item.controls.payment_amount.touched}" positiveThreeDigitDecimalNumber type="text" class="no-style input--bd border p-2" placeholder="123456" value="" formControlName="payment_amount" [readOnly]="true" (change)="changePaymentAmount(item)">
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 removebottomInput divtag">
+                <div  class="input-wrap"  [ngClass]="{disableInput:!isPaymentStatusTrue[i] || item.controls.is_driver_added.value}">
+                  <label for="" class="input--required" *ngIf="isPaymentStatusTrue[i]">Payment mode</label>
+                  <label for="" class=""*ngIf="!isPaymentStatusTrue[i]" >Payment mode</label>
+                  <material-dropdown [searchable]="true" [addable]="false" [disabled]="!isPaymentStatusTrue[i] || item.controls.is_driver_added.value"
+                  [addErrorClass]="addErrorClass(item.controls.payment_mode)"
+                    [selectedOption]="initialDetails?.advanceClientAccount[i]">
+                    <select #customSelect formControlName="payment_mode" class="no-style select--modify border p-2" >
+                      <option value="paid_By_Driver" *ngIf="isDriverSelected">Paid By Driver</option>
+                      <option *ngFor="let option of advanceClientAccountList" value="{{ option?.id }}">
+                        {{ option?.name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 divtag">
+                <div class="input-wrap"  [ngClass]="{disableInput:!isPaymentStatusTrue[i]}">
+                  <label for="" class=""  *ngIf="!isPaymentStatusTrue[i]">Bill No</label>
+                  <label for="" class="" class="input--required" *ngIf="isPaymentStatusTrue[i]">Bill No</label>
+                  <input [ngClass]="{'showInvalid':item.controls.bill_no.invalid&&item.controls.bill_no.touched}"  type="text" class="no-style input--bd border p-2" placeholder="123456" value="" formControlName="bill_no" [readOnly]="!isPaymentStatusTrue[i]">
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 removebottom divtag">
+                <div class="input-wrap"  [ngClass]="{disableInput:!isPaymentStatusTrue[i]}">
+                  <label for="" class=""  *ngIf="!isPaymentStatusTrue[i]">Bill Date</label>
+                  <label for="" class="" class="input--required" *ngIf="isPaymentStatusTrue[i]">Bill Date</label>
+                  <mat-form-field >
+                    <input matInput [matDatepicker]="bill_date" (focus)="bill_date.open()" [readOnly]="!isPaymentStatusTrue[i]"
+                    formControlName="bill_date" placeholder="DD/MM/YYYY" class="">
+                    <mat-datepicker-toggle matSuffix [for]="bill_date" [disabled]="!isPaymentStatusTrue[i]"></mat-datepicker-toggle>
+                    <mat-datepicker #bill_date></mat-datepicker>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+          <div *ngIf="!singleEntry" class="table-footer-actions mg-top-20 tabIndexActive">
+            <a *ngIf="item.controls.editable.value" class="clear-item" (click)="clearItem(item,i)" tabindex="0">Clear all cells</a>
+            <span>
+              <a class="remove-item" (click)="removeItem(i)"  tabindex="0"
+              *ngIf="selfFuelForm['controls'].self_fuel['controls'].length > 1 && item.controls.editable.value">Remove</a>
+              <a class="link-1" (click)="addMoreItem()"  tabindex="0">Add New</a>
+            </span>
+          </div>
+      </div>
+    </div>
+    </div>
+  </div>
+  <div class="row">
+  <div class="col-md-6"></div>
+  <div class="col-md-6">
+  </div>
+  </div>
+  </div>
+  <app-add-party-popup *ngIf="showAddPartyPopup.status" [popDetail]="showAddPartyPopup" [isVendor]="vendor" (closeModal)="closePartyPopup()"
+  (partyAdded)="addPartyToOption($event)"></app-add-party-popup>

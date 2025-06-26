@@ -1,0 +1,96 @@
+<div class="calc-height">
+  <app-list-widget (listWidgetData)="listWidgetData($event)" [subtractDays]="30" [tabSelectionList]="tabSelectionList"  [isSettings]="true" [settingsUrl]="settingsUrl"
+    [isFilter]="true"  [isDateRangeText]="true" [isDateRange]="false" [isDateDropDown]="true"  [isDropDown]="true"  [isAddButton]="true" [filterUrl]="filterUrl"
+    [buttonData]="buttonData" (settingsApplied)="settingsApplied($event)" [isExport]="true" (exportList)="exportList($event)">
+    <button class="gb-video-play float-right me-2"id="custom-button-left"  (click)="openGothrough()">
+      <i class="bi bi-play-circle-fill"></i>
+  </button>
+  </app-list-widget>
+<app-go-through  [goThroughDetais]="goThroughDetais"></app-go-through>
+
+</div>
+
+
+
+
+<div id="quotation-list" class="custom-table-container p-0 def-color quotation-list "
+ (scroll)="onScroll($event)">
+<table [ngClass]="{'h-100':quotationList.length==0}">
+
+  <thead >
+    <tr>
+      <th *ngFor="let header of quotationHeaders">
+        {{header}}
+      </th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody *ngIf="quotationList.length == 0">
+    <tr class="border-0">
+      <td class="bg-white" colspan="30">
+        <div class="no-list-data-wrap">
+          <figure>
+            <img src="assets/img/no-content.png" alt="">
+          </figure>
+          <h5 class="mt-3 primary-brand-text">No data found!</h5>
+        </div>
+      </td>
+    </tr>
+
+  </tbody>
+
+  <tbody>
+    
+
+
+    <tr *ngFor="let data of quotationList; trackBy: trackById" >
+      <ng-container *ngFor="let item of data['extras'];let i =index">
+      <td class="ws-nowrap" *ngIf="item?.name!='Quotation No' && item?.name!='Customer' && item?.name!='Quotation Status'"> {{item?.value ? item?.value : '-'}} </td>
+      <td *ngIf="item?.name=='Quotation No'">
+        <a class="custom-link"  [routerLink]="[prefixUrl+'/trip/quotation/details/',data.id]" [queryParams]="{fromlist: 'quotation'}">{{item?.value?.name}}</a>
+      </td>
+      <td *ngIf="item?.name=='Customer'" class="td-2l">
+        <div class="text-2l">
+        <a class="custom-link " target="_blank" [routerLink]="[prefixUrl+'/onboarding/party/details/client/',item?.value?.id]" >{{item?.value?.name}}</a>
+      </div>
+      </td>
+      <td *ngIf="item?.name=='Quotation Status'">
+        
+          <span class="pending-text" *ngIf="data.status==1">{{ item?.value }}</span>
+        
+        
+          <span class="accept-text" *ngIf="data.status==2">{{item?.value }}</span>
+        
+        
+          <span class="decline-text" *ngIf="data.status==3">{{item?.value }}</span>
+        
+        
+          <span class="draft-text" *ngIf="data.status==4">{{item?.value }}</span>
+        
+        
+          <span class="pending-text" *ngIf="data.status==5">{{item?.value }}</span>
+        
+        
+          <span class="decline-text" *ngIf="data.status==6">{{item?.value }}</span>
+        
+        
+          <span class="decline-text" *ngIf="data.status==7">{{item?.value }}</span>
+        
+      
+      </td>
+    </ng-container>
+
+     
+      <td *ngxPermissionsOnly="quotation[2]" class="icon-box">
+        <div class="d-flex justify-content-center align-items-center min-height-26">
+          <button *ngIf="data?.is_deletable" (click)="popupFunction(data)" class="del-btn"><i
+              class="material-icons  text-danger">delete</i></button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

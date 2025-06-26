@@ -1,0 +1,19 @@
+<form [formGroup]="tdsForm">
+
+      <span>TDS</span>
+      <div class="select-wrap dropdown">
+        <material-dropdown  [searchable]="true" [selectedOption]="tsdOption" [addable]="false" [width200]="true" [addBlank]="true"
+            class="dropDownWidth">
+            <select #customSelect formControlName="tds_type"class="no-style select--modify"  (change)="onSelectTds()">
+                <option  *ngFor="let option of tdsOptions" class="max-width-480"
+                    value="{{ option.id }}">{{ option.label }}
+                </option>
+            </select>
+        </material-dropdown>
+    </div>
+
+
+       <div class="input"> <input twoDigitDecimalNumber type="text" class="error-box" placeholder="0.00" formControlName="tds"></div>
+
+
+</form>

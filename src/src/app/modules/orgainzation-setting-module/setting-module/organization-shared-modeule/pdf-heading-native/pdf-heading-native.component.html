@@ -1,0 +1,35 @@
+<form [formGroup]="pdfHeadingForm" class="def-color">
+    <div class="modal-body p-4 ">
+      
+      <div class="row  mx-0">
+        <p class="col-lg-12 mb-4 fs-6 fw-semibold">
+          {{screenname}} 
+        </p>
+        <div class="col-md-3 col-6">
+          <div class="input-wrap error "  [ngClass]="addErrorClass(pdfHeadingForm.get('tax_head_in_eng'))">
+            <label class="input--required" for="">In English</label>
+            <input appRemoveSpaces type="text" class="no-style input--bd"formControlName="tax_head_in_eng" maxlength="60" >
+            <app-error [controlName]="pdfHeadingForm.get('tax_head_in_eng')"></app-error>
+        </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="input-wrap error "  [ngClass]="addErrorClass(pdfHeadingForm.get('tax_head_in_native'))">
+              <label class="input" for="">In Native</label>
+              <input  type="text" class="no-style input--bd"formControlName="tax_head_in_native"  >
+              <app-error [controlName]="pdfHeadingForm.get('tax_head_in_native')"></app-error>
+          </div>
+          </div>
+        <div class="col-lg-12"  *ngIf="canShowUpdateButton">
+        <button class="updateMark" (click)="upadtePdfHeading()">
+          <span class="updateText">{{updateText}}</span>
+          <span class="successTest"  [ngClass]="{'successTickmark': successMsg}"></span>
+        </button>
+      </div>
+      </div>
+      
+      
+    </div>
+    
+  </form>
+  
+  

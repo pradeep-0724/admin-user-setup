@@ -1,0 +1,166 @@
+@import "../../../../../assets/styles/helpers/variable";
+
+.material-add-btn {
+  width: 24px;
+  height: 24px;
+  background-color: $primary-brand-color;
+  border-radius: 3px;
+  color: white;
+  font-weight: 600;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  font-size: 19px;
+}
+
+.inspectionType-wraper ::ng-deep {
+  position: relative;
+
+  .multiselect-dropdown .dropdown-btn {
+    border: unset !important;
+    border-bottom: 1px solid #adadad !important;
+    border-radius: 0px !important;
+    padding: 0px 0px 10px 0px !important;
+    color: $text-color;
+    line-height: normal !important;
+
+  }
+
+  .dropdown-multiselect__caret {
+    display: none !important;
+  }
+
+  span[style*="float: right !important;"] {
+    visibility: hidden !important;
+  }
+
+}
+
+:host ::ng-deep {
+  .box-inspectionType .multiselect-dropdown .dropdown-btn {
+    border: 1px solid rgba(90, 107, 123, .5) !important;
+    border-radius: 5px !important;
+    color: $text-color !important;
+    height: 35px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding: 0px 10px 0px 10px !important;
+    display: flex !important;
+    align-items: center;
+  }
+
+}
+
+:host ::ng-deep {
+ .showInvalid.box-inspectionType .multiselect-dropdown .dropdown-btn {
+    border: 1px solid red !important;
+    border-radius: 5px !important;
+    color: $text-color !important;
+    height: 40px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding: 0px 10px 0px 10px !important;
+    display: flex !important;
+    align-items: center;
+  }
+
+}
+
+
+.box-inspectionType {
+  .inspectionType-count {
+
+    top: 12px;
+    left: 10px;
+  }
+}
+
+
+.inspectionType-wraper-width::ng-deep {
+  position: relative;
+
+  .multiselect-dropdown .dropdown-btn {
+    border: unset !important;
+    border-bottom: unset !important;
+    border-radius: 0px !important;
+    padding: unset !important;
+    width: 0px;
+    display: none !important;
+  }
+
+  .dropdown-multiselect__caret {
+    display: none !important;
+  }
+
+  .multiselect-dropdown .dropdown-list {
+    max-width: 250px !important;
+  }
+
+  span[style*="float: right !important;"] {
+    visibility: hidden !important;
+  }
+
+}
+
+.inspectionType-count {
+  position: absolute;
+  top: 5px;
+  color: $text-color;
+}
+
+.dot {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  background-color: #868687;
+  border-radius: 50%;
+  margin-right: 3px;
+}
+
+.inspectionType-name {
+  display: inline-block;
+  margin-right: 5px;
+  margin-top: 5px;
+  color: #868687;
+  font: normal normal normal 14px/19px;
+  letter-spacing: 0.28px;
+}
+
+.dot-list {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  background-color: #07c060;
+  border-radius: 50%;
+}
+
+.inspectionType-name-list {
+  display: inline-block;
+  margin-right: 5px;
+  color: #07c060;
+  font: normal normal normal 14px/19px;
+  letter-spacing: 0.28px;
+  vertical-align: middle;
+}
+
+
+.add-other-expense-popup {
+  background-color: $layout-bg;
+  border-radius: 8px;
+}
+
+.popup-header {
+  background-color: #F2F4F7;
+  border-radius: 8px 8px 0 0;
+  padding: 15px 20px;
+  color: $primary-brand-color;
+
+}
+
+.popup-body {
+  padding: 20px;
+  padding-bottom: 15px;
+
+}

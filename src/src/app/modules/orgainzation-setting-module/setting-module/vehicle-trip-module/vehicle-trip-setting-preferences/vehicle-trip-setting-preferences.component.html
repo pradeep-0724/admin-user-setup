@@ -1,0 +1,91 @@
+<app-add-prefix [key]="'trip'"> </app-add-prefix>
+<!-- <app-add-prefix [key]="'tripdeliverynote'"> </app-add-prefix> -->
+
+<form class="mt-4" *ngIf="activate_advance">
+  <!-- <h5>Advance Received</h5>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong>Fuel Advance: </strong> </span>
+      <label for="Fuel_Advance" class="d-inline-block checkbox-15"><input type="checkbox" id="Fuel_Advance" [(ngModel)]="companyAdvance.fuel_rc_op"  name="fuelactive"> <span class="h6">Active </span><div class="d-inline" [class.disabled]="true">
+        <label for="Fuel_Advance_pdf" class="d-inline-block checkbox-15 ms-3"><input type="checkbox" id="Fuel_Advance_pdf" [(ngModel)]="companyAdvance.fuel_rc_view" [readOnly]="true" name="fuelshowpdf"> <span class="h6">Show in PDF</span></label>
+      </div></label>
+    </div>
+
+  </div>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong>Cash Advance: </strong> </span>
+      <label for="Cash_Advance" class="d-inline-block checkbox-15"><input type="checkbox" id="Cash_Advance" [(ngModel)]="companyAdvance.cash_rc_op"  name="cashactive"> <span class="h6">Active </span><div class="d-inline" [class.disabled]="true">
+        <label for="Cash_Advance_pdf" class="d-inline-block checkbox-15 ms-3"><input type="checkbox" id="Cash_Advance_pdf" [(ngModel)]="companyAdvance.cash_rc_view" [readOnly]="true" name="cashshowpdf"> <span class="h6">Show in  PDF</span></label>
+      </div></label>
+    </div>
+
+  </div>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong>Driver Allowance: </strong> </span>
+      <label for="Driver_Allowance" class="d-inline-block checkbox-15"><input type="checkbox" id="Driver_Allowance" [(ngModel)]="companyAdvance.batta_op"  name="battactive"> <span class="h6">Active </span> <div class="d-inline" [class.disabled]="true">
+        <label for="Driver_Allowance_pdf" class="d-inline-block checkbox-15 ms-3"><input type="checkbox" id="Driver_Allowance_pdf" [(ngModel)]="companyAdvance.batta_view" [readOnly]="true" name="battashowpdf"> <span class="h6">Show in PDF</span></label>
+      </div></label>
+    </div>
+
+  </div>
+
+  <h5 class="mt-4">Advance Paid</h5>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong>Fuel Advance: </strong> </span>
+      <label for="Advance_Paid_fuel" class="d-inline-block checkbox-15"><input type="checkbox" id="Advance_Paid_fuel" [(ngModel)]="companyAdvance.fuel_op"  name="fuelactivePaid"> <span class="h6">Active </span><div class="d-inline" [class.disabled]="true">
+        <label for="Advance_Paid_fuel_pdf" class="d-inline-block checkbox-15 ms-3"><input type="checkbox" id="Advance_Paid_fuel_pdf" [(ngModel)]="companyAdvance.fuel_view" [readOnly]="true" name="fuelshowpdfpaid"> <span class="h6">Show in PDF</span></label>
+      </div></label>
+    </div>
+
+  </div>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong>Cash Advance: </strong> </span>
+      <label for="Advance_Paid_cash" class="d-inline-block checkbox-15"><input type="checkbox" id="Advance_Paid_cash" [(ngModel)]="companyAdvance.cash_op"  name="cashactivepaid"> <span class="h6">Active </span><div class="d-inline" [class.disabled]="true">
+        <label for="Advance_Paid_cash_pdf" class="d-inline-block checkbox-15 ms-3"><input type="checkbox" id="Advance_Paid_cash_pdf" [(ngModel)]="companyAdvance.cash_view" [readOnly]="true" name="cashshowpdfpaid"> <span class="h6">Show in  PDF</span></label>
+      </div></label>
+    </div>
+
+  </div>
+</form>
+<button type="button" *ngIf="activate_advance" class="updateMark mt-4" (click)="updateAdvances()">
+  <span class="updateText">{{updateAdvancesText}}</span>
+  <span class="successTest" [ngClass]="{'successAdvancesTickmark': successAdvancesMsg!=''}"></span>
+</button> -->
+
+<!-- <form class="mt-4">
+  <h5>Predefined Fields</h5>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong> POD Received: </strong> </span>
+      <label for="POD_Received" class="d-inline-block checkbox-15"><input type="checkbox" id="POD_Received" [(ngModel)]="podReceived"  name="podreceivedactive"> <span class="h6">Active </span></label>
+    </div>
+  </div>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong> Estimated KMS  </strong> </span>
+      <label for="Estimated_KM" class="d-inline-block checkbox-15"><input type="checkbox"  id="Estimated_KM" [(ngModel)]="estimatedKM"  name="estimatedkmactive"> <span class="h6">Active </span></label>
+    </div>
+  </div>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong> Estimated Duration  </strong> </span>
+      <label for="Estimated_Duration" class="d-inline-block checkbox-15"><input type="checkbox" id="Estimated_Duration" [(ngModel)]="estimatedDuration"  name="estimatedDurationactive"> <span class="h6">Active </span></label>
+    </div>
+  </div>
+</form>
+<button type="button"  class="updateMark mt-4" (click)="updatePreferences()">
+  <span class="updateText">{{updatePreferencesText}}</span>
+  <span class="successTest" [ngClass]="{'successAdvancesTickmark': successPreferencesMsg}"></span>
+</button>
+<div *ngIf="isTax">
+  <app-add-prefix [key]="'builty'" *ngIf="!isEnabledBiltySet"> </app-add-prefix>
+  <app-add-bilty-set (isEnabledBiltySet)="enabledBiltySet($event)"></app-add-bilty-set>
+  <app-add-prefix [key]="'ms'"> </app-add-prefix>
+</div> -->
+
+
+

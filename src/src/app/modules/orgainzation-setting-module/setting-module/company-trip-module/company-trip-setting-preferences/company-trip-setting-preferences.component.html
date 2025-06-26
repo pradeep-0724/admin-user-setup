@@ -1,0 +1,32 @@
+
+<form class="mt-4" *ngIf="activate_advance">
+  <h5>Advances Received</h5>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong>Fuel Advance: </strong> </span>
+      <label for="Fuel_Advance" class="d-inline-block checkbox-15"><input type="checkbox" id="Fuel_Advance" [(ngModel)]="companyAdvance.fuel_op" (change)="companyAdvance.fuel_view=companyAdvance.fuel_op" name="fuelactive"> <span class="h6"> Active </span><div class="d-inline" [class.disabled]="!companyAdvance.fuel_op">
+        <label for="Fuel_Advance_pdf" class="d-inline-block checkbox-15 ms-3"><input type="checkbox" id="Fuel_Advance_pdf" [(ngModel)]="companyAdvance.fuel_view" [readOnly]="!companyAdvance.fuel_op" name="fuelshowpdf"> <span class="h6">Show in PDF</span></label>
+      </div></label>
+    </div>
+
+  </div>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong>Cash Advance: </strong> </span>
+      <label for="Cash_Advance" class="d-inline-block checkbox-15"><input type="checkbox" id="Cash_Advance" [(ngModel)]="companyAdvance.cash_op" (change)="companyAdvance.cash_view=companyAdvance.cash_op" name="cashactive"> <span class="h6"> Active </span><div class="d-inline" [class.disabled]="!companyAdvance.cash_op">
+        <label for="Cash_Advance_pdf" class="d-inline-block checkbox-15 ms-3"><input type="checkbox" id="Cash_Advance_pdf"  [(ngModel)]="companyAdvance.cash_view" [readOnly]="!companyAdvance.cash_op" name="cashshowpdf"> <span>Show in  PDF</span></label>
+      </div></label>
+    </div>
+
+  </div>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong>Driver Advance: </strong> </span>
+      <label for="Driver_Advance" class="d-inline-block checkbox-15"><input type="checkbox" id="Driver_Advance" [(ngModel)]="companyAdvance.batta_op" (change)="companyAdvance.batta_view=companyAdvance.batta_op" name="battactive"> <span class="h6"> Active </span><div class="d-inline" [class.disabled]="!companyAdvance.batta_op">
+        <label for="Driver_Advance_pdf" class="d-inline-block checkbox-15 ms-3"><input type="checkbox" id="Driver_Advance_pdf" [(ngModel)]="companyAdvance.batta_view" [readOnly]="!companyAdvance.batta_op" name="battashowpdf"> <span class="h6">Show in PDF</span></label>
+      </div></label>
+    </div>
+
+  </div>
+</form>
+<button type="button" *ngIf="activate_advance" class="btn btn-primary mt-4" (click)="updateAdvances()">Update Advances</button>

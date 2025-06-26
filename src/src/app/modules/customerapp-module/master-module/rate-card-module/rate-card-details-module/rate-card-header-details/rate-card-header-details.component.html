@@ -1,0 +1,130 @@
+<div class="right-section__header ps-2">
+    <div class="d-flex align-items-center justify-content-between w-100">
+        <div class="d-flex align-items-center">
+        <p class="quotation-id me-2" (click)="historyBack()"><button><i
+                    class="bi bi-chevron-left"></i></button></p>
+                    <p class="quotation-id">{{rateCardHeaderDetails?.name}}</p>
+                    <div class="veh-category-chip {{(rateCardHeaderDetails?.vehicle_category_label).toLowerCase()}}" >
+                        {{rateCardHeaderDetails?.vehicle_category_label}}
+                      </div>
+                </div>
+
+    <div class="d-flex flex-wrap align-items-center">
+            <button class="gb-edit-btn-secondary me-2" *ngxPermissionsOnly="[rateCardPermission[1]]" [routerLink]="[prefixUrl+'/onboarding/rate-card/edit/',rateCardHeaderDetails?.id]"><span  class="material-icons"> create </span>Edit</button>
+            
+                <button (click)="buildPdf()" class="gb-edit-btn-secondary export-btn">Export</button>
+            
+    </div>
+</div>
+</div>
+
+<div class="shadow-inset-top  py-4 pt-3 px-4  def-color">
+    <div class="d-flex">
+        <p class="mb-2 mt-2 me-3"><b>Date : </b>{{rateCardHeaderDetails?.date}}</p>
+        <p class="mb-2 mt-2 me-3"><b>Billing Unit : </b>{{billingUnit}}</p>
+    </div>
+    <div  class="d-flex align-items-center mb-3"><p class=" ws-nowrap fw-semibold ">Rental Charge</p><hr  class="w-100 ms-4"></div>
+    <div class="addable-row-table">
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2" class="text-center">
+                        <mat-checkbox color="primary" (change)="parentRateCardChecked($event.checked)"    [checked]="parentBoxChecked"></mat-checkbox>
+                    </th>
+                    <th rowspan="2" >
+                        Zone
+                    </th>
+                    <th rowspan="2" >
+                        SPECIFICATION
+                    </th>
+                    <th colspan="3" class="text-center">
+                        <mat-checkbox color="primary" (change)="selectAllDaily($event.checked)"  [checked]="daily.isSelected"></mat-checkbox>
+                        {{rateCardTableLabel.daily}}
+                    </th>
+                    <th colspan="3" class="text-center">
+                        <mat-checkbox color="primary"  (change)="selectAllWeekly($event.checked)" [checked]="weekly.isSelected"></mat-checkbox>
+                        {{rateCardTableLabel.weekly}}
+                        
+                        </th>
+                    <th colspan="3" class="text-center">
+                        <mat-checkbox color="primary" (change)="selectAllMonthly($event.checked)"  [checked]="monthly.isSelected"></mat-checkbox>
+                        {{rateCardTableLabel.monthly}}
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <mat-checkbox color="primary" (change)="dailySelection($event.checked,'withFuel')"  [checked]="daily.withFuel"></mat-checkbox>
+                        WITH FUEL</th>
+                    <th>
+                        <mat-checkbox color="primary" (change)="dailySelection($event.checked,'withoutFuel')"  [checked]="daily.withoutFuel"></mat-checkbox>
+                        WITHOUT FUEL</th>
+                    <th>
+                        <mat-checkbox color="primary"  (change)="dailySelection($event.checked,'additionalHours')"  [checked]="daily.additionalHours"></mat-checkbox>
+                        EXTRA 
+                        <ng-container *ngIf="rateCardHeaderDetails?.billing_unit=='hour'">
+                            HOURS
+                        </ng-container>
+                        <ng-container *ngIf="rateCardHeaderDetails?.billing_unit=='day'">
+                            DAYS
+                        </ng-container>
+                    </th>
+                    <th>
+                        <mat-checkbox color="primary"  (change)="weeklySelection($event.checked,'withFuel')"  [checked]="weekly.withFuel"></mat-checkbox>
+                        WITH FUEL</th>
+                    <th>
+                        <mat-checkbox color="primary" (change)="weeklySelection($event.checked,'withoutFuel')"   [checked]="weekly.withoutFuel"></mat-checkbox>
+                        WITHOUT FUEL</th>
+                    <th>
+                        <mat-checkbox color="primary"  (change)="weeklySelection($event.checked,'additionalHours')"  [checked]="weekly.additionalHours"></mat-checkbox>
+                        EXTRA
+                        <ng-container *ngIf="rateCardHeaderDetails?.billing_unit=='hour'">
+                            HOURS
+                        </ng-container>
+                        <ng-container *ngIf="rateCardHeaderDetails?.billing_unit=='day'">
+                            DAYS
+                        </ng-container>
+                        
+                    </th>
+                    <th>
+                        <mat-checkbox color="primary"  (change)="monthlySelection($event.checked,'withFuel')"  [checked]="monthly.withFuel"></mat-checkbox>
+                        WITH FUEL</th>
+                    <th>
+                        <mat-checkbox color="primary" (change)="monthlySelection($event.checked,'withoutFuel')"   [checked]="monthly.withoutFuel"></mat-checkbox>
+                        WITHOUT FUEL</th>
+                    <th>
+                        <mat-checkbox color="primary" (change)="monthlySelection($event.checked,'additionalHours')" [checked]="monthly.additionalHours"></mat-checkbox>
+                        EXTRA 
+                        <ng-container *ngIf="rateCardHeaderDetails?.billing_unit=='hour'">
+                            HOURS
+                        </ng-container>
+                        <ng-container *ngIf="rateCardHeaderDetails?.billing_unit=='day'">
+                            DAYS
+                        </ng-container>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let rateCard of rateCardList; let i = index;">
+                    <td class="text-center">
+                        <mat-checkbox color="primary"  (change)="rateCardChecked($event.checked,i)"   [checked]="rateCard.is_checked"></mat-checkbox>
+                    </td>
+                    <td>{{rateCard?.zone?.name}}</td>
+                    <td>{{rateCard?.specification?.name}}</td>
+
+                    <td>{{rateCard?.daily?.with_fuel| numberFormat}}</td>
+                    <td>{{rateCard?.daily?.without_fuel| numberFormat}}</td>
+                    <td>{{rateCard?.daily?.additional_hours | numberFormat}}</td>
+
+                    <td>{{rateCard?.weekly?.with_fuel | numberFormat}}</td>
+                    <td>{{rateCard?.weekly?.without_fuel | numberFormat}}</td>
+                    <td>{{rateCard?.weekly?.additional_hours | numberFormat}}</td>
+
+                    <td>{{rateCard?.monthly?.with_fuel | numberFormat}}</td>
+                    <td>{{rateCard?.monthly?.without_fuel | numberFormat}}</td>
+                    <td>{{rateCard?.monthly?.additional_hours | numberFormat}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+

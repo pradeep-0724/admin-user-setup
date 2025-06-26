@@ -1,0 +1,81 @@
+<form [formGroup]="othersForm">
+  <div >
+    <div class="px-4">
+      <div class="row tabIndexActiveFields mx-0">
+        <div class="col-xl-3 col-lg-3 col-md-3 col-6 route-input-box" [ngClass]="{'disabled': officeStatus>0}">
+          <div class="input-wrap error dropdownArrow" [ngClass]="addErrorClass(othersForm.controls.route_code)">
+            <label for="" class="input">Route</label>
+            <app-tool-tip class="tool-tip-position route-tool-tip-position" [totalSlides]="routeToolTip.content.length"
+              position="right" [toolTipContent]="routeToolTip"></app-tool-tip>
+            <material-dropdown [searchable]="true" [disabled]="officeStatus>0" [addable]="false" [selectedOption]="initialDetails.route_code">
+              <select #customSelect formControlName="route_code" class="no-style select--modify"
+                (change)="routeSelected()">
+                <option *ngFor="let option of routeCodeList" value="{{ option?.name }}">
+                  {{ option?.name }}
+                </option>
+              </select>
+            </material-dropdown>
+            <app-error [controlName]="othersForm.controls.route_code"></app-error>
+          </div>
+        </div>
+      </div>
+    </div>
+    <app-multiple-destination [canDisplayShowInInvoice]="parentForm.get('vehicle_category').value==0 ? true: false" [disabledIndex]="officeStatus" (dateTimeChanged)="dateTimeChanged($event)" (locationSelectedEmitter)="locationSelected($event)" [ismultipleDestinationFormValid]="ismultipleDestinationFormValid" [parentForm]="othersForm" [contactPersonList]="contactPersonList"
+      [ismultipleDestinationFormValid]="ismultipleDestinationFormValid" [routeId]="routeId"
+      [routeDestinations]="routeDestinations" [isNameRequired]="parentForm.get('vehicle_category').value !=10" [customerId]="customerId" [routeId]="routeId"></app-multiple-destination>
+    <div class="cdc-tab-wrapper">
+      <app-tool-tip class="custom-field-tooltip" [totalSlides]="customFieldToolTip.content.length" position="right"
+        [toolTipContent]="customFieldToolTip"></app-tool-tip>
+      <mat-tab-group mat-stretch-tabs="false" class="mat-group" animationDuration="0ms" mat-align-tabs="start">
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span [ngClass]="{ taberror:isClientFieldTabError }">{{parentForm.get('vehicle_category').value =='10' ? 'Material Info' : 'Customer Freight'}}</span>
+          </ng-template>
+          <app-billing-types  *ngIf="parentForm.get('vehicle_category').value ==0"  [showUnitsAndRateFields]="false" [billingTypeList]="billingTypeList" [parentForm]="othersForm" formType="client_freights"
+            [isDisableBillingTypes]="isDisableBillingTypes" [workOrderClientFrightData]="workOrderClientFrightData"
+            [isMandatory]="false" [isFormValid]="isFormValidclientFright"></app-billing-types>
+          <app-add-edit-material-info-section  [editDetails]="materialFreightEditDetails"
+            [parentForm]="othersForm"  [isSubFormValid]="isFormValidclientFright"></app-add-edit-material-info-section>
+
+        </mat-tab>
+        <mat-tab *ngIf="parentForm.get('is_transporter').value">
+          <ng-template mat-tab-label>
+            <span [ngClass]="{ taberror:isVendorFieldTabError }">Market Vehicle Cost</span>
+          </ng-template>
+          <app-billing-types [showUnitsAndRateFields]="false" [billingTypeList]="billingTypeList" [parentForm]="othersForm" [workOrderClientFrightData]="workOrderVehicleFrightData" formType="vehicle_freights" [isMandatory]="false"
+            [isFormValid]="isFormValidvehicleFreight"></app-billing-types>
+        </mat-tab>
+
+        <mat-tab *ngIf="!parentForm.get('is_transporter').value">
+          <ng-template mat-tab-label>
+            <span [ngClass]="{ taberror: isDriverAllowanceTabError }">Driver Commission</span>
+          </ng-template>
+          <app-driver-allowance-v2 [isPaidByDriver]="isPaidByDriver" [driverId]="driverId" [driverAllowanceEdit]="driverAllowanceEdit" [parentForm]="othersForm"
+            [isFormValid]="isFormValidDriverAllowanceField"></app-driver-allowance-v2>
+        </mat-tab>
+
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span [ngClass]="{ taberror: iscustomFieldTabError }">Custom Field</span>
+
+          </ng-template>
+          <app-custom-field [parentForm]="othersForm" [editData]="customFieldData" [isFormValid]="isFormValidCustomField"></app-custom-field>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span>Job Documents</span>
+
+          </ng-template>
+          <div class="d-flex p-4 gap-3 flex-wrap">
+          <file-uploader-v2 (onFileUploaded)="fileUploader($event)" fileName="Document Unknown" [uploaderId]="'1234'"
+            [isShowOnlyUpload]="false"></file-uploader-v2>
+          <app-file-delete-view [showInlineEdit]="true" [editedFileName]="editedFileName" [fileData]="document"
+            *ngFor="let document of  othersForm.get('documents').value"
+            (fileDeleted)="fileDeleted($event)"></app-file-delete-view>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+  </div>
+</form>

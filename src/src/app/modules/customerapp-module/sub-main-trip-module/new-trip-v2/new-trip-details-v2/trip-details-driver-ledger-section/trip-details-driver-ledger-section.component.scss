@@ -1,0 +1,54 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+.driver-ledger-wrap {
+    background-color: $layout-bg;
+}
+
+.border-bb {
+    border-bottom: 2px solid $gray-400;
+}
+
+.add-money {
+    border: 2px solid #2BB741;
+    padding: 8px 12px;
+    color: #2BB741;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 400ms ease-in-out;
+
+    &:hover {
+
+        transform: scale(1.04);
+
+    }
+
+    .bi {
+        margin-right: 10px;
+        font-weight: bold;
+
+    }
+}
+
+th,
+td {
+    color: $text-color;
+}
+
+.label {
+    font-weight: 600;
+    color: #676A6E;
+    font-size: 15px;
+}
+
+.green {
+    color: #2BB741;
+}
+
+.blue {
+    color: #4CACFE;
+}
+
+.dark {
+    color: #CE0411;
+}

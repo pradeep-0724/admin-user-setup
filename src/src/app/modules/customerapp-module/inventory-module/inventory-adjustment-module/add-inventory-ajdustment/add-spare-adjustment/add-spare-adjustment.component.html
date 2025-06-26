@@ -1,0 +1,111 @@
+
+<form [formGroup]="addSpareForm" style="width: 100%;">
+  <div class="form-layout__card mg-top-30" style="margin-left: 14px;
+  margin-right: 14px;">
+    <div
+        class="table-wrapper table-wrapper--type1 table-wrapper--type2  table--bd table--nobg dropDownOverflow">
+        <table class="table-container table-item">
+            <thead>
+                <tr>
+                    <th width=40%>Item Name</th>
+                    <th width=10%>QTY Available</th>
+                    <th width=10%>new quantity</th>
+                    <th width=10%>adjustment</th>
+                    <th width=10%>Rate ({{ currency_type?.symbol}})</th>
+                    <th width=10%>Total ({{ currency_type?.symbol}})</th>
+                    <th width=10%></th>
+                </tr>
+            </thead>
+            <tbody formArrayName="new_spares">
+              <ng-container *ngFor="let otherItem of addSpareForm.controls.new_spares['controls']; let i = index;" [formGroupName]="i">
+                <tr>
+                        <td>
+                            <div class="select-wrap">
+                              <material-dropdown [addable]="true" class="dropDownWidth" [item]="true"  [addErrorClass]="addErrorClass(otherItem.controls.item_name)"
+                              class="dropDownWidth" (addItemPopup)="openAddExpenseItemModal($event, i)"
+                              (addValueToList)="addParamsToNewSpareItem($event)"
+                              [params]="newSparesItemParams" [selectedOption]="otherItem.controls.item_name_option.value">
+                                    <select #customSelect formControlName="item_name"
+                                        class="no-style select--modify"  (change)="onMaterialSelected(otherItem,i)">
+                                        <option *ngFor="let option of materialList"
+                                            value="{{ option.id }}">
+                                            {{ option.name }}
+                                        </option>
+                                    </select>
+                                </material-dropdown>
+                            </div>
+                        </td>
+
+                        <td>
+                          <div class="input-wrap" [ngClass]="addErrorClass(otherItem.controls.quantity)">
+                            <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="quantity" (change)="onQuantityChange(i)">
+                          </div>
+                        </td>
+
+                        <td class="w-150">
+                          <div class="w-initial">
+                                <input positiveThreeDigitDecimalNumber type="text" placeholder="Eg.: 1234567"
+                                formControlName="newquantity"  (change)="onQuantityChange(i)">
+                          </div>
+                        </td>
+
+                         <td>
+                           <div class="input-wrap" [ngClass]="addErrorClass(otherItem.controls.adjustment)">
+                              <input threeDigitDecimalNumber type="text" placeholder="1000"  class="error-box"
+                              formControlName="adjustment" (change)="onAdjustmentChange(i)">
+                           </div>
+                        </td>
+
+                        <td>
+                          <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="rate" (change)="calculateItemAmount(i)"
+                          [readonly]="otherItem.controls.adjustment_negative.value">
+                        </td>
+
+                        <td>
+                            <div class="input-wrap">
+                              <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="1000"
+                                  formControlName="total" readonly>
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                              <span class="material-icons drop-down " (click)="otherItem.controls.additionalDetails.setValue(!otherItem.controls.additionalDetails.value) "
+                              *ngIf="!otherItem.controls.additionalDetails.value ">arrow_drop_down</span>
+                              <span class="material-icons drop-down " (click)="otherItem.controls.additionalDetails.setValue(!otherItem.controls.additionalDetails.value) "
+                              *ngIf="otherItem.controls.additionalDetails.value ">arrow_drop_up</span>
+                            <span class="material-icons delete"
+                            (click)="removeItem(i)" *ngIf="addSpareForm.controls.new_spares[ 'length'] !==1">add_circle_outline</span>
+                            <span class="material-icons add" *ngIf="addSpareForm.controls.new_spares['controls'].length -1== i"
+                            (click)="addMoreOtherItem()">add_circle_outline</span>
+                        </td>
+                    </tr>
+                    <tr class="border-top-0" *ngIf="otherItem.controls.additionalDetails.value">
+                      <td colspan="4" class="fs-12 pt-0">
+                          <input type="text" placeholder="Description" formControlName="note">
+                      </td>
+                      <td class="fs-12  pe-2">
+                          <span class="table-footer-actions"><a class="clear-item" (click)="clearData(i)">Clear</a></span>
+                      </td>
+                  </tr>
+                  <tr class="border-top-0">
+                    <td class="fs-12 pt-0 table-footer-actions input-wrap error" [ngClass]="addErrorClass(otherItem.controls.hsn_code)">
+                      <p  >HSN Code:
+                         <span class="clear-item" style="cursor: pointer;" *ngIf="!otherItem.controls.isChangeHsn.value" (click)="otherItem.controls.isChangeHsn.setValue(!otherItem.controls.isChangeHsn.value)">  {{otherItem.controls.hsn_code.value}} change</span>
+                         <span>
+                           <input *ngIf="otherItem.controls.isChangeHsn.value" type="text" class="error-box" style="height:16px; width: 50%; display: inline-block;" (focusout)="otherItem.controls.isChangeHsn.setValue(!otherItem.controls.isChangeHsn.value)" placeholder="HSN code" formControlName="hsn_code">
+                           <app-error [controlName]="otherItem.controls.hsn_code"></app-error>
+                        </span>
+                      </p>
+                    </td>
+                </tr>
+              </ng-container>
+            </tbody>
+        </table>
+    </div>
+    <div class="table-footer-actions mg-top-20">
+        <a class="clear-item"  (click)="clearAllOtherItems()">Remove all</a>
+    </div>
+  </div>
+</form>
+<app-add-expense-item [expenseItemPopDetail]="showAddExpenseItemPopup" (closeModal)="closeNewSparesItemPopup()" [units]="staticOptions.itemUnits"
+(itemAdded)="addDropDownNewSapre($event)" [isSpare]=true></app-add-expense-item>

@@ -1,0 +1,113 @@
+<div [formGroup]="vehicleTripForm">
+
+  <div class="row  mx-0 p-3" >
+    <div class="col-6">
+      <div class="toggle-wrapper d-flex align-items-center h-100">
+          <span class="toggle-label">Show Custom Fields in Jobs</span>
+          <label for="toggle" class="toggle-switch">
+              <input type="checkbox" id="toggle"  (change)="allDisplay()" formControlName="display">
+              <span class="toggle-box" >
+                  <span class="toggle-circle"></span>
+              </span>
+          </label>
+      </div>
+    </div>
+    <div class="col-6">
+      <button class="btn btn--primary w-auto py-2" style="float: right;" (click)="addNewField()"> + Add Custom Field</button>
+    </div>
+  </div>
+  <div class="table-section">
+      <div class="table-header p-0" >
+      <div class="table-wrapper-list" id="table-height">
+          <table class="table-container" formArrayName="vehicle_trip_list">
+              <thead>
+                  <tr>
+                    <th>Field Name</th>
+                    <th>Field Type</th>
+                    <th>Show in Jobs</th>
+                    <th>Show in Driver App</th>
+                    <th>Show in {{terminology?.invoice_bos}}</th>
+                    <th>Show in Market Vehicle Bill</th>
+                    <th>Show in Out Pass</th>
+                    <th></th>
+                  </tr>
+              </thead>
+              <tbody class="align-top settings-fields-class" >
+                  <tr *ngIf="sortedData.length==0">
+                      <td colspan="10" style="background-color: #fff">
+                          <div class="no-content-wrapper">
+                              <figure class="no-content-pic">
+                                  <img src="assets/img/no-content.png" alt="">
+                              </figure>
+                              <div class="no-content-txt">
+                                  <h5 class="heading">No data found!</h5>
+                              </div>
+                          </div>
+                      </td>
+                  </tr>
+                   <tr *ngFor="let custom of vehicleTripForm.controls.vehicle_trip_list['controls'] ; let i = index" [formGroupName]="i">
+                       <td>{{custom.controls.field_label.value}}</td>
+                       <td>{{custom.controls.field_type.value.name}}</td>
+                       <td>
+                        <label for="trips-{{custom.controls.id.value}}" class="toggle-switch">
+                          <input type="checkbox" id="trips-{{custom.controls.id.value}}" formControlName="in_trip" (change)="showtrips(custom)" >
+                          <span class="toggle-box">
+                              <span class="toggle-circle"></span>
+                          </span>
+                      </label>
+                       </td>
+                       <td>
+                        <label for="driver-app-{{custom.controls.id.value}}" class="toggle-switch" [ngClass]="{'disabled':!custom.controls.in_trip.value}">
+                          <input type="checkbox" id="driver-app-{{custom.controls.id.value}}" formControlName="in_driver_app" (change)="showDriverapp(custom)" >
+                          <span class="toggle-box">
+                              <span class="toggle-circle"></span>
+                          </span>
+                      </label>
+                       </td>
+                       <td>
+                        <label for="invoice-{{custom.controls.id.value}}" class="toggle-switch"
+                               [ngClass]="{'disabled':!custom.controls.in_trip.value}">
+                          <input type="checkbox" id="invoice-{{custom.controls.id.value}}"  formControlName="in_invoice_bos" (change)="showInvoice(custom)" >
+                          <span class="toggle-box" >
+                              <span class="toggle-circle"></span>
+                          </span>
+                      </label>
+                       </td>
+                       <td>
+                        <label for="vehicle-bill-{{custom.controls.id.value}}" class="toggle-switch"
+                               [ngClass]="{'disabled':!custom.controls.in_trip.value}">
+                          <input type="checkbox" id="vehicle-bill-{{custom.controls.id.value}}"  formControlName="in_vehicle_bill" (change)="showVehicleBill(custom)" >
+                          <span class="toggle-box" >
+                              <span class="toggle-circle"></span>
+                          </span>
+                      </label>
+                       </td>
+                       <td>
+                        <label for="outpass-{{custom.controls.id.value}}" class="toggle-switch"
+                               [ngClass]="{'disabled':!custom.controls.in_trip.value}">
+                          <input type="checkbox" id="outpass-{{custom.controls.id.value}}"  formControlName="in_gate_pass" (change)="showInvoice(custom)" >
+                          <span class="toggle-box" >
+                              <span class="toggle-circle"></span>
+                          </span>
+                      </label>
+                       </td>
+                      <td class="table-action">
+                          <i class="material-icons more-icon" (click)="optionsList($event, 'list_'+custom.controls.id.value)" >more_vert</i>
+                          <ul class="more-actions__menu table-popup" [ngClass]="{show: showOptions === 'list_'+custom.controls.id.value}">
+                              <li class="more-actions__item" (click)="edit(custom.controls.id.value)"><i
+                                class="material-icons">edit</i>Edit</li>
+                              <li class="more-actions__item"(click)="popupFunction(custom.controls.id.value,i,custom.controls.field_label.value)"><i
+                                class="material-icons">delete</i>Delete</li>
+                          </ul>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+  </div>
+  </div>
+
+</div>
+
+  <app-add-custom-fields [url]="url"  [canShowDateTime]="true"  [isShowMandatory]="false" [isFieldTypeChange]="isFieldTypeChange" [editData]="editData" [showNoteModal]="isOpenDialog" (modalClosed)="modelClose($event)"></app-add-custom-fields>
+  <alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

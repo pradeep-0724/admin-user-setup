@@ -1,0 +1,30 @@
+.disableInput {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.showInvalid {
+  border: 1px solid red !important;
+
+}
+
+::ng-deep .removebottom {
+  .mat-form-field-flex {
+    border: 1px solid #dee2e6;
+    padding: 2px 10px;
+    border-radius: 3px;
+  }
+
+  .mat-form-field-underline {
+    height: 0 !important;
+  }
+
+}
+
+::ng-deep .removebottomInput {
+  input {
+    border: 1px solid #dee2e6;
+    padding: 6px 5px;
+  }
+}

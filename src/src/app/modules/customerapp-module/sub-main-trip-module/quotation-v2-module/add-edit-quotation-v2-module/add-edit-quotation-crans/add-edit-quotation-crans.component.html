@@ -1,0 +1,567 @@
+<form [formGroup]="craneFormGroup">
+    <div class="quotation-edit-route-pop flex-lg-row flex-column ">
+        <div class="form-wrap position-relative">
+            <div class="gb-fake-tab-wrapper">
+                <span>Location Details</span>
+
+            </div>
+            <div>
+                <div formGroupName="location_details">
+                    <div class="row  p-4 mx-0">
+                        <div class="col-xl-4 col-lg-3 col-md-4 col-6">
+                            <div class="input-wrap dropdownArrow ">
+                                <label class="input">Zone</label>
+
+                                <material-dropdown [selectedOption]="initialValues.zone" [addBlank]="true" [searchable]="true" class="dropDownWidth">
+                                    <select #customSelect formControlName="zone" class="no-style select--modify" (change)="onZoneChange()">
+                                        <option *ngFor="let option of zonesList" value="{{ option?.id }}">
+                                            {{ option?.name }}
+                                        </option>
+                                    </select>
+                                </material-dropdown>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-3 col-md-4 col-6" >
+                            <div class="input-wrap clearfix dropdownArrow " [ngClass]="addErrorClass(craneFormGroup.controls.location_details.get('area'))">
+                                <label class="input--required">Location</label>
+                                <div>
+                                    <material-dropdown [searchable]="true" [addable]="true"
+                                    [postApiUrl]="areaApi"
+                                    [params]="areaParams"
+                                    (postApiResponse)="getNewArea($event)"
+                                    (addValueToList)="addNewArea($event)"
+                                      [selectedOption]="initialValues?.area">
+                                      <select #customSelect formControlName="area" class="no-style select--modify" >
+                                        <option *ngFor="let option of areaList" value="{{ option?.id }}">
+                                          {{ option?.label }}
+                                        </option>
+                                      </select>
+                                    </material-dropdown>
+                                    <app-error [controlName]="craneFormGroup.controls.location_details.get('area')"></app-error>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-6">
+                            <div class="input-wrap clearfix  ">
+                                <label >Map Coordinate </label>
+                                <app-tool-tip class="tool-tip-position" [totalSlides]="locationToolTip.content.length"
+                                    position="top" [toolTipContent]="locationToolTip"></app-tool-tip>
+                                <app-location-v2 [isnameRequired]="false" [isFromToInvalid]="isLocationValid"
+                                    [placeForm]="craneFormGroup.get('location_details')['controls'].location"
+                                    (placeDetails)="locationSelected($event)"></app-location-v2>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+        <div class="map-wrap">
+            <div class="map-top">
+                <div>
+                    <div> </div>
+                </div>
+            </div>
+            <div class="google-map-box">
+                <google-map height="100%" width="100%" *ngIf="zoom" [zoom]="zoom" [center]="center" >
+                    <map-marker *ngFor="let markerPosition of markerPositions" [position]="markerPosition"
+                        [options]="markerOptions"></map-marker>
+                </google-map>
+            </div>
+
+        </div>
+    </div> 
+
+    <div class="quotation-customFields"  >
+        <div class="gb-tab-wrapper">
+            <mat-tab-group mat-stretch-tabs="false" class="mat-group" animationDuration="0ms" mat-align-tabs="start">
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span [ngClass]="{ taberror:false  }">Rental Charge</span>
+                    </ng-template>
+                    <div formGroupName="rental_charge">
+                        <div class="row px-4 pt-4 mx-0">
+                            <div class="col-lg-3 col-6">
+                                <div class="input-wrap clearfix">
+                                    <label for="" >Billing Unit</label>
+                                    <material-dropdown [selectedOption]="initialValues.billingUnit">
+                                        <select #customSelect formControlName="billing_unit" (change)="onBillingUnitChange()"
+                                        
+                                            class="no-style select--modify">
+                                            <option *ngFor="let option of rateCardBillingList" value="{{ option?.value}}">
+                                                {{ option?.label }}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                               </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="input-wrap dropdownArrow ">
+                                    <label class="input">No. of Shift</label>
+    
+                                    <material-dropdown [searchable]="true" [selectedOption]="initialValues.shifType" class="dropDownWidth">
+                                        <select #customSelect formControlName="no_of_shifts" class="no-style select--modify" (change)="onShiftChange()">
+                                            <option *ngFor="let option of shiftType" [value]="option?.value">
+                                                {{ option?.label }}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="addable-row-table m-4 mt-0" >
+                            <table>
+                                <thead>
+                                    <tr>
+    
+                                        <th rowspan="2" class="input">
+                                            Specification
+                                        </th>
+                                        <th colspan="3" class="text-center"> {{rentalChargeTableLabel.daily}} </th>
+                                        <th colspan="3" class="text-center">{{rentalChargeTableLabel.weekly}} </th>
+                                        <th colspan="3" class="text-center">{{rentalChargeTableLabel.monthly}} </th>
+                                    </tr>
+                                    <tr>
+                                        <th><mat-checkbox formControlName="daily_wth_fuel" (change)="onChangeRentalChargeCheckBox('daily','daily_wth_fuel','with_fuel')" color="primary">With
+                                                Fuel</mat-checkbox></th>
+                                        <th><mat-checkbox formControlName="daily_wo_fuel" (change)="onChangeRentalChargeCheckBox('daily','daily_wo_fuel','without_fuel')" color="primary">Without
+                                                Fuel</mat-checkbox></th>
+                                        <th>Extra 
+                                            <ng-container *ngIf="craneFormGroup.get('rental_charge.billing_unit').value=='hour'">
+                                                Hours
+                                            </ng-container>
+                                            <ng-container *ngIf="craneFormGroup.get('rental_charge.billing_unit').value=='day'">
+                                                Days
+                                            </ng-container>
+                                             </th>
+                                        <th><mat-checkbox formControlName="weekly_wth_fuel" (change)="onChangeRentalChargeCheckBox('weekly','weekly_wth_fuel','with_fuel')" color="primary">With
+                                                Fuel</mat-checkbox></th>
+                                        <th><mat-checkbox formControlName="weekly_wo_fuel" (change)="onChangeRentalChargeCheckBox('weekly','weekly_wo_fuel','without_fuel')" color="primary">Without
+                                                Fuel</mat-checkbox></th>
+                                         <th>Extra  
+                                            <ng-container *ngIf="craneFormGroup.get('rental_charge.billing_unit').value=='hour'">
+                                                Hours
+                                            </ng-container>
+                                            <ng-container *ngIf="craneFormGroup.get('rental_charge.billing_unit').value=='day'">
+                                                Days
+                                            </ng-container>
+                                         </th>
+                                        <th><mat-checkbox formControlName="monthly_wth_fuel" (change)="onChangeRentalChargeCheckBox('monthly','monthly_wth_fuel','with_fuel')" color="primary">With
+                                                Fuel</mat-checkbox></th>
+                                        <th><mat-checkbox formControlName="monthly_wo_fuel" (change)="onChangeRentalChargeCheckBox('monthly','monthly_wo_fuel','without_fuel')" color="primary">Without
+                                                Fuel</mat-checkbox></th>
+                                        <th>Extra  
+                                            <ng-container *ngIf="craneFormGroup.get('rental_charge.billing_unit').value=='hour'">
+                                                Hours
+                                            </ng-container>
+                                            <ng-container *ngIf="craneFormGroup.get('rental_charge.billing_unit').value=='day'">
+                                                Days
+                                            </ng-container>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody formArrayName="rental_charges">
+    
+                                    <ng-container
+                                        *ngFor="let control of this.craneFormGroup.controls['rental_charge'].get('rental_charges')['controls'];let i = index"
+                                        [formGroupName]="i">
+    
+                                        <tr>
+                                            <td>
+                                                <material-dropdown [searchable]="true" [addErrorClass]="control.get('specification')" [selectedOption]="initialValues.specifications[i]">
+                                                    <select #customSelect formControlName="specification" (change)="getRateCard(control,i)">
+                                                        <option *ngFor="let option of vechileSpecifications" value="{{ option?.id }}">
+                                                            {{ option?.specification }}
+                                                        </option>
+                                                    </select>
+                                                </material-dropdown>
+                                            </td>
+                                            <ng-container formGroupName="daily">
+                                                <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wth_fuel').value}">
+                                                    <div>
+                                                        <input type="text" positiveThreeDigitDecimalNumber [readOnly]="!craneFormGroup.get('rental_charge').get('daily_wth_fuel').value" [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wth_fuel').value}" formControlName="with_fuel" class="error-box"
+                                                            placeholder="Eg.: 1234567" value="0" (change)="onchangeRentalCharge()">
+                                                    </div>
+                                                </td>
+                                                <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wo_fuel').value}">
+                                                    <div>
+                                                        <input type="text" positiveThreeDigitDecimalNumber [readOnly]="!craneFormGroup.get('rental_charge').get('daily_wo_fuel').value" [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wo_fuel').value}" formControlName="without_fuel" class="error-box"
+                                                            placeholder="Eg.: 1234567" (change)="onchangeRentalCharge()">
+                                                    </div>
+                                                </td>
+                                                <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wth_fuel').value && !craneFormGroup.get('rental_charge').get('daily_wo_fuel').value }">
+                                                    <div>
+                                                        <input type="text" positiveThreeDigitDecimalNumber formControlName="additional_hours" [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wth_fuel').value && !craneFormGroup.get('rental_charge').get('daily_wo_fuel').value }"
+                                                            class="error-box" placeholder="Eg.: 1234567" [readOnly]="!craneFormGroup.get('rental_charge').get('daily_wo_fuel').value && !craneFormGroup.get('rental_charge').get('daily_wth_fuel').value " (change)="onchangeRentalCharge()" >
+                                                    </div>
+                                                </td>
+                                            </ng-container>
+                                            <ng-container formGroupName="weekly">
+                                                <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wth_fuel').value}">
+                                                    <div>
+                                                        <input type="text" positiveThreeDigitDecimalNumber [readOnly]="!craneFormGroup.get('rental_charge').get('weekly_wth_fuel').value" [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wth_fuel').value}" formControlName="with_fuel" class="error-box"
+                                                            placeholder="Eg.: 1234567" value="0" (change)="onchangeRentalCharge()">
+                                                    </div>
+                                                </td>
+                                                <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wo_fuel').value}">
+                                                    <div>
+                                                        <input type="text" positiveThreeDigitDecimalNumber [readOnly]="!craneFormGroup.get('rental_charge').get('weekly_wo_fuel').value" [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wo_fuel').value}" formControlName="without_fuel" class="error-box"
+                                                            placeholder="Eg.: 1234567" (change)="onchangeRentalCharge()">
+                                                    </div>
+                                                </td>
+                                                <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wth_fuel').value && !craneFormGroup.get('rental_charge').get('weekly_wo_fuel').value}">
+                                                    <div>
+                                                        <input type="text" positiveThreeDigitDecimalNumber formControlName="additional_hours" [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wth_fuel').value && !craneFormGroup.get('rental_charge').get('weekly_wo_fuel').value}"
+                                                            class="error-box" placeholder="Eg.: 1234567"  [readOnly]="!craneFormGroup.get('rental_charge').get('weekly_wth_fuel').value && !craneFormGroup.get('rental_charge').get('weekly_wo_fuel').value" (change)="onchangeRentalCharge()">
+                                                    </div>
+                                                </td>
+                                            </ng-container>
+                                            <ng-container formGroupName="monthly">
+                                                <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wth_fuel').value}">
+                                                    <div>
+                                                        <input type="text" positiveThreeDigitDecimalNumber [readOnly]="!craneFormGroup.get('rental_charge').get('monthly_wth_fuel').value" [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wth_fuel').value}" formControlName="with_fuel" class="error-box"
+                                                            placeholder="Eg.: 1234567" value="0" (change)="onchangeRentalCharge()">
+                                                    </div>
+                                                </td>
+                                                <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wo_fuel').value}">
+                                                    <div>
+                                                        <input type="text" positiveThreeDigitDecimalNumber [readOnly]="!craneFormGroup.get('rental_charge').get('monthly_wo_fuel').value" [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wo_fuel').value}" formControlName="without_fuel" class="error-box"
+                                                            placeholder="Eg.: 1234567" (change)="onchangeRentalCharge()">
+                                                    </div>
+                                                </td>
+                                                <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wth_fuel').value && !craneFormGroup.get('rental_charge').get('monthly_wo_fuel').value }">
+                                                    <div>
+                                                        <input type="text" [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wth_fuel').value && !craneFormGroup.get('rental_charge').get('monthly_wo_fuel').value }" positiveThreeDigitDecimalNumber formControlName="additional_hours"
+                                                            class="error-box" placeholder="Eg.: 1234567" [readOnly]="!craneFormGroup.get('rental_charge').get('monthly_wth_fuel').value && !craneFormGroup.get('rental_charge').get('monthly_wo_fuel').value" (change)="onchangeRentalCharge()">
+                                                    </div>
+                                                </td>
+                                            </ng-container>
+                                        </tr>
+                                        <tr>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="rc-row-btn-wrap border-start-0 border-end-0">
+                                                <div class="d-flex justify-content-end">
+                                                    <button
+                                                        *ngIf="this.craneFormGroup.controls['rental_charge'].get('rental_charges')['controls'].length-1 ==i "
+                                                        (click)="cloneRentalChareItem(control,i)"
+                                                        class=" row-btn row-btn-copy ms-0" matTooltip="clone"><span
+                                                            class="material-icons">
+                                                            content_copy
+                                                        </span></button>
+    
+                                                    <button (click)="removeRentalChareItem(i)"
+                                                        *ngIf="this.craneFormGroup.controls['rental_charge'].get('rental_charges')['controls'].length !== 1"
+                                                        class="  row-btn row-btn-delete "><span class="material-icons">
+                                                            close
+                                                        </span></button>
+                                                    <button (click)="addMoreRentalChargeItem()" *ngIf="this.craneFormGroup.controls['rental_charge'].get('rental_charges')['controls'].length-1 ==i "
+                                                        class=" row-btn row-btn-add "><span class="material-icons">
+                                                            add
+                                                        </span></button>
+    
+    
+                                                </div>
+    
+    
+                                            </td>
+    
+                                        </tr>
+                                    </ng-container>
+    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                
+
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span [ngClass]="{ taberror:isAddChargesTabError  }">Additional Charges</span>
+                    </ng-template>
+                    <div class="p-4">
+                        <div class="mb-3">
+                            <button class="btn btn--primary ms-auto w-auto" (click)="addCharges()">+ Add Additional charge</button>
+
+                        </div>
+                        <div class="addable-row-table " formArrayName="additional_charge">
+
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>
+                                            Additional Charge
+                                        </th>
+                                        <th *ngIf="isTax">Tax</th>
+                                        <th>Unit Of Measurement </th>
+                                        <th>No. Of Units </th>
+                                        <th>Unit Cost   ({{ currency_type?.symbol}})</th>
+                                        <th>Total Amount  ({{ currency_type?.symbol}})  </th>
+
+                                    </tr> 
+
+                                </thead>
+                                <tbody>
+                                    <tr class="border-0" *ngIf="this.craneFormGroup.controls['additional_charge']['controls'].length==0">
+                                        <td class="bg-white" colspan="30">
+                                          <div class="no-list-data-wrap">
+                                            <figure>
+                                              <img src="assets/img/no-content.png" alt="">
+                                            </figure>
+                                            <h5 class="mt-3 primary-brand-text">No additional charges added!</h5>
+                                          </div> 
+                                        </td>
+                                    </tr>
+                                    <tr *ngFor="let control of this.craneFormGroup.controls['additional_charge']['controls'];let i = index"
+                                        [formGroupName]="i">
+                                        <td class="ps-4"> <mat-checkbox formControlName="is_checked" (change)="onChangeAdditionalChargeCheckBox(control)"
+                                                color="primary"></mat-checkbox></td>
+                                        <td>{{control.get('name').value?.['name']}}</td>
+                                        <td  *ngIf="isTax" [ngClass]="{'invalid-input':control.get('tax').invalid && control.get('tax').touched ,'disable':!control.get('is_checked').value}">
+                                            <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="initialValues.additionalTax[i]" [disabled]="!control.get('is_checked').value">
+                                                <select #customSelect name="" class="no-style select--modify error-box" formControlName="tax" (change)="onCalculationChange()">
+                                                <option *ngFor="let option of taxOptions"
+                                                    value="{{ option.id }}">{{
+                                                    option.label }}</option>
+                                                </select>
+                                              </material-dropdown>
+                                        </td>
+                                        <td [ngClass]="{'invalid-input':control.get('unit_of_measurement').invalid && control.get('unit_of_measurement').touched ,'disable':!control.get('is_checked').value}">
+                                            <material-dropdown [disabled]="!control.get('is_checked').value" [searchable]="true" [selectedOption]="initialValues.unit[i]">
+                                                <select #customSelect formControlName="unit_of_measurement">
+                                                    <option *ngFor="let option of unitOfMeasurementList" [ngValue]="option">
+                                                        {{ option?.label }}
+                                                    </option>
+                                                </select>
+                                            </material-dropdown>
+                                        </td>
+                                        <td [ngClass]="{'invalid-input':control.get('quantity').invalid && control.get('quantity').touched ,'disable':!control.get('is_checked').value}">
+                                            <div>
+                                                <input type="text" [readonly]="!control.get('is_checked').value" [ngClass]="{'disable':!control.get('is_checked').value}" positiveThreeDigitDecimalNumber formControlName="quantity" class="error-box"
+                                                    placeholder="Eg.: 1234567" value="0" (change)="onChangeAdditionalCharge()">
+                                            </div>
+                                        </td>
+
+                                        <td [ngClass]="{'invalid-input':control.get('unit_cost').invalid && control.get('unit_cost').touched ,'disable':!control.get('is_checked').value}">
+                                            <div>
+                                                <input [ngClass]="{'disable':!control.get('is_checked').value}" [readonly]="!control.get('is_checked').value" type="number" positiveThreeDigitDecimalNumber formControlName="unit_cost" class="error-box"
+                                                    placeholder="Eg.: 1234567" value="0" (change)="onChangeAdditionalCharge()">
+                                            </div>
+                                        </td>
+                                        <td [ngClass]="{'disable':!control.get('is_checked').value}">
+                                            <div>
+                                                <input [ngClass]="{'disable':!control.get('is_checked').value}" type="text" positiveThreeDigitDecimalNumber formControlName="total" class="error-box"
+                                                    placeholder="Eg.: 1234567" readonly>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </mat-tab>
+
+            </mat-tab-group>
+        </div>
+    </div> 
+
+    <div class="row mx-0 def-color">
+        <div class="col-lg-3 px-0">
+            <div class="gb-fake-tab-wrapper">
+                <span>Approval</span>
+            </div>
+
+
+
+            <div class="p-4">
+
+                <div class="input-wrap clearfix">
+                    <label for="" class="">Signature</label>
+                    <div>
+                        <material-dropdown [searchable]="true" [selectedOption]="initialValues.signature" [addable]="false" class="dropDownWidth"
+                            [addBlank]="true">
+                            <select #customSelect formControlName="signature" class="no-style select--modify">
+                                <option *ngFor="let option of digitalSignature " value="{{option.id}}">
+                                    {{option.name}}
+                                </option>
+                            </select>
+                        </material-dropdown>
+                    </div>
+                </div>
+                <div class="input-wrap clearfix">
+                    <label for="" class="">Term and condition</label>
+                    <div>
+                        <material-dropdown [searchable]="true" [selectedOption]="initialValues.termsAndCondition" [addable]="false" class="dropDownWidth"
+                            [addBlank]="true">
+                            <select #customSelect formControlName="terms_and_condition" class="no-style select--modify">
+                                <option *ngFor="let option of tersmAndConditions " value="{{option.id}}">
+                                    {{option.name}}
+                                </option>
+                            </select>
+                        </material-dropdown>
+                    </div>
+                </div>
+                <div class="input-wrap clearfix">
+                    <label for="" class="">Narration</label>
+                    <div>
+                        <input type="text" class="no-style input--bd" placeholder="Narration"
+                        formControlName="narration" value="">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="col-lg-9 px-0 ">
+            <div class="gb-fake-tab-wrapper">
+                <span>Balance</span>
+            </div>
+
+            <div class="p-4 pb-0 row mx-0" *ngIf="isTax">
+                <div class="col lg-4">
+                    <label for="" class="">&nbsp;</label>
+                    <div class="tax-input-box ">
+
+                        <span for="">Rental</span>
+                        <material-dropdown [searchable]="true" [selectedOption]="initialValues.tax" [addable]="false"
+                            class="dropDownWidth">
+                            <select #customSelect name="" formControlName="tax" (change)=" onChangeTax()">
+                                <option *ngFor="let option of taxOptions" value="{{ option.id }}">{{
+                                    option.label }}</option>
+                            </select>
+                        </material-dropdown>
+
+
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+
+                    <div class="input-wrap clearfix" formGroupName="working_duration">
+                        <label for="" class="">Working Duration</label>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <input type="text" value="0" formControlName="duration"  [ngClass]="{'invalid-input':craneFormGroup.get('working_duration').get('duration')?.invalid&&craneFormGroup.get('working_duration').get('duration')?.touched }"  positiveDigitNumber class="no-style input--bd w-25" (change)="onChangeWorkingDuration()" />
+
+                            <div class=" border-1 mx-2 border" style="height: 15px;"></div>
+
+                            <div class="flex-grow-1" [ngClass]="{'invalid-input':craneFormGroup.get('working_duration').get('working')?.invalid&&craneFormGroup.get('working_duration').get('working')?.touched }" >     
+                                <material-dropdown [searchable]="true" [selectedOption]="initialValues.working" [addable]="false" class="dropDownWidth">
+                                    <select #customSelect formControlName="working" class="no-style select--modify"  (change)="onChangeWorkingDuration()">
+                                        <option *ngFor="let option of durationType" value="{{ option.value }}">
+                                            {{ option.label }}
+                                        </option>
+                                    </select>
+                                </material-dropdown>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="col-lg-4">
+                    <div class="input-wrap clearfix">
+                        <ng-container *ngIf="craneFormGroup.get('rental_charge.billing_unit').value=='hour'">
+                            <label for="" class="">Total Quotation Hours</label>
+                        </ng-container>
+                        <ng-container *ngIf="craneFormGroup.get('rental_charge.billing_unit').value=='day'">
+                            <label for="" class="">Total Quotation Days</label>
+                        </ng-container>
+                        <div class="mt-3">
+                           {{totalQuotationHours}}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="addable-row-table balance-table m-2">
+                <table>
+                    <thead>
+                        <tr>
+
+                            <th rowspan="2">
+
+                            </th>
+                            <th colspan="2" class="text-center">{{dayWeekMonthDuration.day}} {{dayWeekMonthDuration.day==1?'Day':'Days'}} {{balanceChargeTableLabel.daily}}</th>
+                            <th colspan="2" class="text-center">{{dayWeekMonthDuration.week}} {{dayWeekMonthDuration.week==1?'Week':'Weeks'}} {{balanceChargeTableLabel.weekly}}</th>
+                            <th colspan="2" class="text-center">{{dayWeekMonthDuration.month}} {{dayWeekMonthDuration.month==1?'Month':'Months'}}  {{balanceChargeTableLabel.monthly}} </th>
+                        </tr>
+                        <tr>
+                            <th> With Fuel</th>
+                            <th>Without Fuel</th>
+
+                            <th>With Fuel</th>
+                            <th>Without Fuel</th>
+
+                            <th>With Fuel</th>
+                            <th>Without Fuel</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td>Rental Charges</td>
+
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wth_fuel').value}">{{quotationCraneTotal.daily_with_fuel_total|numberFormat}}</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wo_fuel').value}">{{quotationCraneTotal.daily_without_fuel_total|numberFormat}}</td>
+
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wth_fuel').value}">{{quotationCraneTotal.weekly_with_fuel_total|numberFormat}}</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wo_fuel').value}">{{quotationCraneTotal.weekly_without_fuel_total|numberFormat}}</td>
+
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wth_fuel').value}">{{quotationCraneTotal.monthly_with_fuel_total|numberFormat}}</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wo_fuel').value}">{{quotationCraneTotal.monthly_without_fuel_total|numberFormat}}</td>
+                        </tr>
+                        <tr>
+                            <td>Additional Charges</td>
+
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wth_fuel').value}">{{quotationCraneTotal.daily_with_fuel_additional_charge_total|numberFormat}}</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wo_fuel').value}">{{quotationCraneTotal.daily_without_fuel_additional_charge_total|numberFormat}}</td>
+
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wth_fuel').value}">{{quotationCraneTotal.weekly_with_fuel_additional_charge_total|numberFormat}}</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wo_fuel').value}">{{quotationCraneTotal.weekly_without_fuel_additional_charge_total|numberFormat}}</td>
+
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wth_fuel').value}">{{quotationCraneTotal.monthly_with_fuel_additional_charge_total|numberFormat}}</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wo_fuel').value}">{{quotationCraneTotal.monthly_without_fuel_additional_charge_total|numberFormat}}</td>
+                        </tr>
+                        <tr>
+                            <td>VAT Amount</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wth_fuel').value}">{{quotationCraneTotal.vat_daily_with_fuel_total|numberFormat}}</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wo_fuel').value}">{{quotationCraneTotal.vat_daily_without_fuel_total|numberFormat}}</td>
+
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wth_fuel').value}">{{quotationCraneTotal.vat_weekly_with_fuel_total|numberFormat}}</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wo_fuel').value}">{{quotationCraneTotal.vat_weekly_without_fuel_total|numberFormat}}</td>
+
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wth_fuel').value}">{{quotationCraneTotal.vat_monthly_with_fuel_total|numberFormat}}</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wo_fuel').value}">{{quotationCraneTotal.vat_monthly_without_fuel_total|numberFormat}}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Amount</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wth_fuel').value}">{{quotationCraneTotal.daily_with_fuel_total_with_vat|numberFormat}}</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('daily_wo_fuel').value}">{{quotationCraneTotal.daily_without_fuel_total_with_vat|numberFormat}}</td>
+
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wth_fuel').value}">{{quotationCraneTotal.weekly_with_fuel_total_with_vat|numberFormat}}</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('weekly_wo_fuel').value}">{{quotationCraneTotal.weekly_without_fuel_total_with_vat|numberFormat}}</td>
+
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wth_fuel').value}">{{quotationCraneTotal.monthly_with_fuel_total_with_vat|numberFormat}}</td>
+                            <td [ngClass]="{'disable':!craneFormGroup.get('rental_charge').get('monthly_wo_fuel').value}">{{quotationCraneTotal.monthly_without_fuel_total_with_vat|numberFormat}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</form>

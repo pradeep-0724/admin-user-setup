@@ -1,0 +1,15 @@
+<div class="bg-white py-4 px-4 rounded-2 position-relative" width="100% " *ngIf="isAllLoaded">
+
+    <button (click)="close()" class="map-close-btn"><i class="bi bi-x-circle"></i></button>
+
+    <google-map height="400px" width="100%" [zoom]="zoom" [center]="center" *ngIf="markerPositions.length>0">
+        <map-marker *ngFor="let markerPosition of markerPositions" [position]="markerPosition"
+            [options]="markerOptions"></map-marker>
+    </google-map>
+
+    <div class="alert alert-warning" role="alert" *ngIf="markerPositions.length==0">
+        Driver location data is currently unavailable. If you have GPS tracking enabled and still unable to see it, please contact your admin.
+    </div>
+
+
+</div>

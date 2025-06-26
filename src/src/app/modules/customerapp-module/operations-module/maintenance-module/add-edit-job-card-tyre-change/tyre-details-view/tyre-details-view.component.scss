@@ -1,0 +1,186 @@
+
+
+@import "../../../../../../../assets/styles/helpers/variable";
+
+.tyre-diagram-wrap .tyre-diagram-row{
+    position: relative;
+    &::after{
+        position: absolute;
+        content: "";
+        width: 14px;
+        height: 100%;
+        
+        z-index: 10;
+        display: block;
+        top: -35%;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: inset 0px 0px 4px #676A6E;
+    }
+    
+}
+.tyre-diagram-wrap .tyre-diagram-row:first-child{
+    position: relative;
+    &::after{
+        display: none;
+    }
+    
+}
+.tyre-wrap{
+    position: relative;
+    .tyre-name{
+        position:absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        zoom: 170%;
+    }
+    .tyre{
+        height: 80px;
+        width: 35px;
+        background-position: center;
+        background-size: cover;
+        // background-image: url('../../../../../../../assets/img/tyre-top-view.png');
+        background-color: #7d7d7dd1;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 200ms ease-in-out;
+    }
+    &.view{
+        .tyre{
+            cursor: default;
+        }
+    }
+    &:not(.view):not(.active):hover{
+        .tyre{
+            transform: scale(1.2);
+        }
+    }
+    div.disable .tyre{
+        transform: none !important;
+    }
+
+    &.active{
+        .tyre{
+            background-color: #595fab;
+        }
+        .tyre-name{
+            color:#595fab
+        }
+    }
+}
+
+.tyre-layout-overflow{
+    overflow-x: auto;
+}
+
+
+
+
+.h-line{
+    position:relative;
+    width: 250px;
+    min-width: 250px;
+    &::after{
+        position: absolute;
+        content: "";
+        width: 100%;
+        height: 14px;
+        
+        z-index: 10;
+        display: block;
+        top: 50%;
+        left: 0%;
+        transform: translateY(calc(-50% + 24px));
+        box-shadow: inset 0px 0px 4px #676A6E;
+
+    }
+    .h-line-name{
+        position: absolute;
+        left: 20px ;
+        z-index: 12;
+        padding: 15px 4px;
+            background-color: $layout-bg;
+            
+            top: 50%;
+          
+            transform: translateY(calc(-50% + 24px));
+    
+    }
+    .h-line-btn-group{
+        position: absolute;
+        left: 50% ;
+    
+        z-index: 15;
+            
+            top: 50%;
+          
+            transform: translate(-50%,calc(-50% + 24px));
+            
+            
+            
+            border-radius: 10px;
+            box-shadow: inset 0px 0px 4px #676A6E;;
+            background: $layout-bg;
+            .remove-tyre-btn{
+                border-radius: 100%;
+                background-color: red;
+                color: #fff;
+                margin-right: 20px;
+                .material-icons{
+                    font-size: 20px;
+                  }
+                  &:disabled{
+                    cursor: not-allowed;
+                  }
+    
+            }
+            .add-tyre-btn{
+                border-radius: 100%;
+                background-color: $sky-blue;
+                color: #fff;
+                .material-icons{
+                    font-size: 20px;
+                  }
+                  &:disabled{
+                    cursor: not-allowed;
+                  }
+                
+            }
+            &-main {
+                position: relative;
+                padding: 8px;
+                zoom: 180%;
+                
+                
+            }
+    
+    
+    }
+}
+
+
+
+
+
+
+
+.tyre-layout-info{
+    min-height: 55px;
+    border-bottom: 1px solid #CECECE;
+    border-top: 1px solid #CECECE;
+    div{
+        p{
+            color: $text-color;
+            display: flex ;
+            height: 100%;
+            font-weight: 600;
+            align-items: center;
+            font-size: 12px;
+        }
+    }
+
+}
+#tyre-position-view-info-table table thead th:before {
+    display: none;
+}

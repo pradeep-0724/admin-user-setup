@@ -1,0 +1,134 @@
+
+
+<div class="charge-popup def-color">
+    <div class="gb-popup-header">
+        Add Market Vehicle
+    </div>
+    <div class="alert-msg" *ngIf="apiError">
+        <span class="icon-wrap"></span>
+        <p class="message-cont">{{ apiError }}</p>
+    </div>
+    <form [formGroup]="addMarketVehicleForm">
+        <div class="def-color p-4 shadow-inset-top-bottom" [ngClass]="{'disable':vehicle_category!=''}">
+            <p class=" fw-semibold">Vehicle Category<span class="text-danger">*</span></p>
+            <p class="error-reg mt-1">{{category_selected_err}}</p>
+            <div class="d-flex align-items-center pt-4">
+
+                <div class="  veh-type" matRipple (click)="vehicleCatagoryChange(1)" [class.active]="addMarketVehicleForm.get('vehicle_category').value ==1">
+                    <img src="../../../../../../../../assets/img/icons/crane-truck.svg"  alt="truck image">
+                   <p class="text-center mt-2">Crane</p>
+                </div>
+
+                <div class=" veh-type"  matRipple (click)="vehicleCatagoryChange(2)" [class.active]="addMarketVehicleForm.get('vehicle_category').value ==2">
+                    <img src="../../../../../../../../assets/img/icons/awp.svg "   alt="truck image">
+                   <p class="text-center mt-2">AWP</p>
+                </div>
+                <div class="  veh-type" matRipple (click)="vehicleCatagoryChange(3)" [class.active]="addMarketVehicleForm.get('vehicle_category').value ==3">
+                    <img src="../../../../../../../../assets/img/icons/trailer-head.svg "   alt="trailer image">
+    
+                                   <p class="text-center mt-2">Trailer</p>
+                </div>
+                <div class=" veh-type" matRipple (click)="vehicleCatagoryChange(0)" [class.active]="addMarketVehicleForm.get('vehicle_category').value ==0">
+                    <img src="../../../../../../../../assets/img/icons/truck-vehicle.svg "   alt="truck image">
+    
+                                   <p class="text-center mt-2">Others</p>
+                </div>
+    
+
+    
+            </div>
+    
+    
+        </div>
+        <ng-container  *ngIf="!isCatagorySelected">
+            <div class=" flex-grow-1 d-flex justify-content-center align-items-center flex-column" >
+                <i class="bi bi-truck select-veh-truck"></i>
+                <p class="select-veh-text"> Please select a vehicle category for more details</p>
+            </div>
+        
+        </ng-container>
+        <ng-container  *ngIf="isCatagorySelected">
+            <div class="px-4 pt-4 row mx-0 ">
+
+                <div class="col-xl-6 col-lg-6 col-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(addMarketVehicleForm.get('reg_number'))">
+                        <label for="" class="input--required">Vehicle No.</label>
+                        <input type="text"  appUpperCase class="no-style input--bd" placeholder="Charge name" formControlName="reg_number">
+                        <app-error [controlName]="addMarketVehicleForm.get('reg_number')"></app-error>
+                        <span *ngIf="regError" class="error-reg">{{regError}}</span>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6  col-md-3 col-6" [ngClass]="{'disable':vechileSpecifications!=''}">
+                    <div class="input-wrap clearfix error" [ngClass]="addErrorClass(addMarketVehicleForm.controls.vehicle_type)">
+                        <label for="" >Specification</label>
+                        <div>
+                            <material-dropdown  [searchable]="true" [disabled]="vechileSpecifications!=''" [selectedOption]="initialValues.vehicle_type" [addable]="true" class="dropDownWidth" 
+                                [postApiUrl]="vehicleApi" [params]="addVehicle" (postApiResponse)="getNewSpecifications($event)"
+                                (addValueToList)="addNewSpecifications($event)">
+                                <select #customSelect formControlName="vehicle_type" class="no-style select--modify">
+                                    <option *ngFor="let option of vechileTypeList" value="{{ option?.id }}">
+                                        {{ option?.specification }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <app-error [controlName]="addMarketVehicleForm.controls.vehicle_type"></app-error>
+                        </div>
+                    </div>
+                </div>
+                    <div class="col-xl-6 col-lg-6 col-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(addMarketVehicleForm.get('market_driver'))">
+                            <label for="" >Operator Name</label>
+                            <input type="text" class="no-style input--bd" placeholder="Operator Name" formControlName="market_driver">
+                            <app-error [controlName]="addMarketVehicleForm.get('market_driver')"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 country-filed-height">
+                        <div class="input-wrap mb-0"><label for="" >Operator Number</label></div>
+
+
+                        <div class="row mx-0">
+                            <div class="col-4 px-0">
+                                <div class="width-country-code custom-margin me-0">
+                                    <material-dropdown class="dropDownWidth px-0"
+                                        [selectedOption]="initialValues.mobile_country_code">
+                                        <select #customSelect formControlName="mobile_country_code"
+                                            class="no-style select--modify">
+                                            <option *ngFor="let phone_code of countryPhoneCode"
+                                                value="{{ phone_code }}">
+                                                {{phone_code}}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                </div>
+                            </div>
+
+
+                            <div class="px-0 number-grow col-8 px-0">
+                                <div class="ms-3">
+
+                                    <div class="input-wrap error px-0  w-100"
+                                        [ngClass]="addErrorClass(addMarketVehicleForm.controls.mobile)">
+
+                                        <input type="text" positiveDigitNumber formControlName="mobile" maxlength="10"
+                                            pattern="^[0-9]*$" class="no-style input--bd" placeholder="9900000000">
+                                        <span *ngIf="contact_error" class="error-reg">{{contact_error}}</span>
+                                        <app-error [controlName]="addMarketVehicleForm.controls.mobile"></app-error>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+            </div>
+        </ng-container>
+
+
+        <div class="d-flex justify-content-between p-4 pt-3">
+            <button class="btn w-auto" (click)="close()">Cancel</button>
+            <button class="btn  btn--primary w-auto" (click)="saveForm(addMarketVehicleForm)">Save</button>
+        </div>
+
+    </form>
+
+</div>

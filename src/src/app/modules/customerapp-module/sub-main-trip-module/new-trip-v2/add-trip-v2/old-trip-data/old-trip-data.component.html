@@ -1,0 +1,214 @@
+<div class="right-section__header align-items-center justify-content-between">
+    <h1 class="heading col-10 ps-3">Add Trip</h1>
+    <button class="gb-video-play float-right"  (click)="openGothrough()">
+      <i class="bi bi-play-circle-fill"></i>
+  </button>
+  </div>
+  <app-add-trip-v2-documents-expiry *ngIf="displayDocsSection" [vehicleAndDriverData]="vehicleAndDriverData"></app-add-trip-v2-documents-expiry>
+  <div class="position-relative mx add-trip-v2-wrap">
+    <form [formGroup]="addTrip">
+      <div class="form-layout">
+        <div class="alert-msg" *ngIf="apiError">
+          <span class="icon-wrap"></span>
+          <p class="message-cont">{{ apiError }}</p>
+        </div>
+        <div class="p-4">
+          <div class="row tabIndexActiveFields">
+  
+            <div class="col-xl-3 col-lg-3 col-md-3 col-6">
+              <div class="input-wrap error dropdownArrow" [ngClass]="addErrorClass(addTrip.controls.customer)">
+                <label for="" class="input--required">Customer </label>
+                <material-dropdown [searchable]="true" [addable]="true" [selectedOption]="initialDetails.customer"
+                  [party]="true" [maxLength]="46" (addPartyPopup)="openAddPartyModal($event, 'client')"
+                  (addValueToList)="addValueToPartyPopup($event, billingParty)" [params]="partyNamePopup">
+                  <select #customSelect formControlName="customer" class="no-style select--modify"
+                    (change)="onvendorSelected()">
+                    <option *ngFor="let option of partyList" value="{{ option?.id }}">
+                      {{ option?.party_display_name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <span *ngIf="gstin" class="font-small-blue">
+                  {{ terminology.tax_no_type }}: {{ gstin }}
+                </span>
+                <app-error [controlName]="addTrip.controls.customer"></app-error>
+              </div>
+            </div>
+  
+            <div class="col-xl-3 col-lg-3 col-md-3 col-6">
+              <div class="input-wrap error dropdownArrow" [ngClass]="addErrorClass(addTrip.controls.work_order_no)">
+                <label for="" class="input">Work Order No</label>
+                <app-tool-tip class="tool-tip-position work-order" [totalSlides]="workOrderToolTip.content.length"
+                  position="bottom" [toolTipContent]="workOrderToolTip"></app-tool-tip>
+                <material-dropdown [searchable]="true" [disableLastInput]="true"
+                  [selectedOption]="initialDetails.workOrder" (nonOptionSetValue)="workOrderNonOption($event)">
+                  <select #customSelect formControlName="work_order_no" class="no-style select--modify"
+                    (change)="onWorkOrderSelection()">
+                    <option *ngFor="let option of workOrderList" value="{{ option?.workorder_no }}">
+                      {{ option?.workorder_no }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="addTrip.controls.work_order_no"></app-error>
+              </div>
+            </div>
+            
+            <div class="col-xl-3 col-lg-3 col-md-3 col-6">
+              <div class="input-wrap error dropdownArrow" [ngClass]="addErrorClass(addTrip.controls.c_vehicle)">
+                <label for="" class="input">Vehicle Number</label>
+                <material-dropdown [searchable]="true" [addItemText]="'+ Add Market Vehicle'" [isUpperCaseAllowed]="true" [addable]="true" [party]="true"
+                  [selectedOption]="initialDetails.vehicle" (addPartyPopup)="openAddVehicle($event)"
+                  (addValueToList)="addValueToVehiclePopUp($event)" [params]="vehicleNamePopup" [maxLength]="14">
+                  <select #customSelect formControlName="c_vehicle" class="no-style select--modify"
+                    (change)="onVehicleChange()">
+                    <option *ngFor="let option of vehicleList" value="{{ option?.id }}">
+                      {{ option?.reg_number }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="addTrip.controls.c_vehicle"></app-error>
+                <p class="font-small-blue" *ngIf="vehicleType">&nbsp;{{vehicleType}}</p>
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-3 col-6" *ngIf="!isTransporterTrip" [ngClass]="{'disabled':!addTrip.controls.c_vehicle.value}">
+              <label for="" class="driver-name">Driver Name</label>
+              <app-multi-driver-select [driverList]="driverList" [driverControl]="addTrip.controls.driver" (driverId)="prefillDriverSelf($event)"></app-multi-driver-select>
+            </div>
+            <div *ngIf="isTransporterTrip" class="input-wrap  input-box col-xl-3 col-lg-3 col-md-3 col-6" >
+              <label for="" class="input">DRIVER NAME</label>
+              <input type="text" class="no-style input--bd" formControlName="driver">
+            </div>
+  
+            <div class="col-xl-3 col-lg-3 col-6">
+              <div class="input-wrap clearfix error" [ngClass]="addErrorClass(addTrip.controls.lr_no)">
+                <label for="" class="input">Reference No</label>
+                <input type="text" class="no-style input--bd" placeholder="123456" value="" formControlName="lr_no" />
+                <app-error [controlName]="addTrip.controls.lr_no"></app-error>
+              </div>
+            </div>
+  
+            <div class="col-xl-3 col-lg-3 col-6">
+              <div class="input-wrap clearfix">
+                <label for="" class="">Trip No</label>
+                <app-tool-tip class="tool-tip-position trip-no" [totalSlides]="tripToolTip.content.length"
+                  position="right" [toolTipContent]="tripToolTip"></app-tool-tip>
+                <input type="text" class="no-style input--bd" placeholder="123456" readonly value=""
+                  formControlName="trip_id" />
+              </div>
+            </div>
+  
+            <div class="col-xl-3 col-lg-3 col-6" *ngIf="isTransporterTrip">
+              <div class="input-wrap error" [ngClass]="addErrorClass(addTrip.controls.vehicle_provider)">
+                <label for="" class="input--required">Vehicle Provider</label>
+                <material-dropdown [searchable]="true" [selectedOption]="initialDetails.vehicle_provider" [addable]="true"
+                  [addBlank]="true" [maxLength]="46" [status]="true" [party]="true"
+                  (addPartyPopup)="openAddPartyModal($event, 'vendor')"
+                  (addValueToList)="addValueToPartyPopup($event, vehicleprovider)" [params]="partyNamePopup">
+                  <select #customSelect formControlName="vehicle_provider" class="no-style select--modify">
+                    <option *ngFor="let option of partyListVendor" value="{{ option?.id }}">
+                      {{ option?.party_display_name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <span *ngIf="gst_in" class="font-small-blue">
+                  {{ terminology.tax_no_type }}: {{ gst_in }}
+                </span>
+                <app-error [controlName]="addTrip.controls.vehicle_provider"></app-error>
+              </div>
+            </div>
+          </div>
+          <div class="row tabIndexActiveFields">
+            <div class="col-xl-3 col-lg-3 col-md-3 col-6 route-input-box">
+              <div class="input-wrap error dropdownArrow" [ngClass]="addErrorClass(addTrip.controls.route_code)">
+                <label for="" class="input">Route</label>
+                <app-tool-tip class="tool-tip-position route-tool-tip-position"
+                  [totalSlides]="routeToolTip.content.length" position="right"
+                  [toolTipContent]="routeToolTip"></app-tool-tip>
+                <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialDetails.route_code">
+                  <select #customSelect formControlName="route_code" class="no-style select--modify"
+                    (change)="routeSelected()">
+                    <option *ngFor="let option of routeCodeList" value="{{ option?.name }}">
+                      {{ option?.name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="addTrip.controls.route_code"></app-error>
+              </div>
+            </div>
+          </div>
+        </div>
+        <app-multiple-destination [contactPersonList]="contactPersonList"
+          [ismultipleDestinationFormValid]="ismultipleDestinationFormValid" [routeId]="routeId"
+          (multipleDestinationFormData)="multipleDestinationFormData($event)" [routeDestinations]="routeDestinations"
+          [customerId]="customerId"></app-multiple-destination>
+        <div class="cdc-tab-wrapper">
+          <app-tool-tip  class="custom-field-tooltip" [totalSlides]="customFieldToolTip.content.length"
+            position="right" [toolTipContent]="customFieldToolTip"></app-tool-tip>
+          <mat-tab-group mat-stretch-tabs="false" class="mat-group" animationDuration="0ms" mat-align-tabs="start">
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <span [ngClass]="{ taberror: !isAllFormValidError.clientFright }">Customer Freight</span>
+              </ng-template>
+              <app-billing-types [isMandatory]="false" [isDisableBillingTypes]="isDisableBillingTypes" [isFormValid]="isFormValidclientFright" [workOrderClientFrightData]="workOrderClientFrightData"
+                (dataFromBilling)="clientFreight($event)"></app-billing-types></mat-tab>
+            <mat-tab *ngIf="isTransporterTrip">
+              <ng-template mat-tab-label>
+                <span [ngClass]="{ taberror: !isAllFormValidError.vehicleFreight }">Market Vehicle Cost</span>
+              </ng-template>
+              <app-billing-types [isMandatory]="false" [isFormValid]="isFormValidvehicleFreight"
+                (dataFromBilling)="vehicleFreight($event)"></app-billing-types></mat-tab>
+            <mat-tab *ngIf="!isTransporterTrip">
+              <ng-template mat-tab-label>
+                <span [ngClass]="{ taberror: !isAllFormValidError.driverAllowance }">Driver Allowance</span>
+              </ng-template>
+              <app-driver-allowance-v2 [driverId]="driverId" [isFormValid]="isFormValidDriverAllowance"
+                (dataFromSelfDriver)="dataFromSelfDriver($event)"></app-driver-allowance-v2>
+            </mat-tab>
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <span [ngClass]="{ taberror: !isAllFormValidError.customField }">Custom Field</span>
+                
+              </ng-template>
+              <app-custom-field (customFieldForm)="customFieldForm($event)"
+                [isFormValid]="isFormValidCustomField"></app-custom-field>
+            </mat-tab>
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <span>Trip Documents</span>
+                
+              </ng-template>
+              <div class="col-12 d-flex flex-wrap gap-4 py-4 m-1">
+                <file-uploader-v2 (onFileUploaded)="fileUploader($event)" fileName="Document Unknown" [uploaderId]="'1234'"
+                    [isShowOnlyUpload]="false"></file-uploader-v2>
+                <app-file-delete-view  [showInlineEdit]="true" [editedFileName]="editedFileName" [fileData]="document" *ngFor="let document of tripDocuments"
+                    (fileDeleted)="fileDeleted($event)"></app-file-delete-view>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+        <div class="bottom-btn-wrapper d-flex justify-content-end py-2 px-4">
+  
+  
+          <button class="btn me-3 w-auto" [routerLink]="preFixUrl + '/trip/new-trip/list'">
+            Cancel
+          </button>
+          <button class="btn btn--primary w-auto" (click)="saveTrip()">
+            Create Trip
+          </button>
+  
+        </div>
+      </div>
+    </form>
+  </div>
+  
+  
+  <app-add-party-popup vendorPartyType="2" *ngIf="showAddPartyPopup.status" [popDetail]="showAddPartyPopup" [isVendor]="vendor"
+    (closeModal)="closePartyPopup()" (partyAdded)="addPartyToOption($event)"></app-add-party-popup>
+  <alert-popup [inputData]="popupWorkOrderInputData" (outputData)="confirmWorkOrderButton($event)"></alert-popup>
+  <alert-popup [inputData]="popupWorkOrderInputDataSave" (outputData)="confirmWorkOrderSaveButton($event)"></alert-popup>
+  
+  
+  <app-go-through  [goThroughDetais]="goThroughDetais"></app-go-through>
+  <app-credit-limit *ngIf="creditLimit.open" [creditLimitData]="creditLimit" (creditLimit)="onCreditLimit($event)"></app-credit-limit>
+  <app-credit-limit *ngIf="creditOnsaveLimit.open" [creditLimitData]="creditOnsaveLimit" (creditLimit)="onCreditLimitOnSave($event)"></app-credit-limit>
+  

@@ -1,0 +1,29 @@
+
+.add-item__error {
+    // position: absolute;
+    // top: 50%;
+    // left: 50%;
+    // -webkit-transform: translate(-50%, -50%);
+    // transform: translate(-50%, -50%);
+    cursor: pointer;
+    color: #e50202;
+}
+.img-loder {
+    position: absolute;
+}
+
+.align-manage-challan {
+    text-align: right;
+    margin: 10px;
+    .align-add-icon {
+        vertical-align: text-bottom;
+    }
+}
+.table-wrapper--scroll {
+    max-height: 331px;
+    overflow: auto;
+}
+
+.modal-body {
+    padding: 20px !important;
+}

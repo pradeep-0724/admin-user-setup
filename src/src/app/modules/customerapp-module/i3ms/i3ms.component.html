@@ -1,0 +1,182 @@
+<div class="form-layout mg-top-30 box-shadow">
+
+    <div class="table-section">
+        <div class="table-header">
+
+            <div class="right-section__header">
+                <h1 class="heading">Mining Report</h1>
+                <div class="row ms-auto me-2 header-actions" style="position: relative;top: -40%;">
+                    <div class="col-sm-10 col-md-10 col-xs-2 date">
+                        <input type="text" class="form-control date-range no-style date-range-style"
+                        [ngModelOptions]="{standalone: true}" bsDaterangepicker [(ngModel)]="selectedRange"
+                        placement="left"
+                        (bsValueChange)="onDateRangeChange($event)"
+                        [bsConfig]="{ rangeInputFormat: 'DD MMM YYYY', showWeekNumbers: false }">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-lg-3 col-sm-6">
+                    <div class="input-wrap" [ngClass]="addErrorClass(transporterName)">
+                        <label for="">Transporter Name :</label>
+                            <material-dropdown [searchable]="true" [addBlank]="true" class="dropDownWidth"
+                            [selectedOption]="{value: transporterName.value, label: transporterName.value}">
+                                <select #customSelect [formControl]="transporterName" class="no-style select--modify"
+                                        (change)="updateTransporter()">
+                                    <option *ngFor="let option of transporters" value="{{ option }}">
+                                        {{ option }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                        <app-error [controlName]="transporterName"></app-error>
+                        <span class="border-anim"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-sm-6" *ngIf="showLicensee">
+                    <div class="input-wrap" [ngClass]="addErrorClass(licensee)">
+                        <label for="">Licensee :</label>
+                            <material-dropdown [searchable]="true" [addBlank]="true" class="dropDownWidth"
+                            [selectedOption]="{value: licensee.value, label: licensee.value}">
+                                <select #customSelect [formControl]="licensee" class="no-style select--modify"
+                                (change)="updateLicensee()">
+                                    <option *ngFor="let option of licensees" value="{{ option }}">
+                                        {{ option }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                        <app-error [controlName]="licensee"></app-error>
+                        <span class="border-anim"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-sm-6" *ngIf="showDestination">
+                    <div class="input-wrap" [ngClass]="addErrorClass(destination)">
+                        <label for="">Destination :</label>
+                        <input type="text" class="no-style input--bd" placeholder="Destination" maxlength="16" [formControl]="destination"
+                        (change)="updateDestination()">
+                        <app-error [controlName]="destination"></app-error>
+                        <span class="border-anim"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-sm-6" *ngIf="showSource">
+                    <div class="input-wrap" [ngClass]="addErrorClass(source)">
+                        <label for="">Source :</label>
+                            <material-dropdown [searchable]="true" [addBlank]="true" class="dropDownWidth"
+                            [selectedOption]="{value: source.value, label: source.value}">
+                                <select #customSelect [formControl]="source" class="no-style select--modify"
+                                (change)="updateSource()">
+                                    <option *ngFor="let option of sources" value="{{ option }}">
+                                        {{ option }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                        <app-error [controlName]="source"></app-error>
+                        <span class="border-anim"></span>
+                    </div>
+                </div>
+
+                                <!-- <div class="col-xl-4 col-md-4 col-xs-12 col-sm-12 col-12 col-lg-4 transporter">
+                                   <p> Transporter Name :</p>
+                                </div>
+                                <div class="col-xl-8 col-md-8 col-xs-12 col-sm-12 col-12 col-lg-8">
+                                    <mat-form-field class="transportName-full-width" floatLabel="never">
+                                    <input matInput [formControl]="transporterName" [readonly]="requestType=='Edit'" placeholder="Transporter Name">
+                                    <mat-error *ngIf="transporterName.hasError('pattern')">
+                                        Please enter a valid Transporter Name.
+                                      </mat-error>
+                                    </mat-form-field>
+                                </div> -->
+
+
+                        <!-- <div>
+                            <p (click)="updateTransporterName(requestType)" class="transporterUpdate">{{requestType}}</p>
+                        </div> -->
+
+
+            </div>
+            <div class="row mg-top-30">
+                <div class="col-xl-12 col-lg-12">
+                    <div class="table-header__left">
+                        <div class="search-options bulk-action">
+                            <input type="text" placeholder="Search" class="no-style search-bar input-search" (ngModelChange)="this.searchDebounceObserbable.next($event)" [(ngModel)]="searchValue"  style="height: 32px;">
+                           <span class="border-anim"></span>
+                       </div>
+                       <div class="select-wrap ms-auto">
+                        <span class="show-text">Showing</span>
+                        <select name=""  class="no-style select--modify"  (ngModelChange)="optionSelected($event)" [(ngModel)]="selectedOption" style="padding: 9px 14px 9px 10px;">
+                            <option *ngFor="let option of selectOptions" [value]="option">
+                                {{option}}
+                              </option>
+                        </select>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table class="table-container">
+                <thead>
+                    <tr>
+                        <th>Departure Date</th>
+                        <th>T.P No.</th>
+                        <th>Vehicle no.</th>
+                        <th>Transporter</th>
+                        <th>Licensee name</th>
+                        <th>Mineral</th>
+                        <th>Weight</th>
+                        <th>Source</th>
+                        <th>Destination</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   <tr *ngIf="triplistData.length <=0">
+                        <td colspan="100" style="background-color: #fff">
+                            <div class="no-content-wrapper">
+                                <figure class="no-content-pic">
+                                    <img src="assets/img/no-content.png" alt="">
+                                </figure>
+                                <div class="no-content-txt">
+                                    <h5 class="heading">No data found!</h5>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr *ngFor="let item of triplistData">
+                        <td>
+                            <p class="mg-bottom-5">{{item.departure_time}}</p>
+                            <p>({{item.departure_time_str}})</p>
+                        </td>
+                        <td>{{item.tp_no}}</td>
+                        <td>{{item.vehicle_no}}</td>
+                        <td>{{item.transporter}}</td>
+                        <td>{{item.licensee_name}}</td>
+                        <td>{{item.mineral}}</td>
+                        <td>{{item.weight}}</td>
+                        <td>{{item.source}}</td>
+                        <td>{{item.designation}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="custom-pagination">
+        </div>
+        <div class="custom-pagination">
+            <div class="table-page-no">
+                <custom-pagination
+                [inputData]="tripList"
+                (outputData)="outputData($event)"
+                [searchValue]="searchValue"
+                [dateParams]="dateParams"
+                [pageNumberCount]="selectedOption">
+            </custom-pagination>
+            </div>
+        </div>
+    </div>
+</div>

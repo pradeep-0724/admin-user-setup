@@ -1,0 +1,94 @@
+<div [formGroup]="workOrderForm">
+
+  <div class="row mx-0 p-3" >
+    <div class="col-md-6">
+      <div class="toggle-wrapper d-flex align-items-center h-100">
+          <span class="toggle-label">Show Custom Fields in Sales Order</span>
+          <label for="toggle" class="toggle-switch">
+              <input type="checkbox" id="toggle"  (change)="allDisplay()" formControlName="display">
+              <span class="toggle-box" >
+                  <span class="toggle-circle"></span>
+              </span>
+          </label>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <button class="btn btn--primary py-2 w-auto" style="float: right;" (click)="addNewField()"> + Add Custom Field</button>
+    </div>
+  </div>
+  <div class="table-section">
+      <div class="table-header p-0 " >
+      <div class="table-wrapper-list" id="table-height">
+          <table class="table-container" formArrayName="work_order_list">
+              <thead>
+                  <tr>
+                    <th>Field Name</th>
+                    <th>Field Type</th>
+                    <th>Mandatory</th>
+                    <th>Show in Sales Order</th>
+                    <th>Show in Invoices</th>
+                    <th></th>
+                  </tr>
+              </thead>
+              <tbody class="align-top settings-fields-class" >
+                  <tr *ngIf="sortedData.length==0">
+                      <td colspan="10" style="background-color: #fff">
+                          <div class="no-content-wrapper">
+                              <figure class="no-content-pic">
+                                  <img src="assets/img/no-content.png" alt="">
+                              </figure>
+                              <div class="no-content-txt">
+                                  <h5 class="heading">No data found!</h5>
+                              </div>
+                          </div>
+                      </td>
+                  </tr>
+                   <tr *ngFor="let custom of workOrderForm.controls.work_order_list['controls'] ; let i = index" [formGroupName]="i">
+                       <td>{{custom.controls.field_label.value}}</td>
+                       <td>{{custom.controls.field_type.value.name}}</td>
+                       <td>{{custom.controls.mandatory.value?'True':'False'}}</td>
+                       <!-- <td>
+                        <label for="active-{{custom.controls.id.value}}" class="toggle-switch">
+                          <input type="checkbox" id="active-{{custom.controls.id.value}}" formControlName="display"(change)="showHide(custom)">
+                          <span class="toggle-box">
+                              <span class="toggle-circle"></span>
+                          </span>
+                      </label>
+                       </td> -->
+                       <td>
+                        <label for="trips-{{custom.controls.id.value}}" class="toggle-switch" [ngClass]="{'disabled':!custom.controls.display.value}">
+                          <input type="checkbox" id="trips-{{custom.controls.id.value}}" formControlName="in_workorder" (change)="showWorkOrder(custom)" >
+                          <span class="toggle-box">
+                              <span class="toggle-circle"></span>
+                          </span>
+                      </label>
+                       </td>
+                       <td>
+                        <label for="invoice-{{custom.controls.id.value}}" class="toggle-switch" 
+                               [ngClass]="{'disabled':!custom.controls.in_workorder.value}">
+                          <input type="checkbox" id="invoice-{{custom.controls.id.value}}"  formControlName="in_invoice_bos" (change)="showInvoice(custom)" >
+                          <span class="toggle-box" >
+                              <span class="toggle-circle"></span>
+                          </span>
+                      </label>
+                       </td>
+                      <td class="table-action">
+                          <i class="material-icons more-icon" (click)="optionsList($event, 'list_'+custom.controls.id.value)" >more_vert</i>
+                          <ul class="more-actions__menu table-popup" [ngClass]="{show: showOptions === 'list_'+custom.controls.id.value}">
+                              <li class="more-actions__item" (click)="edit(custom.controls.id.value)"><i
+                                class="material-icons">edit</i>Edit</li>
+                              <li class="more-actions__item"(click)="popupFunction(custom.controls.id.value,i,custom.controls.field_label.value)"><i
+                                class="material-icons">delete</i>Delete</li>
+                          </ul>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+  </div>
+  </div>
+
+</div>
+
+  <app-add-custom-fields [url]="url" [editData]="editData" [isFieldTypeChange]="isFieldTypeChange" [showNoteModal]="isOpenDialog" (modalClosed)="modelClose($event)"></app-add-custom-fields>
+  <alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

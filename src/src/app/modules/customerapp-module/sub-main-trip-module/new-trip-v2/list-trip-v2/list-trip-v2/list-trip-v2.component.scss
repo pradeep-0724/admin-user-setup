@@ -1,0 +1,162 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+
+
+
+
+
+
+
+.expanded_table {
+  width: 100% !important;
+}
+
+.trip-extended-list>.expanded-trip:nth-child(2n) {
+  background-color: #F6F6F6;
+
+
+}
+
+.expanded-trip {
+  border-bottom: 1px solid #CDCDCD;
+
+}
+
+
+
+.table-wrapper-list {
+  padding: 0px;
+}
+
+.g-map-icon {
+  width: 15px;
+
+  img {
+    width: 100%;
+    margin-left: 1px;
+  }
+}
+
+.field-name {
+  color: #7E7E7E;
+  font-weight: 500;
+}
+
+.field-value {
+  color: $text-color;
+  font-weight: 600;
+}
+
+
+
+.tempo {
+  width: 100%;
+  background-color: blue;
+}
+
+.del-btn {
+  transition: all 100ms ease-in-out;
+
+  &:hover {
+    transform: scale(1.2);
+  }
+}
+
+.live-status-toggle {
+  color: $text-color;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+
+}
+
+.trip-status-card {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 7px 0 13px 0;
+  position: relative;
+
+  .truck-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    border: 2px solid red;
+    margin-right: 14px;
+    border-radius: 50%;
+  }
+
+  &::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: -3px;
+    
+    border-radius: 4px;
+    border:1px solid  $gray-500;
+    height: 50%;
+    transform: translateY(-70%);
+
+  }
+
+}
+
+.live-status-wrap div:nth-child(5) div::after{
+  display: none;
+ 
+}
+
+.yellow-card {
+  .truck-icon {
+    color: $yellow-color;
+    border-color: $yellow-color;
+  }
+
+  .trips-amount {
+    color: $yellow-color;
+  }
+}
+
+.blue-card {
+  .truck-icon {
+    color: $sky-blue;
+    border-color: $sky-blue;
+  }
+
+  .trips-amount {
+    color: $sky-blue;
+  }
+}
+
+.green-card {
+  .truck-icon {
+    color: $green;
+    border-color: $green;
+  }
+
+  .trips-amount {
+    color: $green;
+  }
+}
+
+
+.map-not-allowed{
+  opacity: 0.3;
+  filter: grayscale(100%);
+  cursor: not-allowed;
+}
+
+.market-map-not-allowed{
+  opacity: 0.3;
+  filter: hue-rotate(90deg);
+  cursor: not-allowed;
+}
+:host ::ng-deep{
+  .trip-normal-list .trip-list-map-icon,.trip-extended-list .trip-list-map-icon{
+    width: 15px;
+  }
+}

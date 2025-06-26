@@ -1,0 +1,175 @@
+<div class=""  id="block-white">
+
+
+  <div class="table-header__left align-items-center justify-content-between">
+      <h1 class="heading col-8">Route Summary</h1>
+      <div class="mobile-calender px-0 ms-2 w-auto">
+        <input type="text" class=" form-control "
+        [ngModelOptions]="{standalone: true}" bsDaterangepicker [(ngModel)]="selectedRange"
+        (bsValueChange)="filterDate($event)"
+        [bsConfig]="{ rangeInputFormat: 'DD MMM YYYY', showWeekNumbers: false }" readonly>
+    </div>
+      <!-- <app-video-play [videoUrl]="videoUrl" class="col-2 videoRight ms-auto"></app-video-play> -->
+  </div>
+</div>
+
+
+<div class="alert-msg" *ngIf="apiError">
+<span class="icon-wrap"></span>
+<p class="message-cont">{{ apiError }}</p>
+</div>
+<div class="form-layout" id="form-height">
+<div class="table-section">
+    <div class="table-header">
+        <div class="row">
+            <div class="col-xl-3 col-2">
+                <div class="table-header__left">
+                    <div id="demo-2" class="search">
+                        <input type="search" placeholder="Search"
+                            [(ngModel)]="search">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-9 col-10">
+                <div class="table-header__right justify-content-end">
+                    <button class="btn btn-primary excelIcon" (click)="exportXls()">Export</button>
+
+                    <div class="select-wrap">
+                        <span class="show-text">Showing</span>
+                        <select [(ngModel)]="filter_by" name="" class="no-style select--modify">
+                            <option *ngFor="let num of filter" value="{{num.value}}">{{num.key}}</option>
+                        </select>
+                    </div>
+                    <button class="btn--action mg-left-10" [ngClass]="{'filterOpen':showFilter ||isFilterApplied}" (click)="showFilter = !showFilter">
+                      <span  *ngIf="isFilterApplied && !showFilter" class="material-icons filterBullet">
+                        fiber_manual_record
+                        </span>
+                        <img *ngIf="!isFilterApplied && !showFilter" src="assets/img/filter-icon.svg" alt="">
+                        <img *ngIf="isFilterApplied && !showFilter" src="assets/img/filter_icon_2.svg" alt="">
+                        <img *ngIf="showFilter" src="assets/img/filter-icon-svg-3.svg" alt="">
+                    </button>
+                    <app-filter [config]="options" [data]="allData" [visible]="showFilter"
+                        (onApplied)="filterApplied($event)" (onClear)="filterApplied($event)"></app-filter>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="table-wrapper-list" id="table-height">
+        <table class="table-container tableParentStyles" matSort (matSortChange)="sortData($event)">
+            <thead>
+                <tr>
+                    <th mat-sort-header="date">Date</th>
+                    <th>Vehicle Number</th>
+                    <th>Loop ID</th>
+                    <th>Trip ID</th>
+                    <th>Bilty No</th>
+                    <th>Customer</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Trip Status</th>
+                    <th>Trip Revenue</th>
+                    <th>Trip Expense</th>
+                    <th>Trip P/L</th>
+                    <th>Route Status</th>
+                    <th>Route Revenue</th>
+                    <th>Route Expense</th>
+                    <th>Route P/L</th>
+                </tr>
+            </thead>
+            <tbody class="mainbg">
+                <tr *ngIf="(storedData | routeSummarySearch:search)?.length == 0">
+                    <td colspan="100%" class="white">
+                        <div class="no-content-wrapper">
+                            <figure class="no-content-pic">
+                                <img src="assets/img/no-content.png" alt="">
+                            </figure>
+                            <div class="no-content-txt">
+                                <h5 class="heading">No data found!</h5>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <ng-container  *ngFor="let route of storedData | routeSummarySearch: search | paginate: { itemsPerPage: filter_by, currentPage: p }; let i = index;">
+
+                <!-- <tr>
+                    <td>{{route?.loop_date}}</td>
+                    <td>{{route?.vehicle}}</td>
+                    <td>{{route?.loop_id}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+
+
+                    <td></td>
+                    <td></td>
+
+                    <td>{{route?.route_status}}</td>
+                    <td style="color: green">{{route?.all_trips_profit_loss.all_trips_revenue}}</td>
+                    <td style="color: red">{{route?.all_trips_profit_loss.all_trips_expense}}</td>
+                    <td [ngStyle]="{'color':route?.all_trips_profit_loss.all_trips_net>=0?'green':'red'}">{{route?.all_trips_profit_loss.all_trips_net}}</td>
+
+                </tr>
+                <tr *ngFor="let trips of route.trips">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td  class="link" (click)="routeToTripView(trips.id)">{{trips?.trip_id}}</td>
+                    <td>{{trips?.builty_no}}</td>
+                    <td>{{trips?.customer?.company_name}}</td>
+                    <td>{{trips?.from_loc?.name}}</td>
+                    <td>{{trips?.to_loc?.name}}</td>
+                    <td>{{trips?.status}}</td>
+                    <td style="color: green">{{trips?.profit_loss?.revenue_total}}</td>
+
+
+                    <td style="color: red">{{trips?.profit_loss?.expense_total}}</td>
+                    <td [ngStyle]="{'color':trips?.profit_loss?.net>=0?'green':'red'}">{{trips?.profit_loss?.net}}</td>
+
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr> -->
+
+
+                <tr>
+                    <td>{{route?.loop_date}}</td>
+                    <td>{{route?.vehicle}}</td>
+                    <td>{{route?.loop_id}}</td>
+                    <td class="removeBorder"><tr *ngFor="let trips of route.trips"><td class="link" (click)="routeToTripView(trips.id)">{{trips?.trip_id}}</td></tr></td>
+                    <td class="removeBorder"><tr *ngFor="let trips of route.trips"><td>{{trips?.builty_no}}</td></tr></td>
+                    <td  class="removeBorder"><tr *ngFor="let trips of route.trips"><td><a target="_blank" 
+                        class="link" [routerLink]="[prefixUrl+'/onboarding/party/details/client/'+trips.customer.id]">{{trips?.customer?.company_name}}</a></td></tr></td>
+                    <td class="removeBorder"><tr *ngFor="let trips of route.trips"><td>{{trips?.from_loc?.name}}</td></tr></td>
+                    <td class="removeBorder"><tr *ngFor="let trips of route.trips"><td>{{trips?.to_loc?.name}}</td></tr></td>
+                    <td class="removeBorder"><tr *ngFor="let trips of route.trips"><td>{{trips?.status}}</td></tr></td>
+                    <td class="removeBorder"><tr *ngFor="let trips of route.trips"><td style="color: green">{{trips?.profit_loss?.revenue_total}}</td></tr></td>
+
+
+                    <td class="removeBorder"><tr *ngFor="let trips of route.trips"><td style="color: red">{{trips?.profit_loss?.expense_total}}</td></tr></td>
+                    <td class="removeBorder"><tr *ngFor="let trips of route.trips"><td [ngStyle]="{'color':trips?.profit_loss?.net>=0?'green':'red'}">{{trips?.profit_loss?.net}}</tr></td>
+
+                   <td>{{route?.route_status}}</td>
+                    <td style="color: green">{{route?.all_trips_profit_loss.all_trips_revenue}}</td>
+                    <td style="color: red">{{route?.all_trips_profit_loss.all_trips_expense}}</td>
+                    <td [ngStyle]="{'color':route?.all_trips_profit_loss.all_trips_net>=0?'green':'red'}">{{route?.all_trips_profit_loss.all_trips_net}}</td>
+
+                </tr>
+
+
+
+
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+    <div class="table-page-no">
+        <pagination-controls previousLabel='' nextLabel="" directionLinks="true" class=" my-pagination"
+            (pageChange)="p = $event" (pageBoundsCorrection)="p=$event">
+        </pagination-controls>
+    </div>
+</div>
+</div>

@@ -1,0 +1,21 @@
+<form  [formGroup]="placeForm">
+  <div matAutocompleteOrigin #origin="matAutocompleteOrigin" class="material-wrap  input-wrap mb-0 min-height-wrap" >
+    <input type="text"  matInput formControlName="name" placeholder="Search" class="no-style input--bd "  [matAutocomplete]="auto" (focus)="openResentList($event)">
+  </div>
+    <mat-autocomplete #auto="matAutocomplete">
+      <ng-container  *ngIf=" resentLocation.length>0 &&!isSelected  && showRecentData">
+        <mat-option class="drop-down" *ngFor="let option of resentLocation " [value]="option.name" (click)="recentLocationSelected(option)">
+          {{option.name}}<span *ngIf="option.lng&&option.lat">&nbsp;  &nbsp; <img [src]="googleMaps" alt=""></span>
+        </mat-option>
+      </ng-container>
+
+      <ng-container *ngIf=" newLocations.length>0 &&!isSelected  && !showRecentData" >
+        <mat-option class="drop-down" *ngFor="let option of newLocations " [value]="option.name" (click)="getAddress(option)">
+          {{option.name}}
+        </mat-option>
+      </ng-container>
+
+    </mat-autocomplete>
+  <p *ngIf="placeForm.invalid && placeForm.touched"  style="color: red;">Please select any Address</p>
+</form>
+

@@ -1,0 +1,82 @@
+<div class="coordinates-wrap">
+  <p (click)="isAddNewLoc = true">Enter co-ordinates</p>
+</div>
+<form [formGroup]="placeForm">
+  <div matAutocompleteOrigin #origin="matAutocompleteOrigin" class="material-wrap input-wrap mb-0 min-height-wrap">
+    <input type="text" matInput formControlName="name" (keyup)="searchPlaceByname($event.target.value)" (change)="prepareRequest()" [attr.tabindex]="disabled ? -1 : 0"  placeholder="Search" class="no-style input--bd  w-80"
+      [ngClass]="{'input--bd-error':placeForm.get('name').hasError('required') && placeForm.get('name').touched}"
+      [matAutocomplete]="auto" (focus)="openResentList($event)" />
+
+
+    <span class="info-icon"  *ngIf="placeForm?.controls?.lat?.value">
+      <img src="../../../../../../../assets/img/google-map-icon.svg" alt="google-map-icon">
+    </span>
+
+
+  </div>
+  <mat-autocomplete #auto="matAutocomplete">
+    <ng-container *ngIf="resentLocation.length > 0 && !isSelected && showRecentData">
+      <mat-option class="drop-down" *ngFor="let option of resentLocation" [value]="option.name"
+        (click)="recentLocationSelected(option)">
+        {{ option.name
+        }}<span *ngIf="option.lng && option.lat">&nbsp; &nbsp; <img [src]="googleMaps" alt="" /></span>
+      </mat-option>
+    </ng-container>
+
+    <ng-container *ngIf="newLocations.length > 0 && !isSelected && !showRecentData">
+      <mat-option class="drop-down" *ngFor="let option of newLocations" [value]="option.name"
+        (click)="getAddress(option)">
+        {{ option.name }}
+      </mat-option>
+    </ng-container>
+  </mat-autocomplete>
+  <p *ngIf="placeForm.invalid && placeForm.touched" style="color: red ;font-size: 12px;">
+    Please select any Address
+  </p>
+</form>
+
+<div class="modal fade" [ngClass]="{ show: isAddNewLoc }" id="exampleModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal--sm dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Save Location</h5>
+      </div>
+
+      <div class="form-wrap" [formGroup]="addCoOrdinatesForm">
+        <div class="input-wrap">
+          <label for="" class="input--required">Location co-ordinates </label>
+          <input type="text" class="no-style input--bd" placeholder="12.921486718288056, 77.64559037719661" value=""
+            formControlName="co_ordinates" />
+          <p style="color: red" *ngIf="
+              addCoOrdinatesForm.get('co_ordinates').hasError('pattern') &&
+              addCoOrdinatesForm.get('co_ordinates').touched ">
+            Please enter valid co-ordinates
+          </p>
+          <p style="color: red"
+            *ngIf="
+              addCoOrdinatesForm.get('co_ordinates').hasError('required') && addCoOrdinatesForm.get('co_ordinates').touched">
+            This field is required
+          </p>
+        </div>
+
+        <div class="input-wrap">
+          <label for="" class="">Location Name</label>
+          <input type="text" class="no-style input--bd" placeholder="Dubai" value="" formControlName="name" readonly />
+        </div>
+
+        <div class="input-wrap">
+          <label for="" class="">Save as</label>
+          <input type="text" class="no-style input--bd" placeholder="E.g.: Simple Warehouse" value=""
+            formControlName="alias" />
+        </div>
+      </div>
+
+      <div class="modal-bottom">
+        <button class="btn" (click)="cancelLoc()">Cancel</button>
+        <button class="btn btn--primary" (click)="addLoc()">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="isAddNewLoc" class="modal-backdrop fade show"></div>

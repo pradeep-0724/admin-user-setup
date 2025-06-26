@@ -1,0 +1,25 @@
+<div class="pdf-viewer-container">
+<div class="right-section__header pdf-viewer-header  py-2 px-md-3 px-1  mb-0 justify-content-between">
+  <h1 class="heading col-8">Payment Voucher</h1>
+  <div class="header-actions justify-content-end mt-0 ms-auto">
+      <button class="btn--action mg-left-10" *ngxPermissionsOnly="bill_payment[1]" [routerLink]="[prefixUrl+'/payments/edit/bill/',billid]">
+          <i class="material-icons">edit</i>
+      </button>
+    <button class="btn--action mg-left-10" (click)="downloadPdf(paymentBillData)">
+        <i class="material-icons">cloud_download</i>
+    </button>
+    <button class="btn--action mg-left-10" (click)="openDetails()" *ngIf="routeToDetail"><i class="material-icons">close</i></button>
+
+
+  </div>
+</div>
+
+
+  <pdf-viewer [src]="pdfSrc"
+  [render-text]="true"
+  [stick-to-page]="true"
+  [autoresize]="true"
+  [original-size]="false"
+  [show-all]="true"></pdf-viewer>
+</div>
+

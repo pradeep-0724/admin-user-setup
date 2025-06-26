@@ -1,0 +1,15 @@
+export const environment = {
+    production: true,
+    baseURL: '//oneapi.transportsimple.app',
+    apiPort: '/',
+    apiBaseRoute: 'api/',
+    apiVerion: 'v1/',
+    version: '6.0.0',
+    buildTimestamp: '2024-07-18T17:57:25.819Z',
+    error_reporting: true,
+    ANALYTICS_API_KEY:'7718c67c19c8547e2f0baf4372a8cb52',
+    track_event:true,
+    apiVerionV2: 'v2/',
+    snackBar:true,
+    currencyConverter:false,
+  };

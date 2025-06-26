@@ -1,0 +1,298 @@
+
+<div class=" layout-bg def-color add-screen-wrap d-flex flex-column">
+  <div class="row g-0 ">
+    <div class="d-flex col-12 mx-0 align-items-start   py-3 px-3 ps-4 justify-content-between">
+  
+      <h1 class="heading ">{{tyreChangeId?'Edit':'Add'}} Tyre Change</h1>
+  
+      
+    </div>
+  
+  </div>
+
+  <div *ngIf="tyreMasterDetails?.tyres_info?.length ==0" class="d-flex justify-content-center align-items-center p-4 flex-grow-1 shadow-inset-top-lg no-tyre-master flex-column">
+    <img src="../../../../../../../assets/img/icons/tyre-layout-icon.png"  alt="">
+    <p *ngIf="!noLayoutErr" class="line-height-normal text-center">Please click <a class="custom-link" (click)="getTyreMaster(vehicleId)">Here </a> if you can't see the already added tyre layout.</p>
+    <p *ngIf="noLayoutErr" class="line-height-normal text-center">No tyre layout available for this {{isAsset?'asset':'vehicle'}}. To add tyre change and enable tyre position tracking, please create a Tyre Master for Brand: {{isAsset?vehcileInfo?.brand:vehcileInfo?.make}} and Model: {{vehcileInfo?.model}} </p>
+    <p><a class="arrow-link" *ngIf="noLayoutErr" (click)="createTyreMaster()">Create Tyre Master<span class="arrow"></span></a></p>
+  </div>
+  
+  <div *ngIf="tyreMasterDetails?.tyres_info?.length !=0">
+    <form class="px-0 shadow-inset-top-lg" [formGroup]="addServiceForm">
+             
+      <div class="alert alert-danger" role="alert" *ngIf="!isTotalGreaterThenZero">
+        Tyre Change total should be greater then {{ currency_type?.symbol}} 0.00
+       </div>
+        <!-- <div *ngIf="initialValues.errorMessage.position">
+         <div class="alert-msg">
+             <span class="icon-wrap"></span>
+             <p class="message-cont">Please Note: No information about the Vehicle Tyre Position is available to display,
+                 Please add Tyre Master Information About the Vehicle Make and Model</p>
+         </div>
+           <br>
+        </div> -->
+    
+         <div class="d-flex justify-content-between px-4  align-items-center border-bottom" >
+
+           <div class="fs-6 fw-semibold">Tyre Details</div>
+           <div class="d-flex align-items-center ">
+           <div class="w-auto my-3 me-3" [ngClass]="{'hiddenContent':!isTax}" >
+             <div class="input-wrap clearfix d-inline-flex align-items-end  mb-0 removeBorder">
+               <label for="" class="input">Tax</label>
+               <material-dropdown [searchable]="true" class="dropDownWidth" [selectedOption]="initialValues.tax">
+                 <select #customSelect formControlName="tax" class="no-style select--modify" (change)="onCalculationChange();taxValueChange()">
+                     <option *ngFor="let status of taxOptions" value="{{ status.id }}">
+                         {{ status.label}}</option>
+                 </select>
+             </material-dropdown>
+             </div>
+           </div>
+             <div class="w-auto " [ngClass]="{'hiddenContent':!isTax}">
+               <div>
+                 <label class="check-box d-inline-block">
+                   <input type="checkbox" formControlName="is_tax_included" (change)="onCalculationChange()">
+                   <span class="check-mark"></span>
+                   <span class="label-text">Item rates are tax inclusive</span>
+               </label>
+               </div>
+             </div>
+            </div>
+    
+    
+         </div>
+    
+       <ng-container >
+         <!-- Tyre Change  -->
+            
+            <div class="form-body">
+             <!-- <div class="alert alert-primary" role="alert" *ngIf="!isVehiclePosition">
+               Please Note: No information about the Vehicle Tyre Position is available to display, Please add Tyre Master Information for the Vehicle Make and Model
+             </div> -->
+    
+             <div *ngIf="initialValues.errorMessage.unique_no">
+                 <div class="alert-msg">
+                     <span class="icon-wrap"></span>
+                     <p class="message-cont">Unique number already exists</p>
+                 </div>
+                 <br>
+             </div>
+             <div *ngIf="initialValues.errorMessage.position_no">
+                 <div class="alert-msg">
+                     <span class="icon-wrap"></span>
+                     <p class="message-cont">Vehicle Position already used</p>
+                 </div>
+                 <br>
+             </div>
+             <div formArrayName="tyre_change" class=" tyre-change-wrapper border-bottom">
+             <ng-container *ngFor="let tyreChange of addServiceForm.controls['tyre_change']['controls']; let i = index;"[formGroupName]="i" >
+              <div class="row mx-0 py-3" [ngClass]="{'border-bottom':addServiceForm.controls['tyre_change']['controls'].length-1!=i}">
+               <div class="col-lg-3 col-md-6 tyre-detail-wrap">
+                 <app-tyre-details-view
+                  *ngIf="tyreMasterDetails?.tyres_info?.length !=0" [selectedPosition]="tyreChange?.value?.position_name"[selectedTyres]='selectedTyres' (onTyreSelect)="onTyreClick($event,i)" [tyreDetails]="tyreMasterDetails" [formIndex]="i"></app-tyre-details-view>
+               </div>
+               <div class="col-lg-9">
+                 <div class="row mx-0">
+                 <div class="col-lg col-md-6 px-1 custom-box-input-wrap mb-3" >
+                   <label class="input--required">
+                     Position
+                   </label>
+                     <input placeholder="Click on tyre" type="text" formControlName="position_name" readonly class="box-input"[ngClass]="addErrorClass(tyreChange.controls.position_name)" />
+                 </div>
+                 <div class="col-lg col-md-6 px-1 custom-box-input-wrap mb-3" >
+                   <label for="">
+                     Tyre Number
+                   </label>
+                   <input [ngClass]="addErrorClass(tyreChange.controls.tyre_number)" type="text" placeholder="1000" formControlName="tyre_number" class="box-input" (focusout)="changeUniqueNo(tyreChange)">
+                 </div>
+                 <div class="col-lg col-md-6 px-1 custom-box-input-wrap mb-3" [ngClass]="addErrorClass(tyreChange.controls.tyre_amount)">
+                   <label for="">
+                     Tyre Amount ({{currency_type.symbol}})
+                   </label>
+                   <input type="text" positiveThreeDigitDecimalNumber placeholder="1000" class="box-input" formControlName="tyre_amount" (change)="calculateTotalAmount(tyreChange)"/>
+                 </div>
+                 <div class="col-lg col-md-6 px-1 custom-box-input-wrap mb-3" [ngClass]="addErrorClass(tyreChange.controls.labour_amount)">
+                   <label for="">
+                     Labour Amount ({{currency_type.symbol}})
+                   </label>
+                   <input type="text" positiveThreeDigitDecimalNumber placeholder="1000"  formControlName="labour_amount" class="box-input" (change)="calculateTotalAmount(tyreChange)"/>
+                 </div>
+                 <div class="col-lg col-md-6 px-1 custom-box-input-wrap mb-3" >
+                   <label for="" class="input--required">
+                     Total ({{currency_type.symbol}})
+                   </label>
+                   <input class="box-input" type="text" positiveThreeDigitDecimalNumber  placeholder="1000"  formControlName="total" readonly [ngClass]="{'uniqueNumbererror':tyreChange.controls.total.invalid&&tyreChange.controls.total.touched}">
+                 </div>
+               </div>
+               <div class="row mx-0">
+                 <div class="col-lg col-md-6 px-1 custom-box-input-wrap mb-3" >
+                   <label for="" class="input--required">
+                     Brand
+                   </label>
+                   <material-dropdown [searchable]="true" [addable]="true"
+                   [postApiUrl]="manufacturerApi" [params]="vehicleMakeParam"  [selectedOption]="initialValues.make[i]"
+                   [addErrorClass]="addErrorClass(tyreChange.controls.brand)"
+                   (postApiResponse)="getNewVehicleMake($event,i,tyreChange)" (addValueToList)="addNewVehicleMake($event)">
+                           <select #customSelect formControlName="brand" class="no-style select--modify"
+                           (change)="onMakeChange(tyreChange, i)">
+                           <option *ngFor="let make of tyreManufacturer" value="{{make.name}}">
+                            {{ make.name }}
+                          </option>
+                           </select>
+                       </material-dropdown>
+                 </div>
+                 <div class="col-lg col-md-6 px-1 custom-box-input-wrap mb-3" >
+                   <label for="" class="input--required">
+                     Model
+                   </label>
+                   <div [ngClass]="{'disable':!tyreChange.get('brand').value}">
+                   <material-dropdown [searchable]="true" [addable]="true"
+                   [params]="modelParams"
+                   [postApiUrl]="modelApi[i]"
+                   [selectedOption]="initialValues.model[i]"
+                   [addErrorClass]="addErrorClass(tyreChange.controls.model)"
+                   (postApiResponse)="getNewModel($event,i, tyreChange)"
+                   (addValueToList)="addNewModel($event)"
+                   [disabled]="!tyreChange.get('brand').value"
+                   >
+                       <select #customSelect formControlName="model" class="no-style select--modify">
+                           <option *ngFor="let model of modelList[i] " value="{{model.name}}">
+                               {{ model.name}}
+                           </option>
+                       </select>
+                   </material-dropdown>
+                  </div>
+                 </div>
+                 <div class="col-lg col-md-6 px-1 custom-box-input-wrap mb-3" >
+                   <label for="">
+                     Date of Installation
+                   </label>
+                   <mat-form-field >
+                     <input matInput [matDatepicker]="installationDate"  (focus)="installationDate.open()"
+                       formControlName="installation_date" placeholder="DD/MM/YYYY" readonly
+              >
+                     <mat-datepicker-toggle matSuffix [for]="installationDate"></mat-datepicker-toggle>
+                     <mat-datepicker #installationDate></mat-datepicker>
+                   </mat-form-field>
+                 </div>
+                 <div class="col-lg col-md-6 px-1 custom-box-input-wrap mb-3" >
+                   <label for="">
+                     Permitted Date 
+                   </label>
+                   <mat-form-field >
+                    <input matInput [matDatepicker]="permittedDate"  (focus)="permittedDate.open()"
+                      formControlName="permitted_date" placeholder="DD/MM/YYYY" readonly
+             >
+                    <mat-datepicker-toggle matSuffix [for]="permittedDate"></mat-datepicker-toggle>
+                    <mat-datepicker #permittedDate></mat-datepicker>
+                  </mat-form-field>
+                 </div>
+                 <div class="col-lg col-md-6 px-1 custom-box-input-wrap mb-3" >
+                   <label for="">
+                     Thread Depth
+                   </label>
+                   <input class="box-input" type="text"   placeholder="1000"  formControlName="thread_depth" >
+                 </div>
+               </div>
+               <div class="row mx-0">
+                <div class=" d-flex justify-content-end">
+                 <div matTooltip="No tyre available for change." matTooltipClass="material-toltip-class" matTooltipPosition="above" [matTooltipDisabled]="addServiceForm.controls['tyre_change']['controls'].length-1 != tyreMasterDetails?.tyres_info?.length-1">
+                  <button class="row-btn row-btn-add" [disabled]="addServiceForm.controls['tyre_change']['controls'].length-1 == tyreMasterDetails?.tyres_info?.length-1"  *ngIf="addServiceForm.controls['tyre_change']['controls'].length-1==i" (click)="addTyreChangeItem([{}])"
+                    ><span
+                      class="material-icons">
+                      add
+                    </span></button>
+                  </div>
+                  <button class="row-btn row-btn-delete "
+                  *ngIf="addServiceForm.controls['tyre_change']['controls'].length>1" (click)="removeTyreChange(i)"><span
+                      class="material-icons">
+                      close
+                    </span></button>
+                </div>
+               </div>
+                 </div>
+              </div>
+              </ng-container>
+            </div>
+         </div>
+    
+       </ng-container>
+    
+       </form>
+    
+       <div class="row">
+        <div class="col-md-6 p-0">
+            <app-job-card-payments [paymentForm]="addServiceForm" [paymentEditData]="paymentEditData"></app-job-card-payments>
+        </div>
+        <div class="col-md-6 p-4">
+          
+          <ng-container [formGroup]="addServiceForm"  >
+
+            <!-- claculation part -->
+            <div class="d-flex justify-content-between" >
+              <p >Tyre SubTotal: <span  class="fw-semibold ms-1 fs-6">{{currency_type.symbol}} {{ addServiceForm.controls.service_total.value | numberFormat }}</span></p>
+              <p >Labour SubTotal: <span  class="fw-semibold ms-1 fs-6">{{currency_type.symbol}} {{ addServiceForm.controls.labour_total.value | numberFormat}}</span></p>
+              <p >SubTotal: <span  class="fw-semibold ms-1 fs-6">{{currency_type.symbol}} {{ addServiceForm.controls.subtotal.value | numberFormat}}</span></p>
+            </div>
+      
+                     
+      
+                      
+                        <div class="text-end pt-0 gst-left gst-table-wrapper d-flex justify-content-end align-items-center mt-4" *ngIf="false">
+                            <span class="me-2"> Discount: </span>
+                            <div class="input" [ngClass]="addErrorClass(addServiceForm.controls.discount)">
+                              <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="0.00"
+                              formControlName="discount"
+                              (change)="onCalculationChange()">
+                            </div>
+                            <div class="select-wrap dropdown me-3">
+                              <select name="" class="no-style select--modify custom-select"
+                                  formControlName="discount_choice"
+                                  (change)="onCalculationChange()">
+                                  <option value="0">%</option>
+                                  <option value="1">{{ currency_type?.symbol}}</option>
+                              </select>
+                            </div>
+                            
+
+                            <div class="px-0  text-end gst-right fw-semibold fs-6">{{ currency_type?.symbol}} {{addServiceForm.controls.discount_choice_value.value}}</div>
+    
+                         </div>
+                   
+      
+                      <div class="row mx-0 justify-content-end align-items-center " [ngClass]="{'hiddenContent':!isTax}"
+                                *ngFor="let percentageTotal of    addServiceTotal.taxes;">
+                          <ng-container *ngIf="percentageTotal.total">
+                          <p class="ps-0 w-auto mt-4"> Include {{terminology.tax_type}} &#64; {{ percentageTotal.value }}% on  {{ percentageTotal.total | numberFormat}}
+                          </p>
+                          <p class="pe-0 w-auto fw-semibold fs-6 mt-4">{{currency_type.symbol}} {{ percentageTotal.taxAmount | numberFormat}}</p>
+                        </ng-container>
+                      </div>
+                      <div class="row mx-0 justify-content-end align-items-center  mt-4">
+                        <p class="ps-0 w-auto">
+                          <mat-checkbox [disableRipple]="true" (change)="onRoundOffEvent($event)"
+                            formControlName="is_roundoff">Round Off</mat-checkbox>
+                        </p>
+                        <p class="pe-0 w-auto fw-semibold fs-6"> {{currency_type.symbol}} {{ addServiceForm.controls.roundoff_amount.value | numberFormat}}</p>
+                      </div>
+      
+      
+                <div class="row mx-0 justify-content-end align-items-center mt-4  ">
+                  <h5 class="ps-0 w-auto">Total</h5>  <h5 class="pe-0 w-auto"> {{currency_type.symbol}} {{ addServiceForm.controls.total_amount.value | numberFormat}}</h5>
+                </div>
+              </ng-container>
+          
+          
+        </div>
+    
+    </div>
+  </div>
+</div>
+<div class="row mx-0">
+  <div  class="bottom-btn-wrap py-2 px-4">
+    <div  class="d-flex justify-content-end ">
+      <button  type="button" class="btn  btn--sm me-3" (click)="cancel()" >Cancel</button>
+      <button  type="button" [disabled]="tyreMasterDetails?.tyres_info?.length ==0" (click)="saveTyreChange()" class="btn btn--primary btn--sm" >{{tyreChangeId?'Update':'Create'}}</button>
+    </div>
+  </div>
+</div>
+  

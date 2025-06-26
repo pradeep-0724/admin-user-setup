@@ -1,0 +1,88 @@
+@import "../../../../../../../assets/styles/helpers/variable.scss";
+@import "../../../../../../../assets/styles/helpers/mixins.scss";
+
+.mg-top-23{
+    margin-top: 23px;
+}
+.table-checkbox{
+    .label-text{
+        margin-top: -8px !important;
+    }
+}
+.account-summary{
+    color: $primary-text-color;
+    overflow-x: auto;
+    &__container{
+        width: 850px;
+    }
+    .acc-label{
+        text-align: right;
+        font-weight: bold;
+        margin-bottom: 30px;
+        // @include respond-to(mobile){
+        //     text-align: left;
+        // }
+    }
+    .acc-desc{
+        text-align: right;
+        // white-space: pre-wrap;
+        margin-top: -20px;
+        margin-bottom: 30px;
+        line-height: 20px;
+        // @include respond-to(mobile){
+        //     width: 50vh;
+        //     white-space: unset;
+        //     text-align: left;
+        // }
+    }
+    .acc-value-center{
+        text-align: right;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
+    .acc-value-right{
+        text-align: right;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
+}
+
+
+.note-text{
+    display: inline-block;
+    vertical-align: text-top;
+    margin-left: 10px;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.deactive-note{
+    @include respond-to(mobile){
+        margin-bottom: 15px;
+        text-align: left;
+    }
+}
+div#height-50{
+    height: 50vh;
+}
+.min-width-500{
+min-width:500px;
+}
+.firstTD-max-width td:first-child{
+  max-width: 150px;
+  overflow-x: auto;
+}
+
+.progress-bar-wrap {
+    @media (max-width:639px) {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .progress-bar-list {
+      min-height: 20px;
+      margin-bottom: 0;
+      z-index: 3;
+
+    }
+  }

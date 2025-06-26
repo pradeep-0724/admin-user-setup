@@ -1,0 +1,321 @@
+<div class="add-screen-wrap">
+    <div *ngIf="lpoId" class="right-section__header">
+        <h1 class="heading">Edit Local Purchase Order</h1>
+    </div>
+    <div *ngIf="!lpoId" class="right-section__header d-flex justifi-content-space-between">
+        <h1 class="heading">Add Local Purchase Order</h1>
+    </div>
+
+    <form [formGroup]="lpoForm" (ngSubmit)="submitForm('save_and_submit')">
+        <div class="alert-msg" *ngIf="apiError">
+            <span class="icon-wrap"></span>
+            <p class="message-cont">{{ apiError }}</p>
+        </div>
+        <div class="form-body shadow-inset-top-lg form-layout form-layout--pd no-br-tl no-br-tr">
+            <div class="row">
+                <div *ngIf="lpoId" class="col-lg-3 col-sm-6">
+                    <div class="input-wrap disabled">
+                        <label for="" class="input--required position-relative">Vendor <span *ngIf="isTdsDecleration"
+                                class="blueTag">TDS Declaration Received</span></label>
+                        <div class="input--bd">{{ initialValues.vendor.label }}</div>
+                        <span *ngIf="gstin" class="font-small-blue"> {{terminology.tax_no_type}}: {{gstin}} </span>
+                    </div>
+                </div>
+
+                <div *ngIf="!lpoId" class="col-lg-3 col-sm-6">
+                    <div class="input-wrap error " [ngClass]="addErrorClass(lpoForm.controls.party)">
+                        <label for="" class="input--required position-relative">Vendor <span *ngIf="isTdsDecleration"
+                                class="blueTag">TDS Declaration Received</span></label>
+                        <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth"
+                            [selectedOption]="initialValues.vendor" [party]="true"
+                            (addPartyPopup)="openAddPartyModal($event)" (addValueToList)="addValueToPartyPopup($event)"
+                            [params]="partyNamePopup" [maxLength]="255">
+
+                            <select #customSelect formControlName="party" class="no-style select--modify"
+                                (change)="onVendorSelected($event)" (change)="stopLoaderClasstoBody()">
+                                <option *ngFor="let vendor of vendorList" value="{{ vendor?.id }}">
+                                    {{ vendor.party_display_name }}
+                                </option>
+                            </select>
+                        </material-dropdown>
+                        <span *ngIf="gstin" class="font-small-blue"> {{terminology.tax_no_type}}: {{gstin}} </span>
+                        <app-error [controlName]="lpoForm.controls.party"></app-error>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-lg-3 col-6">
+                    <div class="input-wrap clearfix">
+                        <label for="" class="input--required">LPO No.</label>
+                        <input type="text" class="no-style input--bd" formControlName="lpo_no" placeholder="123456"
+                            value="" readonly>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(lpoForm.controls.lpo_date)">
+                        <label for="" class="input--required">LPO Date</label>
+                        <mat-form-field>
+                            <input matInput readonly [matDatepicker]="lpo_date" (focus)="lpo_date.open()"
+                                formControlName="lpo_date" (dateChange)="setValidityDate()" placeholder="DD/MM/YYYY">
+                            <mat-datepicker-toggle matSuffix [for]="lpo_date"></mat-datepicker-toggle>
+                            <mat-datepicker #lpo_date></mat-datepicker>
+                        </mat-form-field>
+                        <app-error [controlName]="lpoForm.controls.lpo_date"></app-error>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                    <div class="input-wrap clearfix error" [ngClass]="addErrorClass(lpoForm.controls.validity)">
+                        <label for="" class="input--required">Validity Term</label>
+                        <div>
+                            <material-dropdown [selectedOption]="initialValues.validity">
+                                <select #customSelect class="no-style select--modify" formControlName="validity"
+                                    (change)="setValidityDate()">
+
+                                    <option *ngFor="let option of validityTerms " value="{{option.id}}">
+                                        {{option.label}}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <app-error [controlName]="lpoForm.controls.validity"></app-error>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(lpoForm.controls.lpo_expiry_date)">
+                        <label for="" class="input--required">Expiry Date</label>
+                        <mat-form-field>
+                            <input matInput readonly [matDatepicker]="lpo_expiry_date"
+                                (dateChange)="onValidityDateChange()" [min]="lpoForm.controls.lpo_date.value"
+                                formControlName="lpo_expiry_date" (focus)="lpo_expiry_date.open()"
+                                placeholder="DD/MM/YYYY">
+                            <mat-datepicker-toggle matSuffix [for]="lpo_expiry_date"></mat-datepicker-toggle>
+                            <mat-datepicker #lpo_expiry_date></mat-datepicker>
+                        </mat-form-field>
+                        <app-error [controlName]="lpoForm.controls.lpo_expiry_date"></app-error>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-sm-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(lpoForm.controls.reference_no)">
+                        <label for="">Reference No.</label>
+                        <input type="text" class="no-style input--bd add-hsn" placeholder="Eg.:1234567" value=""
+                            formControlName="reference_no">
+                        <app-error [controlName]="lpoForm.controls.reference_no"></app-error>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="input-wrap">
+                        <label for="">Employee In Charge</label>
+                        <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [addBlank]="true"
+                            [selectedOption]="initialValues.employee">
+                            <select #customSelect formControlName="employee" class="no-style select--modify"
+                                (change)="handleEmployeeChange()">
+                                <option *ngFor="let employee of employeeList" value="{{ employee.id }}">
+                                    {{ employee.emp_name_id }}
+                                </option>
+                            </select>
+                        </material-dropdown>
+                        <span class="error-message">Error messge!</span>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-sm-6">
+                    <div class="input-wrap">
+                        <label for="" class="input--required">Payment Term</label>
+                        <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [addBlank]="true"
+                            [selectedOption]="initialValues.paymentTerm">
+                            <select #customSelect formControlName="payment_term" class="no-style select--modify">
+                                <option *ngFor="let option of paymentTermList" value="{{ option.id }}">
+                                    {{ option.label }}
+                                </option>
+                            </select>
+                        </material-dropdown>
+                        <span class="error-message">Error messge!</span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="input-wrap">
+                        <label for="">Point of Contact (Name)</label>
+                        <material-dropdown [searchable]="true" [disableLastInput]="true"
+                            (nonOptionSetValue)="setContactPersons($event)"
+                            [selectedOption]="{label:lpoForm.controls.poc_name.value,value:''}" [addable]="false"
+                            class="dropDownWidth" [addBlank]="true">
+                            <select #customSelect formControlName="poc_name" class="no-style select--modify"
+                                (change)="onContactPersonChange()">
+                                <option *ngFor="let contactperson of contactPersonList"
+                                    value="{{ contactperson.display_name}}">
+                                    {{ contactperson.display_name }}
+                                </option>
+                            </select>
+                        </material-dropdown>
+
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 input-wrap mb-0 country-filed-height" formGroupName="poc_mobile">
+
+                    <label for="" class="input" id="cc-font">Point of Contact (Mobile)</label>
+
+                    <div class="row mx-0">
+                        <div class="col-4 px-0">
+                            <div class="width-country-code custom-margin me-0">
+
+                                <material-dropdown class="dropDownWidth"
+                                    [selectedOption]="{label:lpoForm.get('poc_mobile').get('code').value,value:''}">
+                                    <select #customSelect formControlName="code" class="no-style select--modify">
+                                        <option *ngFor="let phone_code of countryPhoneCodes" [value]="phone_code">
+                                            {{phone_code}}
+                                        </option>
+                                    </select>
+                                </material-dropdown>
+                            </div>
+                        </div>
+                        <div class="px-0 number-grow col-8 px-0">
+                            <div class="ms-3">
+                                <div class="w-auto px-0 number-grow">
+                                    <div class="error input-wrap"
+                                        [ngClass]="addErrorClass(lpoForm.get('poc_mobile').get('no'))">
+                                        <input type="text" class="no-style input--bd" placeholder="9999999999"
+                                            formControlName="no">
+                                        <app-error [controlName]="lpoForm.get('poc_mobile').get('no')"></app-error>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="addable-row-table">
+                <table>
+                    <thead>
+                        <tr>
+
+                            <th class="input" width="30%">
+                                Description
+                            </th>
+                            <th>Total units</th>
+                            <th>Unit Price ({{currency_type.symbol}})</th>
+                            <th *ngIf="isTax">Amount ({{currency_type.symbol}})</th>
+                            <th *ngIf="isTax">Tax (%)</th>
+                            <th>Total Amount ({{currency_type.symbol}})</th>
+                            <th></th>
+
+                        </tr>
+
+                    </thead>
+                    <tbody formArrayName="items">
+
+                        <tr *ngFor="let control of lpoForm.controls['items']['controls'];let i=index "
+                            [formGroupName]="i">
+                            <td>
+                                <div>
+                                    <input type="text" formControlName="description" class="error-box"
+                                        [ngClass]="{'error':control.get('description').invalid && control.get('description').touched }"
+                                        placeholder="Description">
+                                </div>
+                            </td>
+                            <td>
+                                <input positiveThreeDigitDecimalNumber type="text"
+                                    [ngClass]="{'error':control.get('total_units').invalid && control.get('total_units').touched }"
+                                    formControlName="total_units" (change)="calculateItemsAmount(i)">
+
+                            </td>
+                            <td>
+                                <input positiveThreeDigitDecimalNumber type="text"
+                                    [ngClass]="{'error':control.get('rate').invalid && control.get('rate').touched }"
+                                    formControlName="rate" (change)="calculateItemsAmount(i)">
+
+                            </td>
+                            <td *ngIf="isTax">
+                                <input positiveThreeDigitDecimalNumber type="text"
+                                    [ngClass]="{'error':control.get('amount_before_tax').invalid && control.get('amount_before_tax').touched }"
+                                    formControlName="amount_before_tax" readonly>
+
+                            </td>
+                            <td *ngIf="isTax">
+                                <material-dropdown [searchable]="true" [addable]="false"
+                                    [selectedOption]="initialValues.tax[i]" class="dropDownWidth"
+                                    [disabled]="!companyRegistered">
+                                    <select #customSelect formControlName="tax" class="no-style select--modify"
+                                        (change)="calcuationsChanged()">
+
+                                        <option *ngFor="let option of taxes" value="{{ option.id }}">
+                                            {{ option.label }}
+                                        </option>
+                                    </select>
+                                </material-dropdown>
+                            </td>
+                            <td
+                                [ngClass]="{'invalid-input':control.get('amount').invalid && control.get('amount').touched }">
+                                <input positiveThreeDigitDecimalNumber type="text" formControlName="amount" readonly>
+
+                            </td>
+
+                            <td class="rc-row-btn-wrap border-start-0 border-end-0">
+                                <div class="d-flex justify-content-end">
+                                    <button (click)="removeItem(i)"
+                                        *ngIf="lpoForm.controls['items']['controls'].length-1 !=0"
+                                        class="  row-btn row-btn-delete "><span class="material-icons">
+                                            close
+                                        </span></button>
+                                    <button (click)="addItem()"
+                                        *ngIf="lpoForm.controls['items']['controls'].length-1 ==i"
+                                        class=" row-btn row-btn-add "><span class="material-icons">
+                                            add
+                                        </span></button>
+
+                                </div>
+
+
+                            </td>
+                        </tr>
+
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex flex-column align-items-end fw-semibold fs-6 mt-4 def-color">
+                <p class="mb-3">Subtotal: &nbsp;&nbsp;{{currency_type.symbol}} {{lpoForm.get('subtotal').value|numberFormat }}</p>
+                <p class="mb-3">Tax Amount: &nbsp;&nbsp;{{currency_type.symbol}} {{lpoForm.get('tax_amount').value|numberFormat}}</p>
+                <p class="">Total Amount: &nbsp;&nbsp;{{currency_type.symbol}} {{lpoForm.get('total_amount').value|numberFormat}}</p>
+
+            </div>
+            <div class="form-layout__card mg-top-30">
+                <file-uploader (onFileUploaded)="fileUploader($event)" (onFileDeleted)="fileDeleted($event)"
+                    [multiple]="true" [accept]="'capture=camera, image/jpeg,image/x-jpg,image/png, application/pdf'"
+                    [showFileName]="false" [patchFileUrls]="patchFileUrls">
+                </file-uploader>
+            </div>
+        </div>
+        <button type="submit"></button>
+
+    </form>
+</div>
+
+<div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end">
+
+
+    <button class="btn btn--sm " type="button"
+        [routerLink]="[preFixUrl+'/trip/local-purchase-order/list']">Cancel</button>
+    <button class="btn  btn--primary btn--default btn-mg-left btn-w-100 btn--dropdown saveButton"
+        (click)="handleSaveClick()">{{lpoId ?'Update':'Save'}} LPO<i class="material-icons"
+            (click)="$event.stopPropagation(); handleSpanClick()">arrow_drop_down</i>
+        <div class="more-actions__menu" [ngClass]="{'show': saveButton}" id="custom-dropdown-top">
+            <button class="more-actions__item  w-100 text-start" type="click" (click)="submitForm('ongoing')">Save &
+                Submit</button>
+            <div *ngIf="!lpoId">
+                <button class="more-actions__item w-100 text-start" type="button" (click)="submitForm('draft')">Save as
+                    Draft</button>
+            </div>
+            <div *ngIf="lpoId">
+                <button class="more-actions__item w-100 text-start" type="button" (click)="submitForm('draft')"
+                    *ngIf="!lpoData?.status">Save as Draft</button>
+            </div>
+        </div>
+    </button>
+
+</div>
+
+
+<app-add-party-popup vendorPartyType="2" [popDetail]="showAddPartyPopup" (closeModal)="closePartyPopup()"
+    (partyAdded)="addPartyToOption($event)" [isVendor]="true"></app-add-party-popup>

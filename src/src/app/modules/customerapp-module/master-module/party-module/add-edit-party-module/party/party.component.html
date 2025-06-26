@@ -1,0 +1,212 @@
+<div class="add-screen-wrap">
+  <form [formGroup]="editPartyForm">
+
+    <div class="right-section__header align-items-center justify-content-between ">
+      <h1  class="heading col-10"> {{partyId?'Edit':'Add'}} Party Details</h1>
+      <button class="gb-video-play float-right" (click)="openGothrough()">
+        <i class="bi bi-play-circle-fill"></i>
+      </button>
+    </div>
+    <div class="form-layout shadow-inset-top-lg p-4 pb-2">
+      <div class="alert-msg" *ngIf="apiError">
+        <span class="icon-wrap"></span>
+        <p class="message-cont">{{ apiError }}</p>
+      </div>
+      <div class="row " formGroupName="basic_detail">
+       
+         
+            <div class="col-lg-3 col-sm-6">
+              <div class="input-wrap"
+                [ngClass]="addErrorClass(editPartyForm.controls.basic_detail['controls'].party_type)"
+                [class.disabled]="partyId">
+                <label for="" class="input--required">Party</label>
+                  <material-dropdown [searchable]="true" [addable]="false"
+                    [selectedOption]="initialValues.partyType">
+                    <select #customSelect formControlName="party_type" 
+                      (change)="changePartyType()">
+                      <option *ngFor="let option of partyType" value="{{ option?.id }}">
+                        {{ option?.label }}
+                      </option>
+                    </select>
+                  </material-dropdown>            
+                <app-error [controlName]="editPartyForm.controls.basic_detail['controls'].party_type"></app-error>
+              </div>
+
+            </div>
+            <div class="col-lg-3 col-sm-6" >
+              <div class="input-wrap error" [class.disabled]="isCategoryTypeDisable"
+                [ngClass]="addErrorClass(editPartyForm.controls.basic_detail['controls'].vendor_party_type)">
+                <label for="" [ngClass]="{'input--required':editPartyForm.get('basic_detail').get('party_type').value==1}">Category</label>
+                  <material-dropdown [searchable]="true" [disabled]="isCategoryTypeDisable"
+                    [addable]="false" [selectedOption]="initialValues.category" >
+                    <select #customSelect formControlName="vendor_party_type" >
+                      <option *ngFor="let option of categoryTypes" value="{{ option.id}}">
+                        {{ option.value }}
+                      </option>
+                    </select>
+                  </material-dropdown>              
+                <app-error [controlName]="editPartyForm.controls.basic_detail['controls'].vendor_party_type"></app-error>
+              </div>
+            </div>
+        
+        
+
+        <div class="col-lg-3 col-sm-6">
+          <div class="input-wrap error"
+            [ngClass]="addErrorClass(editPartyForm.controls.basic_detail['controls'].company_name)">
+            <label for="" class="input--required">Company</label>
+            <input type="text" class="no-style input--bd" placeholder="Company Name" value=""
+              formControlName="company_name" (change)="setDisplayName()">
+
+            <app-error [controlName]="editPartyForm.controls.basic_detail['controls'].company_name"></app-error>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="input-wrap error"
+            [ngClass]="addErrorClass(editPartyForm.controls.basic_detail['controls'].email_address)">
+            <label for="" class="">Email</label>
+            <input type="email" class="no-style input--bd" placeholder="email@gmail.com" value=""
+              formControlName="email_address" [readOnly]="!emailEditable">
+            <app-error [controlName]="editPartyForm.controls.basic_detail['controls'].email_address"></app-error>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="input-wrap error"
+            [ngClass]="addErrorClass(editPartyForm.controls.basic_detail['controls'].display_name)">
+            <label for="" class="input--required">Display Name</label>
+            <input type="text" class="no-style input--bd" placeholder="Display Name" value=""
+              formControlName="display_name">
+
+            <app-error [controlName]="editPartyForm.controls.basic_detail['controls'].display_name"></app-error>
+            <span *ngIf="display_name_error" class="error-reg">{{display_name_error}}</span>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 input-wrap mb-0 country-filed-height">
+
+          <label for="" class="input" id="cc-font">Contact Number </label>
+
+          <div class="row mx-0">
+            <div class="col-4 px-0">
+              <div class="width-country-code custom-margin me-0">
+
+                <material-dropdown class="dropDownWidth" [selectedOption]="initialValues.mobile_country_code">
+                  <select #customSelect formControlName="mobile_country_code" class="no-style select--modify">
+                    <option *ngFor="let phone_code of countryPhoneCode" [value]="phone_code">
+                      {{phone_code}}
+                    </option>
+                  </select>
+                </material-dropdown>
+              </div>
+            </div>
+
+            <div class="px-0 number-grow col-8 px-0">
+              <div class="ms-3">
+
+                <div class="w-auto px-0 number-grow">
+                  <div class="error input-wrap"
+                    [ngClass]="addErrorClass(editPartyForm.controls.basic_detail['controls'].mobile)">
+
+                    <input type="text" class="no-style input--bd" placeholder="9999999999" formControlName="mobile">
+                    <span *ngIf="mobile_error" class="error-reg">{{mobile_error}}</span>
+                    <app-error [controlName]="editPartyForm.controls.basic_detail['controls'].mobile"></app-error>
+
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6">
+          <div class="input-wrap">
+            <label for="" class="input" >Employee In Charge </label>
+            <material-dropdown [searchable]="true"
+            [selectedOption]="initialValues.salesPerson">
+            <select #customSelect [formControl]="this.editPartyForm.get('basic_detail').get('sales_person_name')" class="no-style select--modify" (change)="handleEmployeeChange()">
+                <option *ngFor="let option of employeeList"
+                    [value]="option?.id">
+                    {{ option?.emp_name_id }}
+                </option>
+            </select>
+        </material-dropdown>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6">
+          <div class="input-wrap">
+            <label for="" class="input" >Party Approver</label>
+            <material-dropdown [searchable]="true"
+            [selectedOption]="initialValues.partyApprover">
+            <select #customSelect [formControl]="this.editPartyForm.get('others').get('party_approver')" class="no-style select--modify" (change)="handlePartyApproverChange()">
+                <option *ngFor="let option of usersList"
+                    [value]="option?.id">
+                    {{ option?.display_name }}
+                </option>
+            </select>
+        </material-dropdown>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+    <div class="gb-tab-wrapper ">
+      <mat-tab-group mat-stretch-tabs="false" class="mat-group" [selectedIndex]="selectedTabIndex" animationDuration="0ms" mat-align-tabs="start">
+        <mat-tab *ngIf="isTax">
+          <ng-template mat-tab-label>
+            <span [ngClass]="{'invalidForm':!isTaxFormValid}">Tax </span>
+          </ng-template>
+          <div style="margin: 0;" class="p-3">
+            <app-party-tax-box [isLarge]="false" (partyTax)="partyTaxOutputData($event)" [isTaxValid]="isTaxValid" [isEdit]="true"
+              [taxEditData]="taxEditData"></app-party-tax-box>
+          </div>
+        </mat-tab>
+        <mat-tab *ngIf="isClient">
+          <ng-template mat-tab-label>
+            <span [ngClass]="{'invalidForm':isCertificatetabError}">Certificate</span>
+          </ng-template>
+          <app-party-certificate [documentEditList]="documentEditList" [isValid]="isValidCertificate" [partyForm]="editPartyForm"></app-party-certificate>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span>Address </span>
+          </ng-template>
+          <app-party-address [editData]="editData" [partyAddress]="editPartyForm.get('address')"></app-party-address>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span>Point of Contact</span>
+          </ng-template>
+          <app-party-contact-person [editData]="editData" [partyForm]="editPartyForm"></app-party-contact-person>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span> Balance & Billing</span>
+          </ng-template>
+          <app-party-balance-billing  [editData]="editData" [isClient]="isClient"
+            [balanceBilling]="editPartyForm.get('balance_billing')"></app-party-balance-billing>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span  [ngClass]="{'invalidForm':isCustomFieldTabError}">Other Details</span>
+          </ng-template>
+          <app-party-notes-attachments   [editData]="editData" [isOtherDetailsValid]="isOtherDetailsValid" [others]="editPartyForm.get('others')"></app-party-notes-attachments>
+        </mat-tab>
+
+      </mat-tab-group>
+    </div>
+
+  </form>
+</div>
+<div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end">
+
+  <button class="btn btn--sm me-2" type="button" [routerLink]="[prefixUrl+'/onboarding/party/view']"
+    routerLinkActive="router-link-active">Cancel</button>
+  <button class="btn btn--primary btn--sm" type="button" (click)="submitPartyForm()">{{partyId?'Update':'Save'}}</button>
+
+</div>
+
+
+<!-- video-pop-up -->
+<app-go-through [goThroughDetais]="goThroughDetais"></app-go-through>

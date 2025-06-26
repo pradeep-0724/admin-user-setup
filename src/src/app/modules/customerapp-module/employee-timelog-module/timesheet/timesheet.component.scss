@@ -1,0 +1,213 @@
+
+.time-sheet-header-left {
+  color: #4E515C;
+  font-weight: 700;
+  font-size: 15px;
+
+  .material-icons {
+    font-size: 15px;
+    color: #4E515C;
+    line-height: 2;
+    font-weight: 600;
+  }
+
+  &.heading {
+    padding: 20px 10px;
+    
+    /* box-shadow: 0px 0px 6px #00000029; */
+  }
+}
+.timesheet-block{
+  border-bottom: 1px solid #D7D7D7;
+}
+.date-select {
+
+  select {
+    appearance: auto;
+    border: 1px solid #595FAB;
+    background: #F5F3FF;
+    color: #595FAB;
+    font-weight: 600;
+  }
+}
+
+.date-styles {
+  /* button {
+    padding-top: 15px;
+  } */
+
+  span {
+    display: block;
+    padding: 5px 0;
+    font-size: 12px;
+  }
+}
+
+.previous,
+.next {
+
+
+  button {
+    width: 8px;
+    height: 12px;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+  }
+}
+
+.previous {
+  button {
+    border-right: 8px solid #B8B8B8;
+  }
+
+
+}
+
+.next {
+
+
+  button {
+    border-left: 8px solid #B8B8B8;
+  }
+}
+
+.time-sheet-right {
+  .text {
+    color: #4E515C;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .total-time {
+    font-size: 17px;
+    color: #4E515C;
+
+    span {
+      color: #4E515C;
+      font-size: 35px;
+      font-weight: 700;
+      display: block;
+      padding: 10px 0 40px 0;
+      border-bottom: 1px dashed #B8B8B8;
+
+    }
+
+    &:last-child span {
+
+      border: none;
+    }
+  }
+}
+.table-dates{
+  td{
+    text-align: center;
+    &.active-date{
+      button,span{
+        color: #595FAB;
+      }
+      button{
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.time-sheet-block {
+
+  color: #545454;
+
+  .table-details {
+    max-height: 350px;
+    tr{
+      border-bottom: 1px solid #D7D7D7;
+      &:last-child{
+        border: none;
+      }
+    }
+    td{
+      border: none;
+      padding: 15px;
+      vertical-align: middle;
+
+    }
+    .in-out {
+
+      width: 100px;
+      span{
+        border: 2px solid #96959E;
+        color: #96959E;
+        padding: 10px;
+        display: inline-block;
+        border-radius: 5px;
+        min-width: 70px;
+        text-align: center;
+      }
+      &.green{
+
+        span{
+          color:#04CE1F;
+          border: 2px solid #04CE1F;
+
+        }
+      }
+    }
+
+    .time {
+     span{
+      font-weight: 600;
+      color: #7E7E7E;
+      font-size: 15px;
+     }
+     width: 100px;
+    }
+    .outTime{
+      color: #7E7E7E;
+      opacity: 100%;
+    }
+
+    .odometer {
+      width: 150px;
+      color: #7E7E7E;
+      span{
+        color: #7E7E7E;
+        font-size: 15px;
+      }
+    }
+
+    .map {
+      width: 50px;
+
+      span{
+        color: #04CE1F;
+        cursor: pointer;
+      }
+
+    }
+
+    .image {
+      width: 50px;
+
+    }
+  }
+}
+.date-text{
+  font-weight: 600;
+  font-size: 14px;
+}
+.table-stick{
+  .sticky-dates{
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    background: #fff;
+  }
+  .added-data-table{
+    position: relative;
+    height: 49vh;
+    overflow-y: auto;
+  }
+  .added-data-table::-webkit-scrollbar {
+    display: none;
+  }
+}

@@ -1,0 +1,29 @@
+<div class="pdf-viewer-container">
+  <div class="right-section__header pd-20-30 mb-0 pdf-viewer-header" *ngIf="advanceReceivedData">
+  <h1 class="heading">Advance Received Details</h1>
+  <div class="header-actions justify-content-end ms-auto tabIndexActive">
+
+    <ng-container *ngIf="advanceStatus !=2">
+      <button class="btn--action py-1"  *ngxPermissionsOnly="advancePermissions[1]" [routerLink]="[prefixUrl+'/income/payments/advance/edit', advanceReceivedData.id]">
+        <i class="material-icons h-auto">edit</i>
+      </button>
+    </ng-container>
+      <button class="btn--action mg-left-10 py-1"  (click)="emailPopUp(advanceReceivedData)"><mat-icon class="h-auto"> email</mat-icon></button>
+    <button class="btn--action mg-left-10 py-1" (click)="downloadPdf(advanceReceivedData)">
+        <i class="material-icons h-auto">cloud_download</i>
+    </button>
+    <button class="btn--action  mg-left-10 py-1" (click)="openDetails()" *ngIf="routeToDetail"><i class="material-icons py-1">close</i></button>
+
+  </div>
+</div>
+
+
+  <pdf-viewer [src]="pdfSrc"
+  [render-text]="true"
+  [stick-to-page]="true"
+  [autoresize]="true"
+  [original-size]="false"
+  [show-all]="true"></pdf-viewer>
+</div>
+<app-add-email *ngIf="isOpen"  (closeDialog)="closeDialog($event)" [filebyteCode]="filebyteCode"></app-add-email>
+

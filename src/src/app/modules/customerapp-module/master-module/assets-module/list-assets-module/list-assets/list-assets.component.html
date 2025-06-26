@@ -1,0 +1,111 @@
+<div class="calc-height">   
+  <div class="info-msg" *ngIf="!canCreateAsset">
+    <p class="message-cont">Please Note: The Maximum Asset Limit ({{registeredAssets}}) has been reached for the
+        tenant. Please delete any unused assets or
+        contact the team to increase the limit.</p>
+</div> 
+<app-list-widget [tabSelectionList]="tabSelectionList" [isDropDown]="true" [isDateDropDown]="false" [isFilter]="true" [isExport]="false"   [isSettings]="true"     [settingsUrl]="settingsUrl"
+        (listWidgetData)="listWidgetData($event)" [buttonData]="buttonData" [isAddButton]="true"
+        [filterUrl]="filterUrl" (exportList)="exportList($event)"  (settingsApplied)="settingsApplied($event)">
+       
+</app-list-widget>
+</div>
+    
+  
+  
+  <div>
+  
+    <ng-template #actionsTemplate let-asset let-index="i">
+      
+        <button class=" p-0 material-icons more-icon" *ngxPermissionsOnly="[assetsPer[1],assetsPer[2]]"
+          (click)="optionsList($event, 'list_'+asset.id)">more_vert</button>
+        <div class="more-actions__menu table-popup" [ngClass]="{show: showOptions === 'list_'+asset.id}">
+          <ng-container *ngxPermissionsOnly="assetsPer[1]">
+            <button  class="more-actions__item w-100" *ngIf="!asset.is_archived_status"
+              (click)="editAssets(asset.id)"><i class="material-icons">edit</i>Edit</button>
+          </ng-container>
+          <ng-container *ngxPermissionsOnly="assetsPer[2]">
+            <button  class="more-actions__item w-100" *ngIf="!asset.is_archived_status"
+              (click)="popupFunction(asset, i)"><i class="material-icons">delete</i>Delete</button>
+          </ng-container>
+          <ng-container>
+            <button class="more-actions__item w-100 py-0" *ngIf="asset.is_archived_status"
+              (click)="activateAsset(asset)"><i class="material-icons"><span
+                  class="material-icons-outlined">
+                  autorenew
+                </span></i>Activate</button>
+          </ng-container>
+      
+        </div>
+    </ng-template>
+  
+  
+    <div class="custom-table-container ws-nowrap" (scroll)="onScroll($event)" id="assets-list">
+      <table [ngClass]="{'h-100':assetsList.length==0}">
+  
+        <thead>
+           <tr>
+     
+             <ng-container *ngFor="let heading of assetsListHeader">
+               <th> {{heading}} </th>
+             </ng-container>
+             <th class="icon-box"></th>
+           </tr>
+         </thead>
+         <tbody *ngIf="assetsList.length == 0">
+           <tr class="border-0">
+             <td class="bg-white" colspan="30">
+               <div class="no-list-data-wrap">
+                 <figure>
+                   <img src="assets/img/no-content.png" alt="">
+                 </figure>
+                 <h5 class="mt-3 primary-brand-text">No data found!</h5>
+               </div>
+             </td>
+           </tr>
+     
+         </tbody> 
+       <tbody>
+           <tr *ngFor="let asset of assetsList; trackBy: trackById ;">
+             <ng-container *ngFor="let item of asset['extras'];let i =index">
+               <td class="ws-nowrap" *ngIf="item?.name !='Display No' && item?.name !='Assigned Vehicle'"> {{item?.value ? item?.value : '-'}} </td>
+               <ng-container *ngIf="item?.name=='Display No'">
+                 <td >
+                  <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/assets/view',asset.id]" [queryParams]="{fromlist: 'own'}"   > {{item.value}} </a>
+                 </td>
+               </ng-container>
+               <ng-container *ngIf="item?.name=='Assigned Vehicle'">
+                  <td *ngIf="item?.value?.length==0">-</td>
+                  <td *ngIf="item?.value.length>0">
+                    <ng-container *ngFor="let vehicle of item?.value; let last = last">
+                      <a class="py-0 custom-link" target="_blank" [routerLink]="[prefixUrl+'/onboarding/vehicle/own/details/',vehicle.id]" > {{ last ? vehicle?.reg_no : vehicle?.reg_no+', ' }}
+                      </a>
+                    </ng-container>
+                  </td>               
+              </ng-container>
+             </ng-container>
+             <td class="icon-box  tabIndexActive"  >
+              <div class="d-flex justify-content-center align-items-center" >
+                  <div class="position-relative">
+                    <ng-container>
+                      <ng-container >
+                        <ng-container *ngTemplateOutlet="actionsTemplate; context: { $implicit: asset,i }"></ng-container>
+                       </ng-container>
+                     
+        
+                    </ng-container>
+                </div>
+                  </div>
+              
+  
+          </td>
+  
+  
+           </tr>
+       </tbody>
+   </table>
+  </div>
+  
+  
+  </div>
+  <alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

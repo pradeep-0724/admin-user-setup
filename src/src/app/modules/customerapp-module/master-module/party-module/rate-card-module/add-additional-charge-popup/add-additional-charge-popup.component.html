@@ -1,0 +1,189 @@
+<div class="charge-popup def-color">
+    <div class="gb-popup-header">
+        {{isEdit ? 'Edit' : 'Add'}} {{chargesData.popupName}}
+    </div>
+    <form [formGroup]="additionalCharges">
+        <div class="px-2 pt-2" *ngIf="!isValidForm">
+            <div class="alert-msg">
+                <span class="icon-wrap"></span>
+                <p class="message-cont">Item should either be a Sales type or a Purchase type or both</p>
+            </div>
+        </div>
+        <div class="content shadow-inset-bottom">
+        <div class="px-3 pt-4 row mx-0 ">
+            <div class="col-12 mb-3">
+                <span class="fw-semibold me-3">Type : </span>
+                <mat-radio-group formControlName="type">
+                    <mat-radio-button color="primary" [value]="1" class="fw-semibold me-4">Service</mat-radio-button>
+                    <mat-radio-button color="primary" [value]="0" class="fw-semibold ">Goods</mat-radio-button>
+                </mat-radio-group>
+
+            </div>
+            <div class="col-xl-4 col-lg-4 col-6">
+                <div class="input-wrap error" [ngClass]="addErrorClass(additionalCharges.get('sku'))">
+                    <label for="" class="input">SKU</label>
+                    <input type="text" class="no-style input--bd" [maxlength]="20" placeholder="SKU"
+                        (change)="sku_msg_error=''" formControlName="sku">
+                    <app-error [controlName]="additionalCharges.get('sku')"></app-error>
+                    <span class="error-reg" *ngIf="sku_msg_error">{{sku_msg_error}}</span>
+                </div>
+            </div>
+            <div class="col-xl-4 col-lg-4 col-6">
+                <div class="input-wrap error" [ngClass]="addErrorClass(additionalCharges.get('name'))">
+                    <label for="" class="input--required">{{chargesData.popupName}} Name</label>
+                    <input type="text" class="no-style input--bd" placeholder="Name" formControlName="name">
+                    <app-error [controlName]="additionalCharges.get('name')"></app-error>
+                    <span class="error-reg">{{charge_error_msg}}</span>
+                </div>
+            </div>
+            <div class="col-xl-4 col-lg-4  col-md-3 col-6">
+                <div class="input-wrap clearfix error"
+                    [ngClass]="addErrorClass(additionalCharges.controls.unit_of_measurement)">
+                    <label for="" class="input--required">Unit of Measurement</label>
+                    <div>
+                        <material-dropdown [searchable]="true" [selectedOption]="initialValues.units">
+                            <select #customSelect formControlName="unit_of_measurement" class="no-style select--modify">
+                                <option *ngFor="let option of staticOptions.itemUnits" value="{{ option.id }}">
+                                    {{ option.label }}
+                                </option>
+                            </select>
+                        </material-dropdown>
+                        <app-error [controlName]="additionalCharges.controls.unit_of_measurement"></app-error>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-lg-4  col-md-3 col-6">
+                <div class="input-wrap">
+                    <label for="" class="input">HSN</label>
+                    <input type="text" class="no-style input--bd" appUpperCase [maxlength]="20" placeholder="HSN"
+                        formControlName="hsn_code">
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-lg-4  col-md-3 col-6" *ngIf="isTax">
+                <div class="input-wrap clearfix">
+                    <label for="" class="input--required">Tax</label>
+                    <div>
+                        <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                            [selectedOption]="initialValues.tax">
+                            <select #customSelect name="" class="no-style select--modify error-box"
+                                formControlName="tax">
+                                <option *ngFor="let option of taxOptions" value="{{ option.id }}">{{
+                                    option.label }}</option>
+                            </select>
+                        </material-dropdown>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="px-3">
+            <div class="row mx-0" [ngClass]="{'disabled':isSalesDisabled}">
+                <div class="d-flex col-lg-12 form-layout__header">
+                    <mat-checkbox formControlName="sales" color="primary" class="fw-semibold "
+                        (change)="salesChange()">
+                        Sales
+                    </mat-checkbox>
+                    <span  class="collapse-line"></span>
+                </div>
+            </div>
+            <div class="row mx-0" [ngClass]="{'disabled':!additionalCharges.get('sales').value}">
+                <div class="col-xl-4 col-lg-4 col-sm-6">
+                    <div class="input-wrap error " [ngClass]="addErrorClass(additionalCharges.get('rate'))">
+                        <label for="" class="input">Unit Cost ({{ currency_type?.symbol}})</label>
+                        <input type="text" class="no-style input--bd" positiveThreeDigitDecimalNumber [maxlength]="20"
+                            placeholder="Unit Cost" formControlName="rate">
+                        <app-error [controlName]="additionalCharges.get('rate')"></app-error>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mx-0 px-3" *ngIf="chargesData.vehicleCategory"
+            [ngClass]="{'disabled':!additionalCharges.get('sales').value}">
+            <div class="col-12 fw-semibold fs-12px">Please select the vehicle categories for which the charge should be
+                applied</div>
+            <div class="col-12 my-3">
+                <mat-checkbox color="primary" (change)="checkAll()" [disabled]="isDisableSelectAll" formControlName="allSelect" ><span class="fw-semibold">Select All</span></mat-checkbox>
+            </div>
+            <div class="col-12 ">
+                <div class="veh-category-wrap no-hover-effect">
+                <div class="veh-category  specification-multi-select-wrap" [ngClass]="{'disabled':disableType==1}"  matRipple *ngIf="vehicleCategories.includes(1)">
+                    <mat-checkbox color="primary" (change)="selectCategory()" [disabled]="disableType==1" formControlName="crane"></mat-checkbox>
+
+
+                    <img src="../../../../../../../assets/img/icons/crane-truck.svg" alt="truck image">
+                    <p class="text-center my-2 fw-semibold fs-12px"> Crane</p>
+
+                </div>
+                <div class="veh-category  specification-multi-select-wrap" [ngClass]="{'disabled':disableType==2}"  matRipple *ngIf="vehicleCategories.includes(2)">
+                    <mat-checkbox color="primary" (change)="selectCategory()" [disabled]="disableType==2" formControlName="awp"></mat-checkbox>
+                    <img src="../../../../../../../assets/img/icons/awp.svg" alt="truck image">
+                    <p class="text-center my-2 fw-semibold fs-12px"> AWP</p>
+
+                </div>
+                <div class="veh-category  specification-multi-select-wrap" [ngClass]="{'disabled':disableType==0}"  matRipple *ngIf="vehicleCategories.includes(0)||vehicleCategories.includes(3)">
+                    <mat-checkbox color="primary" (change)="selectCategory()" [disabled]="disableType==0" formControlName="others"></mat-checkbox>
+                    <img  class="cargo" src="../../../../../../../assets/img/icons/loose-cargo-black.png" alt="truck image">
+                    <p class="text-center my-2 fw-semibold fs-12px"> Loose Cargo</p>
+
+                </div>
+                <div class="veh-category  specification-multi-select-wrap" [ngClass]="{'disabled':disableType==4}"  matRipple *ngIf="vehicleCategories.includes(0)||vehicleCategories.includes(3)">
+                    <mat-checkbox color="primary" [disabled]="disableType==4" formControlName="container"  (change)="selectCategory()"></mat-checkbox>
+                    <img class="container" src="../../../../../../../assets/img/icons/container-black.png" alt="truck image">
+                    <p class="text-center my-2 fw-semibold fs-12px">Container</p>
+
+                </div>
+            </div>
+            </div>
+            <span class="error-reg mt-3" *ngIf="display_msg_error">{{display_msg_error}}</span>
+        </div>
+        <div class="px-3 mt-4">
+            <div class="row mx-0" [ngClass]="{'disabled':isPurchaseDisabled}">
+                <div class="d-flex col-12 form-layout__header">
+                    <mat-checkbox formControlName="purchase" color="primary" class="fw-semibold "
+                        (change)="purchaseChange()">
+                        Purchase
+                    </mat-checkbox>
+                    <span  class="collapse-line"></span>
+                </div>
+            </div>
+            <div class="row mx-0 " [ngClass]="{'disabled':!additionalCharges.get('purchase').value}">
+                <div class="col-xl-4 col-lg-4 col-sm-6">
+                    <div class="input-wrap error"
+                        [ngClass]="addErrorClass(additionalCharges.get('purchase_unit_cost'))">
+                        <label for="" class="input">Unit Cost  ({{ currency_type?.symbol}})</label>
+                        <input type="text" class="no-style input--bd" positiveThreeDigitDecimalNumber [maxlength]="20"
+                            placeholder="Unit Cost" formControlName="purchase_unit_cost">
+                        <app-error [controlName]="additionalCharges.get('purchase_unit_cost')"></app-error>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-sm-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(additionalCharges.get('account'))">
+                        <label for="" [ngClass]="{'input--required':additionalCharges.get('purchase').value}"
+                            class="input">Expense Account</label>
+                        <material-dropdown [searchable]="true" [selectedOption]="initialValues.account" [addable]="true"
+                            class="dropDownWidth" [chartOfAccount]="true" (addChartOfAccount)="openAddCoaModal($event)"
+                            [params]="coaParams" (addValueToList)="addParamsCoaItem($event)">
+                            <select #customSelect formControlName="account" class="no-style select--modify">
+                                <option *ngFor="let account of accountList" value="{{ account.id }}">
+                                    {{ account.name }}</option>
+                            </select>
+                        </material-dropdown>
+                        <app-error [controlName]="additionalCharges.get('account')"></app-error>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="d-flex justify-content-between p-4 pt-2">
+            <button class="btn w-auto" (click)="close()">Cancel</button>
+            <button class="btn  btn--primary w-auto" (click)="saveForm(additionalCharges)"> {{isEdit ? 'Update' :
+                'Save'}}</button>
+        </div>
+
+    </form>
+
+</div>
+<add-new-coa [popDetail]="showAddCoaPopup" [isExpenseType]="true" (closeModal)="closeCoaPopup"
+    (coaAdded)="addExpenseToOption($event)">
+</add-new-coa>

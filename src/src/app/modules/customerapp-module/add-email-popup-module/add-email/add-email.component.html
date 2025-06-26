@@ -1,0 +1,136 @@
+<div class="modal fade" [ngClass]="{'show': isOpen}" id="exampleModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal--wd" role="document">
+    <div class="modal-content"  id="email-popup">
+      <div class="alert-msg mt-3  ps-3" *ngIf="apiError">
+        <span class="icon-wrap"></span>
+        <p>{{ apiError }}</p>
+      </div><br>
+      <div  class="rulesform-class">
+        <form [formGroup]="rulesForm">
+          <!-- to email -->
+        <div class="row align-items-center mb-2">
+          <div class="col-md-1">
+               <p> Send To</p>
+          </div>
+          <div class="col-md-11">
+            <mat-form-field>
+              <mat-chip-list #chipList1 formArrayName="to_emails">
+                <mat-chip [color]="(item.invalid)?'warn':''" selected *ngFor="let item of toEmailList; let i=index"
+                  [selectable]="true"
+                  [removable]="removable"
+                  (removed)="removeEmail(item,'to_emails')"
+                  required name="chips">
+                  {{item.value}}
+                  <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                </mat-chip>
+                <input placeholder="Please enter valid email id "
+                  [matChipInputFor]="chipList1"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes "
+                  [matChipInputAddOnBlur]="true"
+                  autocomplete="off"
+                  (matChipInputTokenEnd)="add($event,'to_emails') " />
+              </mat-chip-list>
+            </mat-form-field>
+            <mat-error *ngIf="rulesForm.get('to_emails').hasError('incorrectEmail')">Invalid email ID</mat-error>
+            <mat-error *ngIf="toEmailList.length>10">Maximum number of recipient is 10</mat-error>
+          </div>
+        </div>
+
+
+
+         <!-- bcc email -->
+         <div class="row align-items-center mb-2">
+           <div class="col-md-1">
+            <p> Send Bcc</p>
+           </div>
+           <div class="col-md-11">
+            <mat-form-field>
+              <mat-chip-list #chipList2 formArrayName="bcc_emails">
+                <mat-chip [color]="(item.invalid)?'warn':''" selected *ngFor="let item of bccEmailList; let i=index"
+                  [selectable]="true"
+                  [removable]="removable"
+                  (removed)="removeEmail(item,'bcc_emails')"
+                  required name="chips">
+                  {{item.value}}
+                  <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                </mat-chip>
+                <input placeholder="Please enter valid email id "
+                  [matChipInputFor]="chipList2"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes "
+                  [matChipInputAddOnBlur]="true"
+                  autocomplete="off"
+                  (matChipInputTokenEnd)="add($event,'bcc_emails') " />
+              </mat-chip-list>
+            </mat-form-field>
+            <mat-error *ngIf="rulesForm.get('bcc_emails').hasError('incorrectEmail')">Invalid email ID</mat-error>
+           </div>
+         </div>
+
+          <!-- cc email -->
+          <div class="row align-items-center mb-2">
+            <div class="col-md-1">
+              <p> Send Cc</p>
+            </div>
+            <div class="col-md-11">
+              <mat-form-field>
+                <mat-chip-list #chipList formArrayName="cc_emails">
+                  <mat-chip [color]="(item.invalid)?'warn':''" selected *ngFor="let item of ccEmailList; let i=index"
+                    [selectable]="true"
+                    [removable]="removable"
+                    (removed)="removeEmail(item,'cc_emails')"
+                    required name="chips">
+                    {{item.value}}
+                    <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                  </mat-chip>
+                  <input placeholder="Please enter valid email id "
+                    [matChipInputFor]="chipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes "
+                    [matChipInputAddOnBlur]="true"
+                    autocomplete="off"
+                    (matChipInputTokenEnd)="add($event,'cc_emails')" />
+                </mat-chip-list>
+              </mat-form-field>
+              <mat-error *ngIf="rulesForm.get('cc_emails').hasError('incorrectEmail')">Invalid email ID</mat-error>
+            </div>
+          </div>
+        <div class="row align-items-center mb-2">
+          <div class="col-md-1">
+           <p>Subject</p>
+          </div>
+          <div class="col-md-11">
+           <input type="text" class="form-control" formControlName="subject" maxlength="150" placeholder="Please enter subject">
+           <mat-error  *ngIf="rulesForm.get('subject').hasError('required') && rulesForm.get('subject').touched"> This field is required</mat-error>
+          </div>
+        </div>
+
+        <div class="row mt-2">
+          <div class="col-md-1">
+           <p>Content</p>
+          </div>
+          <div class="col-md-11">
+            <textarea  class="form-control" maxlength="1000" rows="6" placeholder="description"  formControlName="content"></textarea>
+          </div>
+        </div>
+        <file-uploader (onFileUploaded)="fileUploader($event)"
+        (onFileDeleted)="fileDeleted($event)" [multiple]="true"
+        [accept]="'capture=camera, image/jpeg,image/x-jpg,image/png, application/pdf'"
+        [showFileName]="false" [emailFiles]="emailFiles">
+        </file-uploader>
+        <div class="mg-top-30 section-footer">
+          <div class="btn-wrap ">
+              <button class="btn"
+                  routerLinkActive="active" (click)="close()" >Cancel</button>
+              <button class="btn btn--primary"  (click)="submit()">Submit</button>
+          </div>
+          <div>
+        </div>
+      </div>
+       </form>
+      </div>
+      <div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="!isOpen" class="modal-backdrop fade show"></div>

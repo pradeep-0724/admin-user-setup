@@ -1,0 +1,30 @@
+<div class="emi-paid"> 
+    <div class="popup-header ">
+        <h6 class="d-inline">EMI Paid (month)</h6>
+    </div>
+   <form [formGroup]="addeEMIPaidForm">
+    <div class="p-4 pb-0">
+        <div class="input-wrap error " [ngClass]="addErrorClass(addeEMIPaidForm.controls.amount)">
+            <label>EMI AMOUNT</label>
+            <input positiveThreeDigitDecimalNumber type="text" class="error-box input--bd"  placeholder="0.000" value=""
+              formControlName="amount" />
+        </div>
+    
+        <div class="input-wrap input-box rounded-date error">
+            <label for="name">PAYMENT DATE</label>
+            <mat-form-field>
+              <input matInput [matDatepicker]="transactionDate"  (focus)="transactionDate.open()"
+                formControlName="payment_date" placeholder="DD/MM/YYYY">
+              <mat-datepicker-toggle matSuffix [for]="transactionDate"></mat-datepicker-toggle>
+              <mat-datepicker #transactionDate></mat-datepicker>
+            </mat-form-field>
+        </div>
+        
+    </div>
+   </form>
+    <div class="d-flex justify-content-space-between px-4 pt-2 pb-3">
+        <button class="btn w-auto" type="button" (click)="cancel()">Cancel</button>
+        <button  class="btn btn--primary w-auto" type="submit" (click)="save()">Save</button>
+    </div>
+   
+</div>

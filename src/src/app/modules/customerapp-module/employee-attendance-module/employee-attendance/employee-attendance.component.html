@@ -1,0 +1,82 @@
+<div class="right-section__header" >
+  <h1 class="heading">Employee Attendance</h1>
+</div>
+<div class="form-body form-layout form-layout--pd no-br-tl no-br-tr" id="scroll-test">
+  <div class="row text-center">
+    <div class="col-md-4">
+      <div class="row">
+        <div class="calenderNav w-auto"
+          mwlCalendarPreviousView
+          [view]="view"
+          [(viewDate)]="viewDate"
+          (viewDateChange)="closeOpenMonthViewDay()" >
+        <i class="material-icons">keyboard_arrow_left</i>
+        </div>
+        <div class="calenderNav mt-1 w-auto"
+          mwlCalendarToday
+          [(viewDate)]="viewDate"
+          (viewDateChange)="closeOpenMonthViewDay()"
+        >
+         <span>Today</span>
+        </div>
+        <div class="calenderNav w-auto"
+          mwlCalendarNextView
+          [view]="view"
+          [(viewDate)]="viewDate"
+          (viewDateChange)="closeOpenMonthViewDay()"><i class="material-icons">keyboard_arrow_right</i>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
+    </div>
+    <div class="col-md-4">
+      <div class="colornames">
+        <p> <span class="present">&nbsp;</span> Present</p>
+        <p > <span class="remaining">&nbsp;</span> Remaining</p>
+        <p > <span class="absent">&nbsp;</span> Absent</p>
+      </div>
+    </div>
+  </div>
+  <br />
+  <div>
+  </div>
+  <div [ngSwitch]="view">
+    <mwl-calendar-month-view
+      [viewDate]="viewDate"
+      [events]="events"
+      (dayClicked)="dayClicked($event.day)"
+      [cellTemplate]="customCellTemplate"
+      [weekStartsOn]=1
+
+    >
+    </mwl-calendar-month-view>
+    <ng-template #customCellTemplate let-day="day" let-locale="locale"
+      let-tooltipPlacement="tooltipPlacement"
+      let-highlightDay="highlightDay" let-unhighlightDay="unhighlightDay"
+      let-eventClicked="eventClicked"
+      let-tooltipTemplate="tooltipTemplate"
+      let-tooltipAppendToBody="tooltipAppendToBody" let-tooltipDelay="tooltipDelay">
+      <div class="cal-cell-bottom">
+          <span class="cal-day-number">
+          {{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+      </div>
+      <div *ngIf="day.events.length > 0" class="dayevents">
+          <div  *ngFor="let event of day.events">
+                  <div class="databadge">
+                      <p > {{event?.data.present}}</p>
+                  </div>
+                  <div class="databadge1">
+              <p >{{event?.data.remaining}}</p>
+                   </div>
+               <div class="databadge2">
+                      <p>{{event?.data.absent}}</p>
+                 </div>
+        </div>
+      </div>
+
+  </ng-template>
+  </div>
+</div>
+
+<app-list-attendance [dataFromParent]="datatoChild" (refreshData)="refreshData($event)"></app-list-attendance>

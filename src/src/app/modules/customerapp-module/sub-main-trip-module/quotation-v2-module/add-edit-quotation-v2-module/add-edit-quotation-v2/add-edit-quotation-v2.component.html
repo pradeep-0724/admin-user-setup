@@ -1,0 +1,308 @@
+<div class="add-screen-wrap d-flex flex-column">
+
+    <div class="right-section__header align-items-center justify-content-between ">
+        <h1 class="heading col-10">{{quotationId?'Edit':'Add'}} Quotation</h1>
+        <button class="gb-video-play float-right" (click)="openGothrough()">
+            <i class="bi bi-play-circle-fill"></i>
+        </button>
+    </div>
+    <app-add-trip-v2-documents-expiry [documentExpiryData]="documentExpiryData"></app-add-trip-v2-documents-expiry>
+    <div class=" position-relative mx add-edit-quotation-wrap">
+        <form [formGroup]="quotationForm">
+            <div class="alert-msg" *ngIf="apiError">
+                <span class="icon-wrap"></span>
+                <p class="message-cont">{{ apiError }}</p>
+            </div>
+            <div class="error-msg-list" *ngIf="globalFormErrorList.length > 0">
+                <p class="message-head">{{ errorHeaderMessage }}</p>
+                <span class="icon-wrap"></span>
+                <ul *ngFor="let error of globalFormErrorList">
+                    <li class="message-cont">{{ error }}</li>
+                </ul>
+            </div>
+
+            <div class="def-color p-4 shadow-inset-top-bottom" *ngIf="vehicleCategiriesObj.hasMultipleCategories" [ngClass]="{'disable':quotationId!=''}">
+                <div class="veh-category-wrap ">
+                    <div class="  veh-category" (click)="vehicleCatagoryChange('1')"
+                        [class.active]="quotationForm.get('vehicle_category').value =='1'" *ngIf="vehicleCategiriesObj.categories.includes(1)">
+                        <img src="../../../../../../../../assets/img/icons/crane-truck.svg" alt="truck image">
+
+                        <p class="text-center mt-2">Crane</p>
+                    </div>
+                    <div class="  veh-category" (click)="vehicleCatagoryChange('2')"
+                        [class.active]="quotationForm.get('vehicle_category').value =='2'"  *ngIf="vehicleCategiriesObj.categories.includes(2)">
+                        <img src="../../../../../../../../assets/img/icons/awp.svg" alt="truck image">
+
+                        <p class="text-center mt-2">AWP</p>
+                    </div>
+                 <div class="veh-category" (click)="vehicleCatagoryChange('0')"
+                    [class.active]="quotationForm.get('vehicle_category').value =='0'"  *ngIf="vehicleCategiriesObj.categories.includes(0)|| vehicleCategiriesObj.categories.includes(3)">
+                    <img class="cargo"  src="../../../../../../../assets/img/icons/loose-cargo-black.png" alt="truck image">
+                    <p class="text-center mt-2">Loose Cargo</p>
+                </div>
+
+                <!-- <div class="veh-category coming-soon" (click)="vehicleCatagoryChange('4')" 
+                [class.active]="quotationForm.get('vehicle_category').value =='4'"  *ngIf="vehicleCategiriesObj.categories.includes(0)|| vehicleCategiriesObj.categories.includes(3)">
+                <img class="container"  src="../../../../../../../assets/img/icons/container-black.png" alt="truck image">
+                <p class="text-center mt-2">Container</p>
+                </div> -->
+            </div>
+            </div>
+
+
+
+
+
+            <ng-container *ngIf="isCatagorySelected">
+                <div class=" form-layout--pd pb-0"
+                    [ngClass]="{'shadow-inset-top-bottom':!vehicleCategiriesObj.hasMultipleCategories}">
+                    <div class="alert alert-danger" role="alert" *ngIf="this.isPartyApproverRequired&&!this.isPartyApproverAvailable && this.isApprovalConfigured && quotationForm.controls.customer.value">
+                        <ng-container *ngIf="!isLinkedClicked" >
+                          <p>Party Approver not found. Please add a Party Approver for the approval mechanism to run smoothly</p>
+                          <p   class="pt-2">You can add party approver by clicking<a
+                            class="cursor-pointer text-primary" target="_blank" (click)="linkClicked()" [routerLink]="[preFixUrl+'/onboarding/party/edit/'+quotationForm.controls.customer.value]"> Here</a> </p>
+                        </ng-container>
+                          <p  *ngIf="isLinkedClicked" class="pt-2">If party approver added refresh by clicking <span
+                            class="cursor-pointer text-primary" (click)="getpartyDetails(quotationForm.controls.customer.value)"> Here</span> </p>
+                      </div>
+                    <div class="row">
+                        <div class="col-xl-3 col-lg-3  col-md-3 col-6" [ngClass]="{'disable':quotationId!=''}">
+                            <div class="input-wrap clearfix error"
+                                [ngClass]="addErrorClass(quotationForm.controls.customer)">
+                                <label for="" class="input--required">Customer</label>
+                                <div>
+                                    <material-dropdown [disabled]="quotationId!=''" [searchable]="true" [addable]="true"
+                                        [selectedOption]="initialValues.customer" [party]="true" [maxLength]="255"
+                                        (addPartyPopup)="openAddPartyModal($event)"
+                                        (addValueToList)="addValueToPartyPopup($event)" [params]="partyNamePopup">
+                                        <select #customSelect formControlName="customer" class="no-style select--modify"
+                                            (change)="onvendorSelected($event.target.value)">
+                                            <option *ngFor="let option of customerNameList" value="{{ option?.id }}">
+                                                {{ option?.party_display_name }}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                    <app-error [controlName]="quotationForm.controls.customer"></app-error>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-lg-3 col-6">
+                            <div class="input-wrap clearfix">
+                                <label for="" class="input--required">Quotation Number</label>
+                                <input type="text" class="no-style input--bd" formControlName="quotation_no"
+                                    placeholder="123456" value="" readonly>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-6">
+                            <div class="input-wrap ">
+                                <label for="" class="input--required">Quotation Date</label>
+                                <mat-form-field>
+                                    <input matInput readonly [matDatepicker]="quotation_date"
+                                        (dateChange)="setValidityDate();getDocsExpiryLIst()"
+                                        formControlName="quote_date" (focus)="quotation_date.open()"
+                                        placeholder="DD/MM/YYYY">
+                                    <mat-datepicker-toggle matSuffix [for]="quotation_date"></mat-datepicker-toggle>
+                                    <mat-datepicker #quotation_date></mat-datepicker>
+                                </mat-form-field>
+
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                            <div class="input-wrap clearfix error"
+                                [ngClass]="addErrorClass(quotationForm.controls.validity_term)">
+                                <label for="" class="input--required">Validity Term</label>
+                                <div>
+                                    <material-dropdown [selectedOption]="initialValues.validity_term">
+                                        <select #customSelect class="no-style select--modify"
+                                            formControlName="validity_term" (change)=" setValidityDate()">
+                                            <option *ngFor="let option of validityTerms " value="{{option.id}}">
+                                                {{option.label}}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                    <app-error [controlName]="quotationForm.controls.validity_term"></app-error>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-6">
+                            <div class="input-wrap error"
+                                [ngClass]="addErrorClass(quotationForm.controls.validity_date)">
+                                <label for="" class="input--required">Validity Date</label>
+                                <mat-form-field>
+                                    <input matInput readonly [matDatepicker]="validity_date"
+                                        [min]="quotationForm.controls.quote_date.value" formControlName="validity_date"
+                                        (focus)="validity_date.open()" placeholder="DD/MM/YYYY"
+                                        (dateChange)="onValidityDateChange()">
+                                    <mat-datepicker-toggle matSuffix [for]="validity_date"></mat-datepicker-toggle>
+                                    <mat-datepicker #validity_date></mat-datepicker>
+                                </mat-form-field>
+                                <app-error [controlName]="quotationForm.controls.validity_date"></app-error>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                            <div class="input-wrap clearfix">
+                                <label for="" class="">Payment Terms</label>
+                                <div>
+                                    <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                                        [addBlank]="true" [selectedOption]="initialValues.payementTerms">
+                                        <select #customSelect formControlName="payment_term"
+                                            class="no-style select--modify">
+                                            <option *ngFor="let option of payementTermList" value="{{ option.id }}">
+                                                {{ option.label }}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-3  col-md-3 col-6"
+                            *ngIf="quotationForm.get('vehicle_category').value =='0' || quotationForm.get('vehicle_category').value =='3'">
+                            <div class="input-wrap clearfix">
+                                <label for="" class="">Bank</label>
+                                <div>
+                                    <material-dropdown [selectedOption]="initialValues.bank">
+                                        <select #customSelect class="no-style select--modify"
+                                            formControlName="bank_account">
+                                            <option *ngFor="let option of bankList" value="{{ option?.id }}">
+                                                {{ option?.display_name }}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                            <div class="input-wrap clearfix">
+                                <label for="" class="">Employee In Charge</label>
+                                <div>
+                                    <material-dropdown [selectedOption]="initialValues.employee_in_charge">
+                                        <select #customSelect class="no-style select--modify"
+                                            (change)="handleEmployeeChange()" formControlName="employee_in_charge">
+                                            <option *ngFor="let employee of employeeList" value="{{ employee.id }}">
+                                                {{ employee.emp_name_id }} </option>
+                                        </select>
+                                    </material-dropdown>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-3  col-md-3 col-6" [ngClass]="{'disable':quotationId!=''}"
+                            *ngIf="quotationForm.get('vehicle_category').value =='0'">
+                            <div class="input-wrap clearfix"
+                                [ngClass]="addErrorClass(quotationForm.controls.type_of_movement)">
+                                <label for="" class="input--required">Type Of Movement</label>
+                                <div>
+                                    <material-dropdown [selectedOption]="initialValues.typeOfMovement">
+                                        <select #customSelect class="no-style select--modify"
+                                            formControlName="type_of_movement">
+                                            <option *ngFor="let type of movementTypes" value="{{ type.value }}">
+                                                {{ type.label }} </option>
+                                        </select>
+                                    </material-dropdown>
+                                    <app-error [controlName]="quotationForm.controls.type_of_movement"></app-error>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-3 col-6">
+                            <div class="input-wrap clearfix mb-0">
+                                <label for="" class="input">Reference No</label>
+                                <input type="text" class="no-style input--bd" formControlName="ref_no"
+                                    placeholder="123456" value="">
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-3  col-md-3 col-6"
+                            *ngIf="quotationForm.get('vehicle_category').value !='0' && quotationForm.get('vehicle_category').value !='3'">
+                            <div class="input-wrap clearfix">
+                                <label for="" class="">Site Inspection No</label>
+                                <div>
+                                    <material-dropdown [selectedOption]="initialValues.siteInspectionNo">
+                                        <select #customSelect class="no-style select--modify"
+                                            formControlName="site_inspection_no">
+                                            <option *ngFor="let option of siteInspectionList" value="{{ option.id }}">
+                                                {{ option.site_inspection_no }}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                </div>
+                            </div>
+                        </div>
+                        <div class=" col-xl-3 col-lg-3  col-md-3 col-6">
+                            <div class="input-wrap dropdownArrow">
+                                <label for="">Customer POC</label>
+                                <material-dropdown [addable]="true" [selectedOption]="initialValues.poc"
+                                [postApiUrl]="pocURL" [params]="pocParam"
+                                (postApiResponse)="getAddedPoC($event)"
+                                (addValueToList)="addNewPoC($event)">
+                                    <select #customSelect class="no-style select--modify"
+                                        formControlName="poc">
+                                        <option *ngFor="let option of pointOfContactsList " value="{{option.id}}">{{option.display_name}}
+                                        </option>
+                                    </select>
+                                </material-dropdown>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <ng-container *ngIf="!isCustomerChanged">
+                    <app-quotation-template-truck [quotationDetails]="quotationDetails" [isFormValid]="isFormValid"
+                        *ngIf="quotationForm.get('vehicle_category').value =='0'" [quotationForm]="quotationForm"
+                        (quotationFinalValues)="quotationFinalValues($event)"></app-quotation-template-truck>
+                    <app-quotation-template-trailer [formType]="'loose_cargo'" [quotationDetails]="quotationDetails"
+                        [isFormValid]="isFormValid" *ngIf="quotationForm.get('vehicle_category').value =='3'"
+                        [quotationForm]="quotationForm"
+                        (quotationFinalValues)="quotationFinalValues($event)"></app-quotation-template-trailer>
+                    <app-quotation-template-crane  (partyPrefilledRateCardValues)="partyPrefilledRateCardValues($event)" (isCustomerRateCardExisted)="customerRateCardExisted($event)"
+                        [quotationDetails]="quotationDetails" [isFormValid]="isFormValid" [formType]="'crane'"
+                        [quotationForm]="quotationForm"
+                        *ngIf="quotationForm.get('vehicle_category').value =='1'"></app-quotation-template-crane>
+                    <app-quotation-template-crane (partyPrefilledRateCardValues)="partyPrefilledRateCardValues($event)"  (isCustomerRateCardExisted)="customerRateCardExisted($event)"
+                        [quotationDetails]="quotationDetails" [isFormValid]="isFormValid" [formType]="'awp'"
+                        [quotationForm]="quotationForm"
+                        *ngIf="quotationForm.get('vehicle_category').value =='2'"></app-quotation-template-crane>
+                </ng-container>
+
+            </ng-container>
+
+
+
+
+        </form>
+    </div>
+    <div class=" flex-grow-1 d-flex justify-content-center align-items-center flex-column" *ngIf="!isCatagorySelected">
+        <i class="bi bi-truck select-veh-truck"></i>
+        <p class="select-veh-text text-center line-height-normal "> Please select a vehicle category to proceed</p>
+    </div>
+
+
+</div>
+<div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end">
+
+    <button class="btn me-2 btn--sm" type="button" [routerLink]="[preFixUrl+'/trip/quotation/list']">Cancel</button>
+    <div class="d-flex align-items-center btn-group-1">
+        <button class="btn btn--primary btn--sm border-end f-b"
+            (click)="saveQuotation('save_and_submit','Validation Failed',false)">{{quotationId?'Update':'Save'}}
+        </button>
+        <button mat-button class="btn btn--primary w-auto s-b" [matMenuTriggerFor]="menu"><i
+                class="material-icons">arrow_drop_down</i></button>
+        <mat-menu #menu="matMenu">
+            <button class="more-actions__item w-100 text-start mt-2" type="button" *ngIf="canBeInDraft"
+                (click)="saveQuotation('save_as_draft','',false)">Save as Draft</button>
+            <button class="more-actions__item  w-100 text-start" type="button"
+                (click)="saveQuotation('save_and_submit','Validation Failed',false)">Save and Submit</button>
+            <button class="more-actions__item w-100 text-start mb-2" type="button" *ngIf="isApprovalConfigured"
+                (click)="saveQuotation('send_for_approval','Send Approval',true)">Send for Approval</button>
+
+        </mat-menu>
+
+    </div>
+
+</div>
+<app-add-party-popup [popDetail]="showAddPartyPopup" [isVendor]="false" (closeModal)="closePartyPopup()"
+    (partyAdded)="addPartyToOption($event)"></app-add-party-popup>
+<app-go-through [goThroughDetais]="goThroughDetais"></app-go-through>

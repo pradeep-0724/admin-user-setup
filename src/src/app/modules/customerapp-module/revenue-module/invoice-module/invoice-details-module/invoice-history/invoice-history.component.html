@@ -1,0 +1,44 @@
+<div class="px-3 pt-3 ">
+<div class="invoice-history-item" *ngFor="let item of invoiceHistory;index as i ">
+    <div class="date"><span>{{item.date}}</span></div>
+    <div class="content mb-3" *ngFor="let subItem of item?.values;index as j ">
+        <div class="avatar">{{subItem.name[0]}}</div>
+        <div>
+            <ng-container *ngIf="subItem?.actor!=3">
+                <p class="name mb-3">{{subItem.name}}<span class="time">{{subItem.time}}</span></p>
+                <p class="mt-2"><span class="material-icons verticle-align-middle me-1 fs-6">
+                    play_arrow
+                    </span><span class="verticle-align-middle">{{subItem.message}}</span></p>
+            </ng-container>
+            <ng-container *ngIf="subItem?.actor==3">
+                <p class="name mb-3">{{subItem.name}}<span class="time">{{subItem.time}}</span></p>
+               
+                <p class="mt-2" *ngIf="currI!=i || currJ!=j"><span class="material-icons verticle-align-middle me-1 fs-6">
+                    drive_file_rename_outline
+                    </span>
+                    <span class="verticle-align-middle">Edit Requested ( {{subItem.message}} )</span></p>
+                    <form *ngIf="currI==i && currJ==j">
+                        <textarea  rows="4" cols="60"  [(ngModel)]="subItem.message" class="p-2">
+                        </textarea> 
+                    </form>
+                    <div class="d-flex align-items-center justify-content-start mt-2 btn-wrap">
+                        <ng-container *ngIf="currI==i && currJ==j">
+                            <button (click)="cancelEdit(i,j)" class="gray-text" >Cancel</button>
+                            <span class="mx-2 def-color">|</span>
+                        <button  (click)="editRequest('update',subItem.id,subItem.message)" class="green-text ">Update</button>
+                    </ng-container>
+                    <ng-container *ngIf="currI!=i || currJ!=j">
+                    <button (click)="currI=i;currJ=j" class="gray-text">Edit</button>
+                    <span class="mx-2 def-color">|</span>
+                    <button (click)="editRequest('delete',subItem.id,'')" class="error-text ">Delete</button>
+
+                </ng-container>
+                </div>
+          
+            </ng-container>
+          
+        </div>
+    </div>
+</div>
+
+</div>

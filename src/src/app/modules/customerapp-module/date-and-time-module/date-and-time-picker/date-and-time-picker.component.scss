@@ -1,0 +1,41 @@
+input {
+    visibility: hidden;
+    width: 0;
+    display: inline-block;
+}
+
+p {
+    display: inline-block;
+    width: 82%;
+    padding-bottom: 10px !important;
+}
+
+.border-bottom-custom {
+    border-bottom: 1px solid rgba(90, 107, 123, 0.5);
+}
+
+.time-date-error{
+    border-bottom: 1px solid rgba(250, 8, 8, 0.971);
+}
+
+.customized-datepicker-component {
+    right: 0px;
+    top: -5px;
+
+
+}
+
+
+
+::ng-deep {
+    .customized-datepicker-component {
+        svg {
+            width: 1rem !important;
+        }
+
+        button {
+            width: 30px;
+            height: 30px;
+        }
+    }
+}

@@ -1,0 +1,475 @@
+<div class="p-4 shadow-inset-top-bottom approvel-view">
+    <!------------- approver action ------------------>
+    <div class="row mx-0"  *ngIf="quotationStatusDetails.status_screen_to_show ==='approver_action'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon" *ngIf="quotationStatusDetails.show_approval_button">
+                <img src="../../../../../../../assets/img/icons/approve.svg" alt="">
+            </div>
+            <div class="approve-status-icon" *ngIf="!quotationStatusDetails.show_approval_button">
+                <img src="../../../../../../../assets/img/icons/watch.svg" alt="">
+            </div>
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="approval-details" *ngIf="quotationStatusDetails.show_approval_button">
+                        <div class="header">Waiting for L{{quotationStatusDetails.approver_level}} Approval</div>
+                        <p>This quotation has been submitted for approval.</p>
+                    </div>
+                    <div class="approval-details" *ngIf="!quotationStatusDetails.show_approval_button">
+                        <div class="header">Waiting for L{{quotationStatusDetails.approver_level}} Approval</div>
+                        <p>This quotation has been submitted for approval, You’ll be notified once its approved.</p>
+                    </div>
+                    <div class="pt-3 ps-0 def-color body">
+                        <ng-container   *ngIf="quotationStatusDetails.validations.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of quotationStatusDetails.validations"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name}} :</span><span>{{item?.message}}</span></p>
+                        </ng-container>
+                        <ng-container *ngIf="quotationStatusDetails.remarks.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of quotationStatusDetails.remarks"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name ?item?.name : '-'}} :</span><span>{{item?.message ? item?.message : '-'}}</span></p>
+                        </ng-container>
+    
+                    </div>
+    
+                </div>
+                <div class="col-lg-4">
+                    <div   *ngIf="quotationStatusDetails.show_approval_button">
+                        <div class="d-flex justify-content-end align-items-center mt-2">
+                            <button class="btn btn--primary py-2 w-auto btn--sm"  (click)="openQuotationRejectPopup('Approved',false)">Approve</button>
+                            <button class="btn py-2 w-auto ms-3 btn--sm" (click)="openQuotationRejectPopup('Rejected',true)">Reject</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mx-0 mt-3"  >
+
+                <div class="col-lg-8 px-0">
+                    <div class="d-flex flex-wrap" >
+                        <div class="me-5">
+                            <p class="mb-2 fs-12px">Submitted by</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter blue"> {{ findfingFirstName(quotationStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{quotationStatusDetails.submitter ? quotationStatusDetails.submitter : '-'}}</p>
+                            </div>
+                        </div>
+                        <div class="ps-4">
+                            <p class="mb-2 fs-12px">Current Approver</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter green"> {{ findfingFirstName(quotationStatusDetails.last_action_taken_by)}}</div>
+                                <p class="fw-semibold"> {{quotationStatusDetails.last_action_taken_by ? quotationStatusDetails.last_action_taken_by : '-'}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 d-flex justify-content-end align-items-end" *ngIf="quotationStatusDetails.timeline.length >0">
+        
+                    <button class="fw-semibold primary-brand-text  mt-3 custom-link" (click)="openSideBar()" data-bs-toggle="offcanvas"
+                        data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">View Approval Details</button>
+        
+                </div>
+        
+            </div>
+
+        </div>
+
+    </div>
+    
+    <!-------------- approver rejected --------------->
+    <div class="row mx-0"  *ngIf="quotationStatusDetails.status_screen_to_show ==='approval_rejected'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon">
+                <img src="../../../../../../../assets/img/icons/rejected.svg" alt="">
+            </div>
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="approval-details">
+                        <div class="header">Quotation is Rejected</div>
+                    </div>
+                    <div class="pt-3 def-color body">
+                        <ng-container   *ngIf="quotationStatusDetails.validations.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of quotationStatusDetails.validations"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name}} :</span><span>{{item?.message}}</span></p>
+                        </ng-container>
+                        <ng-container *ngIf="quotationStatusDetails.remarks.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of quotationStatusDetails.remarks"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name ?item?.name : '-'}} :</span><span>{{item?.message ? item?.message : '-'}}</span></p>
+                        </ng-container>
+
+                    </div>
+    
+                </div>
+                <div class="col-lg-4" >
+                    <div class="d-flex justify-content-end align-items-center mt-2"  *ngIf="is_Approval_configured && quotationStatusDetails.show_approval_button">
+                        <button class="btn btn--primary py-2 w-auto btn--sm custom-link"  (click)="saveQuotation('send_for_approval','Send Approval',true)">Send for Approval</button>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="row mx-0 mt-3"  >
+
+                <div class="col-lg-6 px-0">
+                    <div class="d-flex flex-wrap" >
+                        <div class="me-5">
+                            <p class="mb-2 fs-12px">Submitted by</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter blue"> {{ findfingFirstName(quotationStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{quotationStatusDetails.submitter ? quotationStatusDetails.submitter : '-'}}</p>
+                            </div>
+                        </div>
+                        <!-- <div class="ps-4">
+                            <p class="mb-2 fs-12px">Current Approver</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter green"> {{ findfingFirstName(quotationStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{quotationStatusDetails.submitter ? findfingFirstName(quotationStatusDetails.submitter) : '-'}}</p>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex justify-content-end align-items-end"  *ngIf="quotationStatusDetails.timeline.length >0">
+        
+                    <button class="fw-semibold primary-brand-text  mt-3" (click)="openSideBar()" data-bs-toggle="offcanvas"
+                        data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">View Approval Details</button>
+        
+                </div>
+        
+            </div>
+
+        </div>
+
+    </div>
+    <!---------------client Action  ------------------->
+    <div class="row mx-0"  *ngIf="quotationStatusDetails.status_screen_to_show ==='client_action'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon" >
+                <img src="../../../../../../../assets/img/icons/blue-person.svg" alt="">
+            </div>
+           
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                   
+                    <div class="approval-details">
+                        <div class="header">Waiting for Client Approval</div>
+                        <p>This Quote is approved, You can now email it to your customer or simply mark it as approved or rejected.</p>
+                    </div>
+                    <div class="pt-3 ps-0 def-color body">
+                        <ng-container   *ngIf="quotationStatusDetails.validations.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of quotationStatusDetails.validations"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name}} :</span><span>{{item?.message}}</span></p>
+                        </ng-container>
+                        <ng-container *ngIf="quotationStatusDetails.remarks.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of quotationStatusDetails.remarks"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name ?item?.name : '-'}} :</span><span>{{item?.message ? item?.message : '-'}}</span></p>
+                        </ng-container>
+    
+                    </div>
+    
+                </div>
+                <div class="col-lg-4">
+                    <div>
+                        <div class="d-flex justify-content-end align-items-center mt-2">
+                            <button class="btn btn--primary py-2 w-auto btn--sm"  (click)="openQuotationRejectPopup('Approval Approved',false)">Approve</button>
+                            <button class="btn py-2 w-auto ms-3 btn--sm" (click)="openQuotationRejectPopup('Rejected',true)">Reject</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="row mx-0 mt-3"  *ngIf="quotationStatusDetails.status_screen_to_show ==='client_action'">
+
+                <div class="col-lg-6 px-0">
+                    <div class="d-flex flex-wrap" >
+                        <div class="me-5">
+                            <p class="mb-2 fs-12px">Submitted by</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter blue"> {{ findfingFirstName(quotationStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{quotationStatusDetails.submitter ? quotationStatusDetails.submitter : '-'}}</p>
+                            </div>
+                        </div>
+                        <div class="ps-4" *ngIf="quotationStatusDetails.last_action_taken_by">
+                            <p class="mb-2 fs-12px">Approved By</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter green"> {{ findfingFirstName(quotationStatusDetails.last_action_taken_by)}}</div>
+                                <p class="fw-semibold"> {{quotationStatusDetails.last_action_taken_by ? quotationStatusDetails.last_action_taken_by : '-'}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex justify-content-end align-items-end" *ngIf="quotationStatusDetails.timeline.length>0">
+        
+                    <button class="fw-semibold primary-brand-text  mt-3" (click)="openSideBar()" data-bs-toggle="offcanvas"
+                        data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">View Approval Details</button>
+        
+                </div>
+        
+            </div>
+
+        </div>
+
+    </div>
+    <!-- -------------client approved ----------------->
+    <div class="row mx-0"  *ngIf="quotationStatusDetails.status_screen_to_show ==='client_approved'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon">
+                <img src="../../../../../../../assets/img/icons/green-person.svg" alt="">
+            </div>
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="approval-details">
+                        <div class="header">Client Approved</div>
+                        <p>This quotation has been approved by the client.</p>
+                    </div>
+                    <div class="pt-3 def-color body">
+                        <ng-container   *ngIf="quotationStatusDetails.validations.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of quotationStatusDetails.validations"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name}} :</span><span>{{item?.message}}</span></p>
+                        </ng-container>
+                        <ng-container *ngIf="quotationStatusDetails.remarks.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of quotationStatusDetails.remarks"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name ?item?.name : '-'}} :</span><span>{{item?.message ? item?.message : '-'}}</span></p>
+                        </ng-container>
+
+                    </div>
+    
+                </div>
+                <div class="col-lg-4">
+                    <div class="d-flex justify-content-end align-items-center mt-2">
+                       
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="row mx-0 mt-3"  >
+
+                <div class="col-lg-6 px-0">
+                    <div class="d-flex flex-wrap" >
+                        <div class="me-5">
+                            <p class="mb-2 fs-12px">Submitted by</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter blue"> {{ findfingFirstName(quotationStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{quotationStatusDetails.submitter ? quotationStatusDetails.submitter : '-'}}</p>
+                            </div>
+                        </div>
+                        <div class="ps-4">
+                            <p class="mb-2 fs-12px">Approved By</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter green"> {{ findfingFirstName(quotationStatusDetails.last_action_taken_by)}}</div>
+                                <p class="fw-semibold"> {{quotationStatusDetails.last_action_taken_by ? quotationStatusDetails.last_action_taken_by : '-'}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex justify-content-end align-items-end"  *ngIf="quotationStatusDetails.timeline.length>0">
+        
+                    <button class="fw-semibold primary-brand-text  mt-3" (click)="openSideBar()" data-bs-toggle="offcanvas"
+                        data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">View Approval Details</button>
+        
+                </div>
+        
+            </div>
+
+        </div>
+
+    </div>
+    <!---------------- client rejected ---------------->
+    <div class="row mx-0"  *ngIf="quotationStatusDetails.status_screen_to_show ==='client_rejected'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon">
+                <img src="../../../../../../../assets/img/icons/red-person.svg" alt="">
+            </div>
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="approval-details">
+                        <div class="header">Client Rejected</div>
+                        <p>This quotation has been rejected by the client.</p>
+                    </div>
+                    <div class="pt-3 def-color body">
+                        <ng-container   *ngIf="quotationStatusDetails.validations.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of quotationStatusDetails.validations"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name}} :</span><span>{{item?.message}}</span></p>
+                        </ng-container>
+                        <ng-container *ngIf="quotationStatusDetails.remarks.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of quotationStatusDetails.remarks"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name ?item?.name : '-'}} :</span><span>{{item?.message ? item?.message : '-'}}</span></p>
+                        </ng-container>
+
+                    </div>
+    
+                </div>
+                <div class="col-lg-4">
+                    <div class="d-flex justify-content-end align-items-center mt-2">
+                       
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="row mx-0 mt-3"  >
+
+                <div class="col-lg-6 px-0">
+                    <div class="d-flex flex-wrap" >
+                        <div class="me-5">
+                            <p class="mb-2 fs-12px">Submitted by</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter blue"> {{ findfingFirstName(quotationStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{quotationStatusDetails.submitter ? quotationStatusDetails.submitter : '-'}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex justify-content-end align-items-end"  *ngIf="quotationStatusDetails.timeline.length>0">
+        
+                    <button class="fw-semibold primary-brand-text  mt-3" (click)="openSideBar()" data-bs-toggle="offcanvas"
+                        data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">View Approval Details</button>
+        
+                </div>
+        
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--------------- void state ------------------------>
+    
+    <div class="row mx-0"  *ngIf="quotationStatusDetails.status_screen_to_show ==='void'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon" >
+                <img src="../../../../../../../assets/img/icons/rejected.svg" alt="">
+            </div>
+           
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                   
+                    <div class="approval-details">
+                        <div class="header">Quote is Void</div>
+                        <!-- <p>This place will show the message is given by approver after void</p> -->
+                    </div>
+                    
+    
+                </div>
+                
+            </div>
+            <div class="row mx-0 mt-3" >
+
+                <div class="col-lg-6 px-0">
+                    <div class="d-flex flex-wrap" >
+                        <div class="me-5">
+                            <p class="mb-2 fs-12px">Submitted by</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter blue"> {{ findfingFirstName(quotationStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{quotationStatusDetails.submitter ? quotationStatusDetails.submitter : '-'}}</p>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex justify-content-end align-items-end"  *ngIf="quotationStatusDetails.timeline.length>0">
+                    <button class="fw-semibold primary-brand-text  mt-3" (click)="openSideBar()" data-bs-toggle="offcanvas"
+                        data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">View Approval Details</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+   
+
+    <!-------------- draft state ---------------------->
+    <div class="row mx-0"  *ngIf="quotationStatusDetails.status_screen_to_show ==='draft'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon" >
+                <img src="../../../../../../../assets/img/icons/document-purple.svg" alt="">
+            </div>
+           
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                   
+                    <div class="approval-details">
+                        <div class="header">Quotation in Draft</div>
+                        <p>Finalize the quote to get the details verified.</p>
+                    </div>
+                    
+    
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="d-flex justify-content-end align-items-center mt-2 btn-group-1">
+                        
+                            <button class="btn btn--primary btn--sm border-end f-b py-2"
+                                (click)="saveQuotation('save_and_submit','Validation Failed',false)">Save</button>
+                            <button mat-button class="btn btn--primary w-auto s-b" [matMenuTriggerFor]="menu"  *ngIf="is_Approval_configured"><i
+                                    class="material-icons">arrow_drop_down</i></button>
+                            <mat-menu #menu="matMenu">
+                                <button class="more-actions__item  w-100 text-start" type="button"
+                                    (click)="saveQuotation('save_and_submit','Validation Failed',false)">Save and Submit</button>
+                                <button class="more-actions__item w-100 text-start mb-2" type="button"
+                                    (click)="saveQuotation('send_for_approval','Send Approval',true)">Send for Approval</button>
+                            </mat-menu>
+                       
+                </div>
+                
+            </div>
+            
+
+        </div>
+
+    </div>
+    
+</div>
+
+
+
+<app-quotation-v2-view-approval-details [show]="isShow" [timeline]="timeline" (isClose)="isClose($event)"></app-quotation-v2-view-approval-details>

@@ -1,0 +1,317 @@
+<div class="right-section__header">
+  <h1 class="heading col-8" *ngIf="!employeeId">Add Employee Expense</h1>
+  <h1 class="heading col-8" *ngIf="employeeId">Edit Employee Expense</h1>
+  <button class="gb-video-play float-right" (click)="openGothrough()">
+    <i class="bi bi-play-circle-fill"></i>
+  </button>
+</div>
+<div class="alert-msg" *ngIf="apiError">
+  <span class="icon-wrap"></span>
+  <p class="message-cont">{{ apiError }}</p>
+</div>
+
+<div class="error-msg-list" *ngIf="globalFormErrorList.length > 0">
+  <p class="message-head">{{ errorHeaderMessage }}</p>
+  <span class="icon-wrap"></span>
+  <ul *ngFor="let error of globalFormErrorList">
+    <li class="message-cont">{{ error }}</li>
+  </ul>
+</div>
+<form [formGroup]="employeeOthersForm">
+  <div class="form-body shadow-inset-top-lg form-layout form-layout--pd no-br-tl no-br-tr">
+    <div class="row">
+      <div class="col-lg-3 col-sm-6">
+        <div class="input-wrap error" [ngClass]="addErrorClass(employeeOthersForm.controls.date)">
+          <label for="" class="input--required">Date</label>
+          <mat-form-field>
+            <input matInput [matDatepicker]="date" (focus)="date.open()" placeholder="DD/MM/YYYY"
+              formControlName="date">
+            <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+            <mat-datepicker #date></mat-datepicker>
+            <app-error [controlName]="employeeOthersForm.controls.date"></app-error>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="input-wrap error" [ngClass]="addErrorClass(employeeOthersForm.controls.payment_mode)">
+          <label for="" class="input--required">Payment Mode</label>
+          <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+            [selectedOption]="initialValues?.paymentMode">
+            <select #customSelect class="no-style select--modify" formControlName="payment_mode"
+              (change)="paymentModeChanged()">
+              <option value="paid_By_Driver">Paid By Employee</option>
+              <option *ngFor="let account of accountList" value="{{ account.id }}">
+                {{ account.name }}
+              </option>
+            </select>
+          </material-dropdown>
+          <app-error [controlName]="employeeOthersForm.controls.payment_mode"></app-error>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6" *ngIf="employeeOthersForm.get('payment_mode').value==='paid_By_Driver'">
+        <div class="input-wrap error m-0" [ngClass]="addErrorClass(employeeOthersForm.controls.employee)">
+          <label for="" class="input--required">Employee</label>
+          <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+            [selectedOption]="initialValues?.employee">
+            <select #customSelect class="no-style select--modify" formControlName="employee" (change)="handleEmployeeChange()">
+              <option *ngFor="let employee of employeeList" value="{{ employee.id }}">
+                {{ employee.emp_name_id }}
+              </option>
+            </select>
+          </material-dropdown>
+        </div>
+        <app-error class="text-danger" [controlName]="employeeOthersForm.controls.employee"></app-error>
+
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="input-wrap error">
+          <label for="" class="input"> Transaction Date</label>
+          <mat-form-field>
+            <input matInput [matDatepicker]="transaction_date" (focus)="transaction_date.open()"
+              placeholder="DD/MM/YYYY" formControlName="transaction_date">
+            <mat-datepicker-toggle matSuffix [for]="transaction_date"></mat-datepicker-toggle>
+            <mat-datepicker #transaction_date></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="input-wrap">
+          <label for="" class="input">Reference No.</label>
+          <input type="text" class="no-style input--bd" placeholder="2000" formControlName="reference_no">
+          <span class="border-anim"></span>
+        </div>
+      </div>
+
+    </div>
+    <div class="form-layout__card mg-top-30 formResponsiveTable">
+      <div class="">
+        <div class="table-wrapper table-wrapper--type1 table-wrapper--type2  table--bd table--nobg dropdownOverlay">
+          <table class="table-container item-table">
+            <thead>
+              <tr class="desktop_th">
+                <th width=18%>EMPLOYEE NAME</th>
+                <th width=18%>EXPENSE TYPE</th>
+                <th width=18%>AMOUNT ({{ currency_type?.symbol}})</th>
+                <th width=18%>DESCRIPTION</th>
+                <th width=10%></th>
+              </tr>
+            </thead>
+            <tbody formArrayName="employees">
+              <tr class="mobile-flex"
+                *ngFor="let employeeOther of employeeOthersForm.controls.employees['controls']; let i = index;"
+                [formGroupName]="i">
+                <td class="max-wd-120">
+                  <h5 class="th_h5_mobile">EMPLOYEE NAME </h5>
+                  <div class="select-wrap">
+                    <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                      [addErrorClass]="addErrorClass(employeeOthersForm.controls.employees.controls[i].controls.employee)"
+                      [selectedOption]="initialValues.employees[i]">
+                      <select #customSelect class="no-style select--modify" formControlName="employee" (change)="handleEmployeesChange(i)">
+                        <option *ngFor="let employee of employeeList" value="{{ employee.id }}">
+                          {{ employee.emp_name_id }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+                </td>
+
+                <td class="w-120 max-wd-120">
+                  <h5 class="th_h5_mobile">EXPENSE TYPE </h5>
+                  <div class="select-wrap w-initial">
+                    <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth"
+                      [postApiUrl]="addExpenseTypeUrl" [params]="expenseTypeParams"
+                      (addValueToList)="addExpenseType($event)" (postApiResponse)="getExpenseType($event,i)"
+                      [addErrorClass]="addErrorClass(employeeOthersForm.controls.employees.controls[i].controls.expense_type)"
+                      [selectedOption]="initialValues.expenseType[i]">
+                      <select #customSelect class="no-style select--modify" formControlName="expense_type">
+                        <option *ngFor="let expense of expenseTypeData" value="{{ expense.id }}">
+                          {{ expense.expensetype }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+                </td>
+
+                <td class="max-wd-120">
+                  <h5 class="th_h5_mobile">AMOUNT ({{ currency_type?.symbol}}) </h5>
+                  <div class="input-wrap" [ngClass]="addErrorClass(employeeOther.controls.amount)">
+                    <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="0"
+                      formControlName="amount" (change)="onCalcuationsChanged()">
+                  </div>
+                </td>
+
+                <td class="max-wd-120">
+                  <h5 class="th_h5_mobile">DESCRIPTION </h5>
+                  <input type="text" class="no-style input--bd" placeholder="Description" value=""
+                    formControlName="description">
+                </td>
+
+                <td class="text-center mobile-remove-add-position">
+                  <span class="material-icons clear"
+                    (click)="resetItemEmployee(employeeOther, i)">remove_circle_outline</span>
+                  <span class="material-icons delete" (click)="removeItemEmployee(i)"
+                    *ngIf="employeeOthersForm.controls.employees.controls.length !== 1">add_circle_outline</span>
+                  <span class="material-icons add" (click)="addEmployeeRow()">add_circle_outline</span>
+                </td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer-actions mg-top-20">
+          <a class="clear-item" (click)="clearAllCells()">Clear all cells</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="gst-table-wrapper mg-top-30">
+
+      <div class="gst-main">
+        <div class="text-end fw-bold gst-left"> Subtotal: </div>
+        <div class="px-0  text-end fw-bold gst-right">{{ currency_type?.symbol}} {{ employeeOtherTotals.subtotal| numberFormat }}
+        </div>
+      </div>
+      <div class="gst-main">
+        <div class="text-start pt-0 gst-left">
+
+          <div class="dropdown select-wrap">
+            <material-dropdown [selectedOption]="initialValues?.adjustmentAccount">
+              <select #customSelect formControlName="adjustment_account" class="no-style select--modify">
+                <option *ngFor="let option of expenseAccountList" value="{{ option.id }}">{{ option.name }}
+                </option>
+              </select>
+            </material-dropdown>
+          </div>
+          <div class="input" [ngClass]="addErrorClass(employeeOthersForm.controls.adjustment)">
+            <input twoDigitDecimalNumber type="text" class="error-box" placeholder="0.00" formControlName="adjustment"
+              (change)="onCalcuationsChanged()">
+          </div>
+          <div class="select-wrap dropdown">
+            <select name="" class=" mx-0 no-style select--modify custom-select" formControlName="adjustment_choice"
+              (change)="onCalcuationsChanged()">
+              <option value="0">%&nbsp;</option>
+              <option value="1">{{ currency_type?.symbol}}</option>
+            </select>
+          </div>
+
+        </div>
+        <div class="px-0  text-end gst-right">{{ currency_type?.symbol}} {{ employeeOtherTotals.adjustmentAmount| numberFormat }}
+        </div>
+      </div>
+      <div class="text-end gst-main">
+        <div class="text-end h5"> <strong> Total:</strong></div>
+        <div class="px-0 text-end ms-3 h5"><strong> {{ currency_type?.symbol}} {{ employeeOtherTotals.total| numberFormat }} </strong>
+        </div>
+      </div>
+    </div>
+
+
+    <!--  <div class="form-layout__card mg-top-30">
+      <div class="table-wrapper table--nobg table-wrapper--mobile overflow-initial">
+        <table class="table-container ">
+            <tbody>
+                <tr class="border-top-0 border-bottom-0 ">
+                    <td class="p-0 disp-none"></td>
+                    <td class="p-0">
+                        <div class="table-wrapper table-wrapper--type1 table--nobg mc-expenses-wrap">
+                            <table class="table-container mg-bottom-30 mc-expenses respinsiveTable">
+                                <tbody>
+                                    <tr class="border-top-0 mobileFlex">
+                                        <td    class=" text-end bill-item">
+                                            Subtotal:
+                                        </td>
+                                        <td    class="rupee-symbol rupee-symbol--sm px-0  text-end bill-value">
+                                          {{ currency_type?.symbol}} {{ employeeOtherTotals.subtotal }}
+                                        </td>
+                                    </tr>
+                                    <tr class="border-top-0 mobileFlex">
+                                      <td class="text-start pt-0 ">
+                                          <div class="gst">
+                                            <div class="select-wrap d-inline-blockms-0 me-2 mobile-margin  text-end width-300 ">
+                                                <material-dropdown
+                                                    [selectedOption]="initialValues?.adjustmentAccount">
+                                                    <select #customSelect formControlName="adjustment_account"
+                                                        class="no-style select--modify">
+                                                        <option  *ngFor="let option of expenseAccountList"
+                                                            value="{{ option.id }}">{{ option.name }}
+                                                        </option>
+                                                    </select>
+                                                </material-dropdown>
+                                             </div>
+                                              <div class="input-wrap mx-0 margin-right-0 mw-100px" [ngClass]="addErrorClass(employeeOthersForm.controls.adjustment)">
+                                                <input twoDigitDecimalNumber type="text" class="error-box m-auto border-radius-right-none" placeholder="0.00"
+                                                formControlName="adjustment"
+                                                (change)="onCalcuationsChanged()">
+                                              </div>
+                                              <div class="select-wrap d-inline-block">
+                                                    <select name="" class=" mx-0 no-style select--modify custom-select" id="percentage"
+                                                        formControlName="adjustment_choice"
+                                                        (change)="onCalcuationsChanged()">
+                                                        <option value="0">%&nbsp;</option>
+                                                        <option value="1">&#8377;</option>
+                                                    </select>
+                                              </div>
+                                        </div>
+                                    </td>
+                                      <td    class="rupee-symbol rupee-symbol--sm px-0  text-end ms-2">
+                                        {{ currency_type?.symbol}} {{ employeeOtherTotals.adjustmentAmount }}
+                                      </td>
+                                  </tr>
+
+                                    <tr class="border-top-0">
+                                        <td colspan="2" class="pt-0"></td>
+                                    </tr>
+                                    <tr class="mobileFlex">
+                                        <td class=" text-end bill-total disp-w-50">
+                                            Total:
+                                        </td>
+                                        <td    class="rupee-symbol px-0  text-end bill-total">
+                                          {{ currency_type?.symbol}} {{ employeeOtherTotals.total }} </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+  </div> -->
+
+
+    <div class="form-layout__card">
+      <div class="row">
+        <div class="col-lg-12 col-sm-12">
+          <div class="input-wrap">
+            <label for="" class="input">Optional Comment</label>
+            <input type="text" class="no-style input--bd" placeholder="Comments" formControlName="comments">
+            <span class="border-anim"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-layout__card mg-top-30">
+      <file-uploader (onFileUploaded)="fileUploader($event)" (onFileDeleted)="fileDeleted($event)" [multiple]="true"
+        [accept]="'capture=camera, image/jpeg,image/x-jpg,image/png, application/pdf'" [showFileName]="false"
+        [patchFileUrls]="patchFileUrls">
+      </file-uploader>
+    </div>
+
+
+
+  </div>
+ 
+</form>
+ <div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end">
+    
+      <button class="btn me-2 btn--sm"  routerLinkActive="active"
+        [routerLink]="[prefixUrl+'/trip/employee-others/list']">Cancel</button>
+      <button *ngIf="employeeId" class="btn btn--primary" (click)="updateExpense()">Update Expense</button>
+      <button *ngIf="!employeeId" class="btn btn--primary" (click)="saveExpense()">Save Expense</button>
+
+   
+  </div>
+
+<app-go-through [goThroughDetais]="goThroughDetais"></app-go-through>

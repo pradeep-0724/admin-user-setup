@@ -1,0 +1,201 @@
+<form [formGroup]="quotationCustomForm" class="mb-4">
+  <div class="d-flex py-4 px-4 align-items-center justify-content-between" >
+    <div class="tax-input-box">
+      <ng-container *ngIf="isTax">
+        <span for="">Tax on Freight</span>
+        <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialDetails.tax" class="dropDownWidth">
+          <select #customSelect name="" formControlName="tax" (change)="onTaxChanges()">
+            <option *ngFor="let option of taxOptions" value="{{ option.id }}">{{
+              option.label }}</option>
+          </select>
+        </material-dropdown>
+      </ng-container>
+   
+    </div>
+
+    <div class="d-flex flex-wrap" *ngxPermissionsOnly="['super_user'];else elseBlock">
+    <button class="btn w-auto me-3" *ngIf="isShowRedirect"><a class="link" target="_blank" [routerLink]="[prefixUrl+'/organization_setting/settings/quotation/custom-field/']"><i class="bi bi-layout-three-columns fs-6 me-2"></i>Modify Column </a> </button>
+    <button class="btn w-auto btn--secondary" *ngIf="isShowRefresh" (click)="refresh()"><i class="bi bi-arrow-clockwise fs-6 me-2"></i>Refresh</button>
+      
+    </div>
+    <ng-template #elseBlock>
+      <div class="d-flex flex-wrap" matTooltip="Contact our Super Admin to Modify Columns ."
+        matTooltipClass="material-toltip-class">
+        <button class="btn w-auto me-3" *ngIf="isShowRedirect" disabled><a class="link" target="_blank" [routerLink]="[prefixUrl+'/organization_setting/settings/quotation/custom-field/']"><i class="bi bi-layout-three-columns fs-6 me-2"></i>Modify Column </a> </button>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="px-4">
+    <div class="addable-row-table">
+      <table>
+        <thead>
+          <tr>
+            <ng-container *ngFor="let col of visibleColumsList">
+            
+              <th *ngIf="col.key !='description' && !col.is_private && col.key !='rate'">{{col.field_label}}</th>
+              <th  *ngIf="col.key !='description' && col.key =='rate'">{{col.field_label}}   ({{ currency_type?.symbol}})</th>
+              <th *ngIf="col.key !='description' && col.is_private && col.key !='rate'">{{col.field_label}} <span class="private-icon " [matTooltip]="'This is a private column'" matTooltipClass="material-toltip-class" matTooltipPosition="above">p</span></th>
+            </ng-container>
+
+          </tr>
+        </thead>
+        <tbody formArrayName="freights">
+
+          <ng-container *ngFor="let control of quotationCustomForm.controls.freights['controls'];let i = index"
+             [formGroupName]="i">
+            <tr >
+              <ng-container *ngFor="let col of visibleColumsList">
+
+                <ng-container *ngIf="col.system_created">
+                  <ng-container *ngIf="col.key !='description'">
+                    <td >
+                      <ng-container *ngIf="col.key =='rate'">
+                        <input threeDigitDecimalNumber type="text" [ngClass]="{'error':control.controls[col.key]?.touched && control.controls[col.key]?.hasError('min')}" placeholder=""
+                          formControlName="rate" (change)="onCalculationsChange();makeUnitandUnitCostMandatory()">
+                      </ng-container>
+                      <ng-container *ngIf="col.key =='total'">
+                        <input threeDigitDecimalNumber type="text" [ngClass]="{'error':control.controls[col.key]?.touched && control.controls[col.key]?.hasError('min')}" readonly placeholder=""
+                          formControlName="total" (change)="onCalculationsChange();makeUnitandUnitCostMandatory()">
+                      </ng-container>
+                      <ng-container *ngIf="col.key =='quantity'">
+                        <input threeDigitDecimalNumber type="text" [ngClass]="{'error':control.controls[col.key]?.touched && control.controls[col.key]?.hasError('min')}" placeholder=""
+                          formControlName="quantity" (change)="onCalculationsChange();makeUnitandUnitCostMandatory()">
+                      </ng-container>
+                      <ng-container *ngIf="col.key =='make_model'">
+                        <div class="d-flex">
+                          <div >
+                            <material-dropdown [searchable]="true" [addable]="true"
+                              [selectedOption]="initialDetails.make[i]" [addBlank]="false"
+                              [postApiUrl]="vehicleMakeUrl" [params]="vehicleMakeParam"
+                              (postApiResponse)="getNewVehicleMake($event,control,i)"
+                              [ngClass]="{'error':control.controls[col.key]?.touched && control.controls[col.key]?.hasError('min')}"
+                              (addValueToList)="addNewVehicleMake($event)">
+                              <select #customSelect formControlName="make" 
+                                (change)="onMakeSelected($event,i);makeUnitandUnitCostMandatory()">
+                                <option *ngFor="let option of vehicleMake" value="{{ option.id }}">
+                                  {{ option.make_name }}
+                                </option>
+                              </select>
+                            </material-dropdown>
+                          </div>
+                          <div class="mx-1">
+                            <p style="margin-top: 10px;">|</p>
+                          </div>
+                          <div  [ngClass]="{'disabled':!control.get('make').value}">
+                            <material-dropdown [searchable]="true" [selectedOption]="initialDetails.model[i]"
+                              [addable]="true"  [addBlank]="false"
+                              [disabled]="!control.get('make').value" [postApiUrl]="vehicleModelUrl" [ngClass]="{'error':control.controls[col.key]?.touched && control.controls[col.key]?.hasError('min')}"
+                              [params]="vehicleModelParam" (postApiResponse)="getNewVehicleModel($event,control,i)"
+                              (addValueToList)="addNewVehicleModel($event,control)">
+                              <select #customSelect formControlName="model" >
+                                <option *ngFor="let option of modelList[i]" value="{{ option.id }}">
+                                  {{ option.model_name }}
+                                </option>
+                              </select>
+                            </material-dropdown>
+                          </div>
+                        </div>
+                      </ng-container>
+                      <ng-container *ngIf="col.key =='billing'">
+                        <material-dropdown [searchable]="true"  [selectedOption]="initialDetails.billing[i]" [ngClass]="{'error':control.controls[col.key]?.touched && control.controls[col.key]?.hasError('min')}">
+                          <select #customSelect formControlName="billing" >
+                            <option *ngFor="let option of billingTypeList" [value]="option?.value">
+                              {{ option?.label }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                      </ng-container>
+                      <ng-container *ngIf="col.key =='specification'">
+                        <material-dropdown [searchable]="true" [selectedOption]="initialDetails.specification[i]"[ngClass]="{'error':control.controls[col.key]?.touched && control.controls[col.key]?.hasError('min')}"
+                          [addable]="false"  [addBlank]="true" [postApiUrl]="vehicleApi"
+                          [params]="addVehicle" (postApiResponse)="getNewVehicle($event,control,i)"
+                          (addValueToList)="addNewVehicle($event)">
+                          <select #customSelect formControlName="specification" (change)="makeUnitandUnitCostMandatory()" >
+                            <option *ngFor="let option of vechileTypeList" value="{{ option?.id }}">
+                              {{ option?.specification }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                      </ng-container>
+                    </td>
+                  </ng-container>
+
+                </ng-container>
+                <ng-container *ngIf="!col.system_created">
+                  <ng-container *ngIf="col.key !='description'">
+                    <td>
+                      <ng-container *ngIf="col.field_type =='decimal'">
+                        <input threeDigitDecimalNumber type="text"  placeholder="Enter Digits"
+                          [formControlName]="col.key" (change)="makeUnitandUnitCostMandatory()">
+                      </ng-container>
+
+                      <ng-container *ngIf="col.field_type =='string'">
+                        <input type="text"  (change)="makeUnitandUnitCostMandatory()" [formControlName]="col.key" placeholder="Enter Text">
+                      </ng-container>
+  
+                      <ng-container  *ngIf="col.field_type =='date'">
+                        <mat-form-field >
+                          <input matInput [matDatepicker]="control" [formControlName]="col.key" readonly (focus)="control.open()" (dateChange)="dateFormatChange(i,col.key);makeUnitandUnitCostMandatory()"  placeholder="DD/MM/YYYY">
+                          <mat-datepicker-toggle matSuffix [for]="control"></mat-datepicker-toggle>
+                          <mat-datepicker #control ></mat-datepicker>
+                      </mat-form-field>
+                      </ng-container>
+                      <ng-container *ngIf="col.field_type =='select_option'">
+
+                        <material-dropdown [searchable]="true" 
+                          [addable]="true" [addNewOptions]="true"
+                           (addNewOption)="addNewOption($event,col,control)" [selectedOption]="{label:control.get(col.key).value}"  >
+                          <select #customSelect [formControlName]="col.key" (change)="makeUnitandUnitCostMandatory()" >
+                            <option *ngFor="let option of col.option_list" value="{{ option}}">
+                              {{ option }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                      </ng-container>
+                    </td>
+                  </ng-container>
+                </ng-container>
+
+              </ng-container>
+
+            </tr>
+            <tr>
+                <td [attr.colspan]="visibleColumsList.length" class="py-2 pe-5">
+                <div class="justify-content-between d-flex align-items-center">
+                  <div>
+                <ng-container *ngFor="let col of visibleColumsList">
+                  <div class="mb-0" *ngIf="col.key =='description'" style="min-width: 250px;">
+                  <input type="text" placeholder="Enter Description" formControlName="description">
+                </div>
+              </ng-container>
+            </div>
+                  <div class="d-flex flex-wrap  row-btn-wrap">
+                    <button class=" row-btn row-btn-copy " *ngIf="quotationCustomForm.controls.freights['controls'].length-1 ==i " matTooltip="clone" (click)="cloneClientFreight(control,i)"><span class="material-icons">
+                  content_copy
+                  </span></button>
+                  <button class="  row-btn row-btn-delete " *ngIf="quotationCustomForm.controls.freights['controls'].length !=1 " (click)="removeClientFreight(i)"><span class="material-icons">
+                  close
+                  </span></button>
+                    <button class=" row-btn row-btn-add " *ngIf="i==quotationCustomForm.controls.freights['controls'].length - 1" (click)="addNewClientFreight()"  ><span class="material-icons">
+                      add
+                      </span></button>
+                
+                
+                  </div>
+                  </div>
+                </td>
+              
+              
+            </tr>
+
+          </ng-container>
+
+
+
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</form>

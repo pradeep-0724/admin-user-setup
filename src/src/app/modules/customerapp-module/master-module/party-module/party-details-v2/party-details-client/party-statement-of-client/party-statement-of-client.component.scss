@@ -1,0 +1,30 @@
+.share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 34px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.download {
+    color: #4CACFE;
+    border: 2px solid #4CACFE;
+}
+
+.mail {
+    color: #9e9e9c;
+    border: 2px solid #9e9e9c;
+}
+.jndjsnd{
+    height: 35px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 7px;
+    border: 1px solid #B8B8B8;
+    border-radius: 6px;
+    white-space: nowrap;
+    
+}

@@ -1,0 +1,75 @@
+
+<div class="calc-height">
+    <app-list-widget  listTitle="Zones" [isAddButton]="true"   [buttonData]="buttonData" (listWidgetData)="listWidgetData($event)">
+    </app-list-widget>
+  <div class="alert-msg" *ngIf="apiError">
+    <span class="icon-wrap"></span>
+    <p class="message-cont">{{ apiError }}</p>
+</div>
+
+</div> 
+
+<div class="custom-table-container" id="zone-list" (scroll)="scrollEvent()">
+    <table [ngClass]="{'h-100':zoneList.length==0}">
+
+        <thead>
+            <tr>
+                <th>Zone Name</th>
+                <th>COUNTRY</th>
+                <th>State</th>
+                <th>Locations</th>
+                <th class="icon-box"></th>
+            </tr>
+        </thead>
+        <tbody *ngIf="zoneList.length==0">
+            <tr class="border-0">
+                <td class="bg-white" colspan="30">
+                    <div class="no-list-data-wrap">
+                        <figure>
+                            <img src="assets/img/no-content.png" alt="">
+                        </figure>
+                        <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                    </div>
+                </td>
+            </tr>
+
+        </tbody>
+
+        <tbody>
+            <tr *ngFor="let zone of zoneList; let i = index;">
+                <td class="ws-nowrap">{{zone?.name}}</td>
+                <td class="ws-nowrap">{{zone?.country? zone?.country : '-'}}</td>
+                <td class="ws-nowrap">{{zone?.state? zone?.state : '-'}}</td>
+
+                <td class="line-height-normal td-2l">
+                    <ng-container *ngFor="let location of zone.areas; let last = last">
+                        <div>
+                            {{ location.name }}
+                        </div>
+                    </ng-container>
+                </td>
+               
+                <td class="icon-box  tabIndexActive">
+                    <div class="d-flex justify-content-center align-items-center" *ngxPermissionsOnly="[zonePermission[2],zonePermission[1]]">
+                        <div class="position-relative">
+                            <button class="material-icons more-icon p-0"
+                                (click)="optionsList($event, 'list_'+zone?.id)">more_vert</button>
+                            <div class="more-actions__menu table-popup"
+                                [ngClass]="{show: showOptions === 'list_'+zone?.id}">
+                                <button *ngxPermissionsOnly="[zonePermission[1]]" class="more-actions__item w-100" [routerLink]="[prefixUrl+'/onboarding/zone/edit',zone?.id]"><i class="material-icons">edit</i>Edit</button>
+                                <button *ngxPermissionsOnly="[zonePermission[2]]" class="more-actions__item w-100" 
+                                    (click)="popupFunction(zone, i)"><i
+                                        class="material-icons">delete</i>Delete</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </td>
+
+               
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

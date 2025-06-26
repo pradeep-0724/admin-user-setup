@@ -1,0 +1,43 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+
+p {
+    color: $text-color;
+}
+
+.no-wrap {
+    white-space: nowrap;
+}
+
+.edit-btn {
+    border: 1px solid $gray-500;
+    padding: 7px;
+    color: #676A6E;
+    border-radius: 7px;
+    font-size: 10px;
+    font-weight: 600;
+
+
+    transition: all 60ms ease-in-out;
+
+    &:hover {
+
+        transform: scale(1.1);
+
+    }
+
+
+}
+
+.status-label {
+    font-weight: 600;
+    color: #676A6E;
+}
+
+.wrap {
+    background-color: $layout-bg;
+}
+
+
+
+

@@ -1,0 +1,20 @@
+
+<div>
+    <app-overall-trip-report-header></app-overall-trip-report-header>
+</div>
+    <div class="calc-height custom-fake-tab custom-fake-tab-sticky">
+        <button matRipple (click)="selectedTab=1 " class="tab" [ngClass]="{'active-tab':selectedTab==1}">Overview</button>
+        <button matRipple (click)="selectedTab=2" class="tab" [ngClass]="{'active-tab':selectedTab==2}">Drivers Jobs Info.</button>
+        <button matRipple (click)="selectedTab=3" class="tab" [ngClass]="{'active-tab':selectedTab==3}">Vehicles Jobs Info.</button>
+        <button matRipple (click)="selectedTab=4" class="tab" [ngClass]="{'active-tab':selectedTab==4}">Customers Jobs Info.</button>
+        <button matRipple (click)="selectedTab=5" class="tab" [ngClass]="{'active-tab':selectedTab==5}">Vehicle Provider Jobs Info.</button>
+    </div>
+    <div class=" shadow-inset-top tab-content ">
+        <app-overall-trip-report-overview  *ngIf="selectedTab==1"></app-overall-trip-report-overview>
+        <app-overall-trip-report-drivers-trip-info  *ngIf="selectedTab==2"></app-overall-trip-report-drivers-trip-info>
+        <app-overall-trip-report-vehicles-trip-info  *ngIf="selectedTab==3"></app-overall-trip-report-vehicles-trip-info>
+        <app-overall-trip-report-clients-trip-info  *ngIf="selectedTab==4"></app-overall-trip-report-clients-trip-info>
+        <app-overall-trip-report-vehicle-providers-trip-info *ngIf="selectedTab==5"></app-overall-trip-report-vehicle-providers-trip-info>
+    </div>
+   
+ 

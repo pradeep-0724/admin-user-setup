@@ -1,0 +1,111 @@
+::ng-deep.videoRight{
+
+
+  height: 32px;
+  width: 32px;
+  position: relative;
+  text-align: right;
+  max-width: 32px;
+
+
+}
+.videoIcon{
+  color: #467AF9;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(0, -58%);
+  display: block;
+  background-color: unset;
+  border-radius: unset;
+  box-shadow: unset;
+  cursor: pointer;
+
+
+    span{
+      font-weight: 700;
+      font-size: 30px;
+      transition: 1s;
+      line-height: 1;
+      direction: unset;
+      // background-color: #fefefe;
+      // border-radius: 3px;
+      // box-shadow: 0 0 3px 0 rgba(0, 0, 0,  0.1);
+      cursor: pointer;
+
+
+    }
+}
+
+.parentPopup {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  left: 0;
+  top: 0;
+}
+
+.popupMain {
+  position: fixed;
+  max-width: 900px;
+  margin: auto;
+  text-align: center;
+  height: auto;
+  width: 95%;
+  left: 0;
+  right: 0;
+  top: 50%;
+  z-index: 101;
+  transform: translate(0, -50%);
+  background: #fff;
+  padding: 7px;
+  border-radius: 10px;
+animation: durationDelay 1s ease-in-out;
+
+@keyframes durationDelay {
+    from{
+
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+
+    }
+}
+
+
+  .closeIcon {
+    position: absolute;
+    right: -25px;
+    top: -10px;
+    border-radius: 50%;
+    cursor: pointer;
+    background: #333;
+    color: #fff;
+    @media (max-width:800px) {
+        right: 5px;
+        top: 5px;
+
+    }
+  }
+
+  .videoParent {
+    position: relative;
+
+
+    video,
+    iframe {
+
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+
+    }
+  }
+}

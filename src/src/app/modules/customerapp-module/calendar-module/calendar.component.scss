@@ -1,0 +1,274 @@
+@import "../../../../assets/styles/helpers/variable";
+@import "../../../../assets/styles/helpers/mixins";
+.cal-header {
+  // THis is not WORKING!!!
+  padding: 9px 0 !important;
+  text-transform: uppercase;
+  border: 1px solid #d8e1e9;
+}
+.calendar-body {
+  padding: 30px;
+}
+.calendar {
+  &-wrap {
+    background: $white;
+    color: $primary-text-color;
+    border: 1px solid #d8e1e9;
+    @include respond-to(1110px) {
+      @include flex-wrap(wrap);
+    }
+    @include respond-to(mobile) {
+      overflow-x: auto;
+    }
+    .btn--action {
+      height: 26px;
+      width: 26px;
+      padding: 0 !important;
+      >i {
+        line-height: 26px;
+      }
+    }
+    .btn--today {
+      width: initial !important;
+      padding: 0 15px !important;
+      text-transform: uppercase;
+    }
+    .vehicle {
+      &-status-wrap {
+        position: relative;
+        @include respond-to(1110px) {
+          flex-grow: 1;
+        }
+        .add-note-wrap {
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          margin: 10px 0px;
+          >button {
+            margin: 0 auto;
+          }
+        }
+        .sub-heading {
+          padding: 20px 20px 0 20px;
+          margin-bottom: 25px;
+          color: $primary-text-color;
+        }
+        .status {
+          padding: 0px;
+          color: $primary-text-color;
+          position: relative;
+          cursor: pointer;
+          border-left: 2px solid transparent;
+          @include transition(all 0.3s ease);
+          &.active {
+            background: rgba(13, 114, 229, 0.05);
+            border-left: 2px solid #595fab;
+          }
+          &:hover {
+            background: rgba(13, 114, 229, 0.05);
+            border-left: 2px solid #595fab;
+          }
+          &-container {
+            width: 100%;
+            @include flexbox();
+            // @include justify-content(space-between);
+            padding: 15px 0;
+            border-bottom: 1px solid #d8e1e9;
+          }
+          span:first-child {
+            margin: 0 10px 0 10px;
+          }
+        }
+      }
+      &-available {
+        width: 392px;
+        border-left: 1px solid #d8e1e9;
+        padding: 20px;
+        @include respond-to(1110px) {
+          flex-grow: 1;
+        }
+        .sub-heading {
+          margin-bottom: 25px;
+          color: $primary-text-color;
+        }
+        &__item {
+          @include flexbox();
+          @include justify-content(space-between);
+          border-bottom: 1px solid #d8e1e9;
+          padding-bottom: 15px;
+          margin-bottom: 15px;
+          color: $primary-text-color;
+        }
+      }
+    }
+  }
+  &-container {
+    @include flex-grow(1);
+    @include respond-to(1110px) {
+      flex-basis: 100%;
+    }
+    .calendar {
+      &-header {
+        padding: 20px;
+      }
+    }
+  }
+}
+.cal-event {
+  margin-left: 20px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 2px;
+}
+::ng-deep .cal-month-view .cal-day-badge {
+  display: none;
+}
+::ng-deep .cal-month-view .cal-open-day-events {
+  display: none;
+}
+::ng-deep .cal-month-view .cal-cell.cal-has-events.cal-open,
+::ng-deep .cal-month-view .cal-day-cell.cal-in-month.cal-has-events:hover {
+  font-size: 16px;
+  background-color: #d3ecfe;
+}
+::ng-deep .cal-month-view .cal-day-number {
+  margin-left: 15px;
+  float: left;
+}
+::ng-deep .cal-month-view .cal-events {
+  margin: 5px 5px 10px 5px;
+  margin-left: auto;
+}
+::ng-deep .cal-month-view .cal-day-cell.cal-today .cal-day-number {
+  font-size: 20px;
+}
+.cal_list_view {
+  overflow-y: auto;
+}
+.databadge {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  margin-top: 20px;
+  margin-left: 20px;
+  display: inline-block;
+}
+.note-class {
+  display: inline-block;
+}
+.databadge p {
+  padding: 4px 6px;
+}
+.active-calender {
+  background-color: #A9AFD6;
+  width: 42px;
+  border-radius: 100%;
+  margin-top: 1px;
+  height: 42px;
+  margin-left: 4px;
+  .cal-day-number{
+    margin: auto;
+    float: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+}
+@media only screen and (min-width: 1110px) {
+ /*  .calendar-wrap {
+    height: 525px;
+  } */
+
+  .calendar-wrap .vehicle-available {
+    overflow: auto;
+  }
+  .calendar-container {
+    overflow: auto;
+  }
+}
+.note-color {
+  margin-top: 14px;
+  margin-left: 5px;
+}
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  mat-icon {
+    height: auto;
+    width: auto;
+  }
+}
+.calendar-wrap {
+  .slide_parent {
+    position: relative;
+    overflow: hidden;
+    overflow-y: auto;
+
+
+    .display-none-section {
+      transform: translateX(200%);
+      transition: 1s ease-in-out;
+      background: #fff;
+      animation: slide_slow 1s ease-in-out;
+    }
+    .slide-show {
+      animation: slide_slow 1s ease-in-out;
+      transition: 1s ease-in-out;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      top: 0;
+      left: 0;
+      transition: 1s ease;
+      padding: 20px;
+    }
+    @keyframes slide_slow {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.displaynone{
+   display: none;
+}
+.position_parent{
+  position: relative;
+  .btn{
+    z-index: 1;
+    border: none;
+    top: 10px;
+    width: auto;
+    left: 5px;
+    position: absolute;
+    padding: 0 0 0 20px;
+    font-size: 15px;
+    &:hover{
+      color: unset !important;background: none !important;
+    }
+    .material-icons{
+      font-size: 30px;
+      height: 29px;
+      width: auto;
+      font-weight: 500;
+      position: absolute;
+      left: -10px;
+      top: -6px;
+    }
+  }
+  h5{
+    position: relative;
+    padding: 5px 5px 5px 80px;
+  }
+}

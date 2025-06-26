@@ -1,0 +1,66 @@
+<div class="form-layout__card formResponsiveTable tabIndexActive edit-billing-popup ">
+  <div class="popup-header ">
+    <h6>{{freightType}} Freight</h6>
+  </div>
+  <div action="" [formGroup]="billingForm">
+        <div  class="alert alert-warning mt-2 mx-2" *ngIf="totalSumErr">
+          <span  class="icon-wrap me-2 def-color">
+          </span>
+          Total Quantity of the Material is not matching the Total Quantity of Freight.
+          </div>
+        <div class="alert alert-warning mt-2 mx-2" role="alert" *ngIf="warningMessage">
+          {{warningMessage}}
+        </div>
+        <div class="row mx-0 px-3 pt-4 pb-3">
+          <div class="custom-box-input-wrap  col-lg-3 col-md-6 mb-3" [ngClass]="{'disabled':!isDisableBillingTypes}">
+              <label for="" >Billing <span class="position-relative ms-2"><app-tool-tip [totalSlides]="billingTypesToolTip.content.length" position="right" class="position-absolute start-0"
+                [toolTipContent]="billingTypesToolTip"></app-tool-tip></span></label>
+                  <material-dropdown [searchable]="true" [disabled]="!isDisableBillingTypes"  [addErrorClass]="addErrorClass(billingForm.controls.freight_type)"  [selectedOption]="initialValues.billingType">
+                    <select #customSelect formControlName="freight_type" class="no-style select--modify"
+                      (change)="onChangeBillingType()">
+                      <option *ngFor="let option of billingTypeList" [value]="option?.value">
+                        {{ option?.label }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+            
+          </div>
+          <div class="custom-box-input-wrap col-lg-3 col-md-6 mb-3" *ngIf="billingTypeSelected != 'Fixed'  && billingForm.get('freight_type').value !=10">
+              <label for="">Rate Per {{ billingTypeSelected }}</label>
+                  <input positiveThreeDigitDecimalNumber type="text" class="box-input"
+                    (change)="onChangeCalulation()" [ngClass]="{
+                        error:
+                          billingForm.controls.rate.invalid &&
+                          billingForm.controls.rate.touched
+                      }" placeholder="123456" value="" formControlName="rate" />
+          </div>
+
+          <div class="custom-box-input-wrap col-lg-3 col-md-6 mb-3" *ngIf="billingTypeSelected != 'Fixed' && billingForm.get('freight_type').value !=10">
+            <label for="">Total  {{ billingTypeSelected2 }}</label>
+                    <input positiveThreeDigitDecimalNumber (keyup)="onChangeCalulation()" [ngClass]="{
+                      error:
+                        billingForm.controls.total_units.invalid &&
+                        billingForm.controls.total_units.touched
+                    }" type="text" class="box-input" placeholder="123456" value=""
+                  formControlName="total_units" />
+        </div>
+
+        <div class="custom-box-input-wrap col-lg-3 col-md-6 mb-3" >
+          <label for="">Total Amount</label>
+                <input positiveThreeDigitDecimalNumber [ngClass]="{
+                  error:
+                    billingForm.controls.freight_amount.invalid &&
+                    billingForm.controls.freight_amount.touched
+                }" type="text" class="box-input" placeholder="123456" value="" 
+              formControlName="freight_amount" [readonly]="billingTypeSelected != 'Fixed' && billingForm.get('freight_type').value !=10" />
+      </div>
+
+      
+
+      </div>
+    <div class="d-flex justify-content-space-between align-items-center mx-4 pb-4 ">
+      <button class="btn w-auto px-4 " (click)="cancel()">Cancel</button>
+      <button class="btn btn--primary w-auto px-4" (click)="save()">Save</button>
+    </div>
+  </div>
+</div>

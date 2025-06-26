@@ -1,0 +1,430 @@
+<div *ngIf="otherActivityId" class="right-section__header">
+    <h1 class="heading">Edit Other Bills</h1>
+</div>
+<div *ngIf="!otherActivityId" class="right-section__header d-flex justifi-content-space-between">
+    <h1 class="heading">Add Other Bills</h1>
+        <button class="gb-video-play float-right"  (click)="openGothrough()">
+            <i class="bi bi-play-circle-fill"></i>
+        </button>
+   
+
+</div>
+<form [formGroup]="otherActivityForm">
+    <div class="alert-msg" *ngIf="apiError">
+        <span class="icon-wrap"></span>
+        <p class="message-cont">{{ apiError }}</p>
+    </div>
+    <div class="error-msg-list" *ngIf="globalFormErrorList.length > 0">
+        <p class="message-head">{{ errorHeaderMessage }}</p>
+        <span class="icon-wrap"></span>
+        <ul *ngFor="let error of globalFormErrorList">
+          <li class="message-cont">{{ error }}</li>
+        </ul>
+    </div>
+    <div class="form-body shadow-inset-top-lg form-layout form-layout--pd no-br-tl no-br-tr">
+        <div class="row">
+
+            <div *ngIf="otherActivityId" class="col-lg-3 col-sm-6">
+                <div class="input-wrap disabled">
+                    <label for="" class="input--required position-relative">Vendor  <span *ngIf="isTdsDecleration" class="blueTag">TDS Declaration Received</span></label>
+                    <div class="input--bd">{{ initialValues.vendor.label }}</div>
+                    <span *ngIf="gstin" class="font-small-blue"> {{terminology.tax_no_type}}: {{gstin}} </span>
+                </div>
+            </div>
+
+            <div *ngIf="!otherActivityId" class="col-lg-3 col-sm-6">
+                <div class="input-wrap error " [ngClass]="addErrorClass(otherActivityForm.controls.vendor)">
+                    <label for="" class="position-relative">Vendor  <span *ngIf="isTdsDecleration" class="blueTag">TDS Declaration Received</span></label>
+                    <material-dropdown [searchable]="true"
+                                       [addable]="true"
+                                       [maxLength]="255"
+                                        class="dropDownWidth"
+                                        [selectedOption]="initialValues.vendor"
+                                        [party]="true" (addPartyPopup)="openAddPartyModal($event)"
+                                        (addValueToList)="addValueToPartyPopup($event)"
+                                        [params]="partyNamePopup">
+
+                        <select #customSelect formControlName="vendor" class="no-style select--modify"
+                            (change)="onVendorSelected($event)"  (change)="stopLoaderClasstoBody()">
+                            <option *ngFor="let vendor of vendorList" value="{{ vendor?.id }}">
+                                {{ vendor.party_display_name }}
+                            </option>
+                        </select>
+                    </material-dropdown>
+                    <span *ngIf="gstin" class="font-small-blue"> {{terminology.tax_no_type}}: {{gstin}} </span>
+                    <app-error [controlName]="otherActivityForm.controls.vendor"></app-error>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6">
+                <div class="input-wrap">
+                    <label for="">Employee In Charge</label>
+                    <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [addBlank]="true"
+                        [selectedOption]="initialValues.employee">
+                        <select #customSelect formControlName="employee" (change)='handleEmployeeChange()' class="no-style select--modify">
+                            <option *ngFor="let employee of employeeList" value="{{ employee.id }}">
+                                {{ employee.emp_name_id }}
+                            </option>
+                        </select>
+                    </material-dropdown>
+                    <span class="error-message">Error messge!</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="input-wrap error" [ngClass]="addErrorClass(otherActivityForm.controls.bill_number)" [class.disabled]="isAmountUsed">
+                    <label for="" class="input--required">Bill Number</label>
+                    <input type="text" class="no-style input--bd add-hsn" placeholder="Eg.:1234567" value=""
+                        formControlName="bill_number">
+                    <span class="border-anim"></span>
+                    <app-error [controlName]="otherActivityForm.controls.bill_number"></app-error>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="input-wrap error" [ngClass]="addErrorClass(otherActivityForm.controls.bill_number)">
+                    <label for="" class="input--required">Bill Date</label>
+                    <mat-form-field>
+                        <input matInput readonly [matDatepicker]="bill_date" (focus)="bill_date.open()"
+                            formControlName="bill_date" (dateChange)="onCalendarChangePTerm($event?.target?.value)"
+                            placeholder="DD/MM/YYYY">
+                        <mat-datepicker-toggle matSuffix [for]="bill_date"></mat-datepicker-toggle>
+                        <mat-datepicker #bill_date></mat-datepicker>
+                    </mat-form-field>
+                    <app-error [controlName]="otherActivityForm.controls.bill_date"></app-error>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="input-wrap">
+                    <label for="" class="input">Payment Term</label>
+                    <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [addBlank]="true"
+                        [selectedOption]="initialValues.paymentTerm">
+                        <select #customSelect formControlName="payment_term" class="no-style select--modify"
+                            (change)="onpaymentTermSelected($event.target.value)">
+                            <option *ngFor="let option of staticOptions.paymentTermList" value="{{ option.id }}">
+                                {{ option.label }}
+                            </option>
+                        </select>
+                    </material-dropdown>
+                    <span class="error-message">Error messge!</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+              <div class="input-wrap error" [ngClass]="addErrorClass(otherActivityForm.controls.due_date)">
+                <label for="" *ngIf="!isDueDateRequired">Due Date</label>
+                <label for="" class="input--required" *ngIf="isDueDateRequired">Due Date</label>
+                    <mat-form-field>
+                        <input matInput [min]="minDate" [matDatepicker]="due_date" (focus)="due_date.open()" formControlName="due_date"
+                        (dateChange)="onWorkEndDateChange()"  placeholder="DD/MM/YYYY">
+                        <mat-datepicker-toggle matSuffix [for]="due_date"></mat-datepicker-toggle>
+                        <mat-datepicker #due_date></mat-datepicker>
+                    </mat-form-field>
+                    <app-error [controlName]="otherActivityForm.controls.due_date"></app-error>
+                </div>
+            </div>
+
+        </div> 
+        <app-tax-inclusive [taxInclusiveForm]="otherActivityForm"  [editData]="editData" [partyDetails]="partyTaxDetails" [ngClass]="{'hiddenContent':!isTax}"
+        (taxInclusiveFormValueChange)="headerTaxDetails($event)"
+        [isValidForm]="taxFormValid">
+        </app-tax-inclusive>
+        <div class="form-layout__card mg-top-30 formResponsiveTable">
+            <div class="">
+                <div class="table-wrapper table-wrapper--type1 table-wrapper--type2  table--bd table--nobg"
+                    id="table-wrapper">
+                    <table class="table-container">
+                        <thead>
+                            <tr class="desktop_th">
+                                <th width=15%>Item</th>
+                                <th width=15%>Expense Account</th>
+                                <th width=12%>Quantity</th>
+                                <th width=12%>Unit</th>
+                                <th width=12%>Unit Cost ({{ currency_type?.symbol}})</th>
+                                <th width=12% [ngClass]="{'hiddenContent':!isTax}">Amount ({{ currency_type?.symbol}})</th>
+                                <th width=15% [ngClass]="{'hiddenContent':!isTax}">Tax</th>
+                                <th width=10%>Total ({{ currency_type?.symbol}})</th>
+                                <th width=9%></th>
+                            </tr>
+                        </thead>
+                        <tbody formArrayName="item_expenses">
+                            <tr class="mobile-flex" *ngFor="let itemExpense of otherActivityForm.controls.item_expenses['controls']; let i = index;"
+                                [formGroupName]="i">
+                                <td class="ps-2">
+                                    <h5 class="th_h5_mobile"> Item</h5>
+                                   <div class="select-wrap" [ngClass]="addErrorClass(itemExpense.controls.item)">
+                                    <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth" [addBlank]="false"
+                                    [addErrorClass]="addErrorClass(itemExpense.controls.item)" [maxLength]="20"
+                                    [selectedOption]="initialValues?.item[i]" [addNewOptions]="true"
+                                    (addNewOption)="addNewAdditionalCharge($event,i)">
+                                    <select #customSelect formControlName="item" class="no-style select--modify" (change)="onItemSelected(itemExpense,i);">
+                                        <option *ngFor="let option of materialList" value="{{ option?.id }}">
+                                          {{ option.name }}
+                                        </option>
+                                    </select>
+                                  </material-dropdown>
+                                   </div>
+                                </td>
+                                <td>
+                                    <h5 class="th_h5_mobile"> Expense Account</h5>
+                                    <div class="select-wrap" [ngClass]="addErrorClass(itemExpense.controls.expense_account)">
+                                        <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth"
+                                        [chartOfAccount]="true" (addChartOfAccount)="openAddCoaModal($event, i)"
+                                        [params]="coaParams" (addValueToList)="addParamsCoaItem($event)"
+                                            [addErrorClass]="addErrorClass(itemExpense.controls.expense_account)"
+                                            [selectedOption]="initialValues.account[i]">
+                                            <select #customSelect formControlName="expense_account"
+                                                class="no-style select--modify">
+                                                <option *ngFor="let account of accountList" value="{{ account.id }}">
+                                                    {{ account.name }}
+                                                </option>
+                                            </select>
+                                        </material-dropdown>
+                                    </div>
+                                </td>
+                                <td class="max-wd-120">
+                                    <h5 class="th_h5_mobile">Quantity </h5>
+                                    <div class="select-wrap"  [ngClass]="addErrorClass(itemExpense.controls.quantity)">
+                                        <input positiveThreeDigitDecimalNumber type="text" placeholder="1" class="   rounded-left"
+                                            formControlName="quantity" (change)="calculateItemOthersAmount(i)">
+
+                                    </div>
+                                </td>
+                                <td>
+                                    <h5 class="th_h5_mobile"> Unit</h5>
+                                    <div class="select-wrap"  [ngClass]="addErrorClass(itemExpense.controls.units)">
+                                        <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                                         [selectedOption]="initialValues.units[i]" [addBlank]="true">
+                                            <select #customSelect formControlName="units"
+                                                class="no-style select--modify">
+                                                <option *ngFor="let option of staticOptions.itemUnits"
+                                                    value="{{ option.id }}">{{ option.label }}</option>
+                                            </select>
+                                        </material-dropdown>
+                                    </div>
+                                </td>
+                                <td>
+                                    <h5 class="th_h5_mobile"> Unit Cost  ({{ currency_type?.symbol}})</h5>
+                                    <input positiveThreeDigitDecimalNumber class="select-wrap" [ngClass]="addErrorClass(itemExpense.controls.rate_per_unit)" type="text" placeholder="1000" formControlName="rate_per_unit"
+                                        (change)="calculateItemOthersAmount(i)">
+                                </td>
+                                <td class="input-wrap"[ngClass]="{'hiddenContent':!isTax}">
+                                    <h5 class="th_h5_mobile"> Amount  ({{ currency_type?.symbol}})</h5>
+                                  <input positiveThreeDigitDecimalNumber type="text" readonly [ngClass]="addErrorClass(itemExpense.controls.total_before_tax)" placeholder="1000" formControlName="total_before_tax" class="error-box"
+                                      (change)="calculateItemOthersAmount(i)">
+                              </td>
+                              <td [ngClass]="{'hiddenContent':!isTax}">
+                                <h5 class="th_h5_mobile"> Tax</h5>
+                                <div [ngClass]="{disabled: disableTax || !companyRegistered}">
+                                    <div class="select-wrap ms-0 ms-md-1"
+                                        [ngClass]="addErrorClass(itemExpense.controls.tax)">
+                                        <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialValues.tax[i]"
+                                            class="dropDownWidth"  [disabled]="disableTax || !companyRegistered">
+                                            <select #customSelect formControlName="tax"
+                                                class="no-style select--modify"
+                                                (change)="onCalcuationsChanged()">
+                                                <option *ngFor="let option of taxOptions"
+                                                    value="{{ option.id }}">
+                                                    {{ option.label }}
+                                                </option>
+                                            </select>
+                                          </material-dropdown>
+                                        <app-error
+                                            [controlName]="itemExpense.controls.tax">
+                                        </app-error>
+                                    </div>
+                                </div>
+                            </td>
+
+                                <td class="input-wrap disabled">
+                                    <h5 class="th_h5_mobile">Total   ({{ currency_type?.symbol}})</h5>
+                                    <input type="number" placeholder="1000" formControlName="total" [attr.disabled]="true">
+                                </td>
+                                <td class="text-center mobile-remove-add-position">
+                                    <span class="material-icons clear" (click)="resetOtherItem(itemExpense, i)">remove_circle_outline</span>
+                                    <span class="material-icons delete" (click)="removeItemExpense(i);"
+                                        *ngIf="otherActivityForm.controls.item_expenses.length !== 1">add_circle_outline</span>
+                                    <span class="material-icons add"
+                                        (click)="addItemExpense();">add_circle_outline</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-footer-actions mg-top-20">
+                    <a class="clear-item" (click)="clearAllItemExpense()">Remove all</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="gst-table-wrapper mg-top-30">
+
+          <div class="gst-main">
+             <div class="text-end fw-bold gst-left"> Subtotal:</div>
+             <div class="px-0  text-end fw-bold gst-right"> {{ currency_type?.symbol}} {{ newExpenseTotals.subtotal | numberFormat}} </div>
+          </div>
+
+          <div class="gst-main" [ngStyle]="{ 'display': 'none'  }">
+              <div class="text-end pt-0 gst-left">
+                    <span> Discount</span>
+                    <div class="input"> <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="0.00"
+                      formControlName="discount" (change)="onCalcuationsChanged()">
+                    </div>
+                    <div class="select-wrap dropdown">
+                        <select name="" class="no-style select--modify custom-select"
+                            formControlName="discount_type"
+                            (change)="onCalcuationsChanged()">
+                            <option value="0">%</option>
+                            <option value="1">{{ currency_type?.symbol}}</option>
+                        </select>
+                    </div>
+              </div>
+              <div class="px-0  text-end gst-right"> {{ currency_type?.symbol}} {{ newExpenseTotals.discountTotal | numberFormat}} </div>
+            </div>
+
+            <div class="gst-main" [ngClass]="{'hiddenContent':!isTax}"
+                *ngFor="let percentageTotal of newExpenseTotals.taxes;">
+                <ng-container *ngIf="percentageTotal.total && percentageTotal.taxAmount >0">
+
+                  <div class="text-end gst-left"> Include {{terminology.tax_type}} &#64; {{ percentageTotal.value }}% on <span>{{ percentageTotal.total | numberFormat}}</span>
+                  </div>
+                  <div class="px-0  text-end gst-right"> {{ currency_type?.symbol}} {{ percentageTotal.taxAmount | numberFormat}}</div>
+                </ng-container>
+            </div>
+            <div class="gst-main" [ngClass]="{'hiddenContent':!isTax}">
+              <div class="gst-left text-end pt-0">
+                <span>Discount after Tax </span>
+                <div class="input" [ngClass]="addErrorClass(otherActivityForm.controls.discount_after_tax)"
+                            [class.disabled]="disableTax || !companyRegistered">
+                            <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="0.00"
+                                formControlName="discount_after_tax"
+                                (change)="onCalcuationsChanged()">
+                  </div>
+                  <div class="select-wrap dropdown">
+                          <select name="" class="no-style select--modify custom-select"
+                              formControlName="discount_after_tax_type"
+                              (change)="onCalcuationsChanged()">
+                              <option value="0">%</option>
+                              <option value="1">{{ currency_type?.symbol}}</option>
+                          </select>
+                  </div>
+
+                </div>
+                <div class="px-0 gst-right text-end">{{ currency_type?.symbol}} {{ newExpenseTotals.discountAfterTaxTotal | numberFormat}}
+                </div>
+
+            </div>
+
+            <div class="gst-main">
+              <div class="text-start pt-0 gst-left">
+
+                    <div class="dropdown select-wrap">
+                          <material-dropdown
+                      [selectedOption]="initialValues.adjustmentAccount">
+                      <select #customSelect formControlName="adjustment_account"
+                          class="no-style select--modify custom-select">
+                          <option *ngFor="let option of expenseAccountList"
+                              value="{{ option.id }}">{{ option.name }}
+                          </option>
+                      </select>
+                      </material-dropdown>
+                   </div>
+                   <div class="input" [ngClass]="addErrorClass(otherActivityForm.controls.adjustment)">
+                                    <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="0.00"
+                                    formControlName="adjustment"
+                                    (change)="onCalcuationsChanged()">
+                    </div>
+                    <div class="select-wrap dropdown">
+                        <select name=""
+                            class="no-style select--modify custom-selectms-0 custom-select"
+                            formControlName="adjustment_choice"
+                            (change)="onCalcuationsChanged()">
+                            <option value="0">%</option>
+                            <option value="1">{{ currency_type?.symbol}}</option>
+                        </select>
+                    </div>
+            </div>
+            <div class="px-0  text-end gst-right">{{ currency_type?.symbol}} {{ newExpenseTotals.adjustmentAmount | numberFormat}}</div>
+          </div>
+          <div class="text-end gst-main">
+            <div class="text-end h5"> <strong> Total: </strong></div>
+            <div class="px-0 text-end ms-3 h5"><strong> {{ currency_type?.symbol}} {{ newExpenseTotals.total | numberFormat}} </strong></div>
+          </div>
+          <div class="gst-main" [ngClass]="{'hiddenContent':!isTax||isTds}" >
+            <div class="text-end pt-0 gst-left">
+              <app-last-section-inputfield-box  [lastSectionTaxDetails]="lastSectionTaxDetails" [lastSectionEditData]="lastSectionEditData" (lastSectionOutPut)="lastSectionOutPut($event)"></app-last-section-inputfield-box>
+            </div>
+            <div class="px-0 gst-right text-end"> {{ currency_type?.symbol}} {{ newExpenseTotals.tdsAmount | numberFormat}}</div>
+          </div>
+
+
+          <div class="text-end gst-main">
+              <div class="text-end h5"><strong> Balance: </strong></div>
+              <div class="px-0 text-end ms-3 h5"> <strong>{{ currency_type?.symbol}} {{ newExpenseTotals.balance | numberFormat}} </strong> </div>
+          </div>
+
+      </div>
+      <hr>
+      <app-payment-status [vendorId]="otherActivityForm.get('vendor').value"
+      [balanceAmount]="newExpenseTotals.balance"
+      [billDate]="otherActivityForm.get('bill_date').value"
+       [vendorList]="vendorList"
+       [$paymentStatusValid]="$paymentStatusValid"
+       [editPayemntStatusData]="otherActivityData"
+       (paymentStatusData)="paymentStatusData($event)"
+       >
+
+      </app-payment-status>
+      <div class="col-sm-12">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div class="input-wrap mb-0 pb-3">
+                            <label for="">Remind Date</label>
+                            <mat-form-field>
+                                <input matInput [matDatepicker]="reminder" formControlName="reminder"
+                                    (focus)="reminder.open()" placeholder="DD/MM/YYYY">
+                                <mat-datepicker-toggle matSuffix [for]="reminder"></mat-datepicker-toggle>
+                                <mat-datepicker #reminder></mat-datepicker>
+                            </mat-form-field>
+                            <span class="error-message">Error messge!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="input-wrap mb-0 pb-3">
+                    <label for="" class="">Optional Comment</label>
+                    <input type="text" class="no-style input--bd" placeholder="Comments"
+                        formControlName="comments">
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="form-layout__card mg-top-30">
+            <file-uploader (onFileUploaded)="fileUploader($event)"
+            (onFileDeleted)="fileDeleted($event)" [multiple]="true"
+            [accept]="'capture=camera, image/jpeg,image/x-jpg,image/png, application/pdf'"
+            [showFileName]="false" [patchFileUrls]="patchFileUrls">
+            </file-uploader>
+         </div>
+    </div>
+    
+</form>
+<div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end" >
+        
+            <button class="btn me-2 btn--sm" [routerLink]="[prefixUrl+'/expense/others_expense/list']"
+                routerLinkActive="active">Cancel</button>
+            <button *ngIf="otherActivityId" class="btn btn--primary" (click)="updateExpense()">Update Expense</button>
+            <button *ngIf="!otherActivityId" class="btn btn--primary" (click)="saveExpense()">Save Expense</button>
+
+       
+    </div>
+    <add-new-coa [popDetail]="showAddCoaPopup" [isExpenseType]="true" (closeModal)="closeCoaPopup" (coaAdded)="addExpenseToOption($event)">
+    </add-new-coa>
+
+    <app-add-party-popup vendorPartyType="0" [popDetail]="showAddPartyPopup" (closeModal)="closePartyPopup()"
+    (partyAdded)="addPartyToOption($event)" [isVendor]="true"></app-add-party-popup>
+
+
+    <!-- video-popup -->
+    <app-go-through  [goThroughDetais]="goThroughDetais"></app-go-through>

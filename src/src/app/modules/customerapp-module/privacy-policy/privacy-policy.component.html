@@ -1,0 +1,21 @@
+
+
+
+
+
+<div class="modal fade" [ngClass]="{'show':show}" id="exampleModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal--sm" role="document">
+        <div class="modal-content">
+          <div class="modal-body text-center pd-20">
+            <p class="line-height">
+              We have updated our privacy policy terms, By clicking on proceed, you confirm that you’ve read and accepted TransportSimple's Terms of Service  and <a href="https://ts-pub-directory.s3.ap-south-1.amazonaws.com/TransportSimple+Privacy+Policy.pdf" target="_blank">Privacy Policy</a> .
+            </p>
+            <div class="okButton text-center mt-5">
+              <button class="btn btn- btn--primary m-auto" (click)="onOkButtonClick()" type="submit">Proceed</button>
+          </div>
+          </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="show" class="modal-backdrop fade show"></div>

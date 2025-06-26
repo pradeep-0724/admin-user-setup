@@ -1,0 +1,457 @@
+<div class="custom-fake-tab ">
+
+    <button class="tab active-tab" matRipple><span class="material-icons me-2">dashboard </span>Dashboard</button>
+</div>
+
+<div class=" shadow-inset-top tab-content def-color">
+
+    <div class="container-fluid">
+        <div class="row g-3">
+            <div class="col-lg-6 ">
+                <div class="dash-info-card">
+                    <div class=" head">
+                        <span>Outstanding Invoices</span>
+                        <span class="green-text">{{ currency_type?.symbol}}  {{fixedTo3Decimal(receivable?.amount )}}</span>
+
+                    </div>
+
+                    <div class="dash-progress-bar-wrap ">
+                        <div class="dash-progress-bar">
+                            <div class="blue-value" [ngStyle]="{'width':receivable?.current?.percent+'%'}"></div>
+                            <div class="yellow-value" [ngStyle]="{'width':receivable?.over_due?.percent+'%'}"></div>
+                        </div>
+
+                    </div>
+                    <div class=" below ">
+                        <div>
+                            <p class="mb-3 sky-blue-text">Current</p>
+                            <p class="fw-semibold fs-6">{{ currency_type?.symbol}} {{fixedTo3Decimal(receivable?.current?.amount) }}</p>
+                        </div>
+                        <div class="separator ">
+                            <p class="mb-2 yellow-text">Overdue</p>
+                            <p class="d-flex align-items-center fw-semibold fs-6"> {{ currency_type?.symbol}} {{fixedTo3Decimal(receivable?.over_due?.amount)}}<mat-icon
+                                    class="drop-down" mat-icon-button
+                                    [matMenuTriggerFor]="receivableMenu">arrow_drop_down</mat-icon>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6  ">
+                <div class="dash-info-card">
+                    <div class=" head">
+                        <span>Outstanding Bills</span>
+                        <span class="warn-text">{{ currency_type?.symbol}} {{ fixedTo3Decimal(payable?.amount)}}</span>
+
+                    </div>
+
+                    <div class="dash-progress-bar-wrap ">
+                        <div class="dash-progress-bar">
+                            <div class="blue-value" [ngStyle]="{'width':payable?.current?.percent+'%'}"></div>
+                            <div class="yellow-value" [ngStyle]="{'width':payable?.over_due?.percent+'%'}"></div>
+                        </div>
+
+                    </div>
+                    <div class=" below ">
+                        <div>
+                            <p class="mb-3 sky-blue-text">Current</p>
+                            <p class="fw-semibold fs-6">{{ currency_type?.symbol}}  {{fixedTo3Decimal(payable?.current?.amount)}}</p>
+                        </div>
+                        <div class="separator ">
+                            <p class="mb-2 yellow-text">Overdue</p>
+                            <p class="d-flex align-items-center fw-semibold fs-6"> {{ currency_type?.symbol}} {{fixedTo3Decimal(payable?.over_due?.amount)}}<mat-icon
+                                    class="drop-down" mat-icon-button
+                                    [matMenuTriggerFor]="payableMenu">arrow_drop_down</mat-icon>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6  ">
+                <div class="dash-info-card">
+                    <div class=" head">
+                        <span>Scheduled / Ongoing Jobs</span>
+                        <span >{{tripDetails?.total}} </span>
+
+                    </div>
+
+                    <div class="dash-progress-bar-wrap ">
+                        <div class="dash-progress-bar">
+                            <div class="blue-value" [ngStyle]="{'width':tripDetails?.scheduled?.percent+'%'}"></div>
+                            <div class="green-value" [ngStyle]="{'width':tripDetails?.ongoing?.percent+'%'}"></div>
+                        </div>
+
+                    </div>
+                    <div class=" below ">
+                        <div>
+                            <p class="mb-3 sky-blue-text">Scheduled</p>
+                            <p class="d-flex align-items-center fw-semibold fs-6">{{tripDetails?.scheduled?.count}} Jobs<mat-icon
+                                class="drop-down" mat-icon-button
+                                [matMenuTriggerFor]="scheduled">arrow_drop_down</mat-icon>
+                         </p>
+                        </div>
+                        <div class="separator ">
+                            <p class="mb-2 green-text">Ongoing</p>
+                            <p class="d-flex align-items-center fw-semibold fs-6">{{tripDetails?.ongoing?.count}} Jobs<mat-icon
+                                    class="drop-down" mat-icon-button
+                                    [matMenuTriggerFor]="ongoing">arrow_drop_down</mat-icon>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6  ">
+                <div class="dash-info-card">
+                    <div class=" head">
+                        <span>Assigned / Unassigned Vehicles</span>
+                        <span>{{vehicle?.total}}</span>
+
+                    </div>
+
+                    <div class="dash-progress-bar-wrap ">
+                        <div class="dash-progress-bar">
+                            <div class="blue-value" [ngStyle]="{'width':vehicle?.assigned?.percent+'%'}"></div>
+                            <div class="yellow-value" [ngStyle]="{'width':vehicle?.unassigned?.percent+'%'}"></div>
+                        </div>
+
+                    </div>
+                    <div class=" below ">
+                        <div>
+                            <p class="mb-3 sky-blue-text">Assigned</p>
+                            <p class="fw-semibold fs-6">{{vehicle?.assigned?.count}}</p>
+                        </div>
+                        <div class="separator ">
+                            <p class="mb-2 yellow-text">Unassigned</p>
+                            <p class="fw-semibold fs-6">{{vehicle?.unassigned?.count}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="dash-info-card">
+                    <div class=" head">
+                        <span>Scheduled Sales Order</span>
+                        <span>{{workOrderScheduled?.total}}</span>
+
+                    </div>
+
+                    <div class="dash-progress-bar-wrap ">
+                        <div class="dash-progress-bar">
+                            <div class="blue-value" [ngStyle]="{'width':workOrderScheduled?.current?.percent+'%'}"></div>
+                            <div class="yellow-value" [ngStyle]="{'width':workOrderScheduled?.over_due?.percent+'%'}"></div>
+                        </div>
+
+                    </div>
+                    <div class=" below ">
+                        <div>
+                            <p class="mb-3 sky-blue-text">Current</p>
+                            <p class="fw-semibold fs-6">{{workOrderScheduled?.current?.count}}</p>
+                        </div>
+                        <div class="separator ">
+                            <p class="mb-2 yellow-text">Overdue</p>
+                            <p class="d-flex align-items-center fw-semibold fs-6">{{workOrderScheduled?.over_due?.count}}<mat-icon class="drop-down"
+                                    mat-icon-button [matMenuTriggerFor]="workOrderScheduledmenu">arrow_drop_down</mat-icon>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="dash-info-card">
+                    <div class=" head">
+                        <span>Ongoing Sales Order</span>
+                        <span>{{workOrdersOngoing?.total}}</span>
+
+                    </div>
+
+                    <div class="dash-progress-bar-wrap ">
+                        <div class="dash-progress-bar">
+                            <div class="blue-value" [ngStyle]="{'width':workOrdersOngoing?.current?.percent+'%'}"></div>
+                            <div class="yellow-value" [ngStyle]="{'width':workOrdersOngoing?.over_due?.percent+'%'}"></div>
+                        </div>
+
+                    </div>
+                    <div class=" below ">
+                        <div>
+                            <p class="mb-3 sky-blue-text">Current</p>
+                            <p class="fw-semibold fs-6">{{workOrdersOngoing?.current?.count}}</p>
+                        </div>
+                        <div class="separator ">
+                            <p class="mb-2 yellow-text">Overdue</p>
+                            <p class="d-flex align-items-center fw-semibold fs-6">{{workOrdersOngoing?.over_due?.count}}<mat-icon class="drop-down"
+                                    mat-icon-button [matMenuTriggerFor]="workOrdersOngoingMenu">arrow_drop_down</mat-icon>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-4">
+                <div class="dash-info-card h-100">
+                    <div class=" head border-bottom">
+                        <span>Fuel Slips Unbilled</span>
+
+
+                    </div>
+                    <div class="p-3 d-flex align-items-center">
+                        <div class="pay-slip-img">
+                            <img src="../../../../assets/img/fuel-pay-slip.png" alt="" class="w-100">
+                        </div>
+                        <div>
+                            <p class="mb-3">Number of Slips: <span class="fs-6 fw-semibold ms-2">{{fuelSlip?.count}}</span></p>
+                            <p>Amount: <span class="fs-6 fw-semibold ms-2"> {{ currency_type?.symbol}} {{fixedTo3Decimal(fuelSlip?.total)}}</span></p>
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="dash-info-card h-100">
+                    <div class=" head">
+                        <span class="green-text">Top 10 Receivable</span>
+                        <span class="green-text">{{ currency_type?.symbol}}  {{fixedTo3Decimal(totalReceiveable)}}</span>
+
+                    </div>
+                    <div>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr class="border-top def-color">
+                                    <th scope="col " class="ps-4 py-3 serial-no">NO.</th>
+                                    <th scope="col" class=" py-3">CUSTOMER</th>
+                                    <th scope="col" class=" py-3 amount">PENDING RECEIVABLES ({{ currency_type?.symbol}})</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let client of clientList;let i=index" class="def-color">
+                                    <th scope="row" class="ps-4 py-3">{{i+1}}</th>
+                                    <td class=" py-3"> <a  target="_blank" class="custom-link" [routerLink]="[preFixUrl+'/onboarding/party/details/client/'+client?.id]">{{client?.name}} </a></td>
+                                    <td class=" py-3">{{ fixedTo3Decimal(client?.amount)}}</td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="col-lg-6">
+                
+                    <div class="dash-info-card h-100">
+                        <div class=" head">
+                            <span class="sky-blue-text">Top 10 Payables</span>
+                            <span class="sky-blue-text">{{ currency_type?.symbol}}  {{fixedTo3Decimal(totalPayable)}}</span>
+
+                        </div>
+                        <div>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr class="border-top def-color">
+                                        <th scope="col " class="ps-4 py-3 serial-no">NO.</th>
+                                        <th scope="col" class=" py-3">VENDOR</th>
+                                        <th scope="col" class=" py-3 amount">PENDING PAYABLES ({{ currency_type?.symbol}})</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let vendor of vendorList;let i=index" class="def-color">
+                                        <th scope="row" class="ps-4 py-3">{{i+1}}</th>
+                                        <td class=" py-3"><a target="_blank"class="custom-link" [routerLink]="[preFixUrl+'/onboarding/party/details/vendor/'+vendor?.id]">{{vendor?.name}} </a></td>
+                                        <td class=" py-3">{{ fixedTo3Decimal(vendor?.amount)}}</td>
+    
+                                    </tr>
+                                 
+
+
+                                </tbody>
+                            </table>
+
+                        </div>
+
+
+                    </div>
+
+
+                
+            </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+    </div>
+
+
+</div>
+
+
+
+<mat-menu #receivableMenu="matMenu" yPosition="below" class="py-2 ">
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">1 - 15 Days </span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{ currency_type?.symbol}}  {{fixedTo3Decimal(receivable?.over_due['1_15'])}}</span>
+    </div>
+
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">16-30 days </span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{ currency_type?.symbol}} {{fixedTo3Decimal(receivable?.over_due['15_30'])}}</span>
+    </div>
+
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">31-60 days</span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{ currency_type?.symbol}}  {{fixedTo3Decimal(receivable?.over_due['30_60'])}}</span>
+    </div>
+
+
+    <div mat-menu-item  disabled>
+
+        <span class="me-4 def-color">Above 60 days </span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{ currency_type?.symbol}} {{fixedTo3Decimal(receivable?.over_due['over_60'])}}</span>
+
+    </div>
+
+
+</mat-menu>
+
+<mat-menu #workOrderScheduledmenu="matMenu" yPosition="below" class="py-2 ">
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">1 - 15 Days </span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{workOrderScheduled?.over_due?.['1_15']}}</span>
+    </div>
+
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">16-30 days </span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{workOrderScheduled?.over_due['15_30']}}</span>
+    </div>
+
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">31-60 days</span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{workOrderScheduled?.over_due['30_60']}}</span>
+    </div>
+
+
+    <div mat-menu-item  disabled>
+
+        <span class="me-4 def-color">Above 60 days </span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{workOrderScheduled?.over_due['over_60']}}</span>
+
+    </div>
+
+
+</mat-menu>
+
+<mat-menu #workOrdersOngoingMenu="matMenu" yPosition="below" class="py-2 ">
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">1 - 15 Days </span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{workOrdersOngoing?.over_due?.['1_15']}}</span>
+    </div>
+
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">16-30 days </span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{workOrdersOngoing?.over_due['15_30']}}</span>
+    </div>
+
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">31-60 days</span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{workOrdersOngoing?.over_due['30_60']}}</span>
+    </div>
+
+
+    <div mat-menu-item  disabled>
+
+        <span class="me-4 def-color">Above 60 days </span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{workOrdersOngoing?.over_due['over_60']}}</span>
+
+    </div>
+
+
+</mat-menu>
+
+
+<mat-menu #payableMenu="matMenu" yPosition="below" class="py-2 ">
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">1 - 15 Days </span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{ currency_type?.symbol}} {{fixedTo3Decimal(payable?.over_due['1_15'])}}</span>
+    </div>
+
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">16-30 days </span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{ currency_type?.symbol}} {{fixedTo3Decimal(payable?.over_due['15_30'])}}</span>
+    </div>
+
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">31-60 days</span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{ currency_type?.symbol}} {{fixedTo3Decimal(payable?.over_due['30_60'])}}</span>
+    </div>
+
+
+    <div mat-menu-item  disabled>
+
+        <span class="me-4 def-color">Above 60 days </span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  {{ currency_type?.symbol}} {{fixedTo3Decimal(payable?.over_due['over_60'])}}</span>
+
+    </div>
+
+
+</mat-menu>
+
+
+
+<mat-menu #scheduled="matMenu" yPosition="below" class="py-2 ">
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">No Vehicle Assigned </span>
+        <span class=" primary-brand-text float-end fw-bold"> &nbsp;  &nbsp; {{tripDetails?.scheduled?.no_vehicle}}</span>
+    </div>
+
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">Own Vehicle </span>
+        <span class=" primary-brand-text float-end fw-bold">{{tripDetails?.scheduled?.own_vehicle}}</span>
+    </div>
+
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">Market Vehicle</span>
+        <span class=" primary-brand-text float-end fw-bold">{{tripDetails?.scheduled?.market_vehicle}}</span>
+    </div>
+</mat-menu>
+
+<mat-menu #ongoing="matMenu" yPosition="below" class="py-2 ">
+    <div mat-menu-item  disabled>
+
+        <span class="def-color">Own Vehicle</span>
+        <span class=" primary-brand-text float-end fw-bold">&nbsp;  &nbsp;  {{tripDetails?.ongoing?.own_vehicle}}</span>
+    </div>
+
+    <div mat-menu-item  disabled>
+
+        <span  class="def-color">Market Vehicle</span>
+        <span class=" primary-brand-text float-end fw-bold"> &nbsp;  &nbsp; {{tripDetails?.ongoing?.market_vehicle}}</span>
+    </div>
+
+</mat-menu>

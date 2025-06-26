@@ -1,0 +1,62 @@
+<div class="modal fade" [ngClass]="{'show':jobCardStart.open}" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog "  role="document">
+      <div class="modal-content "  [formGroup]="startJobCard">
+        <div  class="popup-header">
+          <h6  class="d-inline">Start Job card</h6>
+        </div>  
+       
+        <div class="px-3 input-wrap my-3">
+        <p style="color: red;" *ngIf="apiError">{{apiError}}</p>
+        <div class="alert alert-warning" *ngIf="startJobCard.controls.error_message.value">
+            {{startJobCard.controls.error_message.value}}
+          </div>
+          <div class="alert alert-warning" *ngIf="startJobCard.controls.error_message_hour.value">
+            {{startJobCard.controls.error_message_hour.value}}
+          </div>
+        <div class="row px-1">
+          <div class="col-lg-4 col-md-6">
+            <div class="custom-box-input-wrap">
+              <label for="" class="">Start Date</label>
+              <mat-form-field>
+                <input matInput [matDatepicker]="actual_start_date"  (focus)="actual_start_date.open()" formControlName="actual_start_date"
+                    placeholder="DD/MM/YYYY" (dateChange)="setOdmeter();setHour()">
+                <mat-datepicker-toggle matSuffix [for]="actual_start_date"></mat-datepicker-toggle>
+                <mat-datepicker #actual_start_date></mat-datepicker>
+            </mat-form-field>
+  
+             </div>
+          </div>
+
+            <div class="col-lg-4 col-md-6">
+              <div class="custom-box-input-wrap" [ngClass]="addErrorClass(startJobCard.controls.kms)">
+                <label for="" >Odometer KMS</label>
+                <input type="text" class="box-input" positiveDigitNumber placeholder="123456" value=""
+                  formControlName="kms" (change)="onKmsChange()">
+                <app-error [controlName]="startJobCard.controls.kms"></app-error>
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" formGroupName="hour_min">
+              <div class="custom-box-input-wrap"
+                [ngClass]="addErrorClass(startJobCard.controls.hour_min['controls'].hour)">
+                <label for="" class="input">Odometer Hours</label>
+                <input positiveDigitNumber type="text" class="box-input" placeholder="Hours" value=""
+                  formControlName="hour" (change)="onHourChange()">
+                <app-error [controlName]="startJobCard.controls.hour_min['controls'].hour"
+                  class="w-100 desktop-position"></app-error>
+              </div>
+            </div>
+
+
+       </div>
+       <div class="d-flex justify-content-between flex-wrap mt-4">
+       <button class="btn btn--sm" (click)=" cancel()">Cancel</button>
+       <button class="btn btn--primary btn--sm" (click)=" save()">Save</button>
+      </div>
+      </div>
+  
+  
+    </div>
+  </div>
+  </div>
+  <div *ngIf="jobCardStart.open" class="modal-backdrop fade show"></div>

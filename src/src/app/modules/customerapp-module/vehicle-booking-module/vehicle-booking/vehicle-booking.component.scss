@@ -1,0 +1,232 @@
+$color_primary:#595FAB;
+ .colornames p {
+   display: inline-block;
+   padding: 10px;
+
+   margin-right: 6px;
+ }
+ p span {
+   border-radius: 34px;
+   padding: 0px 8px;
+   margin-right: 7px;
+ }
+ .present {
+   background-color: #FFCC1D;
+ }
+ .remaining {
+   background-color: #116530;
+ }
+ .absent {
+   background-color: #2D46B9;
+ }
+ .activeVehicle {
+   background-color: #080808;
+ }
+ .databadge,
+ .databadge1,
+ .databadge2,
+ .databadge3 {
+  display: inline-block;
+  min-width: 42px;
+  margin: 2px;
+  border-radius: 7px;
+  padding: 2px 0;
+  vertical-align: middle;
+ }
+ .databadge1 {
+   border: 1px solid #FFCC1D;
+  //  color: #FFCC1D;
+ }
+ .databadge3 {
+   border: 1px solid #080808;
+  //  color: #080808;
+ }
+ .databadge {
+   border: 1px solid #2D46B9;
+  //  color: #2D46B9;
+ }
+ .databadge2 {
+   border: 1px solid #116530;
+  //  color: #116530;
+ }
+ ::ng-deep .cal-month-view .cal-day-cell {
+
+   min-width: 110px !important;
+   cursor: pointer;
+   min-height: 100px;
+ }
+ .form-layout--pd {
+   padding: 22px !important;
+ }
+ .calenderNav {
+   padding: 5px;
+   cursor: pointer;
+ }
+ .calenderNav span {
+   font-weight: bold;
+ }
+ .dayevents {
+  margin:30px 0 15px 0;
+   text-align: center;
+ }
+ div#scroll-test {
+   overflow-x: auto;
+ }
+ :host ::ng-deep.ngx-pagination .current {
+   background: #595fab !important;
+   border-radius: 2px;
+ }
+
+ .normalwidth {
+   width: 100%;
+ }
+ .cal-cell-bottom{
+  min-height: 55px;
+}
+ .active-calender {
+
+
+   margin-top: 1px;
+
+   margin-left: 15px;
+
+   .cal-day-number{
+    width: 42px;
+    background-color: #A9AFD6;
+    height: 42px;
+    border-radius: 50%;
+    justify-content: center;
+    display: flex;
+    float: none;
+    text-align: center;
+    margin: auto;
+    align-items: center;
+
+   }
+ }
+ .cal-month-view .cal-day-cell.cal-today .cal-day-number{
+  transform: scale(1.5);
+ }
+ .close-icon {
+   float: right;
+ }
+ .flex_parent {
+   display: flex;
+   flex-wrap: wrap;
+   flex-direction: row;
+   justify-content: space-evenly;
+   align-items: center;
+   .btn-primary {}
+   .colornames {
+
+     text-align: left;
+
+   }
+ }
+ .vehicle_right {
+
+   .row {
+     text-align: center;
+     margin: 10px auto 15px auto;
+     justify-content: center;
+     width: 100%;
+
+     .no-vehicle{
+       font-size: 17px;
+       color: $color_primary;
+     }
+   }
+   button {
+     text-align: center;
+     margin: auto;
+   }
+ }
+ .custom_pop_parent{
+  width: 100%;
+  z-index: 21;
+  position: fixed;
+ top: 0;
+  overflow: hidden;
+  height: 100%;
+
+  .slide_bg{
+
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 0;
+    transition: 0s;
+    height: 100%;
+    background: rgba($color: #000000, $alpha: 0.5);
+  }
+
+
+ .custom_pop_slide{
+  animation-name: end_to_left;
+  animation-duration: 1s;
+  transition: 1s ease-in-out;
+  overflow: auto;
+  max-width: 450px;
+  padding: 10px;
+  background: #fff;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 22;
+
+ }
+ &.hideBlock{
+
+  .custom_pop_slide{
+    transform: translate(200%,0);
+  }
+  @keyframes end_to_left {
+    from {
+      opacity: 0;
+      transform: translate(200%, 0);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+  }
+}
+
+
+}
+
+
+:host ::ng-deep{
+.modal
+ {
+  &.show{
+
+    animation: none;
+  }
+ }}
+
+ .hideBlock{
+  transform: translateX(200%);
+ }
+ .vehicle-booking-slide{
+   box-shadow: 0 0 4px 1px rgba(89, 95, 171,50%);
+  transition: 0.2s ease-in-out;
+   &:hover{
+     transform: translateY(-2px);
+     box-shadow: 0 0 8px 1.5px rgba(89, 95, 171,50%);
+     cursor: pointer;
+
+   }
+   p{
+     padding: 2px 0;
+   }
+   >div{
+     margin: 3px 0;
+   }
+ }
+ .margin-top-more{
+   margin-top: 40%;
+ }

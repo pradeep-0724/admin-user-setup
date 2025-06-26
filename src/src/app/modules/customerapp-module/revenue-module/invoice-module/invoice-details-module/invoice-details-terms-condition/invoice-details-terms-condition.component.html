@@ -1,0 +1,14 @@
+<div class="px-4 py-4 def-color pb-5">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <p class="fs-6 mb-2"><b>Signature</b></p>
+            <img *ngIf="invoiceDetail['table_data']['tnc']?.signature" [src]="invoiceDetail['table_data']['tnc']?.signature?.presigned_url" class="sign-img my-3" alt="">
+            <p class="primary-brand-text fs-6 ms-4 my-4" *ngIf="!invoiceDetail['table_data']['tnc']?.signature">No Signature Uploaded.</p>
+            <p class="mb-3 fs-6"><b>Terms and condition: </b> {{invoiceDetail['table_data']['tnc']['tnc']?.name}}</p>
+            <div [innerHtml]="invoiceDetail['table_data']['tnc']['tnc']?.content" class="tnc-content"></div>
+            <p class="fw-semibold my-3 fs-6">Narration</p>
+             <p>{{invoiceDetail['table_data']['tnc']?.narration}}</p>
+        </div>
+        <div>
+        </div>
+    </div>

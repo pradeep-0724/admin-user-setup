@@ -1,0 +1,608 @@
+<div class="form-body form-layout form-layout--pd no-br-tl no-br-tr pt-3 def-color">
+  <h4 class="mt-2 mb-2">{{ typeOfSecreen }}</h4>
+  <form [formGroup]="userRolesAndResponsibilities" (keydown.enter)="$event.preventDefault()">
+    <div class="alert-msg" *ngIf="apiError">
+      <span class="icon-wrap"></span>
+      <p class="message-cont">{{ apiError }}</p>
+    </div>
+
+    <div class="error-msg-list" *ngIf="globalFormErrorList.length > 0">
+      <p class="message-head">{{ errorHeaderMessage }}</p>
+      <span class="icon-wrap"></span>
+      <ul *ngFor="let error of globalFormErrorList">
+        <li class="message-cont">{{ error }}</li>
+      </ul>
+    </div>
+    <br />
+    <div class="row">
+      <div class="col-lg-3 col-sm-6">
+        <div class="input-wrap error" [ngClass]="addErrorClass(userRolesAndResponsibilities.controls.role)">
+          <label for="" class="input--required">Role Name</label>
+          <input type="text" class="no-style input--bd" placeholder="Role" value="" formControlName="role" />
+          <app-error [controlName]="userRolesAndResponsibilities.controls.role"></app-error>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-sm-6">
+        <div class="input-wrap" [ngClass]="
+            addErrorClass(userRolesAndResponsibilities.controls.description)
+          ">
+          <label for="">Description</label>
+          <input type="text" class="no-style input--bd" placeholder="Description" value=""
+            formControlName="description" />
+          <app-error [controlName]="userRolesAndResponsibilities.controls.description"></app-error>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div></div>
+ <!-- Others  permission  -->
+
+ <form *ngIf="othersItem.length > 0">
+  <div class="form-layout__card mg-top-30">
+    <div class="form-layout__header d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center">
+        <input name="dashboardAll" (change)="parentBoxesChecked(othersItem,$event,'others')" type="checkbox"
+          value="" [checked]="parentAccess.others" class="mr-2 m-1" />
+        <h2 class="sub-heading mb-0 m-1">Others</h2>
+      </div>
+      <span class="collapse-line"></span>
+    </div>
+    <div class="">
+      <div class="table-wrapper table-wrapper--type1 table-wrapper--type2 table--bd table--nobg dropdownOverlay">
+        <table class="table-container item-table">
+          <thead>
+            <tr>
+              <th width="50%">Name</th>
+              <th width="10%" class="text-center">Full Access</th>
+              <th width="10%" class="text-center">View</th>
+              <th width="10%" class="text-center">Create</th>
+              <th width="10%" class="text-center">Edit</th>
+              <th width="10%" class="text-center">Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let t of othersItem">
+              <tr *ngIf="t.item.length == 0; else elsepartof; let i = index">
+                <td class="fw-bold">
+                  {{ t.fieldName }}
+                </td>
+                <td>
+                  <input name="all" (change)="selectAll(t, $event);checkIsAllSelected($event,othersItem,'others')" type="checkbox" *ngIf="t.isAllAccess"
+                    [checked]="t.allAccess" value="" />
+                </td>
+                <td>
+                  <input name="view" (change)="selectCheckboxItem(t, $event, 'view');checkIsAllSelected($event,othersItem,'others')" type="checkbox" value=""
+                    *ngIf="t.isView" [checked]="t.view" />
+                </td>
+                <td>
+                  <input name="add" (change)="selectCheckboxItem(t, $event, 'add');checkIsAllSelected($event,othersItem,'others')" type="checkbox" value=""
+                    *ngIf="t.isAdd" [checked]="t.add" />
+                </td>
+                <td>
+                  <input name="edit" (change)="selectCheckboxItem(t, $event, 'edit');checkIsAllSelected($event,othersItem,'others')" type="checkbox" value=""
+                    *ngIf="t.isEdit" [checked]="t.edit" />
+                </td>
+                <td>
+                  <input name="delete" (change)="selectCheckboxItem(t, $event, 'delete');checkIsAllSelected($event,othersItem,'others')" type="checkbox" value=""
+                    *ngIf="t.isDelete" [checked]="t.delete" />
+                </td>
+              </tr>
+              <ng-template #elsepartof>
+                <tr>
+                  <td class="fw-bold">
+                    {{ t.fieldName }}
+                  </td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr *ngFor="let tt of t.item; let ii = index">
+                  <td [ngClass]="{ 'float-end': true }">
+                    {{ tt.fieldName }}
+                  </td>
+                  <td>
+                    <input (change)="selectAll(tt);checkIsAllSelected($event,othersItem,'others')" name="all" type="checkbox" *ngIf="tt.isAllAccess"
+                      [checked]="tt.allAccess" value="" />
+                  </td>
+                  <td>
+                    <input (change)="selectCheckboxItem(tt, $event, 'view');checkIsAllSelected($event,othersItem,'others')" name="view" type="checkbox"
+                      *ngIf="tt.isView" value="" [checked]="tt.view" />
+                  </td>
+                  <td>
+                    <input (change)="selectCheckboxItem(tt, $event, 'add');checkIsAllSelected($event,othersItem,'others')" name="add" type="checkbox"
+                      *ngIf="tt.isAdd" value="" [checked]="tt.add" />
+                  </td>
+                  <td>
+                    <input (change)="selectCheckboxItem(tt, $event, 'edit');checkIsAllSelected($event,othersItem,'others')" name="edit" type="checkbox"
+                      *ngIf="tt.isEdit" value="" [checked]="tt.edit" />
+                  </td>
+                  <td>
+                    <input (change)="selectCheckboxItem(tt, $event, 'delete');checkIsAllSelected($event,othersItem,'others')" name="delete" type="checkbox"
+                      *ngIf="tt.isDelete" value="" [checked]="tt.delete" />
+                  </td>
+                </tr>
+              </ng-template>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-footer-actions mg-top-20">
+        <a class="clear-item" (click)="clearAll(othersItem);checkIsAllSelected($event,othersItem,'others')"> Clear all</a>
+      </div>
+    </div>
+  </div>
+</form> 
+  <!-- Onboarding -->
+  <form *ngIf="onBoarding.length > 0">
+    <div class="form-layout__card mg-top-30">
+      <div class="form-layout__header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <input name="dashboardAll1" (change)="parentBoxesChecked(onBoarding,$event,'onboarding')" type="checkbox" 
+            value="parentAccess.onboarding" [checked]="parentAccess.onboarding" class="mr-2 m-1" />
+          <h2 class="sub-heading mb-0 m-1">Onboarding</h2>
+        </div>
+        <span class="collapse-line"></span>
+      </div>
+      
+      <div class="">
+        <div class="table-wrapper table-wrapper--type1 table-wrapper--type2 table--bd table--nobg dropdownOverlay">
+          <table class="table-container item-table">
+            <thead>
+              <tr>
+                <th width="50%">Name</th>
+                <th width="10%" class="text-center">Full Access</th>
+                <th width="10%" class="text-center">View</th>
+                <th width="10%" class="text-center">Create</th>
+                <th width="10%" class="text-center">Edit</th>
+                <th width="10%" class="text-center">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let t of onBoarding">
+                <tr *ngIf="t.item.length == 0; else elsepartof; let i = index">
+                  <td class="fw-bold">
+                    {{ t.fieldName }}
+                  </td>
+                  <td>
+                    <input name="all" (change)="selectAll(t, $event);checkIsAllSelected($event,onBoarding,'onboarding')" type="checkbox" *ngIf="t.isAllAccess"
+                      [checked]="t.allAccess" value="" />
+                  </td>
+                  <td>
+                    <input name="view" (change)="selectCheckboxItem(t, $event, 'view');checkIsAllSelected($event,onBoarding,'onboarding')" type="checkbox" value=""
+                      *ngIf="t.isView" [checked]="t.view" />
+                  </td>
+                  <td>
+                    <input name="add" (change)="selectCheckboxItem(t, $event, 'add');checkIsAllSelected($event,onBoarding,'onboarding')" type="checkbox" value=""
+                      *ngIf="t.isAdd" [checked]="t.add" />
+                  </td>
+                  <td>
+                    <input name="edit" (change)="selectCheckboxItem(t, $event, 'edit');checkIsAllSelected($event,onBoarding,'onboarding')" type="checkbox" value=""
+                      *ngIf="t.isEdit" [checked]="t.edit" />
+                  </td>
+                  <td>
+                    <input name="delete" (change)="selectCheckboxItem(t, $event, 'delete');checkIsAllSelected($event,onBoarding,'onboarding')" type="checkbox" value=""
+                      *ngIf="t.isDelete" [checked]="t.delete" />
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer-actions mg-top-20">
+          <a class="clear-item" (click)="clearAll(onBoarding);checkIsAllSelected($event,onBoarding,'onboarding')"> Clear all</a>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Trip -->
+  <form *ngIf="trip.length > 0">
+    <div class="form-layout__card mg-top-30">
+      <div class="form-layout__header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <input name="dashboardAll" (change)="parentBoxesChecked(trip,$event,'trip')" type="checkbox"
+            value="" [checked]="parentAccess.trip" class="mr-2 m-1" />
+          <h2 class="sub-heading mb-0 m-1">Job</h2>
+        </div>
+        <span class="collapse-line"></span>
+      </div>
+      <div class="">
+        <div class="table-wrapper table-wrapper--type1 table-wrapper--type2 table--bd table--nobg dropdownOverlay">
+          <table class="table-container item-table">
+            <thead>
+              <tr>
+                <th width="50%">Name</th>
+                <th width="10%" class="text-center">Full Access</th>
+                <th width="10%" class="text-center">View</th>
+                <th width="10%" class="text-center">Create</th>
+                <th width="10%" class="text-center">Edit</th>
+                <th width="10%" class="text-center">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let t of trip">
+                <tr *ngIf="t.item.length == 0; else elsepartof; let i = index">
+                  <td class="fw-bold">
+                    {{ t.fieldName }}
+                  </td>
+                  <td>
+                    <input name="all" (change)="selectAll(t, $event);checkIsAllSelected($event,trip,'trip')" type="checkbox" *ngIf="t.isAllAccess"
+                      [checked]="t.allAccess" value="" />
+                  </td>
+                  <td>
+                    <input name="view" (change)="selectCheckboxItem(t, $event, 'view');checkIsAllSelected($event,trip,'trip')" type="checkbox" value=""
+                      *ngIf="t.isView" [checked]="t.view" />
+                  </td>
+                  <td>
+                    <input name="add" (change)="selectCheckboxItem(t, $event, 'add');checkIsAllSelected($event,trip,'trip')" type="checkbox" value=""
+                      *ngIf="t.isAdd" [checked]="t.add" />
+                  </td>
+                  <td>
+                    <input name="edit" (change)="selectCheckboxItem(t, $event, 'edit');checkIsAllSelected($event,trip,'trip')" type="checkbox" value=""
+                      *ngIf="t.isEdit" [checked]="t.edit" />
+                  </td>
+                  <td>
+                    <input name="delete" (change)="selectCheckboxItem(t, $event, 'delete');checkIsAllSelected($event,trip,'trip')" type="checkbox" value=""
+                      *ngIf="t.isDelete" [checked]="t.delete" />
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer-actions mg-top-20">
+          <a class="clear-item" (click)="clearAll(trip);checkIsAllSelected($event,trip,'trip')"> Clear all</a>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Income -->
+  <form *ngIf="income.length > 0">
+    <div class="form-layout__card mg-top-30">
+      <div class="form-layout__header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <input name="dashboardAll" (change)="parentBoxesChecked(income,$event,'income')" type="checkbox"
+            value="" [checked]="parentAccess.income" class="mr-2 m-1" />
+          <h2 class="sub-heading mb-0 m-1">Income</h2>
+        </div>
+        <span class="collapse-line"></span>
+      </div>
+      <div class="">
+        <div class="table-wrapper table-wrapper--type1 table-wrapper--type2 table--bd table--nobg dropdownOverlay">
+          <table class="table-container item-table">
+            <thead>
+              <tr>
+                <th width="50%">Name</th>
+                <th width="10%" class="text-center">Full Access</th>
+                <th width="10%" class="text-center">View</th>
+                <th width="10%" class="text-center">Create</th>
+                <th width="10%" class="text-center">Edit</th>
+                <th width="10%" class="text-center">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let t of income">
+                <tr *ngIf="t.item.length == 0; else elsepartof; let i = index">
+                  <td class="fw-bold">
+                    {{ t.fieldName }}
+                  </td>
+                  <td>
+                    <input name="all" (change)="selectAll(t, $event);checkIsAllSelected($event,income,'income')" type="checkbox" *ngIf="t.isAllAccess"
+                      [checked]="t.allAccess" value="" />
+                  </td>
+                  <td>
+                    <input name="view" (change)="selectCheckboxItem(t, $event, 'view');checkIsAllSelected($event,income,'income')" type="checkbox" value=""
+                      *ngIf="t.isView" [checked]="t.view" />
+                  </td>
+                  <td>
+                    <input name="add" (change)="selectCheckboxItem(t, $event, 'add');checkIsAllSelected($event,income,'income')" type="checkbox" value=""
+                      *ngIf="t.isAdd" [checked]="t.add" />
+                  </td>
+                  <td>
+                    <input name="edit" (change)="selectCheckboxItem(t, $event, 'edit');checkIsAllSelected($event,income,'income')" type="checkbox" value=""
+                      *ngIf="t.isEdit" [checked]="t.edit" />
+                  </td>
+                  <td>
+                    <input name="delete" (change)="selectCheckboxItem(t, $event, 'delete');checkIsAllSelected($event,income,'income')" type="checkbox" value=""
+                      *ngIf="t.isDelete" [checked]="t.delete" />
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer-actions mg-top-20">
+          <a class="clear-item" (click)="clearAll(income);checkIsAllSelected($event,income,'income')"> Clear all</a>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Expenses -->
+  <form *ngIf="expenses.length > 0">
+    <div class="form-layout__card mg-top-30">
+      <div class="form-layout__header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <input name="dashboardAll" (change)="parentBoxesChecked(expenses,$event,'expenses')" type="checkbox"
+            value="" [checked]="parentAccess.expenses" class="mr-2 m-1" />
+          <h2 class="sub-heading mb-0 m-1">Expenses</h2>
+        </div>
+        <span class="collapse-line"></span>
+      </div>
+      <div class="">
+        <div class="table-wrapper table-wrapper--type1 table-wrapper--type2 table--bd table--nobg dropdownOverlay">
+          <table class="table-container item-table">
+            <thead>
+              <tr>
+                <th width="50%">Name</th>
+                <th width="10%" class="text-center">Full Access</th>
+                <th width="10%" class="text-center">View</th>
+                <th width="10%" class="text-center">Create</th>
+                <th width="10%" class="text-center">Edit</th>
+                <th width="10%" class="text-center">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let t of expenses">
+                <tr *ngIf="t.item.length == 0; else elsepartof; let i = index">
+                  <td class="fw-bold">
+                    {{ t.fieldName }}
+                  </td>
+                  <td>
+                    <input name="all" (change)="selectAll(t, $event);checkIsAllSelected($event,expenses,'expenses')" type="checkbox" *ngIf="t.isAllAccess"
+                      [checked]="t.allAccess" value="" />
+                  </td>
+                  <td>
+                    <input name="view" (change)="selectCheckboxItem(t, $event, 'view');checkIsAllSelected($event,expenses,'expenses')" type="checkbox" value=""
+                      *ngIf="t.isView" [checked]="t.view" />
+                  </td>
+                  <td>
+                    <input name="add" (change)="selectCheckboxItem(t, $event, 'add');checkIsAllSelected($event,expenses,'expenses')" type="checkbox" value=""
+                      *ngIf="t.isAdd" [checked]="t.add" />
+                  </td>
+                  <td>
+                    <input name="edit" (change)="selectCheckboxItem(t, $event, 'edit');checkIsAllSelected($event,expenses,'expenses')" type="checkbox" value=""
+                      *ngIf="t.isEdit" [checked]="t.edit" />
+                  </td>
+                  <td>
+                    <input name="delete" (change)="selectCheckboxItem(t, $event, 'delete');checkIsAllSelected($event,expenses,'expenses')" type="checkbox" value=""
+                      *ngIf="t.isDelete" [checked]="t.delete" />
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer-actions mg-top-20">
+          <a class="clear-item" (click)="clearAll(expenses);checkIsAllSelected($event,expenses,'expenses')"> Clear all</a>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Payments -->
+  <form *ngIf="payments.length > 0">
+    <div class="form-layout__card mg-top-30">
+      <div class="form-layout__header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <input name="dashboardAll" (change)="parentBoxesChecked(payments,$event,'payments')" type="checkbox"
+            value="" [checked]="parentAccess.payments" class="mr-2 m-1" />
+          <h2 class="sub-heading mb-0 m-1">Payments</h2>
+        </div>
+        <span class="collapse-line"></span>
+      </div>
+      <div class="">
+        <div class="table-wrapper table-wrapper--type1 table-wrapper--type2 table--bd table--nobg dropdownOverlay">
+          <table class="table-container item-table">
+            <thead>
+              <tr>
+                <th width="50%">Name</th>
+                <th width="10%" class="text-center">Full Access</th>
+                <th width="10%" class="text-center">View</th>
+                <th width="10%" class="text-center">Create</th>
+                <th width="10%" class="text-center">Edit</th>
+                <th width="10%" class="text-center">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let t of payments">
+                <tr *ngIf="t.item.length == 0; else elsepartof; let i = index">
+                  <td class="fw-bold">
+                    {{ t.fieldName }}
+                  </td>
+                  <td>
+                    <input name="all" (change)="selectAll(t, $event);checkIsAllSelected($event,payments,'payments')" type="checkbox" *ngIf="t.isAllAccess"
+                      [checked]="t.allAccess" value="" />
+                  </td>
+                  <td>
+                    <input name="view" (change)="selectCheckboxItem(t, $event, 'view');checkIsAllSelected($event,payments,'payments')" type="checkbox" value=""
+                      *ngIf="t.isView" [checked]="t.view" />
+                  </td>
+                  <td>
+                    <input name="add" (change)="selectCheckboxItem(t, $event, 'add');checkIsAllSelected($event,payments,'payments')" type="checkbox" value=""
+                      *ngIf="t.isAdd" [checked]="t.add" />
+                  </td>
+                  <td>
+                    <input name="edit" (change)="selectCheckboxItem(t, $event, 'edit');checkIsAllSelected($event,payments,'payments')" type="checkbox" value=""
+                      *ngIf="t.isEdit" [checked]="t.edit" />
+                  </td>
+                  <td>
+                    <input name="delete" (change)="selectCheckboxItem(t, $event, 'delete');checkIsAllSelected($event,payments,'payments')" type="checkbox" value=""
+                      *ngIf="t.isDelete" [checked]="t.delete" />
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer-actions mg-top-20">
+          <a class="clear-item" (click)="clearAll(payments);checkIsAllSelected($event,payments,'payments')"> Clear all</a>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Inventory -->
+  <!-- <form *ngIf="inventory.length>0">
+    <div class="form-layout__card mg-top-30">
+      <div class="form-layout__header">
+        <h2 class="sub-heading">Inventory</h2>
+        <span class="collapse-line"></span>
+      </div>
+      <div class="">
+        <div class="table-wrapper table-wrapper--type1 table-wrapper--type2  table--bd table--nobg dropdownOverlay">
+          <table class="table-container item-table">
+            <thead>
+              <tr>
+                <th width=50%>Name</th>
+                <th width=10% class="text-center">Full Access</th>
+                <th width=10% class="text-center">View</th>
+                <th width=10% class="text-center">Create</th>
+                <th width=10% class="text-center">Edit</th>
+                <th width=10% class="text-center">Delete</th>
+
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let t of inventory">
+                <tr *ngIf="t.item.length==0 ;else elsepartof let i = index">
+                  <td class="fw-bold">
+                    {{t.fieldName}}
+                  </td>
+                  <td> <input name="all" (change)="selectAll(t,$event)" type="checkbox" *ngIf="t.isAllAccess"
+                      [checked]="t.allAccess" value=""></td>
+                  <td> <input name="view" (change)="selectCheckboxItem(t,$event,'view')" type="checkbox" value=""
+                      *ngIf="t.isView" [checked]="t.view"></td>
+                  <td> <input name="add" (change)="selectCheckboxItem(t,$event,'add')" type="checkbox" value=""
+                      *ngIf="t.isAdd" [checked]="t.add"></td>
+                  <td> <input name="edit" (change)="selectCheckboxItem(t,$event,'edit')" type="checkbox" value=""
+                      *ngIf="t.isEdit" [checked]="t.edit"></td>
+                  <td> <input name="delete" (change)="selectCheckboxItem(t,$event,'delete')" type="checkbox" value=""
+                      *ngIf="t.isDelete" [checked]="t.delete"></td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer-actions mg-top-20">
+          <a class="clear-item" (click)="clearAll(inventory)">
+            Clear all</a>
+        </div>
+      </div>
+    </div>
+  </form> -->
+
+  <form *ngIf="reportItems.length > 0">
+    <div class="form-layout__card mg-top-30">
+      <div class="form-layout__header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <input name="dashboardAll" (change)="parentBoxesChecked(reportItems,$event,'reports')" type="checkbox"
+            value="" [checked]="parentAccess.reports" class="mr-2 m-1" />
+          <h2 class="sub-heading mb-0 m-1">Reports</h2>
+        </div>
+        <span class="collapse-line"></span>
+      </div>
+      <div class="">
+        <div class="table-wrapper table-wrapper--type1 table-wrapper--type2 table--bd table--nobg dropdownOverlay">
+          <table class="table-container item-table">
+            <thead>
+              <tr>
+                <th width="50%">Name</th>
+                <th width="10%" class="text-center">Full Access</th>
+                <th width="10%" class="text-center">View</th>
+                <th width="10%" class="text-center">Create</th>
+                <th width="10%" class="text-center">Edit</th>
+                <th width="10%" class="text-center">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let t of reportItems">
+                <tr *ngIf="t.item.length == 0; else elsepartof; let i = index">
+                  <td class="fw-bold">
+                    {{ t.fieldName }}
+                  </td>
+                  <td>
+                    <input name="all" (change)="selectAll(t, $event);checkIsAllSelected($event,reportItems,'reports')" type="checkbox" *ngIf="t.isAllAccess"
+                      [checked]="t.allAccess" value="" />
+                  </td>
+                  <td>
+                    <input name="view" (change)="selectCheckboxItem(t, $event, 'view');checkIsAllSelected($event,reportItems,'reports')" type="checkbox" value=""
+                      *ngIf="t.isView" [checked]="t.view" />
+                  </td>
+                  <td>
+                    <input name="add" (change)="selectCheckboxItem(t, $event, 'add');checkIsAllSelected($event,reportItems,'reports')" type="checkbox" value=""
+                      *ngIf="t.isAdd" [checked]="t.add" />
+                  </td>
+                  <td>
+                    <input name="edit" (change)="selectCheckboxItem(t, $event, 'edit');checkIsAllSelected($event,reportItems,'reports')" type="checkbox" value=""
+                      *ngIf="t.isEdit" [checked]="t.edit" />
+                  </td>
+                  <td>
+                    <input name="delete" (change)="selectCheckboxItem(t, $event, 'delete');checkIsAllSelected($event,reportItems,'reports')" type="checkbox" value=""
+                      *ngIf="t.isDelete" [checked]="t.delete" />
+                  </td>
+                </tr>
+                <ng-template #elsepartof>
+                  <tr>
+                    <td class="fw-bold">
+                      {{ t.fieldName }}
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr *ngFor="let tt of t.item; let ii = index">
+                    <td [ngClass]="{ 'float-end': true }">
+                      {{ tt.fieldName }}
+                    </td>
+                    <td>
+                      <input (change)="selectAll(tt, $event);checkIsAllSelected($event,reportItems,'reports')" name="all" type="checkbox" *ngIf="tt.isAllAccess"
+                        [checked]="tt.allAccess" value="" />
+                    </td>
+                    <td>
+                      <input (change)="selectCheckboxItem(tt, $event, 'view');checkIsAllSelected($event,reportItems,'reports')" name="view" type="checkbox"
+                        *ngIf="tt.isView" value="" [checked]="tt.view" />
+                    </td>
+                    <td>
+                      <input (change)="selectCheckboxItem(tt, $event, 'add');checkIsAllSelected($event,reportItems,'reports')" name="add" type="checkbox"
+                        *ngIf="tt.isAdd" value="" [checked]="tt.add" />
+                    </td>
+                    <td>
+                      <input (change)="selectCheckboxItem(tt, $event, 'edit');checkIsAllSelected($event,reportItems,'reports')" name="edit" type="checkbox"
+                        *ngIf="tt.isEdit" value="" [checked]="tt.edit" />
+                    </td>
+                    <td>
+                      <input (change)="selectCheckboxItem(tt, $event, 'delete');checkIsAllSelected($event,reportItems,'reports')" name="delete" type="checkbox"
+                        *ngIf="tt.isDelete" value="" [checked]="tt.delete" />
+                    </td>
+                  </tr>
+                </ng-template>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer-actions mg-top-20">
+          <a class="clear-item" (click)="clearAll(reportItems);checkIsAllSelected($event,reportItems,'reports')"> Clear all</a>
+        </div>
+      </div>
+    </div>
+  </form>
+
+ 
+</div>
+
+<div  class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-between">
+  <button  type="button" class="btn  btn--sm"   [routerLink]="[preFixUrl +'/organization_setting/user_management/user-roles-responsibilities']">
+    Cancel
+  </button>
+  <button  type="button" class="btn btn--primary btn--sm" (click)="save()">
+    Save
+  </button>
+ 
+</div>

@@ -1,0 +1,187 @@
+<app-veh-payment-details-header [vehPaymentId]="vehPaymentId"
+    [vehPaymentData]="vehPaymentData"></app-veh-payment-details-header>
+<div class="gb-tab-wrapper">
+    <mat-tab-group animationDuration="0ms">
+        <mat-tab>
+            <ng-template mat-tab-label>
+                <span>Jobs Detail </span>
+            </ng-template>
+            <div class="addable-row-table addable-row-table-display m-1 ws-nowrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sales Order No.</th>
+                            <th>Job No.</th>
+                            <th>Job Date</th>
+                            <th>Job Category</th>
+                            <th>Vehicle Number</th>
+                            <th>Total Charges ({{ currency_type?.symbol }})</th>
+                            <th>Total Deductions ({{ currency_type?.symbol }})</th>
+                            <th *ngIf="isTax">TAX ({{ currency_type?.symbol }})</th>
+                            <th>TOTAL AMOUNT ({{ currency_type?.symbol }})</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="vehPaymentData?.jod_details.length == 0">
+                        <tr class="border-0">
+                            <td class="bg-white" colspan="30">
+                                <div class="no-list-data-wrap">
+                                    <figure>
+                                        <img src="assets/img/no-content.png" alt="" />
+                                    </figure>
+                                    <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tbody *ngIf="vehPaymentData?.jod_details.length != 0">
+                        <tr *ngFor="let item of vehPaymentData?.jod_details">
+                            <td><a class="custom-link" target="_blank" [routerLink]="[preFixUrl+'/trip/work-order/details/'+item?.work_order_id]" *ngIf="item?.work_order_no">{{ item?.work_order_no }}</a> <span *ngIf="!item?.work_order_no">-</span></td>
+                            <td><a class="custom-link" target="_blank" [routerLink]="[preFixUrl+'/trip/new-trip/details/'+item?.id]">{{ item?.trip_id }}</a></td>
+                            <td>{{ item?.date }}</td>
+                            <td>{{ item?.category }}</td>
+                            <td >{{ item?.vehicle_no ?item?.vehicle_no : '-' }}</td>
+                            <td>{{item?.charges|numberFormat}}</td>
+                            <td>{{item?.deductions|numberFormat}}</td>
+                            <td *ngIf="isTax">{{item?.tax_amount|numberFormat}}</td>
+                            <td>{{item?.total|numberFormat}}</td>
+                        </tr>
+                        <tr class="fw-semibold" >
+                            <td>Total</td>
+                            <td colspan="4"></td>  
+                            <td>{{vehPaymentData?.job_cal?.charges|numberFormat}}</td>
+                            <td>{{vehPaymentData?.job_cal?.deductions|numberFormat}}</td>
+                            <td *ngIf="isTax">{{vehPaymentData?.job_cal?.tax_amount|numberFormat}}</td>
+                            <td>{{vehPaymentData?.job_cal?.total|numberFormat}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </mat-tab>
+        <mat-tab>
+            <ng-template mat-tab-label>
+                <span>Additional Charges</span>
+            </ng-template>
+
+            <div class="addable-row-table addable-row-table-display m-1 ">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Additional Charge</th>
+                            <th>UNIT OF MEASUREMENT</th>
+                            <th>NO. OF UNITS</th>
+                            <th>UNIT COST ({{ currency_type?.symbol }})</th>
+                            <th *ngIf="isTax">TAX ({{ currency_type?.symbol }})</th>
+                            <th>TOTAL AMOUNT ({{ currency_type?.symbol }})</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="vehPaymentData?.others.length == 0">
+                        <tr class="border-0">
+                            <td class="bg-white" colspan="30">
+                                <div class="no-list-data-wrap">
+                                    <figure>
+                                        <img src="assets/img/no-content.png" alt="" />
+                                    </figure>
+                                    <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tbody>
+                        <tr *ngFor="let other of vehPaymentData?.others">
+                            <td>{{ other?.item__name }}</td>
+                            <td>{{ other?.unit }}</td>
+                            <td>{{ other?.quantity }}</td>
+                            <td>{{ other?.unit_cost|numberFormat }}</td>
+                            <td *ngIf="isTax">{{ other?.tax_amount|numberFormat }}</td>
+                            <td>{{ other?.total |numberFormat}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</div>
+<div class="row mx-0 def-color">
+    <div class="col-lg-7 p-0 invoice-amount-wrap" style="border-right:1px solid #eaeaea">
+    <div class="gb-fake-tab-wrapper">
+        <span>Purchase Amount </span>
+
+    </div>
+    <div class="px-4 pt-4">
+        <div class="fw-semibold  d-flex justify-content-between align-items-center mb-4">
+            <span>Subtotal</span>
+            <span>{{ currency_type?.symbol}} {{vehPaymentData?.subtotal_before_tax|numberFormat}}</span>
+        </div>
+        <p class="mb-3">(+) Total Charges: {{ currency_type?.symbol}} {{vehPaymentData?.charges|numberFormat}} </p>
+        <p class="mb-3">(+) Additional Charge: {{ currency_type?.symbol}} {{vehPaymentData?.additional_charges|numberFormat }} </p>
+        <p class="mb-3">(-) Total Deductions: {{ currency_type?.symbol}} {{vehPaymentData?.deductions|numberFormat}} </p>
+        
+
+        <div class="fw-semibold  d-flex justify-content-between align-items-center mb-2" *ngIf="isTax">
+            <span>Total Tax Amount</span>
+            <span> {{ currency_type?.symbol}} {{vehPaymentData?.tax_amount|numberFormat}}</span>
+
+        </div>
+
+        <div class="fw-semibold  d-flex justify-content-between align-items-center mb-4" *ngIf="isTax">
+            <span>Discount after Tax</span>
+            <span> {{ currency_type?.symbol}} {{vehPaymentData?.discount_after_tax_amount|numberFormat}}</span>
+
+        </div>
+        
+    </div>
+    <div class="fw-semibold py-3 px-4 border-top fs-5  d-flex justify-content-between align-items-center ">
+        <span>Total Amount</span>
+        <span> {{ currency_type?.symbol}} {{vehPaymentData?.total | numberFormat}}</span>
+    </div>
+    <div class="px-4 pt-1" *ngIf="!isVat && vehPaymentData?.tds">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <span>{{vehPaymentData?.tds?.type}}</span>
+            <span>{{ currency_type?.symbol}} {{vehPaymentData?.tds?.amount|numberFormat}}</span>
+        </div>
+    </div>
+    <div class="fw-semibold py-2 px-4  fs-5  d-flex justify-content-between align-items-center ">
+        <span>Balance</span>
+        <span> {{ currency_type?.symbol}} {{vehPaymentData?.total_balance|numberFormat}}</span>
+    </div>
+</div>
+<div class="col-lg-5 p-0">
+    <div class="gb-fake-tab-wrapper">
+        <span>Payment Info</span>
+    </div>
+    <div class="p-4">
+        <div class="fw-semibold  d-flex justify-content-between align-items-center mb-4">
+            <span>Transaction Date</span>
+            <span>{{vehPaymentData?.transaction_date ? vehPaymentData?.transaction_date : '-'}}</span>
+
+        </div>
+        <div class="fw-semibold  d-flex justify-content-between align-items-center mb-4" *ngIf="isTax">
+            <span>Payment Mode</span>
+            <span>{{vehPaymentData?.payment_mode ? vehPaymentData?.payment_mode: '-'}}</span>
+
+        </div>
+        <div class="fw-semibold  d-flex justify-content-between align-items-center mb-4" *ngIf="isTax">
+            <span>Banking Charges</span>
+            <span>{{vehPaymentData?.bank_charges|numberFormat}}</span>
+
+        </div>
+        <div class="fw-semibold  d-flex justify-content-between align-items-center mb-4" *ngIf="isTax">
+            <span>Remind Date</span>
+            <span>{{vehPaymentData?.reminder?vehPaymentData?.reminder: '-'}}</span>
+
+        </div>
+        <div >
+            <p class=" fs-6 mb-2 fw-semibold primary-brand-text"><span class="material-icons  verticle-align-middle me-2">
+                comment
+                </span>Comment</p>
+            <p class="line-height-normal">{{vehPaymentData?.comments ? vehPaymentData?.comments : 'No comment added.'}}</p>
+
+        </div>
+        
+        
+    </div>
+
+</div>
+</div>

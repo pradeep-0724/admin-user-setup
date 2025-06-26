@@ -1,0 +1,254 @@
+<div class=" position-relative  add-edit-quotation-wrap  add-screen-wrap">
+    <div class="right-section__header align-items-center justify-content-between border-bottom ">
+        <h1 class="heading col-10">{{rateCardId?'Edit':'Add'}} Rate Card</h1>
+    </div>
+    <div class="alert alert-danger text-center "role="alert" *ngIf="apiError">
+        {{apiError}}
+    </div> 
+
+    <form [formGroup]="rateCardForm">
+        <ng-container>
+            <div>
+                <div class="row px-4 pt-4">
+
+                    <div class="col-lg-3 col-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(rateCardForm.controls.date)">
+                            <label for="" >Date</label>
+                            <mat-form-field>
+                                <input matInput [matDatepicker]="date" formControlName="date" (focus)="date.open()"
+                                    placeholder="DD/MM/YYYY" readonly>
+                                <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                                <mat-datepicker #date></mat-datepicker>
+                            </mat-form-field>
+                            <app-error [controlName]="rateCardForm.controls.date"></app-error>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fake-tab-bar"><span>Rate Card</span></div>
+                <div class="p-3" >
+                    <div class="d-flex fw-semibold justify-content-end align-items-center def-color flex-wrap mb-3">
+                        <mat-checkbox class="me-3" (change)="onChangeScopeOfWork('pullout')" [formControl]="rateCardForm.get('is_pullout')"  color="primary">Pullout</mat-checkbox>
+                        <mat-checkbox class="me-3" (change)="onChangeScopeOfWork('deposit')" [formControl]="rateCardForm.get('is_deposit')" color="primary">Deposit </mat-checkbox>
+                        <mat-checkbox class="me-3" (change)="onChangeScopeOfWork('pullout_deposit')"  [formControl]="rateCardForm.get('is_pullout_and_deposit')" color="primary">Pullout and Deposit</mat-checkbox>
+                        <mat-checkbox class="me-3" (change)="onChangeScopeOfWork('live_loading')" [formControl]="rateCardForm.get('is_liveLoading')" color="primary">Live Loading</mat-checkbox>
+                        <button [disabled]="doesCompanyRateCardExisted" *ngIf="rateCardId" (click)="syncCommonRateCardValues()" class="gb-btn gb-btn-green gb-btn-green-fill me-1 " >
+                            Sync to Common Rate Card</button>
+                    </div>
+                    <div class=" alert alert-warning text-center " role="alert">
+                        To add more routes, please add from the Common Rate Card.
+                    </div>
+                    <div class="addable-row-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="input--required" rowspan="2">
+                                        PullOut Port
+                                    </th>
+                                    <th class="input--required" rowspan="2">
+                                        Customer Location
+                                    </th>
+                                    <th class="input--required" rowspan="2">
+                                        Deposit Port
+                                    </th>
+
+                                    <th class="text-center" *ngIf="rateCardForm.get('is_pullout').value" colspan="5"> 
+                                       PullOut
+                                    </th>
+                                    <th  class="text-center" *ngIf="rateCardForm.get('is_deposit').value" colspan="5">
+                                        Deposit
+                                    </th>
+                                    <th  class="text-center" *ngIf="rateCardForm.get('is_pullout_and_deposit').value"colspan="5">
+                                        PullOut and Deposit                                     
+                                    </th>
+                                    <th  class="text-center" *ngIf="rateCardForm.get('is_liveLoading').value" colspan="5">
+                                        Live Loading                                     
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <ng-container *ngIf="rateCardForm.get('is_pullout').value">
+                                    <th >Regular</th>
+                                    <th >Couple</th>
+                                    <th >Boggy</th>
+                                    <th >Side Loader</th>
+                                    <th >LowBed</th>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="rateCardForm.get('is_deposit').value" colspan="5">
+                                    <th >Regular</th>
+                                    <th >Couple</th>
+                                    <th >Boggy</th>
+                                    <th >Side Loader</th>
+                                    <th >LowBed</th>
+                                    </ng-container>
+
+                                    <ng-container   *ngIf="rateCardForm.get('is_pullout_and_deposit').value"colspan="5">
+
+                                    <th >Regular</th>
+                                    <th >Couple</th>
+                                    <th >Boggy</th>
+                                    <th >Side Loader</th>
+                                    <th >LowBed</th>
+                                    </ng-container>
+
+                                    <ng-container   *ngIf="rateCardForm.get('is_liveLoading').value" colspan="5">
+
+                                    <th >Regular</th>
+                                    <th >Couple</th>
+                                    <th >Boggy</th>
+                                    <th >Side Loader</th>
+                                    <th >LowBed</th>
+                                    </ng-container>
+                                </tr>
+                              
+                            </thead>
+                            <tbody formArrayName="ratecardmeta">
+                                <tr *ngFor="let rateCard of rateCardForm.controls.ratecardmeta['controls']; let i = index;"
+                                    [formGroupName]="i">
+                                    <td class="disabled">
+                                        <material-dropdown [disabled]="true" 
+                                            [selectedOption]="initialValues.pullOut[i]"
+                                            [addErrorClass]="addErrorClass(rateCard.controls.pull_out_port)">
+                                            <select #customSelect formControlName="pull_out_port"
+                                                class="no-style select--modify" (change)="pullOutChange(rateCard,i)">
+                                                <option *ngFor="let option of zonesList" value="{{ option?.id }}">
+                                                    {{ option?.name }}
+                                                </option>
+                                            </select>
+                                        </material-dropdown>
+                                    </td>
+                                    <td class="disabled">
+                                        <material-dropdown  [disabled]="true" 
+                                        [selectedOption]="initialValues.customer[i]"
+                                        [addErrorClass]="addErrorClass(rateCard.controls.customer_location)">
+                                        <select #customSelect formControlName="customer_location"
+                                            class="no-style select--modify">
+                                            <option *ngFor="let option of zonesList" value="{{ option?.id }}">
+                                                {{ option?.name }}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                       
+                                    </td>
+                                    <td class="disabled">
+                                        <material-dropdown
+                                        [selectedOption]="initialValues.deposit[i]"
+                                        [disabled]="true"
+                                        [addErrorClass]="addErrorClass(rateCard.controls.deposit_port)">
+                                        <select #customSelect formControlName="deposit_port"
+                                            class="no-style select--modify">
+                                            <option *ngFor="let option of zonesList" value="{{ option?.id }}">
+                                                {{ option?.name }}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                       
+                                    </td>
+
+                                 <!-- pullout -->
+                                  <ng-container *ngIf="rateCardForm.get('is_pullout').value" formGroupName="pullout">
+                                    <td >
+                                        <input type="text" class="no-style input--bd" positiveThreeDigitDecimalNumber formControlName="regular"  placeholder="123456" value=""/>  
+                                    </td>
+                                    <td >
+                                        <input type="text" class="no-style input--bd" positiveThreeDigitDecimalNumber  formControlName="couple"  placeholder="123456" value=""/>  
+
+                                    </td>
+                                    <td >
+                                        <input type="text" class="no-style input--bd" positiveThreeDigitDecimalNumber formControlName="boggy" placeholder="123456" value=""/>  
+
+                                    </td>
+                                    <td >
+                                        <input type="text" class="no-style input--bd" positiveThreeDigitDecimalNumber formControlName="sideLoader"  placeholder="123456" value=""/>  
+
+                                    </td>
+                                    <td>
+                                        <input type="text" class="no-style input--bd" positiveThreeDigitDecimalNumber formControlName="lowBed"   placeholder="123456" value=""/>  
+                                    </td>
+
+                                  </ng-container>
+
+                                
+
+                                 <!-- deposit -->
+
+                                   <ng-container  *ngIf="rateCardForm.get('is_deposit').value" formGroupName="deposit">
+                                    <td >
+                                        <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="regular"  placeholder="123456" value=""/>  
+                                    </td>
+                                    <td >
+                                        <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="couple"  placeholder="123456" value=""/>  
+
+                                    </td>
+                                    <td >
+                                        <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="boggy" placeholder="123456" value=""/>  
+
+                                    </td>
+                                    <td >
+                                        <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="sideLoader"  placeholder="123456" value=""/>  
+
+                                    </td>
+                                    <td>
+                                        <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="lowBed"   placeholder="123456" value=""/>  
+                                    </td>
+                                   </ng-container>
+               
+                                    <!-- pull out and deposit -->
+                                    <ng-container *ngIf="rateCardForm.get('is_pullout_and_deposit').value" formGroupName="pullout_deposit">
+                                        <td >
+                                            <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="regular"  placeholder="123456" value=""/>  
+                                        </td>
+                                        <td >
+                                            <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="couple"  placeholder="123456" value=""/>  
+
+                                        </td>
+                                        <td >
+                                            <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="boggy" placeholder="123456" value=""/>  
+
+                                        </td>
+                                        <td >
+                                            <input type="text" positiveThreeDigitDecimalNumber  class="no-style input--bd" formControlName="sideLoader"  placeholder="123456" value=""/>  
+
+                                        </td>
+                                        <td>
+                                            <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="lowBed"   placeholder="123456" value=""/>  
+                                        </td>
+                                    </ng-container>
+                                    
+                                        
+
+                                    <!-- live loading -->
+                                    <ng-container *ngIf="rateCardForm.get('is_liveLoading').value"  formGroupName="live_loading"> 
+                                        <td >
+                                            <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="regular"  placeholder="123456" value=""/>  
+                                        </td>
+                                        <td >
+                                            <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="couple"  placeholder="123456" value=""/>  
+
+                                        </td>
+                                        <td >
+                                            <input type="text" positiveThreeDigitDecimalNumber  class="no-style input--bd" formControlName="boggy" placeholder="123456" value=""/>  
+
+                                        </td>
+                                        <td >
+                                            <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="sideLoader"  placeholder="123456" value=""/>  
+
+                                        </td>
+                                        <td>
+                                            <input type="text" positiveThreeDigitDecimalNumber class="no-style input--bd" formControlName="lowBed"   placeholder="123456" value=""/>  
+                                        </td>
+                                    </ng-container>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </form>
+</div>
+
+<div class="custom-footer-bg d-flex justify-content-end py-2 px-4 " >
+    <button class="btn  btn--sm me-3" type="button" (click)="navigateToList()">Cancel</button>
+    <button class="btn btn--primary btn--sm" (click)="saveRateCard()">Save </button>
+</div>

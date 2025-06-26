@@ -1,0 +1,16 @@
+<div id="content"></div>
+<article  id="article-id" >
+  <main *ngIf="isOnboaded"  id="main-content" [ngClass]="{'main-content-demo':isDemoAccount}" class="main-content clearfix" cdkScrollable>
+    <app-header   [routeChange]="routeChange" ></app-header>
+    <app-orgainzation-setting-slidebar></app-orgainzation-setting-slidebar>
+    <section class="right-section float-end" id="section" cdkScrollable [ngClass]="{'width-change': collapsed, 'mobile-view-nav' :mobileView}">
+      <div id="app-view"></div>
+      <router-outlet (activate)="onActivate($event)"></router-outlet>
+    </section>
+    <app-footer [routeChange]="routeChange"></app-footer>
+  </main>
+</article>
+<app-privacy-policy [show]="show"></app-privacy-policy>
+<app-trail-period-warning></app-trail-period-warning>
+<alert-popup [inputData]="popupInputData" *ngIf="popupInputData.show" (outputData)="confirmButton($event)"></alert-popup>
+<app-user-onboading-popup></app-user-onboading-popup>

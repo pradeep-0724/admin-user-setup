@@ -1,0 +1,149 @@
+<div *ngIf="headerDetailsDataSub |async as headerDetails">
+  <div class="right-section__header py-1" [ngClass]="{'shadow-inset-bottom': headerDetails?.vehicle_category ==10}">
+
+    <div class="d-flex align-items-center">
+      <p class="trip-id  pe-2" (click)="backToList()"><button><i
+            class="bi bi-chevron-left"></i></button>{{headerDetails?.trip_id}}</p>
+            <div class=" border" style="height: 20px;"></div>
+            <div *ngIf="headerDetails?.vehicle_category !=0 && headerDetails?.vehicle_category !=4 && headerDetails?.vehicle_category !=10"  class="veh-category-chip {{getVehicleCategory(headerDetails?.vehicle_category)}} {{headerDetails?.vehicle_category==4?'container-veh':''}} ms-2">{{getVehicleCategory(headerDetails?.vehicle_category)}}</div>
+            <div *ngIf="headerDetails?.vehicle_category == 4"  class="veh-category-chip container-chip ms-2">{{getVehicleCategory(headerDetails?.vehicle_category)}}</div>
+            <div  class="header-chip header-chip-green trailer-chip ms-2" *ngIf="headerDetails?.vehicle_category ==0"><img  src="../../../../../../../assets/img/icons/loose-cargo-green.png" alt="">  Loose Cargo</div>
+
+            <div  class="header-chip header-chip-green no-money-chip ms-2" 
+            *ngIf="headerDetails?.vehicle_category ==10"
+            ><img  src="../../../../../../../assets/img/icons/no-money-green.png" alt="">Internal Job</div>
+
+      <p *ngIf="!headerDetails?.is_transporter" class="wheel-icon ms-2"> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-steering-wheel" width="20"
+              height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <circle cx="12" cy="12" r="9" />
+              <circle cx="12" cy="12" r="2" />
+              <line x1="12" y1="14" x2="12" y2="21" />
+              <line x1="10" y1="12" x2="3.25" y2="10" />
+              <line x1="14" y1="12" x2="20.75" y2="10" />
+            </svg></p>
+        <app-multi-driver-select  [ngClass]="{'disable':isAllDisabled}" *ngIf="!headerDetails?.is_transporter && headerDetails?.vehicle" [isDriverAdd]="true" (selectedDriverList)="selectedDriverList($event)" [driverList]="driverList" [driverControl]="driverControl"></app-multi-driver-select>
+      <p *ngIf="headerDetails?.is_transporter" class="wheel-icon ms-2"> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-steering-wheel" width="20"
+          height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <circle cx="12" cy="12" r="9" />
+          <circle cx="12" cy="12" r="2" />
+          <line x1="12" y1="14" x2="12" y2="21" />
+          <line x1="10" y1="12" x2="3.25" y2="10" />
+          <line x1="14" y1="12" x2="20.75" y2="10" />
+        </svg> {{headerDetails?.driver?headerDetails?.driver?.name:'-'}}</p>
+    </div>
+    <div>
+      <div class="d-flex flex-wrap align-items-center" (mouseenter)="isTripTaskUpdated()">
+        <div 
+        matTooltip="Void restriction: Linked invoices must be deleted."
+        [matTooltipDisabled]="!partyTransactionData?.has_invoice"matTooltipClass="material-toltip-class">
+        <button class="gb-btn gb-btn-red ms-2" *ngIf="headerDetails['status']!=4" (click)="openVoidQuotation()" [disabled]="partyTransactionData?.has_invoice" >Void Job </button>
+        </div>
+        <button class="gb-edit-btn-secondary ms-2" (click)="editRequest()"><span  class="material-icons"> create </span>Edit Request</button>
+        <ng-container *ngIf="headerDetails['status']!=4">
+          <button class="gb-edit-btn-secondary ms-2" [disabled]="headerDetails['status']==2"  *ngxPermissionsOnly="[trip[1]]" [routerLink]="[prefixUrl+'/trip/new-trip/edit/',tripId]">
+            <span  class="material-icons"> create </span>Edit</button>
+          <button class="btn btn--primary ms-2" *ngIf="!headerDetails?.vehicle?.id && !headerDetails?.is_void" [disabled] = "isAllDisabled" (click)="openAssignVehicle()">Assign Vehicle </button>
+          <ng-container *ngIf="vehicle_category==2 || vehicle_category == 1"  >
+            <ng-container *ngIf="headerDetails['status']==0" >
+              <button class="btn btn--primary ms-2 btn--sm" *ngIf="headerDetails?.vehicle?.id"  [disabled] = "isAllDisabled" (click)="openStartJob(false)" >Start Job</button>
+            </ng-container>
+            <ng-container *ngIf="headerDetails['status']==1" >
+              <button class="gb-btn gb-btn-green gb-btn-green-fill ms-2" (click)="openStartJob(true)"   [disabled] = "isAllDisabled" >Complete Job</button>
+            </ng-container>
+  
+          </ng-container>
+
+        </ng-container>
+
+        <button  class="gb-edit-btn-secondary ms-2 " style="padding: 12px;"  (click)="downloadGatePass()"><i  class="bi bi-download me-2 def-color" style="-webkit-text-stroke: 0.5px;"></i>Out Pass</button>
+
+      </div>
+
+    </div>
+  </div>
+  <app-add-trip-v2-documents-expiry [scheduledJobsForSelectedVehicleList]="scheduledJobsForSelectedVehicleList" [locations]="locations" [documentExpiryData]="documentExpiryData"></app-add-trip-v2-documents-expiry>
+  
+  <app-trip-details-status-block *ngIf="headerDetails?.approval_status?.status_screen_to_show !=''" [tripDetails]="headerDetails"></app-trip-details-status-block>
+
+
+  <div class="details">
+    
+    <div class="row border-1 text-center text-sm-start mx-0 p-4 shadow-inset-bottom">
+      <p class="col-lg-4 col-md-5"><b>Customer :</b><a class="custom-link" target="_blank" [routerLink]="[prefixUrl+'/onboarding/party/details/client/',headerDetails?.customer?.id]" >{{headerDetails?.customer?.name}}</a></p>
+      <ng-container *ngIf="headerDetails?.job_from?.type==0" >
+        <p class="col-lg-4 col-md-5"><b>Job from : </b>Quotation</p>
+      </ng-container>
+      <ng-container *ngIf="headerDetails?.job_from?.type==1" >
+        <p class="col-lg-4 col-md-5"><b>Job from : </b>Sales Order</p>
+      </ng-container>
+      <ng-container *ngIf="headerDetails?.job_from?.type==2" >
+        <p class="col-lg-4 col-md-5"><b>Job from: </b>N/A</p>
+      </ng-container>
+
+      <ng-container *ngIf="headerDetails?.job_from?.type==0" >
+        <p class="col-lg-4 col-md-5"><b>Quotation No.: </b>
+        <a class="py-0 custom-link" target="_blank" [routerLink]="[prefixUrl+'/trip/quotation/details',headerDetails?.job_from?.origin.id]"> {{headerDetails?.job_from?.origin?.number}} </a></p>
+      </ng-container>
+      <ng-container *ngIf="headerDetails?.job_from?.type==1" >
+        <p class="col-lg-4 col-md-5"><b>Sales Order No.: </b>
+        <a class="py-0 custom-link" target="_blank" [routerLink]="[prefixUrl+'/trip/work-order/details',headerDetails?.job_from?.origin.id]"> {{headerDetails?.job_from?.origin?.number}} </a></p>
+      </ng-container>
+      <ng-container *ngIf="headerDetails?.vehicle_category ==0">
+        <p class="col-lg-4 col-md-5"><b>Type of Movement : </b>{{headerDetails?.type_of_movement}}</p>
+        <ng-container *ngIf="headerDetails?.type_of_movement == 'Import' || headerDetails?.type_of_movement == 'Export'">
+          <p class="col-lg-4 col-md-6 "><b>{{headerDetails?.type_of_movement=='Import'? 'DO' : headerDetails?.type_of_movement=='Export' ? 'Booking' : ''}} No.: </b>{{headerDetails?.no? headerDetails?.no : '-'}}</p>
+          <p class="col-lg-4 col-md-6 "><b>{{headerDetails?.type_of_movement=='Import'? 'DO' : headerDetails?.type_of_movement=='Export' ? 'Booking':''}} Date : </b>{{headerDetails?.date? headerDetails?.date : '-'}}</p>
+          <p class="col-lg-4 col-md-6 "><b>Is Inspection Required : </b>{{headerDetails?.is_inspection_required}}</p>
+          <p class="col-lg-4 col-md-6 " *ngIf="headerDetails?.is_inspection_required == 'Yes'"><b >Type Of Inspection: </b> <span *ngFor="let inspection of headerDetails?.inspection_type;let last =last;">{{inspection?.label ? inspection?.label : '-'}}{{last ? '':', '}}</span> </p>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="headerDetails?.vehicle_category ==4">
+        <p class="col-lg-4 col-md-5"><b>Type of Movement : </b>{{headerDetails?.type_of_movement}}</p>
+        <p class="col-lg-4 col-md-5" *ngIf="headerDetails?.movement_sow"><b>Scope Of Work : </b>{{headerDetails?.movement_sow}}</p>
+        <p class="col-lg-4 col-md-5" *ngIf="headerDetails?.job_type"><b>Container Handling : </b>{{headerDetails?.job_type}}</p>
+      </ng-container>
+      <p class="col-lg-4 col-md-5"><b>Reference No:</b>{{headerDetails?.lr_no?headerDetails?.lr_no:'-'}}</p>
+      <p class="col-lg-4 col-md-5" *ngIf="bdpDetails?.has_bdp_trip"><b>Container Number:
+        </b>{{bdpDetails?.container_number?bdpDetails?.container_number:'-'}}</p>
+      <p class="col-lg-4 col-md-5" *ngIf="bdpDetails?.has_bdp_trip"><b>Tender Number:
+        </b>{{bdpDetails?.tender_number?bdpDetails?.tender_number:'-'}}</p>
+     <p class="col-lg-4 col-md-5 px-1"><b>Customer POC :</b>{{headerDetails?.poc? headerDetails?.poc?.display_name: '-' }}</p>
+    </div>
+  </div>
+  <div class=" details def-color">
+    <div class=" row  p-4  mx-0 text-center text-sm-start line-height-normal">
+      <div class="col-lg-12 px-0 mb-2">
+        <span class="fw-semibold fs-6"> Vehicle Info.</span>
+      </div>
+      <p class="col-lg-4 col-md-5 px-1" *ngIf="headerDetails?.vehicle_category !=0 && headerDetails?.vehicle_category !=4"><b>Specification :</b>{{headerDetails?.specification?.name}}</p>
+      <p class="col-lg-4 col-md-5 px-1 "><b>Vehicle No. :</b>
+        <a *ngIf="!headerDetails?.is_transporter && headerDetails?.vehicle?.id" class="custom-link"  target="_blank" [routerLink]="[prefixUrl+'/onboarding/vehicle/own/details',headerDetails?.vehicle.id]" >{{headerDetails?.vehicle.name}} {{headerDetails?.vehicle_category >=3 ? '('+headerDetails?.vehicle?.specification+')' : ''}}</a>
+        <a *ngIf="headerDetails?.is_transporter && headerDetails?.vehicle?.id" class="custom-link"  target="_blank" [routerLink]="[prefixUrl+'/onboarding/vehicle/market/details',headerDetails?.vehicle.id]" >{{headerDetails?.vehicle.name}}  {{headerDetails?.vehicle_category >=3 ? '('+headerDetails?.vehicle?.specification+')' : ''}}</a>
+        <span *ngIf="!headerDetails?.vehicle?.id">-</span>
+      </p>
+      <p class="col-lg-4 col-md-5  px-1" *ngIf="(headerDetails?.vehicle_category ==0 || headerDetails?.vehicle_category ==4 || headerDetails?.vehicle_category ==10) && !headerDetails?.is_transporter"><b>Assets :</b>
+        <a  class="custom-link"  target="_blank" [routerLink]="[prefixUrl+'/onboarding/assets/view',headerDetails?.asset_1?.id]" *ngIf="headerDetails?.asset_1?.name">   {{headerDetails?.asset_1?.name ? headerDetails?.asset_1?.name : ''}} ({{headerDetails?.asset_1?.specification ? headerDetails?.asset_1?.specification: ''}} ) </a>
+        {{headerDetails?.asset_2?.name && headerDetails?.asset_1?.name ?  ', ': ''}}  
+        <a  class="custom-link"  target="_blank" [routerLink]="[prefixUrl+'/onboarding/assets/view',headerDetails?.asset_2?.id]" *ngIf="headerDetails?.asset_2?.name">   {{headerDetails?.asset_2?.name ? headerDetails?.asset_2?.name : ''}} ({{headerDetails?.asset_2?.specification ? headerDetails?.asset_2?.specification: ''}} ) </a>
+        {{(headerDetails?.asset_3?.name && headerDetails?.asset_2?.name)|| (headerDetails?.asset_1?.name && headerDetails?.asset_3?.name) ?  ', ': ''}}  
+        <a  class="custom-link"  target="_blank" [routerLink]="[prefixUrl+'/onboarding/assets/view',headerDetails?.asset_3?.id]" *ngIf="headerDetails?.asset_3?.name">   {{headerDetails?.asset_3?.name ? headerDetails?.asset_3?.name : ''}} ({{headerDetails?.asset_3?.specification ? headerDetails?.asset_3?.specification: ''}} ) </a> 
+      </p>
+      <p class="col-lg-4 col-md-5 px-1" *ngIf="headerDetails?.vehicle?.name"><b>Vehicle Type :</b>{{headerDetails?.is_transporter?'Market':'Own'}}</p>
+      <p class="col-lg-4 col-md-5 px-1" *ngIf="headerDetails?.is_transporter"><b>Vehicle Provider :
+      </b>
+      <a  class="custom-link"  target="_blank" [routerLink]="[prefixUrl+'/onboarding/party/details/vendor',headerDetails?.vehicle_provider.id]" >{{headerDetails?.vehicle_provider? headerDetails?.vehicle_provider?.name:'-'}}</a></p>
+      <p class="col-lg-4 col-md-5 px-1" *ngIf="headerDetails?.is_transporter"><b>LPO :</b>
+        <a *ngIf="headerDetails?.ipo?.id" class="custom-link"  target="_blank" [routerLink]="[prefixUrl+'/trip/local-purchase-order/view/',headerDetails?.ipo.id]" >{{headerDetails?.ipo?.name}}</a>
+        <span *ngIf="!headerDetails?.ipo?.id">-</span>
+     </p> 
+    </div>
+   
+  </div>
+
+</div>
+
+<app-job-gate-pass-pdf [tripId]="tripId" [isDownloadGatePass]="isDownloadGatePass"></app-job-gate-pass-pdf>

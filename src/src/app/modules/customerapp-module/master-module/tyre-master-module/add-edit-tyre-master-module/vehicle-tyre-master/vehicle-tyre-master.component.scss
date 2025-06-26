@@ -1,0 +1,49 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+.position-number{
+    border: 1px solid white;
+    height: 0px;
+    width: 0px;
+}
+
+  .disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+.remove-btn{
+  border-radius: 100%;
+  background-color: red;
+  color: #fff;
+  .material-icons{
+    font-size: 20px;
+  }
+  &:disabled{
+    cursor: not-allowed;
+  }
+  
+
+}
+.add-btn{
+  border-radius: 100%;
+  background-color: $sky-blue;
+  color: #fff;
+  .material-icons{
+    font-size: 20px;
+  }
+  &:disabled{
+    cursor: not-allowed;
+  }
+  
+}
+.btn-amount{
+  padding:15px 10px;
+  background-color: #EFEFEF;
+  display: block;
+  margin: 0px 8px;
+
+
+}
+.tyre-layout-height{
+  min-height: calc(100vh - 158px - 62px);
+}
+  

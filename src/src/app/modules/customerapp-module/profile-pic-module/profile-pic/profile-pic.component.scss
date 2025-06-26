@@ -1,0 +1,38 @@
+.image_error {
+    color: #eb1e4a;
+    font-size: 12px;
+}
+@media (max-width: 360px) {
+   .upload-img-wrapper{
+        margin-left: 3% !important;
+    }
+    .input-wrap label{
+        min-width: auto;
+    }
+}
+input[type=file]{
+  visibility: visible;
+  height: 100%;
+  width: 100%;
+  top: -11px;
+  left: 0;
+  border: none;
+  opacity: 1;
+  cursor: pointer;
+  font-size: 0;
+  &:focus-visible{
+
+      box-shadow: 0 0 5px 0 rgba(89,95,171,0.3);
+
+
+  }
+}
+.position-index{
+  position: relative;
+  z-index: 1;
+}
+
+.upload-image > img{
+  background-color: #f1f3f4;
+  object-fit: contain;
+}

@@ -1,0 +1,48 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+@import "../../../../../../../assets/styles/repeated/cost-card";
+.card-shadow {
+    box-shadow: 0 0 6px #00000029;
+}
+.vehicle-stats{
+    padding: 10px;
+    border-radius: 10px;
+    div{
+        padding: 10px 3px 0px 20px;
+        
+        
+        p.heading{
+            color: $sky-blue;
+            margin-bottom: 20px;
+            font-size: 17px;
+        }
+      div.details{
+        position: relative;
+        padding: 0;
+        &::after{
+            content: "";
+            display: block;
+            width: 2px;
+            height: 100%;
+            background-color: gainsboro;
+            border-radius: 4px;
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+
+
+        }
+        p{
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+      }
+      div.details.last-child{
+        &::after{
+display: none;
+        }
+      }
+
+    }
+    
+}

@@ -1,0 +1,123 @@
+<div class="right-section__header">
+  <h1 class="heading">Vehicle Booking</h1>
+</div>
+<div class="row">
+  <div class="normalwidth" [ngClass]="{'widthsrink':isVehicleListOpen}">
+    <div class="form-body form-layout form-layout--pd no-br-tl no-br-tr" id="scroll-test">
+      <div class="row text-center align-items-center justify-content-between mx-0">
+        <div class=" w-auto">
+          <div class=" ">
+            <div class="calenderNav align-middle d-inline-block" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate"
+              (viewDateChange)="closeOpenMonthViewDay()">
+              <i class="material-icons">keyboard_arrow_left</i>
+            </div>
+            <div class="calenderNav align-middle d-inline-block" mwlCalendarToday [(viewDate)]="viewDate"
+              (viewDateChange)="closeOpenMonthViewDay()">
+              <span>Today</span>
+            </div>
+            <div class="calenderNav align-middle d-inline-block" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate"
+              (viewDateChange)="closeOpenMonthViewDay()"><i class="material-icons">keyboard_arrow_right</i>
+            </div>
+          </div>
+        </div>
+        <div class="w-auto ">
+          <h3 class="m-0">{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
+        </div>
+        <div class="w-auto  flex_parent">
+          <button class="btn btn-primary me-3" *ngxPermissionsOnly="vehicleBookingPermission" (click)="addBooking()">Add
+            Booking</button>
+          <div class="colornames">
+            <p> <span class="activeVehicle">&nbsp;</span>Total Active Vehicles</p>
+            <p> <span class="present">&nbsp;</span>Total Vehicles Booked</p>
+            <p> <span class="remaining">&nbsp;</span>Total Vehicles Available</p>
+            <p> <span class="absent">&nbsp;</span>Total Vehicles in Trips</p>
+          </div>
+        </div>
+      </div>
+      <br />
+      <div>
+      </div>
+      <div [ngSwitch]="view">
+        <mwl-calendar-month-view [viewDate]="viewDate" [events]="events" (dayClicked)="dayClicked($event.day)"
+          [cellTemplate]="customCellTemplate" [weekStartsOn]=1>
+        </mwl-calendar-month-view>
+        <ng-template #customCellTemplate let-day="day" let-locale="locale" let-tooltipPlacement="tooltipPlacement"
+          let-highlightDay="highlightDay" let-unhighlightDay="unhighlightDay" let-eventClicked="eventClicked"
+          let-tooltipTemplate="tooltipTemplate" let-tooltipAppendToBody="tooltipAppendToBody"
+          let-tooltipDelay="tooltipDelay">
+          <div class="cal-cell-bottom" [ngClass]="{'active-calender':isActiveDay(day.date)}">
+            <span class="cal-day-number">
+              {{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+          </div>
+          <div *ngIf="day.events.length > 0" class="dayevents">
+            <div *ngFor="let event of day.events">
+              <div class="databadge3">
+                <p> {{event?.data.vehicle_active}}</p>
+              </div>
+              <div class="databadge2">
+                <p> {{event?.data.vehicle_available}}</p>
+              </div>
+              <div class="databadge1">
+                <p>{{event?.data.vehicle_booked}}</p>
+              </div>
+              <div class="databadge">
+                <p>{{event?.data.vehicle_in_trip}}</p>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+  <div class="vehicle_right custom_pop_parent" [ngClass]="{hideBlock:!isVehicleListOpen}">
+    <div class="form-layout form-body form-layout--pd no-br-tl no-br-tr custom_pop_slide"
+      *ngxPermissionsOnly="vehicleBookingPermission">
+      <button class="close-icon" (click)="isVehicleListOpen=!isVehicleListOpen;popupOverflowHide();">
+        <mat-icon>highlight_off</mat-icon>
+      </button>
+      <h4 class="text-center mb-3">Vehicle Booking</h4>
+      <h6 class="mb-2">{{selectedDate| date: 'dd/MM/yyyy'}}</h6>
+      <div class="row mg-top-20  text-start py-2 vehicle-booking-slide" *ngFor="let booking of vehicleBookingList"
+        (click)="editVehicleBooking(booking)">
+        <!-- <div *ngxPermissionsOnly="vehicleBookingPermission[0]">
+                  <mat-icon (click)="editVehicleBooking(booking)">create</mat-icon>
+        </div> -->
+        <div class="col-md-12">
+          <h5>Booking ID: {{booking.booking_id}}</h5>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Party Name: </strong></p>
+          <p class="h6 mb-0">{{booking.party.display_name}}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Number of Vehicle: </strong></p>
+          <p class="h6 mb-0"> {{booking.number_of_vehicles}}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Trip Start Date: </strong></p>
+          <p class="h6 mb-0">{{booking.trip_start_date}}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Trip End Date: </strong></p>
+          <p class="h6 mb-0">{{booking.trip_end_date}}</p>
+        </div>
+        <div class="col-md-12">
+          <p><strong>Vehicle Number: </strong> <span *ngFor="let vehicle of booking.vehicle_numbers"
+              class="mg-top-10  h6 mb-0">{{vehicle.reg_number}}</span></p>
+        </div>
+      </div>
+      <div class="row align-items-center flex-column">
+        <div *ngIf="vehicleBookingList.length<=0" class="margin-top-more">
+          <img class="mw-100" src="/assets/img/no-content.png" alt="No data" />
+          <p class="mg-top-10 no-vehicle">No vehicle booking's to display
+          </p>
+        </div>
+        <button class="btn btn-primary mt-4 mb-0" *ngxPermissionsOnly="vehicleBookingPermission"
+          (click)="addBooking()">Add Booking</button>
+      </div>
+    </div>
+    <div class="slide_bg"></div>
+  </div>
+</div>
+<app-add-vehicle-popup *ngIf="addVehiclePopup.show" [addVehiclePopup]="addVehiclePopup"
+  (dataFromVehicleBooking)="dataFromVehicleBooking($event)"></app-add-vehicle-popup>

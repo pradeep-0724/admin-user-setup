@@ -1,0 +1,308 @@
+<div class="container-fluid">
+    <div class="row align-items-lg-stretch def-color">
+        <div class="col-12 rounded-3 layout-bg p-3 pt-0 custom-shadow-md">
+            <app-table-widget tableTitle="Vendor Stats" [isDateRange]="true" [selectedDateRangeType]="10" [isShowDateRangeText]="true"
+                (dateRangeEmitter)="dateRangeVendorStat($event)"></app-table-widget>
+            <div class="row ">
+                <div class="col-lg px-2 col-md-6 mt-3 mt-lg-0">
+                    <div class="stats-card yellow-activity-card yellow-card  rounded-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold fs-12px">Total Activities</span>
+                            <span class="stats-icon">
+
+                            </span>
+                        </div>
+                        <p class="fs-5 fw-bold mt-3">{{vendorStats?.transactions}}</p> 
+                    </div>
+                </div>
+                <div class="col-lg px-2 col-md-6 mt-3 mt-lg-0">
+                    <div class="stats-card green-card green-cost-card rounded-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold fs-12px">Opening Balance</span>
+                            <span class="stats-icon">
+
+                            </span>
+                        </div>
+                        <p class="fs-5 fw-bold mt-3">{{ currency_type?.symbol}} {{vendorStats?.opening_balance| numberFormat}}</p>
+                    </div>
+                </div>
+                <div class="col-lg px-2 col-md-6 mt-3 mt-lg-0">
+                    <div class="stats-card red-card red-cost-card rounded-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold fs-12px">Expense</span>
+                            <span class="stats-icon">
+
+                            </span>
+                        </div>
+                        <p class="fs-5 fw-bold mt-3"> {{vendorStats?.bills_created}}</p>
+                    </div>
+                </div>
+                <div class="col-lg px-2 col-md-6 mt-3 mt-lg-0">
+                    <div class="stats-card green-card  green-cost-card rounded-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold fs-12px">Paid</span>
+                            <span class="stats-icon">
+
+                            </span>
+                        </div>
+                        <p class="fs-5 fw-bold mt-3"> {{vendorStats?.bills_cleared}}</p>
+                    </div>
+                </div>
+                <div class="col-lg px-2 col-md-6 mt-3 mt-lg-0">
+                    <div class="stats-card green-card  green-cost-card rounded-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold fs-12px">Closing Balance</span>
+                            <span class="stats-icon">
+
+                            </span>
+                        </div>
+                        <p class="fs-5 fw-bold mt-3"> {{ currency_type?.symbol}} {{vendorStats?.closing_balance| numberFormat}}</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- <div class="row rounded-3 mt-4  layout-bg def-color custom-shadow-md overflow-hidden">
+        <app-table-widget tableTitle="Pay Later Pending" isSearch="true" isCollapsable="true" isExpanded="true"
+            (expandCollapseEvent)="expandCollapseBilling($event)"></app-table-widget>
+        <div class="col-12 p-0" [@collapse]="isExpandBilling">
+            <div class="custom-table-container ">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>DATE</th>
+                            <th>JOB CARD NO.</th>
+                            <th>BILL NO.</th>
+                            <th>SERVICE AMOUNT ({{ currency_type?.symbol}})</th>
+                            <th>LABOUR AMOUNT({{ currency_type?.symbol}})</th>
+                            <th>TAX</th>
+                            <th>TOTAL AMOUNT ({{ currency_type?.symbol}})</th>
+                            <th class="icon-box "></th>
+                        </tr>
+                    </thead>
+                    <tbody class="d-none ">
+                        <tr class="border-0 ">
+                            <td colspan="30" class="bg-white ">
+                                <div class="no-list-data-wrap ">
+                                    <figure><img src="assets/img/no-content.png" alt=""></figure>
+                                    <h5 class="mt-3 primary-brand-text ">No data found!</h5>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>12/11/2022</td>
+                            <td>45120</td>
+
+                            <td>Distibutors</td>
+                            <td>31515</td>
+                            <td>3124515</td>
+                            <td>312</td>
+                            <td>3125</td>
+
+                            <td class="icon-box ">
+                                <div class="justify-content-center align-items-center d-flex ">
+                                    <button><span class="material-icons "> more_vert </span></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div> -->
+
+    <div class="row rounded-3 mt-4  layout-bg def-color custom-shadow-md overflow-hidden">
+        <app-table-widget tableTitle="Billing" [isSearch]="true" [isCollapsable]="true" [isExpanded]="true"
+            (expandCollapseEvent)="expandCollapseBilling($event)"
+            (searchedData)="searchedDataBill($event)"></app-table-widget>
+        <div class="col-12 p-0" [@collapse]="isExpandBilling">
+            <div class="custom-table-container bill_scroll " (scroll)="onScrollBills($event)">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>DATE</th>
+                            <th>BILL NO.</th>
+                            <th>AMOUNT ({{ currency_type?.symbol}})</th>
+                            <th>BALANCE ({{ currency_type?.symbol}})</th>
+                            <th>DUE DATE</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="billingList.length==0">
+                        <tr class="border-0 ">
+                            <td colspan="30" class="bg-white ">
+                                <div class="no-list-data-wrap ">
+                                    <figure><img src="assets/img/no-content.png" alt=""></figure>
+                                    <h5 class="mt-3 primary-brand-text ">No data found!</h5>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr *ngFor="let bill of billingList ">
+                            <td>{{bill?.date}}</td>
+                            <td><a  target="_blank" class="custom-link"
+                                [href]="getUrl(bill)"> {{bill?.bill_number}}</a>
+                            </td>
+                            <td>{{bill?.amount| numberFormat}}</td>
+                            <td>{{bill?.balance| numberFormat}}</td>
+                            <td>{{bill?.due_date}}</td>
+                            <td>{{bill?.status}}</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="row rounded-3 mt-4  layout-bg def-color custom-shadow-md overflow-hidden">
+        <app-table-widget tableTitle="Payment " [isSearch]="true" [isCollapsable]="true" [isExpanded]="true"
+            (expandCollapseEvent)="expandCollapsePayment($event)"></app-table-widget>
+        <div class="col-12 p-0" [@collapse]="isExpandPayment">
+            <div class="custom-table-container payment_scroll" (scroll)="onScrollPayment($event)">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>DATE</th>
+                            <th>PAYMENT NO.</th>
+                            <th>ACCOUNT NO.</th>
+                            <th>TOTAL AMOUNT ({{ currency_type?.symbol}})</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="paymentList.length==0">
+                        <tr class="border-0 ">
+                            <td colspan="30" class="bg-white ">
+                                <div class="no-list-data-wrap ">
+                                    <figure><img src="assets/img/no-content.png" alt=""></figure>
+                                    <h5 class="mt-3 primary-brand-text ">No data found!</h5>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr *ngFor="let payment of paymentList">
+                            <td>{{payment?.date}}</td>
+                            <td><a  target="_blank" class="custom-link"
+                                [href]="getPrefixUrl+'/payments/list/bill?pdfViewId='+payment.id"> {{payment?.payment_no}}</a>
+                            </td>
+                            <td>{{payment?.account}}</td>
+                            <td>{{payment?.amount| numberFormat}}</td>
+                            <td class="icon-box">
+                                <div class="justify-content-center align-items-center d-flex ">
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="row rounded-3 mt-4  layout-bg def-color custom-shadow-md overflow-hidden">
+        <app-table-widget tableTitle="Vendor Credit" [isSearch]="true" [isCollapsable]="true"
+            (expandCollapseEvent)="expandCollapseVendorCredit($event)" (searchedData)="searchedDataVendorCredit($event)"></app-table-widget>
+        <div class="col-12 p-0" [@collapse]="isExpandVendorCredit">
+            <div class="custom-table-container vendor_credit_scroll" (scroll)="onScrollVendorCredit($event)">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>DATE</th>
+                            <th>VENDOR CREDIT NO.</th>
+                            <th>BILL NO.</th>
+                            <th>BALANCE ({{ currency_type?.symbol}})</th>
+                            <th>AMOUNT ({{ currency_type?.symbol}})</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="vendorCredit.length==0">
+                        <tr class="border-0 ">
+                            <td colspan="30" class="bg-white ">
+                                <div class="no-list-data-wrap ">
+                                    <figure><img src="assets/img/no-content.png" alt=""></figure>
+                                    <h5 class="mt-3 primary-brand-text ">No data found!</h5>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr *ngFor="let data of vendorCredit">
+                            <td>{{data?.date}}</td>
+                            <td><a target="_blank" class="custom-link"
+                                [href]="getPrefixUrl+'/payments/vendor_credit/edit/'+data.id">
+                                {{data?.vendor_credit_no}}</a>
+                            </td>
+                            <td>{{data?.bill_number}}</td>
+                            <td>{{data?.balance| numberFormat}}</td>
+                            <td>{{data?.amount| numberFormat}}</td>
+                            <td>{{data?.status}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+
+
+    <div class="row rounded-3 mt-4  layout-bg def-color custom-shadow-md overflow-hidden">
+        <app-table-widget tableTitle="Vendor Advance" [isCollapsable]="true" (searchedData)="searchedDataVdendorAdvance($event)"
+            (expandCollapseEvent)="expandCollapseVendorAdvance($event)" [isSearch]="true"></app-table-widget>
+        <div class="col-12 p-0" [@collapse]="isExpandVendorAdvance">
+            <div class="custom-table-container vendor_advance_scroll"  (scroll)="onScrollVendorAdvance($event)">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>DATE</th>
+                            <th>VENDOR ADVANCE NO.</th>
+                            <th>PAYMENT MODE</th>
+                            <th>BALANCE ({{ currency_type?.symbol}})</th>
+                            <th>AMOUNT ({{ currency_type?.symbol}})</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="vendorAdvance.length==0">
+                        <tr class="border-0 ">
+                            <td colspan="30" class="bg-white ">
+                                <div class="no-list-data-wrap ">
+                                    <figure><img src="assets/img/no-content.png" alt=""></figure>
+                                    <h5 class="mt-3 primary-brand-text ">No data found!</h5>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                         <tr *ngFor="let data of vendorAdvance">
+                            <td>{{data?.date}}</td>
+                            <td><a [routerLink]="[getPrefixUrl + '/payments/list/advance/']" 
+                                [queryParams]="{pdfViewId: data.id}"  class="custom-link"
+                                target="_blank"> {{data?.advance_no}}</a>
+                            </td>
+                            <td>{{data?.payment_mode}}</td>
+                            <td>{{data?.balance| numberFormat}}</td>
+                            <td>{{data?.amount| numberFormat}}</td>
+                            <td>{{data?.status}}</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+</div>

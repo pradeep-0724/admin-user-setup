@@ -1,0 +1,8 @@
+.popup-scroll-body{
+    max-height: calc(100vh - 200px );
+    overflow: auto;
+}
+.invalid-input{
+
+    border: 2px solid red !important;
+  }

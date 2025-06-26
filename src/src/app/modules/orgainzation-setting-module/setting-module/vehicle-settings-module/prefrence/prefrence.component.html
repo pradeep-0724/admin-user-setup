@@ -1,0 +1,10 @@
+<div class="p-4 def-color">
+    <form [formGroup]="vehicleSettings">
+      <p  class="fw-semibold mb-3">Show EMI details Option in Add Vehicle Screen</p>
+      <p class="mb-3">This allows you to record the EMI details so that the system can remind you about EMI payment </p>
+      <mat-radio-group formControlName="emi">
+        <mat-radio-button [value]="true" color="primary" class="me-5">Yes</mat-radio-button>
+        <mat-radio-button [value]="false" color="primary">No</mat-radio-button>
+      </mat-radio-group>
+    </form>
+    </div>

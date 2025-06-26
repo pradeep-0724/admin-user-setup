@@ -1,0 +1,131 @@
+<div class="modal fade" [ngClass]="{'show':showModal}" id="exampleModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal--wd" role="document">
+    <div class="modal-content">
+      <form [formGroup]="addChartOfAccountForm" (ngSubmit)="submitForm(addChartOfAccountForm)"
+        (keydown.enter)="$event.preventDefault();">
+
+        <div class="modal-header">
+          <h6 class="modal-title" id="exampleModalLabel">Create New Account</h6>
+          <button type="button" class="close" data-dismiss="modal" (click)="close(false);popupOverflowHide()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body pd-20">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="input-wrap error clearfix"
+                [ngClass]="addErrorClass(addChartOfAccountForm.get('account_type'))" [ngClass]="{disabled: toDisableAccountType}" >
+                <label for="" class="input--required">Account Type</label>
+                <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialValues.account_type" [disabled] ="toDisableAccountType">
+                  <select #customSelect formControlName="account_type" class="no-style select--modify"
+                    (change)="onAccountTypeSelection(addChartOfAccountForm.controls.account_type.value)">
+                    <option *ngFor="let option of accountTypes" value="{{ option?.id }}">
+                      {{ option?.name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="addChartOfAccountForm.get('account_type')"></app-error>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="row">
+                <div class="col-2">
+                  <label for="tick" class="check-box mt-3">
+                    <input type="checkbox" id="tick" formControlName="is_parent_acc"
+                      (change)="disableParentAccount(addChartOfAccountForm.controls.is_parent_acc.value)">
+                    <span class="check-mark"></span>
+                  </label>
+                </div>
+                <div class="col-10">
+                  <div class="input-wrap"  [ngClass]="{disabled:disableParentAcc}">
+                    <div class="input-wrap error clearfix"
+                      [ngClass]="addErrorClass(addChartOfAccountForm.controls.account)">
+                      <label for="" class="input--required">Add Parent
+                        Account</label>
+                      <material-dropdown [disabled]="true" [searchable]="true" [addable]="false" [selectedOption]="initialValues.account">
+                        <select   #customSelect formControlName="account" class="no-style select--modify">
+                          <option tabindex="-1"   *ngFor="let option of parentAccounts" value="{{ option?.id }}">
+                            {{ option?.name }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                      <app-error [controlName]="addChartOfAccountForm.controls.account"></app-error>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="input-wrap error clearfix" [ngClass]="addErrorClass(addChartOfAccountForm.get('name'))">
+                <label for="" class="input--required">Account Name</label>
+                <input  type="text" class="no-style input--bd" formControlName="name" placeholder="Name" value=""
+                  required>
+                <span class="border-anim"></span>
+                <app-error [controlName]="addChartOfAccountForm.get('name')"></app-error>
+                <span *ngIf="name_error" class="error-name">{{name_error}}</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="input-wrap error clearfix" [ngClass]="addErrorClass(addChartOfAccountForm.get('as_on_date'))" [class.disabled]="opening_balance_present">
+                <label for="" class="input--required">As on Date</label>
+                <mat-form-field>
+                  <input tabindex="-1" matInput [matDatepicker]="as_on_date" (focus)="as_on_date.open()" formControlName="as_on_date"
+                    placeholder="DD/MM/YYYY">
+                  <mat-datepicker-toggle matSuffix [for]="as_on_date"></mat-datepicker-toggle>
+                  <mat-datepicker #as_on_date></mat-datepicker>
+                </mat-form-field>
+                <app-error [controlName]="addChartOfAccountForm.get('as_on_date')"></app-error>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="input-wrap">
+                <label for="" class="input--required">Amount Type</label>
+                <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialValues.amountType">
+                  <select #customSelect class="no-style select--modify" [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="amountType" (change)="onAmountTypeChange(amountType)">
+                    <option value="debit">Debit</option>
+                    <option value="credit">Credit</option>
+                  </select>
+                </material-dropdown>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="input-wrap error clearfix" [ngClass]="addErrorClass(addChartOfAccountForm.get('amount'))">
+                <div *ngIf="isDebited">
+                  <label for="" class="input--required">Debit Amount ({{ currency_type?.symbol}})</label>
+                  <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" formControlName="amount" placeholder="Amount"
+                    value="" required>
+                  <span class="border-anim"></span>
+                </div>
+                <div *ngIf="!isDebited">
+                  <label for="" class="input--required">Credit Amount  ({{ currency_type?.symbol}})</label>
+                  <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" formControlName="amount" placeholder="Amount"
+                    value="" required>
+                  <span class="border-anim"></span>
+                </div>
+                <app-error [controlName]="addChartOfAccountForm.get('amount')"></app-error>
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <div class="input-wrap error clearfix"
+                [ngClass]="addErrorClass(addChartOfAccountForm.get('description'))">
+                <label for="">Description</label>
+                <input type="text" class="no-style input--bd" formControlName="description"
+                  placeholder="Max 500 Characters" value="">
+                <span class="border-anim"></span>
+                <app-error [controlName]="addChartOfAccountForm.get('description')"></app-error>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer no-border">
+          <button type="button" class="btn" data-dismiss="modal" (click)="close(false);popupOverflowHide()">Close</button>
+          <button type="submit" class="btn btn--primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div *ngIf="showModal" class="modal-backdrop fade show"></div>

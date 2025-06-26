@@ -1,0 +1,6 @@
+div#table-height{
+    height:51vh;
+    @media only screen and (min-width: 1900px) {
+        height: 60vh;
+        }
+     }

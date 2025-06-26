@@ -1,0 +1,344 @@
+
+
+<!-- Header Title section with date picker -->
+
+<div class="right-section__header">
+  <h1 class="heading">Spare Summary</h1>
+  <div class="header-actions">
+
+      <div class="wd-220">
+          <input type="text"  class="form-control date-range no-style date-range-style" [ngModelOptions]="{standalone: true}" bsDaterangepicker 
+          [(ngModel)]="defaultDate" (bsValueChange)="getSelectedDate($event)"
+          [bsConfig]="{ rangeInputFormat: 'DD MMM YYYY', showWeekNumbers: false }"
+          />
+      </div>
+
+  </div>
+</div>
+
+<!-- Top coloured blocks section -->
+
+<div class="stat-report-wrap mg-top-30" >
+  <div class="container-fluid">
+     <div class="row">
+         <div class="col-md-4 col-lg-4 col-sm-12">
+                 <div class="stat-report-list stat-report-list--sm-pd stat-report-list--blue">
+                         <div class="stat-report-list__item">
+                             <div class="cont">
+                                 <label class="label">Total Inventory</label>
+                                 <span class="value">{{ topInventoryBlockData?.total_inventory }}</span>
+                             </div>
+                             <figure class="pic">
+                                 <img src="../assets/img/material/outline-account_box.svg" alt="">
+                             </figure>
+                         </div>
+                         <div class="stat-report-list__item">
+                             <div class="cont">
+                                 <label class="label">Total SKU's</label>
+                                 <span class="value">{{ topInventoryBlockData?.total_skus }}</span>
+                             </div>
+                             <figure class="pic">
+                                 <img src="../assets/img/material/outline-account_box.svg" alt="">
+                             </figure>
+                         </div>
+                     </div>
+         </div>
+         <div class="col-md-4 col-lg-4 col-sm-12">
+                 <div class="stat-report-list stat-report-list--sm-pd stat-report-list--pink">
+                         <div class="stat-report-list__item">
+                             <div class="cont">
+                                 <label class="label">Est Purchase</label>
+                                 <span
+                                     class="value rupee-symbol rupee-symbol--sm"> {{ currency_type?.symbol}}{{ topEstimateBlockData?.est_purchase}}</span>
+                             </div>
+                             <div class="pic">
+                                 <img src="../assets/img/material/outline-account_box.svg" alt="">
+                             </div>
+                         </div>
+                         <div class="stat-report-list__item">
+                             <div class="cont">
+                                 <label class="label">Est Issue </label>
+                                 <span
+                                     class="value">{{ topEstimateBlockData?.est_issue}}</span>
+                             </div>
+                             <div class="pic">
+                                 <img src="../assets/img/material/outline-account_box.svg" alt="">
+                             </div>
+                         </div>
+       </div>
+
+     </div>
+     <div class="col-md-4 col-lg-4 col-sm-12">
+         <div class="stat-report-list stat-report-list--sm-pd stat-report-list--orange">
+                 <div class="stat-report-list__item">
+                     <div class="cont">
+                         <label class="label">Stock Value</label>
+                         <span
+                             class="value rupee-symbol rupee-symbol--sm"> {{ currency_type?.symbol}} {{ topEstimateBlockData?.stock_value}} </span>
+                     </div>
+                     <div class="pic">
+                         <img src="../assets/img/material/outline-account_box.svg" alt="">
+                     </div>
+                 </div>
+                 <div class="stat-report-list__item">
+                  <div class="cont">
+                      <label class="label">Critical Limit SKU's </label>
+                      <span
+                          class="value">{{ topInventoryBlockData?.critical_limit_sku }}</span>
+                  </div>
+                  <div class="pic">
+                      <img src="../assets/img/material/outline-account_box.svg" alt="">
+                  </div>
+              </div>
+         </div>
+    </div>
+ </div>
+</div>
+
+</div>
+
+<!-- Items Below  -->
+
+<div class="form-body taxes mg-top-30">
+
+  <div class="row">
+
+      <div class="col-md-6">
+          <div class="box-shadow">
+            <div class="form-layout" style="height: 600px;">
+            <div class="table-section">
+                <div class="table-header">
+                    <div class="row">
+                        <div class="col-xl-12">
+                            <div class="table-header__left">
+                              <div class="search-options">
+                                <p class="critical-limit-table-sub-heading">Items below Critical Limit</p>
+                               </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-wrapper-list">
+                    <div>
+                    <table class="table-container">
+                        <thead>
+                            <tr>
+                              <th > ITEM NAME</th>
+                              <th >IN STOCK</th>
+                              <th >CRITICAL LIMIT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="criticalLimitData ?.length == 0">
+                                <td colspan="10" style="background-color: #fff">
+                                    <div class="no-content-wrapper">
+                                        <figure class="no-content-pic">
+                                            <img src="assets/img/no-content.png" alt="">
+                                        </figure>
+                                        <div class="no-content-txt">
+                                            <h5 class="heading">No data found!</h5>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr *ngFor="let data of criticalLimitData | paginate: {id:'pagination1', itemsPerPage: 5, currentPage: p3 }; let i = index;">
+                            <td>{{data?.item_name}}</td>
+                             <td> {{data?.in_stock}}</td>
+                             <td> {{data?.critical_limit}}</td>
+                          </tr>
+
+                        </tbody>
+                    </table>
+                    </div>
+                    <div class="table-page-no" style="margin-top: 15%;">
+                        <pagination-controls id="pagination1"  previousLabel='' nextLabel="" directionLinks="true" class="my-pagination"
+                            (pageChange)="p3 = $event" (pageBoundsCorrection)="p3=$event">
+                        </pagination-controls>
+                      </div>
+                </div>
+            </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="col-md-6">
+           <div class="box-shadow">
+          <div class="form-layout" style="height: 600px;">
+            <div class="table-header">
+             <p class="inventory-table-sub-heading">
+              Inventory Utilisation </p>
+            </div>
+            <div *ngIf="pieChartData ?.length == 0">
+                <div  style="background-color: #fff">
+                    <div class="no-content-wrapper">
+                        <figure class="no-content-pic">
+                            <img src="assets/img/no-content.png" alt="">
+                        </figure>
+                        <div class="no-content-txt">
+                            <h5 class="heading">No data found!</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="display: block;padding: 12px;" *ngIf="pieChartData.length>0">
+              <canvas baseChart
+                [data]="pieChartData"
+                [labels]="pieChartLabels"
+                [chartType]="pieChartType"
+                [options]="pieChartOptions"
+                [plugins]="pieChartPlugins"
+                [legend]="pieChartLegend">
+              </canvas>
+            </div>
+          </div>
+          </div>
+        </div>
+
+
+    </div>
+
+
+
+
+
+<div class="form-layout mg-top-30 box-shadow">
+  <div class="table-section">
+      <div class="table-header">
+          <div class="row">
+              <div class="col-lg-4 col-sm-12">
+                  <div class="table-header__left">
+                      <h2 class="sub-heading">All Inventory</h2>
+
+                      <nav class="party-menu">
+                        <ul >
+                            <li class="party-menu__list" (click)="selectInventoryTab('1')"  [ngClass]="{active: activeInventoryTab('1')}">
+                                    Available
+                            </li>
+
+                            <li class="party-menu__list" (click)="selectInventoryTab('2')" [ngClass]="{active: activeInventoryTab('2')}">
+                                    Under Maintenance
+                            </li>
+
+
+                         </ul>
+                      </nav>
+                  </div>
+              </div>
+              <div class="col-lg-8 col-sm-12">
+                  <div class="table-header__right">
+                      <div id="demo-2">
+                        <input type="search" placeholder="Search" [(ngModel)]="search">
+                    </div>
+                      <div class="select-wrap">
+                          <span class="show-text">Showing</span>
+                          <select name="" [(ngModel)]="filter_by" class="no-style select--modify">
+                            <option *ngFor="let num of filter" value="{{num.value}}">{{num.key}}</option>
+                        </select>
+                      </div>
+
+                  </div>
+              </div>
+          </div>
+
+      </div>
+      <div class="table-wrapper"  *ngIf="inventoryTabNumber == 1">
+          <div>
+              <table class="table-container" matSort (matSortChange)="sortAvialableTable($event)">
+                      <thead>
+                          <tr>
+                              <th mat-sort-header="item_name">ITEM NAME</th>
+                              <th mat-sort-header="opening">OPENING ({{ currency_type?.symbol}})</th>
+                              <th mat-sort-header="issued"> ISSUED  ({{ currency_type?.symbol}})</th>
+                              <th mat-sort-header="purchased">PURCHASE ({{ currency_type?.symbol}})</th>
+                              <th mat-sort-header="repaired">REPAIRED ({{ currency_type?.symbol}})</th>
+                              <th mat-sort-header="closing">CLOSING ({{ currency_type?.symbol}})</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngIf="(availableData | inventoryPipe: search) ?.length == 0">
+                            <td colspan="10" style="background-color: #fff">
+                                <div class="no-content-wrapper">
+                                    <figure class="no-content-pic">
+                                        <img src="assets/img/no-content.png" alt="">
+                                    </figure>
+                                    <div class="no-content-txt">
+                                        <h5 class="heading">No data found!</h5>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                          <tr *ngFor="let data of availableData | inventoryPipe: search  | paginate: { id:'pagination2' ,itemsPerPage: filter_by, currentPage: p1 }; let i = index;">
+                            <td>{{ data?.item_name}}</td>
+                            <td>  {{ data?.opening?.total}} | <span class="rupee-symbol rupee-symbol--sm"> {{data?.opening?.value}} </span></td>
+                            <td>{{ data?.issued?.total}} | <span class="rupee-symbol rupee-symbol--sm"> {{ data?.issued?.value}} </span></td>
+                            <td>{{ data?.purchased?.total}} |  <span class="rupee-symbol rupee-symbol--sm">{{ data?.purchased?.value}} </span></td>
+                            <td>{{ data?.repaired?.total}} | <span class="rupee-symbol rupee-symbol--sm">{{ data?.repaired?.value}} </span></td>
+                            <td>{{ data?.closing?.total}} | <span class="rupee-symbol rupee-symbol--sm">{{ data?.closing?.value}} </span></td>
+
+                         </tr>
+
+                      </tbody>
+                  </table>
+      </div>
+      <div class="table-page-no">
+        <pagination-controls id="pagination2" previousLabel='' nextLabel="" directionLinks="true" class="my-pagination"
+            (pageChange)="p1 = $event" (pageBoundsCorrection)="p1=$event">
+        </pagination-controls>
+      </div>
+      </div>
+
+      <div class="table-wrapper"  *ngIf="inventoryTabNumber == 2">
+          <div>
+          <table class="table-container" matSort (matSortChange)="sortUnderMaintenanceDataTable($event)">
+                  <thead>
+                      <tr>
+                          <th mat-sort-header="item_name">ITEM NAME</th>
+                          <th mat-sort-header="opening">OPENING ({{ currency_type?.symbol}})</th>
+                          <th mat-sort-header="repair">UNDER REPAIR ({{ currency_type?.symbol}})</th>
+                          <th mat-sort-header="repaired"> REPAIRED ({{ currency_type?.symbol}})</th>
+                          <th mat-sort-header="closing"> CLOSING ({{ currency_type?.symbol}})</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngIf="(maintenanceData| inventoryPipe: search )?.length == 0">
+                        <td colspan="10" style="background-color: #fff">
+                            <div class="no-content-wrapper">
+                                <figure class="no-content-pic">
+                                    <img src="assets/img/no-content.png" alt="">
+                                </figure>
+                                <div class="no-content-txt">
+                                    <h5 class="heading">No data found!</h5>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                      <tr *ngFor="let data of maintenanceData | inventoryPipe: search  | paginate: { id:'pagination3' ,itemsPerPage: filter_by, currentPage: p2 }; let i = index;">
+                        <td>{{ data?.item_name}}</td>
+                        <td>  {{ data?.opening?.total}} | <span class="rupee-symbol rupee-symbol--sm"> {{data?.opening?.value}} </span></td>
+                        <td>{{ data?.repair?.total}} | <span class="rupee-symbol rupee-symbol--sm"> {{ data?.repair?.value}} </span></td>
+                        <td>{{ data?.repaired?.total}} | <span class="rupee-symbol rupee-symbol--sm">{{ data?.repaired?.value}} </span></td>
+                        <td>{{ data?.closing?.total}} | <span class="rupee-symbol rupee-symbol--sm">{{ data?.closing?.value}} </span></td>
+
+
+
+                      </tr>
+
+
+                  </tbody>
+              </table>
+         </div>
+  <div class="table-page-no">
+    <pagination-controls id="pagination3"  previousLabel='' nextLabel="" directionLinks="true" class="my-pagination"
+        (pageChange)="p2 = $event" (pageBoundsCorrection)="p2=$event">
+    </pagination-controls>
+  </div>
+  </div>
+
+  </div>
+</div>
+
+
+</div>

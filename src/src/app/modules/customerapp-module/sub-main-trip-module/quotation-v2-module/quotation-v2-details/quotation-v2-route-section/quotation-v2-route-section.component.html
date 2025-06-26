@@ -1,0 +1,9 @@
+<div class="statusMainWrap p-4 position-relative">
+  <div class=" m-auto">
+    <p class="mb-2"><b class="me-3">Route :</b>{{quotationDetail?.[findCategory(quotationDetail?.vehicle_category)]?.route_code? quotationDetail?.[findCategory(quotationDetail?.vehicle_category)]?.route_code : '-'}}</p>
+    <div class="mx-lg-4">
+    <app-trip-v2-status [statusDetails]="quotationDetail?.[findCategory(quotationDetail?.vehicle_category)]?.path" statusType="workorder"></app-trip-v2-status>
+  </div>
+  </div>
+
+</div>

@@ -1,0 +1,73 @@
+
+ <div class="calc-height">
+ <app-list-widget (listWidgetData)="listWidgetData($event)" [buttonData]="buttonData" [isAddButton]="true"   [isSettings]="true"     [settingsUrl]="settingsUrl"
+   [isDropDown]="true"  [isDateDropDown]="false" [isExport]="true"(exportList)="exportList($event)" [tabSelectionList]="tabSelectionList"  (settingsApplied)="settingsApplied($event)">
+    <button class="gb-video-play me-2" id="custom-button-left" (click)="openGothrough()"><i   class="bi bi-play-circle-fill"></i>     </button>
+  </app-list-widget>  
+</div>
+      <div class="custom-table-container " id="party-list"   (scroll)="onScroll()">
+        <table [ngClass]="{'h-100':partyListDetails.length==0}">
+
+          <thead>
+             <tr>
+               <ng-container *ngFor="let heading of partyHeader">
+                 <th> {{heading}} </th>
+               </ng-container>
+               <th class="icon-box"></th>
+             </tr>
+           </thead>
+           <tbody *ngIf="partyListDetails.length == 0">
+             <tr class="border-0">
+               <td class="bg-white" colspan="30">
+                 <div class="no-list-data-wrap">
+                   <figure>
+                     <img src="assets/img/no-content.png" alt="">
+                   </figure>
+                   <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                 </div>
+               </td>
+             </tr>
+       
+           </tbody>
+         <tbody>
+             <tr *ngFor="let party of partyListDetails; trackBy: trackById ;">
+               <ng-container *ngFor="let item of party['extras'];let i =index">
+                 <td  *ngIf="item?.name !='Display Name' && item?.name !='Company Name'" > {{item?.value ? item?.value : '-'}} </td>
+                 <td  *ngIf="item?.name =='Company Name'" class="td-2l"> <p class="text-2l">{{item?.value ? item?.value : '-'}}</p> </td>
+
+                 <ng-container *ngIf="item?.name=='Display Name'">
+                  <td class="td-2l">
+                    <div class="text-2l">
+                    <a  class="custom-link " [routerLink]="generateURL(party)"  [queryParams]="{fromlist: 'party'}"> {{item?.value ? item?.value : '-'}} </a>
+                  </div>
+                  </td>
+                 </ng-container>
+               </ng-container>
+               <td class="icon-box  tabIndexActive"  >
+                <div class="d-flex justify-content-center align-items-center" >
+                    <div class="position-relative">
+                      <button class="p-0 material-icons more-icon" *ngxPermissionsOnly="[partyPer[1]]"
+                      (click)="optionsList($event, 'list_'+party?.id)">more_vert</button>
+                  <div class="more-actions__menu table-popup"
+                      [ngClass]="{show: showOptions === 'list_'+party.id}">
+                      <button *ngxPermissionsOnly="partyPer[1]" class="more-actions__item w-100 text-start" (click)="editParty(party.id)"><i
+                              class="material-icons">edit</i>Edit</button>
+                  </div>
+                    </div>
+                </div>
+
+               </td>
+
+
+ 
+ 
+             </tr>
+         </tbody>
+        </table>
+    </div>
+  
+ 
+
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>
+
+<app-go-through  [goThroughDetais]="goThroughDetais"></app-go-through>

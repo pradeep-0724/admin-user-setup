@@ -1,0 +1,183 @@
+<section>
+
+  <div class="right-section__header">
+    <h1 class="heading w-auto my-1">Profit & Loss</h1>
+    <div class="header-actions w-auto my-1">
+      <button class="btn btn--primary btn--dropdown  mg-right-10 export-mobile-icon" (click)="$event.stopPropagation();canDownloadProfitLoss = !canDownloadProfitLoss">Export<span><i class="fas fa-file-export"></i></span><i class="material-icons mobile-hide">arrow_drop_down</i>
+        <ul class="more-actions__menu" [ngClass]="{'show': canDownloadProfitLoss}">
+            <!-- <li class="more-actions__item" type="button" (click)="downLoadxlsxOrpdf('xlsx','Profit & Loss ')"  >Export As xlsx</li> -->
+            <li class="more-actions__item" type="button"  (click)="downLoadxlsxOrpdf('pdf','Profit & Loss ')" >Export As Pdf</li>
+        </ul>
+       </button>
+        <div class="mobile-calender">
+        <input type="text" class="form-control date-range no-style date-range-style  " [ngModelOptions]="{standalone: true}" bsDaterangepicker
+        [(ngModel)]="selectedRange" (bsValueChange)="filterProfitLoss($event)"
+        [bsConfig]="{ rangeInputFormat: 'DD MMM YYYY', showWeekNumbers: false }">
+      </div>
+
+    </div>
+  </div>
+  <div class="balance-header box-shadow">
+    <div class="row">
+      <div class="col-md-6">
+        <h2 class="sub-heading">{{(companyData?.company_name)?(companyData?.company_name):'-'}}</h2>
+        <p class="fs-14 mt-3 sub-text">Profit & Loss from {{selectedRange[0] | date}} to {{selectedRange[1] | date}}</p>
+      </div>
+      <div class="col-md-6 actions-item">
+        <div class="actions-wrap">
+          <button class="btn" [ngClass]="{'btn--primary':!collapseFlag}" (click)="expandCollapseAll(false)">Collapse All</button>
+          <button class="btn mg-left-10" [ngClass]="{'btn--primary':collapseFlag}" (click)="expandCollapseAll(true)">Expand All</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="balance-sheet-container" [ngClass]="{'t-shaped-wrapper': type == 't'}">
+    <div class="balance-sheet-wrap form-layout mg-top-30 box-shadow" [ngClass]="{'mg-right-5 col-lg-6': type == 't' }">
+      <div class="container balance-sheet-table">
+        <div class="row tree-row flex-box">
+          <div class="flex-grow-1 pd-left-25 tree-heading w-auto">
+            EXPENSE
+          </div>
+          <div class="wd-200  text-end pd-right-10 tree-heading w-auto">
+            AMOUNT ({{ currency_type?.symbol}})
+          </div>
+        </div>
+        <div class="container">
+          <div *ngFor="let expense of profitLossData?.Expense | keyvalue;let i = index">
+            <div class="flex-box">
+              <div class="name">
+                <span *ngIf="expense.value?.length>0" class="mg-right-7 removeStyles">
+                  <a class="plus-icon-sm" *ngIf="!showLoss[i]" (click)="showLoss[i] = !showLoss[i]"></a>
+                  <a class="minus-icon-sm" *ngIf="showLoss[i]" (click)="showLoss[i] = !showLoss[i]"></a>
+                </span>
+                <span *ngIf="expense.value?.length==0" class="mg-left-22"></span>
+                <span [ngClass]="{'fw-600':showLoss[i]}">{{expense.key}}</span>
+              </div>
+              <div *ngIf="!showLoss[i]" class="debit">
+                <span>{{ identifyAmountType(calculateParentSubTotal(expense.value),true) }}</span>&nbsp;
+                <span class="rupee-symbol rupee-symbol--sm"></span>
+                {{ currency_type?.symbol}} {{ returnAbsoluteNumber(calculateParentSubTotal(expense.value)) }}</div>
+            </div>
+            <div class="nested-items" *ngIf="showLoss[i]">
+              <div *ngFor="let acc of expense?.value">
+                <tree [debitPositive]="true" [response]="acc"></tree>
+              </div>
+              <div class="flex-box mg-left-7">
+                <div class="total fw-600">
+                  Total for {{expense.key}}
+                </div>
+                <div class="debit">
+                  <span>{{ identifyAmountType(calculateParentSubTotal(expense.value),true) }}</span>&nbsp;
+                  <span class="rupee-symbol rupee-symbol--sm"></span>
+                  {{ currency_type?.symbol}} {{ returnAbsoluteNumber(calculateParentSubTotal(expense.value)) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="row tree-row flex-box">
+            <div class="flex-grow-1 pd-left-15 tree-heading fs-14 w-auto">
+              <span *ngIf="returnAbsoluteNumber(expenseTotal) < returnAbsoluteNumber(incomeTotal)">FINAL</span> TOTAL
+            </div>
+            <div class="wd-200  text-end pd-right-15 tree-heading fs-14 w-auto">
+              <span>{{ identifyAmountType(expenseTotal,true) }}</span>&nbsp;
+              <span class="rupee-symbol rupee-symbol--sm"> {{ currency_type?.symbol}} {{ returnAbsoluteNumber(expenseTotal) }}</span>
+            </div>
+          </div>
+          <div *ngIf="returnAbsoluteNumber(expenseTotal) > returnAbsoluteNumber(incomeTotal)">
+            <div class="row tree-row flex-box">
+              <div class="flex-grow-1 pd-left-15 tree-heading fs-14 w-auto">
+                NET LOSS
+              </div>
+              <div class="wd-200  text-end pd-right-15 tree-heading fs-14 w-auto">
+                <span>{{ identifyAmountType(calculateDifferenceAmount(expenseTotal,incomeTotal),false) }}</span>&nbsp;
+                <span class="rupee-symbol rupee-symbol--sm">{{ currency_type?.symbol}} {{ returnAbsoluteNumber(expenseTotal) - returnAbsoluteNumber(incomeTotal) }}</span>
+              </div>
+            </div>
+            <div class="row tree-row flex-box">
+              <div class="flex-grow-1 pd-left-15 tree-heading fs-14 w-auto">
+                FINAL TOTAL
+              </div>
+              <div class="wd-200  text-end pd-right-15 tree-heading fs-14 w-auto">
+                <span>{{ identifyAmountType(incomeTotal,false) }}</span>&nbsp;
+                <span class="rupee-symbol rupee-symbol--sm">{{ currency_type?.symbol}} {{ returnAbsoluteNumber(incomeTotal) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="balance-sheet-wrap form-layout mg-top-30 box-shadow" [ngClass]="{'mg-left-5 col-lg-6': type == 't' }">
+      <div class="container balance-sheet-table">
+        <div class="row tree-row flex-box">
+          <div class="flex-grow-1 pd-left-25 tree-heading w-auto">
+            INCOME
+          </div>
+          <div class="wd-200  text-end pd-right-10 tree-heading w-auto">
+            AMOUNT ({{ currency_type?.symbol}})
+          </div>
+        </div>
+        <div *ngFor="let income of profitLossData?.Income | keyvalue;let i = index">
+          <div class="flex-box">
+            <div class="name">
+              <span *ngIf="income.value?.length>0" class="mg-right-7 removeStyles">
+                <a class="plus-icon-sm" *ngIf="!showProfit[i]" (click)="showProfit[i] = !showProfit[i]"></a>
+                <a class="minus-icon-sm" *ngIf="showProfit[i]" (click)="showProfit[i] = !showProfit[i]"></a>
+              </span>
+              <span *ngIf="income.value?.length==0" class="mg-left-22"></span>
+              <span [ngClass]="{'fw-600':showProfit[i]}">{{income.key}}</span>
+            </div>
+            <div *ngIf="!showProfit[i]" class="debit">
+              <span>{{ identifyAmountType(calculateParentSubTotal(income.value),false) }}</span>&nbsp;
+              <span class="rupee-symbol rupee-symbol--sm"></span>
+              {{ currency_type?.symbol}} {{ returnAbsoluteNumber(calculateParentSubTotal(income.value)) }}
+            </div>
+          </div>
+          <div class="nested-items" *ngIf="showProfit[i]">
+            <div *ngFor="let acc of income?.value">
+              <tree [debitPositive]="false" [response]="acc"></tree>
+            </div>
+            <div class="flex-box mg-left-7">
+              <div class="total fw-600">
+                Total for {{income.key}}
+              </div>
+              <div class="debit">
+                <span>{{ identifyAmountType(calculateParentSubTotal(income.value),false) }}</span>&nbsp;
+                <span class="rupee-symbol rupee-symbol--sm"></span>
+                {{ currency_type?.symbol}} {{ returnAbsoluteNumber(calculateParentSubTotal(income.value)) }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row tree-row flex-box">
+          <div class="flex-grow-1 pd-left-15 tree-heading fs-14 w-auto">
+            <span *ngIf="returnAbsoluteNumber(incomeTotal) < returnAbsoluteNumber(expenseTotal)">FINAL</span> TOTAL
+          </div>
+          <div class="wd-200  text-end pd-right-15 tree-heading fs-14 w-auto">
+            <span>{{ identifyAmountType(incomeTotal,false) }}</span>&nbsp;
+            <span class="rupee-symbol rupee-symbol--sm">{{ currency_type?.symbol}} {{ returnAbsoluteNumber(incomeTotal) }}</span>
+          </div>
+        </div>
+        <div *ngIf="returnAbsoluteNumber(incomeTotal) > returnAbsoluteNumber(expenseTotal)">
+          <div class="row tree-row flex-box">
+            <div class="flex-grow-1 pd-left-15 tree-heading fs-14 w-auto">
+              NET PROFIT
+            </div>
+            <div class="wd-200  text-end pd-right-15 tree-heading fs-14 w-auto">
+              <span>{{ identifyAmountType(calculateDifferenceAmount(incomeTotal,expenseTotal),false) }}</span>&nbsp;
+              <span class="rupee-symbol rupee-symbol--sm">{{ currency_type?.symbol}} {{ returnAbsoluteNumber(incomeTotal) - returnAbsoluteNumber(expenseTotal) }}</span>
+            </div>
+          </div>
+          <div class="row tree-row flex-box">
+            <div class="flex-grow-1 pd-left-15 tree-heading fs-14 w-auto">
+              FINAL TOTAL
+            </div>
+            <div class="wd-200  text-end pd-right-15 tree-heading fs-14 w-auto">
+              <span>{{ identifyAmountType(expenseTotal,true) }}</span>&nbsp;
+              <span class="rupee-symbol rupee-symbol--sm">{{ currency_type?.symbol}} {{ returnAbsoluteNumber(expenseTotal) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>

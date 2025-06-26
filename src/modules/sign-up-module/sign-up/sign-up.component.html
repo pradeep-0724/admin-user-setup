@@ -1,6 +1,25 @@
 
 <div class="main-body">
-    <span> {{envTitle}}</span>
+
+    <app-trip-visualizer></app-trip-visualizer>
+    <div class="header-common">
+        <i  class="fa-solid fa-angle-left  left-chevron"></i>
+        <h4 class="m-0">So9879698</h4>
+        <div class="btn-active" role="button">
+            <i  class="fa-solid fa-circle m-1"></i>Active
+        </div>
+    </div>
+    <div class="d-flex justify-content-start box-shadow parent-row">
+    <div class="child-elements2 p-2 m-1 highlight-bottom">Vehicle Info</div>
+    <div class="child-elements2 p-2 m-1">Tyre Details Info</div>
+    <div class="child-elements2 p-2 m-1">Jobs History</div>
+    <div class="child-elements2 p-2 m-1">Service History</div>
+    <div class="child-elements2 p-2 m-1">Fuel History</div>
+</div>
+    <!-- <app-pdf-sample></app-pdf-sample> -->
+    
+    <!-- <span> {{envTitle}}</span> -->
+
     <div class="login-card d-flex justify-content-center align-items-center">
         <div class="col-6">
             <h2>Welcome to Admin&User Interface</h2>
@@ -14,18 +33,18 @@
                 </div>
                 <div class="input-group">
                     <label for="mobile">Enter Mobile</label>
-                    <input type="text" id="mobile" formControlName="mobile">
-                    <app-error [controlName]="signUpForm.controls['mobile']"></app-error>
+                    <input type="number" id="mobile" formControlName="number">
+                    <app-error [controlName]="signUpForm.controls['number']"></app-error>
                 </div>
                 <div class="input-group">
-                    <label for="password">Enter Password</label>
+                    <label for="c_password">Enter Username!</label>
+                    <input type="text" id="c_password" formControlName="name">
+                    <app-error [controlName]="signUpForm.controls['name']"></app-error>
+                </div>
+                <div class="input-group">
+                    <label for="password">Enter  Password!</label>
                     <input type="text" id="password" formControlName="password">
                     <app-error [controlName]="signUpForm.controls['password']"></app-error>
-                </div>
-                <div class="input-group">
-                    <label for="c_password">Enter Confirm Password!</label>
-                    <input type="text" id="c_password" formControlName="c_password">
-                    <app-error [controlName]="signUpForm.controls['c_password']"></app-error>
                 </div>
                 <div>
                     <button class="btn btn-danger" type="submit" (click)="submit()">Sign Up</button>

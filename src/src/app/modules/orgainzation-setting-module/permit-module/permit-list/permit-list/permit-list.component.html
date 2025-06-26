@@ -1,0 +1,89 @@
+<div class="row mx-0 p-3 calc-height" >
+    <div class="col-md-6  d-flex align-items-center" > 
+        <h6 class="fs-5 semi-bold def-color layout-bg">Permit List</h6>
+      </div>
+    <div class="col-md-6">
+      <button class="btn btn--primary py-2 w-auto" style="float: right;" [routerLink]="[perfixUrl+'/organization_setting/permit/add']"> + Add Permit</button>
+    </div>
+
+  </div>
+  <div  class="gb-border-table-wrap mx-1 addable-row-table-display" id="veh-permit-list">
+    <table [ngClass]="{'h-100':vehiclePermitList.length == 0}">
+        <thead>
+            <tr>
+            <th class="text-center">S.NO</th>
+            <th>PERMIT NAME</th>
+            <th>COUNTRY</th>
+            <th>STATE</th>
+            <th>COVERAGE AREA</th>
+            <th>AREAS</th>
+            <th class="text-center">EXPIRY DATE MANDATORY</th>
+            <th class="border-start-0"></th>
+        </tr>
+        </thead>
+        <tbody *ngIf="vehiclePermitList.length == 0">
+            <tr class="border-0">
+                <td class="bg-white" colspan="30">
+                    <div class="no-list-data-wrap">
+                        <figure>
+                            <img src="assets/img/no-content.png" alt="">
+                        </figure>
+                        <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                    </div>
+                </td>
+            </tr>
+
+        </tbody>
+
+        <tbody>
+            <tr *ngFor="let area of vehiclePermitList;let i = index;trackBy: trackById;">
+                <td class="text-center">
+                    {{i+1}}
+                </td>
+                <td>{{area?.name}}</td>
+                <td class="fields-wrap">
+                    <div class="field" *ngFor="let state of area['states']">
+                        {{state?.country}}
+                     </div>
+                </td>
+                <td class="fields-wrap">
+                    <div class="field" *ngFor="let state of area['states']">
+                        {{state?.state}}
+                     </div>
+                </td>
+                <td class="fields-wrap">
+                    <div class="field" *ngFor="let state of area['states']">
+                        {{state?.area == 0 ? 'Entire State' : state?.area == 1 ? 'Exclude Selected Areas ' : state?.area ==2 ? 'Include Selected Areas Only' : ''}}
+                     </div>
+                </td>
+                <td class="fields-wrap">
+                    <div class="field" *ngFor="let state of area['states']">
+                        <span *ngIf="state?.area == 0">Entire State</span>
+                        <button class="custom-link" (click)="openLocationsSideBar(state?.locations)" *ngIf="state?.area != 0">{{state?.locations?.length}}</button>
+                     </div>
+                </td>
+                <td class="text-center ">
+                    <mat-checkbox color="primary" (change)="expiryMandatoryChanged($event.checked,area)"  [checked]="area.expiry_date_mandatory"></mat-checkbox>
+                </td>
+
+                <td class="text-end border-start-0">
+                    <button class="gb-btn-hover "  [routerLink]="[perfixUrl + '/organization_setting/permit/edit/',area.id]">
+                        <span class="no-style px-2">
+                            <i class="material-icons def-color fs-5" 
+                            >edit</i>
+                        </span>
+                    </button>
+                    <button class="gb-btn-hover " (click)="popupFunction(area.id,i)">
+                        <span class="no-style px-2 " >
+                            <i class="material-icons text-danger fs-5">delete</i>
+                        </span>
+                    </button>
+                </td>
+               
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  
+<app-permit-locations-side-bar *ngIf="show" (closePopup)="closePopup($event)" [show]="show" [locations]="locations"></app-permit-locations-side-bar>
+  <alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

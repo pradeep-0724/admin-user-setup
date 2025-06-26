@@ -1,0 +1,42 @@
+.readonlyStyles input:read-only{
+  background: rgba(13,114,229,0.05);
+  opacity: 0.9;
+}
+label{
+  font-weight: 700;
+  color: #45505b;
+}
+.showInvalid {
+  border: 1px solid red !important;
+
+}
+
+.input-border {
+  border: 1px solid #bcc7d1;
+  padding: 9px;
+}
+
+.width-20 {
+  max-width: 20%;
+  padding: 1%;
+
+  input {
+    margin: 10px 0 5px 0;
+  }
+
+  @media (max-width:800px) {
+   width: 100%;
+    max-width: 47%;
+    padding: 10px 5px;
+
+  }
+
+  @media (max-width:480px) {
+
+
+
+    .justify-content-center {
+      justify-content: flex-start !important;
+    }
+  }
+}

@@ -1,0 +1,11 @@
+<div class="text-center pd-20">
+  <google-map height="400px" *ngIf="markerPositions.length>0" width="100%" [zoom]="zoom" [center]="center">
+    <map-marker *ngFor="let markerPosition of markerPositions" [position]="markerPosition"
+      [options]="markerOptions"></map-marker>
+      <map-polyline [options]="pathOptions" [path]="pathPositions"></map-polyline>
+  </google-map>
+
+  <div class="alert alert-warning" role="alert" *ngIf="markerPositions.length==0">
+    Driver location data is currently unavailable. If you have GPS tracking enabled and still unable to see it, please contact your admin.
+  </div>
+</div>

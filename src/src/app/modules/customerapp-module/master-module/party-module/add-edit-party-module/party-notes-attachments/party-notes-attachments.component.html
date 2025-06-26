@@ -1,0 +1,15 @@
+<div class="form-body notes" [formGroup]="others">
+    <div class="row  pt-4 px-4 mx-0" >
+        <div class="col-lg-3 col-md-6 ">
+            <div class="input-wrap mb-0">
+                <label for="">Note</label>
+                <input type="text" class="no-style input--bd" placeholder="Comments" value="" formControlName="notes">
+            </div>
+        </div>
+    </div>
+    <div>
+        <app-generic-custom-fields [apiUrl]="apiUrl" [screen]="'Party'" [routeToSettings]="routeToSettings" [isEdit]="isEdit"  [editData]="customFieldData" [parentForm]="others"
+        [isFormValid]="isOtherDetailsValid"></app-generic-custom-fields>
+    </div>
+    <!-- (customFieldForm)="customFieldForm($event)" -->
+</div>

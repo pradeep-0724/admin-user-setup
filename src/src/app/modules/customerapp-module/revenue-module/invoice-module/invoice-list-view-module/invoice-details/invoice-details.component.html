@@ -1,0 +1,47 @@
+<div id="pdf-viewer-height">
+<div class="right-section__header pd-20-30 mb-0 pdf-viewer-header" *ngIf="invoiceData">
+    <h1 class="heading">Invoice</h1>
+    <div class="header-actions">
+        <mat-checkbox  color="primary" class="checkbox-style" [checked]="excludeAnnexure"
+        (change)="excludeAnnexure = !excludeAnnexure">Exclude Annexure</mat-checkbox>
+       <div class="tabIndexActive"><button class="btn--action material-icons py-0" *ngxPermissionsOnly="invoicePermissions[1]" [routerLink]="[preFixUrl+'/income/invoice/edit', invoiceData.id]"> edit </button></div>
+
+        <div class="dropdown-menu-details v-align">
+         <div class="tabIndexActive"><button class="btn--action mg-left-10 material-icons h-auto py-2" (click)="showEmailOptions = !showEmailOptions"> email </button></div>
+          <div class="dropdown-menu-details__menu tabIndexActive" [ngClass]="{show: showEmailOptions}" *ngIf="showEmailOptions">
+              <button _ngcontent-c1="" class="dropdown-menu-details__item w-100 text-start" [ngClass]="{'active': createCopySeleted==0}"
+                  (click)="createCopySelect(0);  downloadForEmailPdf(invoiceData);">Invoice Only</button>
+              <button _ngcontent-c1="" class="dropdown-menu-details__item w-100 text-start" [ngClass]="{'active': createCopySeleted==1}"
+                  (click)="createCopySelect(1);  downloadForEmailPdf(invoiceData);">Invoice With attachments</button>
+          </div>
+      </div>
+        <div class="dropdown-menu-details v-align">
+          <div class="tabIndexActive"> <button class="btn--action mg-left-10 material-icons h-auto py-2" (click)="showOptions = !showOptions"> cloud_download  </button>
+            <div class="dropdown-menu-details__menu tabIndexActive" [ngClass]="{show: showOptions}" *ngIf="showOptions">
+                <button _ngcontent-c1="" class="dropdown-menu-details__item w-100 text-start" [ngClass]="{'active': createCopySeleted==0}"
+                    (click)="createCopySelect(0); downloadPdf(invoiceData);">Invoice Only</button>
+                <button _ngcontent-c1="" class="dropdown-menu-details__item w-100 text-start" [ngClass]="{'active': createCopySeleted==1}"
+                    (click)="createCopySelect(1); downloadPdf(invoiceData);">Invoice With attachments</button>
+            </div>
+        </div>
+    </div>
+    <button class="btn--action   mg-left-10 h-auto  " (click)="openDetails()" *ngIf="routeToDetail"><i class="material-icons">close</i></button>
+
+</div>
+</div>
+<div class="w-100">
+<app-comment [commentData]="commentData" *ngIf="isGotComment"></app-comment>
+</div>
+
+    <pdf-viewer [src]="pdfSrc"
+    [render-text]="true"
+    [stick-to-page]="true"
+    [autoresize]="true"
+    [original-size]="false"
+    [show-all]="true">
+</pdf-viewer>
+</div>
+
+
+<app-add-email *ngIf="isOpen"  (closeDialog)="closeDialog($event)" [filebyteCode]="filebyteCode"></app-add-email>
+

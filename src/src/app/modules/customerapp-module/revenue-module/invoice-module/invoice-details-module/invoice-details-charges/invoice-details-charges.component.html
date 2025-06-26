@@ -1,0 +1,892 @@
+<div class="charges-wrap">
+<ng-container *ngIf="vehicleFreight?.entries?.length == 0 && cargoFreight?.entries?.length == 0 && containerFreight?.entries?.length == 0 && craneRentalCharges?.timesheets.length==0 && awpRentalCharges?.timesheets.length==0 && additionalCharges.length == 0 && chargesList.length == 0 && marketvehicleFreight?.entries.length==0 && cargoMarketFreight?.entries.length==0 && containerMarketFreight?.entries.length==0">
+    <div class="border-0">
+      <div class="bg-white">
+        <div class="no-list-data-wrap">
+          <figure>
+            <img src="assets/img/no-content.png" alt="">
+          </figure>
+          <h5 class="mt-3 primary-brand-text">No data found!</h5>
+        </div>
+      </div>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="vehicleFreight?.entries?.length != 0">
+  <div class="toggle-collapse py-3 row mx-0 line-height-normal def-color align-items-center" type="button"
+    data-bs-toggle="collapse" data-bs-target="#vehicle-freight" aria-expanded="false" aria-controls="vehicle-freight">
+    <div class="col-lg-3 col-md-6 fw-semibold"><span class="material-icons arrow def-color me-3">
+        chevron_right
+      </span>Vehicle Freight</div>
+  
+    <div class="col-lg-2 col-md-6">
+      <b class="me-2">Entry:</b>
+      {{vehicleFreight?.no}}
+    </div>
+    <div class="col-lg col-md-6">
+      <b class="me-2">Total Sales Amount:</b>
+      {{ currency_type?.symbol}} {{vehicleFreight?.sales_total| numberFormat}} 
+  
+    </div>
+    <div class="col-lg col-md-6">
+      <b class="me-2">Total Purchase Amount: - </b>
+    </div>
+    <div class="col-lg col-md-6">
+      <b class="me-2">Net Margin: - </b>
+  
+    </div>
+  
+  
+  </div>
+  <div class="collapse show" id="vehicle-freight">
+    <div class="custom-table-container ws-nowrap ">
+      <table>
+        <thead>
+          <tr>
+            <th>JOB NO.</th>
+            <th>SALES AMOUNT ({{ currency_type?.symbol}})</th>
+            <th *ngIf="isTax">TAX (%)</th>
+            <th *ngIf="isTax">TAX AMOUNT ({{ currency_type?.symbol}})</th>
+            <th class="ws-nowrap">SALES DATE</th>
+            <th>VEHICLE NO.</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="vehicleFreight?.entries.length==0">
+          <tr class="border-0">
+            <td class="bg-white" colspan="30">
+              <div class="no-list-data-wrap">
+                <figure>
+                  <img src="assets/img/no-content.png" alt="">
+                </figure>
+                <h5 class="mt-3 primary-brand-text">No data found!</h5>
+              </div>
+            </td>
+          </tr>
+  
+        </tbody>
+  
+        <tbody>
+          <tr *ngFor="let data  of vehicleFreight?.entries">
+            <td class="ws-nowrap"><a class="custom-link" [routerLink]="[prefixUrl+'/trip/new-trip/details/'+data?.id]" target="_blank">{{data?.trip_id}}</a>
+            </td> 
+            <td>{{data?.total | numberFormat}}</td>
+            <td *ngIf="isTax">{{data?.tax_percent}}</td>
+            <td *ngIf="isTax">{{data?.tax_amount| numberFormat}}</td>
+            <td>{{data?.date}}</td>
+            <td >
+              <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/vehicle/'+ (data?.vehicle?.is_market ? 'market': 'own') + '/details',data?.vehicle?.id]" target="_blank"> {{data?.vehicle?.number ? data?.vehicle.number : '-'}} </a>
+             </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+  </div>
+  <div class="p-1 shadow-inset-top-bottom separator" ></div>
+  </ng-container>
+
+
+<ng-container *ngIf="cargoFreight?.entries?.length != 0">
+  <div class="toggle-collapse py-3 row mx-0 line-height-normal def-color align-items-center" type="button" [ngClass]="{'collapsed':vehicleFreight?.entries?.length != 0}"
+    data-bs-toggle="collapse" data-bs-target="#cargo-freight" aria-expanded="false" aria-controls="cargo-freight">
+    <div class="col-lg-3 col-md-6 fw-semibold"><span class="material-icons arrow def-color me-3">
+        chevron_right
+      </span>Loose Cargo Freight</div>
+  
+    <div class="col-lg-2 col-md-6">
+      <b class="me-2">Entry:</b>
+      {{cargoFreight?.no}}
+    </div>
+    <div class="col-lg col-md-6">
+      <b class="me-2">Total Sales Amount:</b>
+      {{ currency_type?.symbol}} {{cargoFreight?.sales_total| numberFormat}} 
+  
+    </div>
+    <div class="col-lg col-md-6">
+      <b class="me-2">Total Purchase Amount: - </b>
+    </div>
+    <div class="col-lg col-md-6">
+      <b class="me-2">Net Margin: - </b>
+  
+    </div>
+  
+  
+  </div>
+  <div class="collapse " [ngClass]="{'show':vehicleFreight?.entries?.length == 0}" id="cargo-freight">
+    <div class="custom-table-container ws-nowrap ">
+      <table>
+        <thead>
+          <tr>
+            <th>JOB NO.</th>
+            <th>SALES AMOUNT ({{ currency_type?.symbol}})</th>
+            <th *ngIf="isTax">TAX (%)</th>
+            <th *ngIf="isTax">TAX AMOUNT ({{ currency_type?.symbol}})</th>
+            <th class="ws-nowrap">SALES DATE</th>
+            <th>VEHICLE NO.</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="cargoFreight?.entries.length==0">
+          <tr class="border-0">
+            <td class="bg-white" colspan="30">
+              <div class="no-list-data-wrap">
+                <figure>
+                  <img src="assets/img/no-content.png" alt="">
+                </figure>
+                <h5 class="mt-3 primary-brand-text">No data found!</h5>
+              </div>
+            </td>
+          </tr>
+  
+        </tbody>
+  
+        <tbody>
+          <tr *ngFor="let data  of cargoFreight?.entries">
+            <td class="ws-nowrap"><a class="custom-link" [routerLink]="[prefixUrl+'/trip/new-trip/details/'+data?.id]" target="_blank">{{data?.trip_id}}</a>
+            </td> 
+            <td>{{data?.total| numberFormat}}</td>
+            <td *ngIf="isTax">{{data?.tax_percent}}</td>
+            <td *ngIf="isTax">{{data?.tax_amount| numberFormat}}</td>
+            <td>{{data?.date}}</td>
+            <td >
+              <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/vehicle/'+ (data?.vehicle?.is_market ? 'market': 'own') + '/details',data?.vehicle?.id]" target="_blank"> {{data?.vehicle?.number ? data?.vehicle.number : '-'}} </a>
+             </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+  </div>
+  <div class="p-1 shadow-inset-top-bottom separator" ></div>
+  </ng-container>
+
+  <ng-container *ngIf="containerFreight?.entries?.length != 0">
+  <div class="toggle-collapse py-3 row mx-0 line-height-normal def-color align-items-center" type="button" [ngClass]="{'collapsed':vehicleFreight?.entries?.length != 0 || cargoFreight?.entries?.length != 0}"
+    data-bs-toggle="collapse" data-bs-target="#container-freight" aria-expanded="false" aria-controls="container-freight">
+    <div class="col-lg-3 col-md-6 fw-semibold"><span class="material-icons arrow def-color me-3">
+        chevron_right
+      </span>Container Freight</div>
+  
+    <div class="col-lg-2 col-md-6">
+      <b class="me-2">Entry:</b>
+      {{containerFreight?.no}}
+    </div>
+    <div class="col-lg col-md-6">
+      <b class="me-2">Total Sales Amount:</b>
+      {{ currency_type?.symbol}} {{containerFreight?.sales_total| numberFormat}} 
+  
+    </div>
+    <div class="col-lg col-md-6">
+      <b class="me-2">Total Purchase Amount: - </b>
+    </div>
+    <div class="col-lg col-md-6">
+      <b class="me-2">Net Margin: - </b>
+  
+    </div>
+  
+  
+  </div>
+  <div class="collapse" [ngClass]="{'show':vehicleFreight?.entries?.length == 0 && cargoFreight?.entries?.length == 0}" id="container-freight">
+    <div class="custom-table-container ws-nowrap ">
+      <table>
+        <thead>
+          <tr>
+            <th>JOB NO.</th>
+            <th>Container No.' s</th>
+            <th>SALES AMOUNT ({{ currency_type?.symbol}})</th>
+            <th *ngIf="isTax">TAX (%)</th>
+            <th *ngIf="isTax">TAX AMOUNT ({{ currency_type?.symbol}})</th>
+            <th class="ws-nowrap">Job Date</th>
+            <th>VEHICLE NO.</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="containerFreight?.entries.length==0">
+          <tr class="border-0">
+            <td class="bg-white" colspan="30">
+              <div class="no-list-data-wrap">
+                <figure>
+                  <img src="assets/img/no-content.png" alt="">
+                </figure>
+                <h5 class="mt-3 primary-brand-text">No data found!</h5>
+              </div>
+            </td>
+          </tr>
+  
+        </tbody>
+  
+        <tbody>
+          <tr *ngFor="let data  of containerFreight?.entries">
+            <td class="ws-nowrap"><a class="custom-link" [routerLink]="[prefixUrl+'/trip/new-trip/details/'+data?.id]" target="_blank">{{data?.trip_id}}</a>
+            </td> 
+            <td class="td-2l">
+              <div *ngIf="data.containers_no.length" class="text-2l">
+                <span *ngFor="let c of data.containers_no;let i=index">
+                  {{c==''?'-':i!=data.containers_no.length-1? c + ', ':c}}
+                </span>
+
+              </div>
+              <span  *ngIf="!data.containers_no.length">-</span>
+            </td>
+            <td>{{data?.total| numberFormat}}</td>
+            <td *ngIf="isTax">{{data?.tax_percent}}</td>
+            <td *ngIf="isTax">{{data?.tax_amount| numberFormat}}</td>
+            <td>{{data?.date}}</td>
+            <td >
+              <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/vehicle/'+ (data?.vehicle?.is_market ? 'market': 'own') + '/details',data?.vehicle?.id]" target="_blank"> {{data?.vehicle?.number ? data?.vehicle.number : '-'}} </a>
+             </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+  </div>
+  <div class="p-1 shadow-inset-top-bottom separator" ></div>
+  </ng-container>
+
+
+<ng-container *ngIf="craneRentalCharges?.timesheets.length" >
+  <div class="toggle-collapse collapsed py-3 row mx-0 line-height-normal def-color align-items-center" type="button"
+  data-bs-toggle="collapse" data-bs-target="#crane-rental-charges" aria-expanded="false" aria-controls="crane-rental-charges">
+  <div class="col-lg-3 col-md-6 fw-semibold"><span class="material-icons arrow def-color me-3">
+      chevron_right
+    </span>Crane Rentals</div>
+
+  <div class="col-lg-2 col-md-6">
+    <b class="me-2">Entry:</b>
+    {{craneRentalCharges?.no}}
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Billing Amount:</b>
+    {{ currency_type?.symbol}} {{craneRentalCharges?.billing_amount| numberFormat}} 
+
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Extra Amount:</b>
+    {{ currency_type?.symbol}} {{craneRentalCharges?.extra_amount| numberFormat}}
+  </div>
+  <div class="col-lg col-md-6"></div>
+ 
+
+
+</div>
+<div class="collapse " id="crane-rental-charges">
+  <div class="addable-row-table ws-nowrap m-1 mt-0">
+    <table>
+      <thead>
+        <tr>
+          <th rowspan="2" class="border-start-0" >
+            Sales Order No.
+          </th>
+          <th  rowspan="2">JOB NO. </th>
+          <th  rowspan="2">JOB Date. </th>
+          <th rowspan="2">VEHICLE NO.</th>
+          <th rowspan="2">Timesheet No.</th>
+          <th colspan="3" class="text-center">Billing Amount ({{currency_type.symbol}})</th>
+          <th colspan="3" class="text-center">Extra Amount ({{currency_type.symbol}})</th>
+          <th rowspan="2" *ngIf="isTax">Tax%</th>
+          <th rowspan="2" *ngIf="isTax">Tax Amount ({{currency_type.symbol}})</th>
+          
+
+      </tr>
+      <tr>
+       
+        <th>Unit</th>
+        <th>Rate per Unit ({{currency_type.symbol}})</th>
+        <th>Amount ({{currency_type.symbol}})</th>
+        <th>Unit</th>
+        <th>Rate per Unit ({{currency_type.symbol}})</th>
+        <th>Amount ({{currency_type.symbol}})</th>  
+      </tr>
+      </thead>
+      <tbody *ngIf="craneRentalCharges?.timesheets.length==0">
+        <tr class="border-0">
+          <td class="bg-white" colspan="30">
+            <div class="no-list-data-wrap">
+              <figure>
+                <img src="assets/img/no-content.png" alt="">
+              </figure>
+              <h5 class="mt-3 primary-brand-text">No data found!</h5>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+
+      <tbody>
+        <tr  *ngFor="let data  of craneRentalCharges?.timesheets;let i = index " >
+
+          <td class="py-3">{{data.workorder_no ?data.workorder_no:'-'}}</td>
+          <td class="ws-nowrap"><a class="custom-link" [routerLink]="[prefixUrl+'/trip/new-trip/details/'+data?.id]" target="_blank">{{data?.trip_id}}</a>
+          </td> 
+          <td>{{data?.date }}</td>
+          <td >
+            <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/vehicle/'+ (data?.vehicle?.is_market ? 'market': 'own') + '/details',data?.vehicle?.id]" target="_blank"> {{data?.vehicle?.number ? data?.vehicle.number : '-'}} </a>
+           </td>
+          <td>{{data?.timesheet_no ?data?.timesheet_no:'-'}}</td>
+          
+          <td>{{data?.billing_hours }}</td>
+          <td>{{data?.billing_rate| numberFormat }}</td>
+          <td>{{data?.billing_amount| numberFormat }}</td>
+          <td>{{data?.extra_hours }}</td>
+          <td>{{data?.extra_rate | numberFormat}}</td>
+          <td>{{data?.extra_amount| numberFormat }}</td>
+          <td *ngIf="isTax">{{data?.tax }}</td>
+          <td *ngIf="isTax">{{data?.tax_amount | numberFormat}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<div class="p-1 shadow-inset-top-bottom separator" ></div>
+</ng-container>
+
+<ng-container *ngIf="awpRentalCharges?.timesheets.length" >
+  <div class="toggle-collapse collapsed py-3 row mx-0 line-height-normal def-color align-items-center" type="button"
+  data-bs-toggle="collapse" data-bs-target="#awp-rental-charges" aria-expanded="false" aria-controls="awp-rental-charges">
+  <div class="col-lg-3 col-md-6 fw-semibold"><span class="material-icons arrow def-color me-3">
+      chevron_right
+    </span>AWP Rentals</div>
+
+  <div class="col-lg-2 col-md-6">
+    <b class="me-2">Entry:</b>
+    {{awpRentalCharges?.no}}
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Billing Amount:</b>
+    {{ currency_type?.symbol}} {{awpRentalCharges?.billing_amount| numberFormat}} 
+
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Extra Amount:</b>
+    {{ currency_type?.symbol}} {{awpRentalCharges?.extra_amount| numberFormat}}
+  </div>
+  <div class="col-lg col-md-6"></div>
+ 
+
+
+</div>
+<div class="collapse " id="awp-rental-charges">
+  <div class="addable-row-table ws-nowra m-1 mt-0">
+    <table>
+      <thead>
+        <tr>
+          <th rowspan="2" class="border-start-0" >
+            Sales Order No.
+          </th>
+          <th  rowspan="2">JOB NO. </th>
+          <th  rowspan="2">JOB Date. </th>
+          <th rowspan="2">VEHICLE NO.</th>
+          <th rowspan="2">Timesheet No.</th>
+          <th colspan="3" class="text-center">Billing Amount ({{currency_type.symbol}})</th>
+          <th colspan="3" class="text-center">Extra Amount ({{currency_type.symbol}})</th>
+          <th rowspan="2" *ngIf="isTax">Tax%</th>
+          <th rowspan="2" *ngIf="isTax">Tax Amount ({{currency_type.symbol}})</th>
+      </tr>
+      <tr>
+       
+        <th>Unit</th>
+        <th>Rate per Unit ({{currency_type.symbol}})</th>
+        <th>Amount ({{currency_type.symbol}})</th>
+        <th>Unit</th>
+        <th>Rate per Unit ({{currency_type.symbol}})</th>
+        <th>Amount ({{currency_type.symbol}})</th>  
+      </tr>
+      </thead>
+      <tbody *ngIf="awpRentalCharges?.timesheets.length==0">
+        <tr class="border-0">
+          <td class="bg-white" colspan="30">
+            <div class="no-list-data-wrap">
+              <figure>
+                <img src="assets/img/no-content.png" alt="">
+              </figure>
+              <h5 class="mt-3 primary-brand-text">No data found!</h5>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+
+      <tbody>
+        <tr  *ngFor="let data  of awpRentalCharges?.timesheets;let i = index " >
+
+          <td class="py-3">{{data.workorder_no ?data.workorder_no:'-'}}</td>
+          <td class="ws-nowrap"><a class="custom-link" [routerLink]="[prefixUrl+'/trip/new-trip/details/'+data?.id]" target="_blank">{{data?.trip_id}}</a>
+          </td> 
+          <td>{{data?.date }}</td>
+          <td >
+            <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/vehicle/'+ (data?.vehicle?.is_market ? 'market': 'own') + '/details',data?.vehicle?.id]" target="_blank"> {{data?.vehicle?.number ? data?.vehicle.number : '-'}} </a>
+           </td>
+          <td>{{data?.timesheet_no ?data?.timesheet_no:'-'}}</td>
+          
+          <td>{{data?.billing_hours| numberFormat }}</td>
+          <td>{{data?.billing_rate | numberFormat}}</td>
+          <td>{{data?.billing_amount| numberFormat }}</td>
+          <td>{{data?.extra_hours | numberFormat}}</td>
+          <td>{{data?.extra_rate | numberFormat}}</td>
+          <td>{{data?.extra_amount| numberFormat }}</td>
+          <td *ngIf="isTax">{{data?.tax }}</td>
+          <td *ngIf="isTax">{{data?.tax_amount | numberFormat}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<div class="p-1 shadow-inset-top-bottom separator" ></div>
+</ng-container>
+
+
+<ng-container *ngFor="let charges of additionalCharges;let i=index" >
+
+  <div class="toggle-collapse collapsed py-3 row mx-0 line-height-normal def-color align-items-center" type="button"
+  data-bs-toggle="collapse" [attr.data-bs-target]="'#additional-charge-'+i" aria-expanded="false" [attr.aria-controls]="'additional-charge-'+i">
+  <div class="col-lg-3 col-md-6 fw-semibold"><span class="material-icons arrow def-color me-3">
+      chevron_right
+    </span>{{charges?.name}}</div>
+
+  <div class="col-lg-2 col-md-6">
+    <b class="me-2">Entry:</b>
+    {{charges?.no}}
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Sales Amount:</b>
+    {{ currency_type?.symbol}}  {{charges?.sales_amount| numberFormat}}
+
+  </div>
+
+
+
+</div>
+<div class="collapse " id="additional-charge-{{i}}">
+  <div class="custom-table-container ws-nowrap ">
+    <table>
+      <thead>
+        <tr>
+          <th>Sales Order No.</th>
+          <th>Sales Order Date</th>
+          <th>Unit of Measurement	</th>
+          <th>Units</th>
+          <th>Rate Per Unit ({{ currency_type?.symbol}})</th>
+          <th>AMOUNT  ({{ currency_type?.symbol}})</th>
+          <!-- <th>Discount</th> -->
+          <th *ngIf="isTax">TAX (%)</th>
+          <th *ngIf="isTax">TAX AMOUNT ({{ currency_type?.symbol}})</th>
+         <th>Sub Total</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="charges?.entries.length==0">
+        <tr class="border-0">
+          <td class="bg-white" colspan="30">
+            <div class="no-list-data-wrap">
+              <figure>
+                <img src="assets/img/no-content.png" alt="">
+              </figure>
+              <h5 class="mt-3 primary-brand-text">No data found!</h5>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+
+      <tbody>
+        <tr *ngFor="let data  of charges?.entries">
+          <td>{{data?.workorder_no}}</td>
+          <td>{{data?.date}}</td>
+          <td >{{data?.units}}</td>
+          <td >{{data?.quantity| numberFormat}}</td>
+          <td >{{data?.unit_cost| numberFormat}}</td>
+          <td>{{data?.amount_before_tax| numberFormat}}</td>
+          <!-- <td>{{data?.discount}}</td> -->
+          <td *ngIf="isTax">{{data?.tax}}</td>
+          <td *ngIf="isTax">{{data?.tax_amount| numberFormat}}</td>
+          <td >{{data?.amount| numberFormat}}</td>
+          
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<div class="p-1 shadow-inset-top-bottom separator" ></div>
+</ng-container>
+
+
+
+<ng-container *ngFor="let charges of chargesList;let i=index" >
+
+  <div class="toggle-collapse collapsed py-3 row mx-0 line-height-normal def-color align-items-center" type="button"
+  data-bs-toggle="collapse" [attr.data-bs-target]="'#charge-'+i" aria-expanded="false" [attr.aria-controls]="'charge-'+i">
+  <div class="col-lg-3 col-md-6 fw-semibold"><span class="material-icons arrow def-color me-3">
+      chevron_right
+    </span>{{charges?.name}}</div>
+
+  <div class="col-lg-2 col-md-6">
+    <b class="me-2">Entry:</b>
+    {{charges?.no}}
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Sales Amount:</b>
+    {{ currency_type?.symbol}}  {{charges?.sales_amount| numberFormat}}
+
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Purchase Amount:</b>
+    {{ currency_type?.symbol}} {{charges?.purchase_amount| numberFormat}} 
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Net Margin:</b>
+    {{ currency_type?.symbol}} {{charges?.net_margin| numberFormat}} 
+
+  </div>
+
+
+</div>
+<div class="collapse " id="charge-{{i}}">
+  <div class="custom-table-container ws-nowrap ">
+    <table>
+      <thead>
+        <tr>
+          <th>JOB NO.</th>
+          <th>SALES AMOUNT  ({{ currency_type?.symbol}})</th>
+          <th *ngIf="isTax">TAX (%)</th>
+          <th *ngIf="isTax">TAX AMOUNT ({{ currency_type?.symbol}})</th>
+          <th  >SALES DATE</th>
+          <th>VEHICLE NO.</th>
+          <th>PURCHASE AMOUNT ({{ currency_type?.symbol}})</th>
+          <th *ngIf="isTax">TAX (%)</th>
+          <th *ngIf="isTax">TAX AMOUNT ({{ currency_type?.symbol}})</th>
+          <th >PURCHASE DATE</th>
+          <th  >VENDOR NAME</th>
+          <th>NET MARGIN </th>
+        </tr>
+      </thead>
+      <tbody *ngIf="charges?.entries.length==0">
+        <tr class="border-0">
+          <td class="bg-white" colspan="30">
+            <div class="no-list-data-wrap">
+              <figure>
+                <img src="assets/img/no-content.png" alt="">
+              </figure>
+              <h5 class="mt-3 primary-brand-text">No data found!</h5>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+
+      <tbody>
+        <tr *ngFor="let data  of charges?.entries">
+          <td class="ws-nowrap"><a class="custom-link" [routerLink]="[prefixUrl+'/trip/new-trip/details/'+data?.id]" target="_blank">{{data?.trip_id}}</a>
+          </td> 
+          <td>{{data?.sales_amount}}</td>
+          <td *ngIf="isTax">{{data?.sales_tax_percent}}</td>
+          <td *ngIf="isTax">{{data?.sales_tax_amount| numberFormat}}</td>
+          <td class="ws-nowrap">{{data?.sales_date}}</td>
+          <td >
+            <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/vehicle/'+ (data?.vehicle?.is_market ? 'market': 'own') + '/details',data?.vehicle?.id]" target="_blank"> {{data?.vehicle?.number ? data?.vehicle.number : '-'}} </a>
+           </td>
+          <td>{{data?.purchase_amount| numberFormat}}</td>
+          <td *ngIf="isTax">{{data?.purchase_tax_percent}}</td>
+          <td *ngIf="isTax">{{data?.purchase_tax_amount| numberFormat}}</td>
+          <td class="ws-nowrap">{{data?.purchase_date}}</td>
+          <td class="ws-nowrap">
+            <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/party/details/vendor',data?.vendor?.id]" target="_blank"> {{data?.vendor?.name ?data?.vendor.name:'-'}} </a>
+           </td>
+          <td>{{data?.net_margin| numberFormat}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<div class="p-1 shadow-inset-top-bottom separator" ></div>
+</ng-container>
+
+<ng-container *ngIf="marketvehicleFreight?.entries.length" >
+  <div class="toggle-collapse collapsed py-3 row mx-0 line-height-normal def-color align-items-center" type="button"
+  data-bs-toggle="collapse" data-bs-target="#market-vehicle-freight" aria-expanded="false" aria-controls="market-vehicle-freight">
+  <div class="col-lg-3 col-md-6 fw-semibold"><span class="material-icons arrow def-color me-3">
+      chevron_right
+    </span>Market Vehicle Freight</div>
+
+  <div class="col-lg-2 col-md-6">
+    <b class="me-2">Entry:</b>
+    {{marketvehicleFreight?.no}}
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Sales Amount:</b>
+    {{ currency_type?.symbol}} {{marketvehicleFreight?.sales_total| numberFormat}} 
+
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Purchase Amount:</b>
+    {{ currency_type?.symbol}} {{marketvehicleFreight?.purchase_total| numberFormat}}
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Net Margin:</b>
+    {{ currency_type?.symbol}} {{marketvehicleFreight?.net_margin| numberFormat}} 
+
+  </div>
+
+
+</div>
+<div class="collapse " id="market-vehicle-freight">
+  <div class="custom-table-container ws-nowrap ">
+    <table>
+      <thead>
+        <tr>
+          <th>JOB NO.</th>
+          <th>SALES AMOUNT ({{ currency_type?.symbol}})</th>
+          <th *ngIf="isTax">TAX (%)</th>
+          <th *ngIf="isTax">TAX AMOUNT ({{ currency_type?.symbol}})</th>
+          <th>SALES DATE</th>
+          <th>VEHICLE NO.</th>
+          <th>PURCHASE AMOUNT ({{ currency_type?.symbol}})</th>
+          <th *ngIf="isTax">TAX (%)</th>
+          <th *ngIf="isTax">TAX AMOUNT ({{ currency_type?.symbol}})</th>
+          <th>PURCHASE DATE</th>
+          <th>VENDOR NAME</th>
+          <th>NET MARGIN ({{ currency_type?.symbol}})</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="marketvehicleFreight?.entries.length==0">
+        <tr class="border-0">
+          <td class="bg-white" colspan="30">
+            <div class="no-list-data-wrap">
+              <figure>
+                <img src="assets/img/no-content.png" alt="">
+              </figure>
+              <h5 class="mt-3 primary-brand-text">No data found!</h5>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+
+      <tbody>
+        <tr *ngFor="let data  of marketvehicleFreight?.entries">
+          <td class="ws-nowrap"><a class="custom-link" [routerLink]="[prefixUrl+'/trip/new-trip/details/'+data?.id]" target="_blank">{{data?.trip_id}}</a>
+          </td> 
+          <td>{{data?.sales_total}}</td>
+          <td *ngIf="isTax">{{data?.sales_tax_percent}}</td>
+          <td *ngIf="isTax">{{data?.sales_tax_amount| numberFormat}}</td>
+          <td>{{data?.date}}</td>
+          <td >
+            <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/vehicle/'+ (data?.vehicle?.is_market ? 'market': 'own') + '/details',data?.vehicle?.id]" target="_blank"> {{data?.vehicle?.number ? data?.vehicle.number : '-'}} </a>
+           </td>
+          <td>{{data?.purchase_total| numberFormat}}</td>
+          <td *ngIf="isTax">{{data?.purchase_tax_percent}}</td>
+          <td *ngIf="isTax">{{data?.purchase_tax_amount| numberFormat}}</td>
+          <td>{{data?.date}}</td>
+          <td class="ws-nowrap">
+            <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/party/details/vendor',data?.vendor?.id]" target="_blank"> {{data?.vendor?.name ?data?.vendor.name:'-'}} </a>
+           </td>
+          <td>{{data?.net_margin| numberFormat}}</td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<div class="p-1 shadow-inset-top-bottom separator" ></div>
+</ng-container>
+
+<ng-container *ngIf="cargoMarketFreight?.entries.length" >
+  <div class="toggle-collapse collapsed py-3 row mx-0 line-height-normal def-color align-items-center" type="button"
+  data-bs-toggle="collapse" data-bs-target="#cargo-market-vehicle-freight" aria-expanded="false" aria-controls="cargo-market-vehicle-freight">
+  <div class="col-lg-3 col-md-6 fw-semibold"><span class="material-icons arrow def-color me-3">
+      chevron_right
+    </span>Loose Cargo Freight (Market)</div>
+
+  <div class="col-lg-2 col-md-6">
+    <b class="me-2">Entry:</b>
+    {{cargoMarketFreight?.no}}
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Sales Amount:</b>
+    {{ currency_type?.symbol}} {{cargoMarketFreight?.sales_total| numberFormat}} 
+
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Purchase Amount:</b>
+    {{ currency_type?.symbol}} {{cargoMarketFreight?.purchase_total| numberFormat}}
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Net Margin:</b>
+    {{ currency_type?.symbol}} {{cargoMarketFreight?.net_margin| numberFormat}} 
+
+  </div>
+
+
+</div>
+<div class="collapse " id="cargo-market-vehicle-freight">
+  <div class="custom-table-container ws-nowrap">
+    <table>
+      <thead>
+        <tr>
+          <th>JOB NO.</th>
+          <th>SALES AMOUNT ({{ currency_type?.symbol}})</th>
+          <th *ngIf="isTax">TAX (%)</th>
+          <th *ngIf="isTax">TAX AMOUNT ({{ currency_type?.symbol}})</th>
+          <th>SALES DATE</th>
+          <th>VEHICLE NO.</th>
+          <th>PURCHASE AMOUNT ({{ currency_type?.symbol}})</th>
+          <th *ngIf="isTax">TAX (%)</th>
+          <th *ngIf="isTax">TAX AMOUNT ({{ currency_type?.symbol}})</th>
+          <th>PURCHASE DATE</th>
+          <th>VENDOR NAME</th>
+          <th>NET MARGIN ({{ currency_type?.symbol}})</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="cargoMarketFreight?.entries.length==0">
+        <tr class="border-0">
+          <td class="bg-white" colspan="30">
+            <div class="no-list-data-wrap">
+              <figure>
+                <img src="assets/img/no-content.png" alt="">
+              </figure>
+              <h5 class="mt-3 primary-brand-text">No data found!</h5>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+
+      <tbody>
+        <tr *ngFor="let data  of cargoMarketFreight?.entries">
+          <td class="ws-nowrap"><a class="custom-link" [routerLink]="[prefixUrl+'/trip/new-trip/details/'+data?.id]" target="_blank">{{data?.trip_id}}</a>
+          </td> 
+          <td>{{data?.sales_total}}</td>
+          <td *ngIf="isTax">{{data?.sales_tax_percent}}</td>
+          <td *ngIf="isTax">{{data?.sales_tax_amount| numberFormat}}</td>
+          <td>{{data?.date}}</td>
+          <td >
+            <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/vehicle/'+ (data?.vehicle?.is_market ? 'market': 'own') + '/details',data?.vehicle?.id]" target="_blank"> {{data?.vehicle?.number ? data?.vehicle.number : '-'}} </a>
+           </td>
+          <td>{{data?.purchase_total| numberFormat}}</td>
+          <td *ngIf="isTax">{{data?.purchase_tax_percent}}</td>
+          <td *ngIf="isTax">{{data?.purchase_tax_amount| numberFormat}}</td>
+          <td>{{data?.date}}</td>
+          <td class="ws-nowrap">
+            <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/party/details/vendor',data?.vendor?.id]" target="_blank"> {{data?.vendor?.name ?data?.vendor.name:'-'}} </a>
+           </td>
+          <td>{{data?.net_margin| numberFormat}}</td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<div class="p-1 shadow-inset-top-bottom separator" ></div>
+
+
+
+</ng-container>
+
+<ng-container *ngIf="containerMarketFreight?.entries.length" >
+  <div class="toggle-collapse collapsed py-3 row mx-0 line-height-normal def-color align-items-center" type="button"
+  data-bs-toggle="collapse" data-bs-target="#container-market-vehicle-freight" aria-expanded="false" aria-controls="container-market-vehicle-freight">
+  <div class="col-lg-3 col-md-6 fw-semibold"><span class="material-icons arrow def-color me-3">
+      chevron_right
+    </span>Container Freight (Market)</div>
+
+  <div class="col-lg-2 col-md-6">
+    <b class="me-2">Entry:</b>
+    {{containerMarketFreight?.no}}
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Sales Amount:</b>
+    {{ currency_type?.symbol}} {{containerMarketFreight?.sales_total| numberFormat}} 
+
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Total Purchase Amount:</b>
+    {{ currency_type?.symbol}} {{containerMarketFreight?.purchase_total| numberFormat}}
+  </div>
+  <div class="col-lg col-md-6">
+    <b class="me-2">Net Margin:</b>
+    {{ currency_type?.symbol}} {{containerMarketFreight?.net_margin| numberFormat}} 
+
+  </div>
+
+
+</div>
+<div class="collapse " id="container-market-vehicle-freight">
+  <div class="custom-table-container ws-nowrap">
+    <table>
+      <thead>
+        <tr>
+          <th>JOB NO.</th>
+          <th>Container No.' s</th>
+          <th>SALES AMOUNT ({{ currency_type?.symbol}})</th>
+          <th *ngIf="isTax">TAX (%)</th>
+          <th *ngIf="isTax">TAX AMOUNT ({{ currency_type?.symbol}})</th>
+          <th>Job Date</th>
+          <th>VEHICLE NO.</th>
+          <th>PURCHASE AMOUNT ({{ currency_type?.symbol}})</th>
+          <th *ngIf="isTax">TAX (%)</th>
+          <th *ngIf="isTax">TAX AMOUNT ({{ currency_type?.symbol}})</th>
+          <th>PURCHASE DATE</th>
+          <th>VENDOR NAME</th>
+          <th>NET MARGIN ({{ currency_type?.symbol}})</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="containerMarketFreight?.entries.length==0">
+        <tr class="border-0">
+          <td class="bg-white" colspan="30">
+            <div class="no-list-data-wrap">
+              <figure>
+                <img src="assets/img/no-content.png" alt="">
+              </figure>
+              <h5 class="mt-3 primary-brand-text">No data found!</h5>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+
+      <tbody>
+        <tr *ngFor="let data  of containerMarketFreight?.entries">
+          <td class="ws-nowrap"><a class="custom-link" [routerLink]="[prefixUrl+'/trip/new-trip/details/'+data?.id]" target="_blank">{{data?.trip_id}}</a>
+          </td> 
+          <td class="td-2l">
+            <div *ngIf="data.containers_no.length" class="text-2l">
+              <span *ngFor="let c of data.containers_no;let i=index">
+                {{c==''?'-':i!=data.containers_no.length-1? c + ', ':c}}
+              </span>
+
+            </div>
+            <span  *ngIf="!data.containers_no.length">-</span>
+          </td>
+          <td>{{data?.sales_total}}</td>
+          <td *ngIf="isTax">{{data?.sales_tax_percent}}</td>
+          <td *ngIf="isTax">{{data?.sales_tax_amount| numberFormat}}</td>
+          <td>{{data?.date}}</td>
+          <td >
+            <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/vehicle/'+ (data?.vehicle?.is_market ? 'market': 'own') + '/details',data?.vehicle?.id]" target="_blank"> {{data?.vehicle?.number ? data?.vehicle.number : '-'}} </a>
+           </td>
+          <td>{{data?.purchase_total| numberFormat}}</td>
+          <td *ngIf="isTax">{{data?.purchase_tax_percent}}</td>
+          <td *ngIf="isTax">{{data?.purchase_tax_amount| numberFormat}}</td>
+          <td>{{data?.date}}</td>
+          <td class="ws-nowrap">
+            <a class="py-0 custom-link" [routerLink]="[prefixUrl+'/onboarding/party/details/vendor',data?.vendor?.id]" target="_blank"> {{data?.vendor?.name ?data?.vendor.name:'-' }} </a>
+           </td>
+          <td>{{data?.net_margin| numberFormat}}</td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<div class="p-1 shadow-inset-top-bottom separator" ></div>
+
+
+
+</ng-container>
+
+</div>
+

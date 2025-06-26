@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="22px" viewBox="0 0 18 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53 (72520) - https://sketchapp.com -->
+    <title>Group 8</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="0 0 17.279568 0 17.279568 21.599784 0 21.599784"></polygon>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon/sub-nav/active/invoices" transform="translate(-3.000000, -1.000000)">
+            <g id="Group-8" transform="translate(3.600000, 1.200000)">
+                <polygon id="Fill-1" fill="#D8DCEF" points="2.159568 2.159784 10.890288 2.159784 16.355088 7.353504 16.355088 20.200104 0.997488 20.200104"></polygon>
+                <polygon id="Fill-3" fill="#595FAB" points="7.81812 11.04732 9.4608 11.04732 9.4608 9.40464 7.81812 9.40464"></polygon>
+                <polygon id="Fill-4" fill="#595FAB" points="7.81812 17.07912 9.4608 17.07912 9.4608 12.15 7.81812 12.15"></polygon>
+                <g id="Group-7">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <g id="Clip-6"></g>
+                    <path d="M15.119568,19.439784 L2.159568,19.439784 L2.159568,2.159784 L9.719568,2.159784 L9.719568,7.559784 L15.119568,7.559784 L15.119568,19.439784 Z M10.799568,-0.000216 L2.159568,-0.000216 C0.971568,-0.000216 -0.000432,0.971784 -0.000432,2.159784 L-0.000432,19.439784 C-0.000432,20.627784 0.961848,21.599784 2.148768,21.599784 L15.119568,21.599784 C16.308648,21.599784 17.279568,20.627784 17.279568,19.439784 L17.279568,6.479784 L10.799568,-0.000216 Z" id="Fill-5" fill="#595FAB" mask="url(#mask-2)"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

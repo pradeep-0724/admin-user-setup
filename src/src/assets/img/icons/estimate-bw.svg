@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="22px" viewBox="0 0 18 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53 (72520) - https://sketchapp.com -->
+    <title>Group 8</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="0 0.000216 17.279784 0.000216 17.279784 21.6 0 21.6"></polygon>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon/sub-nav/estimate" transform="translate(-3.000000, -1.000000)">
+            <g id="Group-8" transform="translate(3.600000, 1.200000)">
+                <polygon id="Fill-1" fill="#EAEAEA" points="1.268568 1.511028 1.268568 20.488788 15.958728 20.488788 16.402608 6.982308 11.028528 6.637788 10.585728 1.017468"></polygon>
+                <g id="Group-5">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <g id="Clip-4"></g>
+                    <path d="M15.119784,19.440216 L2.159784,19.440216 L2.159784,2.160216 L9.719784,2.160216 L9.719784,7.560216 L15.119784,7.560216 L15.119784,19.440216 Z M10.799784,0.000216 L2.159784,0.000216 C0.971784,0.000216 -0.000216,0.972216 -0.000216,2.160216 L-0.000216,19.440216 C-0.000216,20.628216 0.962064,21.600216 2.148984,21.600216 L15.119784,21.600216 C16.308864,21.600216 17.279784,20.628216 17.279784,19.440216 L17.279784,6.480216 L10.799784,0.000216 Z" id="Fill-3" fill="#939BA4" mask="url(#mask-2)"></path>
+                </g>
+                <polygon id="Fill-6" fill="#939BA4" points="7.99956 15.029496 7.99956 13.354416 10.71036 13.354416 10.71036 11.771136 7.99956 11.771136 7.99956 10.406016 10.8648 10.406016 10.8648 8.813016 6.25968 8.813016 6.25968 16.625736 11.02032 16.625736 11.02032 15.029496"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

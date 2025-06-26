@@ -1,0 +1,36 @@
+<div class="parent-row">
+  <div class="flex-box mg-left-7">
+    <div class="name">
+      <span *ngIf="response.accounts?.length>0" class="mg-right-7">
+        <a class="plus-icon-sm" *ngIf="!response.show" (click)="response.show = !response.show"></a>
+        <a class="minus-icon-sm" *ngIf="response.show" (click)="response.show = !response.show"></a>
+      </span>
+      <span *ngIf="response.accounts?.length==0"></span>
+      <span [ngClass]="{'fw-600':response.show}">{{response.name}}</span></div>
+    <div *ngIf="!response.show" class="debit">
+      <span>{{ identifyAmountType(response?.sub_total) }}</span>&nbsp;
+      <span class="rupee-symbol rupee-symbol--sm"></span>{{ currency_type?.symbol}} {{returnAbsoluteNumber(response?.sub_total)}}</div>
+    <div *ngIf="response.show" class="debit">
+      <span>{{ identifyAmountType(response?.amount) }}</span>&nbsp;
+      <span
+          class="rupee-symbol rupee-symbol--sm"></span>{{ currency_type?.symbol}} {{returnAbsoluteNumber(response?.amount)}}</div>
+  </div>
+  <div class="nested-items" *ngIf="response.show">
+    <div *ngFor="let res of response | keyvalue; index as value; let i = index">
+      <div *ngIf="isArray(res)">
+        <div *ngFor="let item of res.value">
+          <tree [response]="item"></tree>
+        </div>
+        <div class="flex-box mg-left-10">
+          <div class="total fw-600">
+            Total for {{response.name}}
+          </div>
+          <div class="debit">
+            <span>{{ identifyAmountType(response?.sub_total) }}</span>&nbsp;
+            <span class="rupee-symbol rupee-symbol--sm"></span>
+            {{ currency_type?.symbol}} {{returnAbsoluteNumber(response?.sub_total)}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

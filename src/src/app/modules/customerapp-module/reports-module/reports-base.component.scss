@@ -1,0 +1,79 @@
+@import "../../../../assets/styles/helpers/variable.scss";
+@import "../../../../assets/styles/helpers/mixins.scss";
+@import "../../../../assets/styles/repeated/cost-card";
+
+.report-title{
+  white-space: nowrap;
+  color: $text-color;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.report-card{
+  box-shadow: 0px 1px 6px #0000001F;
+  height: 100%;
+  padding: 14px;
+  border-radius: 6px;
+  .report-des{
+    line-height: normal;
+    margin-top: 10px ;
+  }
+}
+
+.isTax{
+    display: none;
+}
+
+.report-heading {
+    display: flex;
+    align-items: center;
+    padding: 15px 0px;
+  }
+  
+  .report-heading i {
+    margin-right: 10px; 
+  }
+  .report-heading hr{
+    
+    margin-left: 10px;
+    flex-grow: 1;
+    size: 2px;
+  }
+ 
+  .icon {
+    background-size: contain;
+    width: 27px;
+    height: 18px;
+    background-repeat: no-repeat;
+    background-position: center;
+    &--vehicle{
+      background-image:url('/assets/img/icons/vehicles-bw.svg');
+    }
+    &--accountant{
+      background-image:url('/assets/img/icons/bank-bw.svg');
+    }
+    &--operations{
+      background-image: url('/assets/img/aside/work-order.svg');
+    }
+    &--revenue{
+      background-image: url('/assets/img/aside/payment-received.svg');
+
+    }
+    &--aging{
+      
+      background-image: url('/assets/img/icons/reports-bw.svg');
+
+    }
+    &--business{
+      filter: grayscale(1);
+      background-image: url('/assets/img/icons/business.svg');
+
+    }
+    &--others{
+      filter: grayscale(1);
+      background-image: url('/assets/img/icons/others.svg');
+
+    }
+  }
+  
+  

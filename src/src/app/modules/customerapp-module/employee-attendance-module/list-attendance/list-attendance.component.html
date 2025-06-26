@@ -1,0 +1,275 @@
+<div class="modal fade modal-scrollable" [ngClass]="{'show':isOpen}" id="exampleModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal--wd" role="document">
+    <div class="modal-content">
+      <div>
+        <div>
+          <button (click)="close()"  aria-label="Close" class="bth closebtn close">  <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div>
+          <div class="form-layout">
+            <h5>{{date|date}}</h5>
+            <div class="dropdown">
+              <ng-multiselect-dropdown
+              [placeholder]="'Select Designation'"
+              [data]="dropdownList"
+              [(ngModel)]="selectedItems"
+              [settings]="dropdownSettings"
+              (onSelect)="onItemSelect($event)"
+              (onSelectAll)="onSelectAll($event)"
+              (onDeSelectAll)="onDeSelectAll($event)"
+              (onDeSelect)="onItemDeSelect($event)"
+            >
+            </ng-multiselect-dropdown>
+            </div>
+            <div class="table-section">
+                <div class="table-header">
+                    <div class="row mx-0 align-items-center">
+                        <div class="col-6">
+                            <div class="table-header__left">
+                                <div class="mb-0" id="demo-2">
+                                    <input type="search" class="no-style search-bar input-search" placeholder="Search..."
+                                        [(ngModel)]="search">
+                                   <!--  <span class="border-anim"></span> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                          <div class="table-header__right align-left-lg justify-content-end mt-0">
+                              <div class="select-wrap">
+                                  <span class="show-text">Showing</span>
+                                  <select [(ngModel)]="filter_by" name="" class="no-style select--modify">
+                                      <option *ngFor="let num of filter" value="{{num.value}}">{{num.key}}</option>
+                                  </select>
+                              </div>
+
+                          </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="row present-absent-tabs">
+                  <div class="col-md-4">
+                    <h6 (click)="selectedTabs('')" [ngClass]="{'active':selectedTab==''}">Others({{remailningMarked.length}}) </h6>
+                  </div>
+                  <div class="col-md-4">
+                    <h6 (click)="selectedTabs('present')" [ngClass]="{'active':selectedTab=='present'}">Present({{presentMarked.length}}) </h6>
+                  </div>
+                  <div class="col-md-4">
+                    <h6 (click)="selectedTabs('absent')" [ngClass]="{'active':selectedTab=='absent'}">Absent({{absentMarked.length}}) </h6>
+                  </div>
+                </div>
+                  <div [ngSwitch]="selectedTab">
+
+                    <!-- others  -->
+
+                   <div *ngSwitchDefault>
+                    <div class="table-wrapper-list">
+                      <table class="table-container">
+                          <thead>
+                            <tr *ngIf="remailningMarked.length == 0">
+                              <td colspan="10" style="background-color: #fff">
+                                  <div class="no-content-wrapper">
+                                      <figure class="no-content-pic">
+                                          <img src="assets/img/no-content.png" alt="">
+                                      </figure>
+                                      <div class="no-content-txt">
+                                          <h5 class="heading">No data found!</h5>
+                                      </div>
+                                  </div>
+                              </td>
+                          </tr>
+                              <tr *ngIf="remailningMarked.length>0">
+                                  <th><input type="checkbox"  value=""
+                                    [(ngModel)]="selectallEmployee" (change)="selectallEmployees()"><span class="ms-2">Employee Name </span>
+                                  </th>
+
+                              </tr>
+                          </thead>
+                          <tbody>
+                            <tr  *ngFor="let data of othersMarked |attendenceSearchPipe:search| paginate: { itemsPerPage: filter_by, currentPage: p }; let i = index;">
+                              <td> <input type="checkbox"  value="{{data.id}}"
+                                [(ngModel)]="data.checked" (change)="itemSelectChange(othersMarked)" > <span class="ms-2"> {{data.name}}  </span> <span *ngIf="data?.driver_vehicle"> - {{data?.driver_vehicle}}</span> </td>
+                            </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  <div class="table-page-no"  *ngIf="remailningMarked.length>0">
+                  <pagination-controls previousLabel='' nextLabel="" directionLinks="true" class=" my-pagination"
+                        (pageChange)="p = $event" (pageBoundsCorrection)="p=$event">
+                   </pagination-controls>
+                  </div>
+                  <div class="row mx-0" *ngIf="remailningMarked.length>0">
+                    <div class="col-12" >
+                      <div class="d-inline">
+                        <p> Mark As:</p>
+                      </div>
+                      <div class="d-inline">
+                        <select [(ngModel)]="markedAS">
+                          <option value='-1'>
+                            Choose
+                          </option>
+                          <option value='Present'>
+                            Present
+                          </option>
+                          <option value='Absent'>
+                            Absent
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mx-0 pb-4" *ngIf="remailningMarked.length>0">
+                    <div class="col-6">
+                      <div class="d-inline" *ngIf="!selectallEmployee" id="mark-other-as" >
+                        <input [(ngModel)]="isMarkedother" (change)="onOtherMarkedChange()" type="checkbox" class="markotherCheckbox">
+                      </div>
+                      <div class="d-inline" *ngIf="!selectallEmployee" >
+                        <p> Mark other As : {{othersAreSelectedAs}}</p>
+                      </div>
+                    </div>
+                    <div class="col-6" *ngIf="remailningMarked.length>0">
+                      <button class="btn btn-primary mx-auto"  (click)="submit()">submit </button>
+                    </div>
+                    </div>
+                    </div>
+
+                           <!-- present -->
+
+                    <div *ngSwitchCase="present">
+                      <div class="table-wrapper-list">
+                        <table class="table-container">
+                            <thead>
+                              <tr *ngIf="presentMarked.length == 0">
+                                <td colspan="10" style="background-color: #fff">
+                                    <div class="no-content-wrapper">
+                                        <figure class="no-content-pic">
+                                            <img src="assets/img/no-content.png" alt="">
+                                        </figure>
+                                        <div class="no-content-txt">
+                                            <h5 class="heading">No data found!</h5>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                                <tr *ngIf="presentMarked.length>0">
+                                    <th><input type="checkbox"  value=""
+                                      [(ngModel)]="selectallEmployee" (change)="selectallEmployees()"><span>Employee Name </span>
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                              <tr  *ngFor="let data of othersMarked |attendenceSearchPipe:search| paginate: { itemsPerPage: filter_by, currentPage: p }; let i = index;">
+                                <td> <input type="checkbox"  value="{{data.id}}"
+                                  [(ngModel)]="data.checked"  (change)="itemSelectChange(othersMarked)"> <span> {{data.name}} </span>  <span *ngIf="data?.driver_vehicle"> - {{data?.driver_vehicle}}</span> </td>
+                              </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-page-no" *ngIf="presentMarked.length>0">
+                    <pagination-controls previousLabel='' nextLabel="" directionLinks="true" class=" my-pagination"
+                          (pageChange)="p = $event" (pageBoundsCorrection)="p=$event">
+                     </pagination-controls>
+                    </div>
+                    <div class="row" *ngIf="presentMarked.length>0">
+                      <div class="col-md-6">
+                        <div  class="d-inline">
+                        <p> Mark As:</p>
+                        </div>
+                        <div  class="d-inline">
+                          <select [(ngModel)]="markedAS">
+                            <option value='-1'>
+                              Choose
+                            </option>
+                            <option value='Remaining'>
+                              Others
+                            </option>
+                            <option value='Absent'>
+                              Absent
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <button class="btn btn-primary"  (click)="submit()">submit </button>
+                      </div>
+                      </div>
+                    </div>
+
+
+                   <!-- absent -->
+
+                    <div *ngSwitchCase="absent">
+                      <div class="table-wrapper-list">
+                        <table class="table-container">
+                            <thead>
+                              <tr *ngIf="absentMarked.length == 0">
+                                <td colspan="10" style="background-color: #fff">
+                                    <div class="no-content-wrapper">
+                                        <figure class="no-content-pic">
+                                            <img src="assets/img/no-content.png" alt="">
+                                        </figure>
+                                        <div class="no-content-txt">
+                                            <h5 class="heading">No data found!</h5>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                                <tr *ngIf="absentMarked.length>0">
+                                    <th><input type="checkbox"  value=""
+                                      [(ngModel)]="selectallEmployee" (change)="selectallEmployees()"> <span>Employee Name </span>
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                              <tr  *ngFor="let data of othersMarked |attendenceSearchPipe:search| paginate: { itemsPerPage: filter_by, currentPage: p }; let i = index;">
+                                <td> <input type="checkbox"  value="{{data.id}}"
+                                  [(ngModel)]="data.checked" (change)="itemSelectChange(othersMarked)" > <span> {{data.name}} </span>  <span *ngIf="data?.driver_vehicle"> - {{data?.driver_vehicle}}</span></td>
+                              </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-page-no" *ngIf="absentMarked.length>0">
+                    <pagination-controls previousLabel='' nextLabel="" directionLinks="true" class=" my-pagination"
+                          (pageChange)="p = $event" (pageBoundsCorrection)="p=$event">
+                     </pagination-controls>
+                    </div>
+                    <div class="row" *ngIf="absentMarked.length>0">
+                      <div class="col-md-6">
+                        <div  class="d-inline">
+                          <p> Mark As:</p>
+                        </div>
+                         <div  class="d-inline">
+                           <select [(ngModel)]="markedAS">
+                             <option value='-1'>
+                               Choose
+                             </option>
+                             <option value='Remaining'>
+                               Others
+                             </option>
+                             <option value='Present'>
+                               Present
+                             </option>
+                           </select>
+                         </div>
+                      </div>
+                      <div class="col-md-6">
+                        <button class="btn btn-primary"  (click)="submit()">submit </button>
+                      </div>
+                      </div>
+                    </div>
+
+                 <!-- switchend -->
+
+                  </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+</div>
+<div *ngIf="isOpen" class="modal-backdrop fade show"></div>

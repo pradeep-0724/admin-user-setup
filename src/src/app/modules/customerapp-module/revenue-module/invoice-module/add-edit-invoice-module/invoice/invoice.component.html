@@ -1,0 +1,1861 @@
+
+<form [formGroup]="addInvoiceForm">
+  <div class="alert-msg" *ngIf="apiError">
+    <span class="icon-wrap"></span>
+    <p class="message-cont">{{ apiError }}</p>
+  </div>
+  <div class="error-msg-list" *ngIf="globalFormErrorList.length > 0">
+    <p class="message-head">{{ errorHeaderMessage }}</p>
+    <span class="icon-wrap"></span>
+    <ul *ngFor="let error of globalFormErrorList">
+      <li class="message-cont">{{ error }}</li>
+    </ul>
+  </div>
+  <div class="form-layout  pt-4">
+    <div class="form-layout__card active">
+      <div class="form-body px-3 mb-0">
+        <div class="row mx-0 tabIndexActiveFields">
+          <div class="col-lg-3 col-sm-6">
+            <div class="input-wrap">
+              <label for="">Employee In Charge</label>
+              <material-dropdown [searchable]="true" [selectedOption]="initialValues.employee" [addable]="false"
+                class="dropDownWidth" [addBlank]="true">
+                <select #customSelect formControlName="employee" class="no-style select--modify" (change)="handleEmployeeChange()">
+                  <option *ngFor="let employee of employeeList" value="{{ employee.id }}">
+                    {{  employee.emp_name_id }} 
+                  </option>
+                </select>
+              </material-dropdown>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6" [ngClass]="{disableInput: invoiceId !=='null'}">
+            <div class="input-wrap error" [ngClass]="addErrorClass(addInvoiceForm.controls.invoice_number)">
+              <label for="" class="input--required">Invoice No</label>
+              <input type="text" class="no-style input--bd" [readonly]="{disableInput: invoiceId !=='null'}"
+                placeholder="Placeholder" maxlength="16" formControlName="invoice_number">
+              <app-error [controlName]="addInvoiceForm.controls.invoice_number"></app-error>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            <div class="input-wrap error error--type-1" [ngClass]="addErrorClass(addInvoiceForm.controls.invoice_date)">
+              <label for="" class="input--required">Invoice Date</label>
+              <mat-form-field class="width--100">
+                <input matInput [matDatepicker]="invoice_date" (focus)="invoice_date.open()"
+                  formControlName="invoice_date" (dateChange)="onDateSelection()" placeholder="DD/MM/YYYY" readonly>
+                <mat-datepicker-toggle matSuffix [for]="invoice_date"></mat-datepicker-toggle>
+                <mat-datepicker #invoice_date></mat-datepicker>
+              </mat-form-field>
+              <app-error [controlName]="addInvoiceForm.controls.invoice_date"></app-error>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            <div class="input-wrap error" [ngClass]="addErrorClass(addInvoiceForm.controls.payment_term)">
+              <label for="" class="input">Payment Term</label>
+              <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" 
+                [selectedOption]="initialValues.paymentTerm">
+                <select #customSelect formControlName="payment_term" class="no-style select--modify"
+                  (change)="onpaymentTermSelected($event.target.value)">
+                  <option *ngFor="let option of paymentTermList" value="{{ option.id }}">
+                    {{ option.label }}
+                  </option>
+                </select>
+              </material-dropdown>
+              <app-error [controlName]="addInvoiceForm.controls.payment_term"></app-error>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            <div class="input-wrap error error--type-1" [ngClass]="addErrorClass(addInvoiceForm.controls.due_date)">
+              <label for="" *ngIf="!isDueDateRequired">Due Date</label>
+              <label for="" class="input--required" *ngIf="isDueDateRequired">Due Date</label>
+              <mat-form-field class="width--100">
+                <input [min]="minDate" matInput [matDatepicker]="due_date" (focus)="due_date.open()" formControlName="due_date"
+                (dateChange)="onWorkEndDateChange()"  placeholder="DD/MM/YYYY" readonly>
+                <mat-datepicker-toggle matSuffix [for]="due_date"></mat-datepicker-toggle>
+                <mat-datepicker #due_date></mat-datepicker>
+              </mat-form-field>
+              <app-error [controlName]="addInvoiceForm.controls.due_date"></app-error>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-4">
+            <div class="input-wrap error" [ngClass]="addErrorClass(addInvoiceForm.controls.bank_account)">
+              <label for="" class="input">Bank</label>
+              <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                [selectedOption]="initialValues.bank_account" [addBlank]="true">
+                <select #customSelect formControlName="bank_account" class="no-style select--modify">
+                  <option *ngFor="let option of bankList" value="{{ option.id }}">
+                    {{ option.display_name }}
+                  </option>
+                </select>
+              </material-dropdown>
+              <app-error [controlName]="addInvoiceForm.controls.bank_account"></app-error>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-sm-6">
+            <div class="input-wrap error" [ngClass]="addErrorClass(addInvoiceForm.controls.reference_no)">
+              <label for="" class="input">Reference No </label>
+              <input type="text" class="no-style input--bd"
+                placeholder="Reference No" formControlName="reference_no">
+              <app-error [controlName]="addInvoiceForm.controls.reference_no"></app-error>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-sm-6">
+            <div class="input-wrap">
+              <label for="">Point of Contact (Name)</label>
+              <material-dropdown [searchable]="true" [disableLastInput]="true"  (nonOptionSetValue)="setContactPersons($event)" [selectedOption]="{label:addInvoiceForm.controls.contact_person_name.value,value:''}" [addable]="false"
+                class="dropDownWidth" [addBlank]="true">
+                <select #customSelect formControlName="contact_person_name" class="no-style select--modify" (change)="onContactPersonChange()">
+                  <option *ngFor="let contactperson of contactPersonList" value="{{ contactperson.display_name}}">
+                    {{  contactperson.display_name }}
+                  </option>
+                </select>
+              </material-dropdown>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-sm-6 input-wrap mb-0 country-filed-height">
+
+            <label for="" class="input" id="cc-font">Point of Contact (Mobile)</label>
+  
+            <div class="row mx-0">
+              <div class="col-4 px-0">
+                <div class="width-country-code custom-margin me-0">
+  
+                  <material-dropdown class="dropDownWidth" [selectedOption]="{label:addInvoiceForm.controls.country_code.value,value:''}">
+                    <select #customSelect formControlName="country_code" class="no-style select--modify">
+                      <option *ngFor="let phone_code of countryPhoneCode" [value]="phone_code">
+                        {{phone_code}}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </div>
+              <div class="px-0 number-grow col-8 px-0">
+                <div class="ms-3">
+                  <div class="w-auto px-0 number-grow">
+                    <div class="error input-wrap" [ngClass]="addErrorClass(addInvoiceForm.controls.contact_person_no)">
+                      <input type="text" class="no-style input--bd" placeholder="9999999999" formControlName="contact_person_no">
+                      <app-error [controlName]="addInvoiceForm.controls.contact_person_no"></app-error>
+  
+                    </div>
+                  </div>
+                </div>
+  
+              </div>
+            </div>
+          </div>
+
+          <ng-container formArrayName="customfields">
+            <ng-container
+              *ngFor="let customfiled of addInvoiceForm['controls']['customfields']['controls']; let ii = index;"
+              [formGroupName]="ii">
+              <ng-container *ngIf="customfiled.controls.field_type.value !='checkbox'">
+                <app-invoice-custom-field class="col-lg-3 col-sm-6" [customfiled]="customfiled"></app-invoice-custom-field>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+          <ng-container formArrayName="customfields">
+            <ng-container
+            *ngFor="let customfiled of addInvoiceForm['controls']['customfields']['controls']; let iii = index;"
+            [formGroupName]="iii">
+            <ng-container *ngIf="customfiled.controls.field_type.value =='checkbox'">
+              <app-invoice-custom-field class="col-lg-3 col-sm-6" [customfiled]="customfiled"></app-invoice-custom-field>
+            </ng-container>
+          </ng-container>
+          </ng-container>
+        </div>
+      
+
+        
+             
+      </div>
+      <div class="row px-3 mx-0 mb-3">
+        <div *ngIf="selectedParty?.address && selectedParty?.address.length" class="col-lg-12">
+          <app-address [address]="selectedParty?.address" (emitAddress)="getAddress($event)"></app-address>
+        </div> 
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="gb-tab-wrapper">
+      <mat-tab-group animationDuration="0ms" [selectedIndex]="activetabIndex" >
+
+        <mat-tab *ngIf="isCarneDataAvailable">
+          <ng-template mat-tab-label>
+            <span >Job for Cranes</span>
+          </ng-template>
+
+          <div class="row mx-0  py-2">
+            <div class="col-lg-3 col-md-6 my-2 " >
+              <div class="box-tab" matRipple [matRippleDisabled]="craneTabActiveIndex==1"(click)="craneTabActiveIndex=1" [ngClass]="{'active':craneTabActiveIndex==1}">
+                <b>Timesheets </b>
+                <ng-container *ngIf="craneTimeSheet.selectedSheetList.length==0">
+                  <p *ngIf="craneTimeSheet.sheetList.length>0" >Please select by clicking <span (click)="openCraneAwpTimeSheet('crane')" class="custom-link" [ngClass]="{'disable':craneTabActiveIndex!=1}"> here  </span></p>
+                  <p *ngIf="craneTimeSheet.sheetList.length==0">No Timesheets found.</p>
+                </ng-container>
+            
+              </div>
+             
+            </div>
+            <div class="col-lg-3 col-md-6 my-2 ">
+              <div class="box-tab" matRipple [matRippleDisabled]="craneTabActiveIndex==2" (click)="craneTabActiveIndex=2" [ngClass]="{'active':craneTabActiveIndex==2}">
+                <b>Sales Order Additional Charges</b>
+                <ng-container *ngIf="craneSOAdditionalCharge.selectedChargeList.length==0">
+                  <p *ngIf="craneSOAdditionalCharge.chargeList.length > 0">Please select by clicking <span (click)="openCraneAwpAdditionalCharges('crane')" [ngClass]="{'disable':craneTabActiveIndex!=2}" class="custom-link">  here  </span></p>
+                  <p  *ngIf="craneSOAdditionalCharge.chargeList.length==0" >No Sales Order Additional Charges found.</p>
+                </ng-container>
+             
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 my-2">
+              <div class="box-tab" matRipple [matRippleDisabled]="craneTabActiveIndex==3" (click)="craneTabActiveIndex=3" [ngClass]="{'active':craneTabActiveIndex==3}">
+                <b>Job Charge</b>
+                <ng-container *ngIf="craneCharges.selectedChargeList.length==0">
+                  <p *ngIf="craneCharges.chargeList.length>0">Please select by clicking <span (click)="openCraneAwpCharges('crane')" class="custom-link" [ngClass]="{'disable':craneTabActiveIndex!=3}">  here  </span></p>
+                  <p  *ngIf="craneCharges.chargeList.length==0" >No Job Charges found.</p>
+                </ng-container>
+             
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 my-2 ">
+              <div class="box-tab" matRipple [matRippleDisabled]="craneTabActiveIndex==4" (click)="craneTabActiveIndex=4" [ngClass]="{'active':craneTabActiveIndex==4}">
+                <b>Job Deduction</b>
+                <ng-container *ngIf="craneDeductions.selectedDeductionList.length==0" >
+                  <p *ngIf="craneDeductions.deductionList.length>0">Please select by clicking <span (click)="openCraneAwpDeductions('crane')" class="custom-link" [ngClass]="{'disable':craneTabActiveIndex!=4}">  here  </span></p>
+                  <p  *ngIf="craneDeductions.deductionList.length==0" >No Job Deductions found.</p>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="craneTabActiveIndex ==1 && this.craneTimeSheet.selectedSheetList.length" formGroupName="crane">
+
+
+            <div class="d-flex justify-content-between p-3 pt-0">
+              <div >
+               
+                <div [ngClass]="{'hiddenContent':!isTax}" class="tabIndexActiveFields">
+                  <div  [ngClass]="{disable: disableTax}">
+                    <div class="tax-input-box ">
+                      <span for="">Tax</span>
+                    <material-dropdown [disabled]="disableTax"
+                      [selectedOption]="initialValues.craneTax">
+                      <select #customSelect class="no-style select--modify" formControlName="timesheet_tax" (change)="onSelectTimeSheetTax('crane')">
+                        <option *ngFor="let option of taxOptions" value="{{ option.id }}">
+                          {{ option.label }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                     
+                    </div>
+                  </div>
+                </div>
+              </div>
+             
+              <div >
+               <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openCraneAwpTimeSheet('crane')">Manage</button>
+              </div>
+            </div>
+            <div class="addable-row-table m-1 mt-0 ws-nowrap" >
+              <table>
+                  <thead>
+                      <tr>
+                          <th rowspan="2" class="border-start-0" >
+                            Sales Order No.
+                          </th>
+                          <th  rowspan="2">JOB NO. </th>
+                          <th  rowspan="2">JOB Date. </th>
+                          <th rowspan="2">VEHICLE NO.</th>
+                          <th rowspan="2">Timesheet No.</th>
+                          <th rowspan="2">Start Date</th>
+                          <th rowspan="2">End Date</th>
+                          <th colspan="3" class="text-center">Billing Amount ({{currency_type?.symbol}})</th>
+                          <th colspan="3" class="text-center">Extra Amount ({{currency_type?.symbol}})</th>
+                          <th rowspan="2" *ngIf="isTax">Total Tax ({{currency_type?.symbol}})</th>
+                          <th rowspan="2">Total Amount ({{currency_type?.symbol}})</th>
+  
+                      </tr>
+                      <tr>
+                       
+                        <th>Unit</th>
+                        <th>Rate per Unit ({{currency_type?.symbol}})</th>
+                        <th>Amount ({{currency_type?.symbol}})</th>
+                        <th>Unit</th>
+                        <th>Rate per Unit ({{currency_type?.symbol}})</th>
+                        <th>Amount ({{currency_type?.symbol}})</th>  
+                      </tr>
+                  </thead>
+                  <tbody  formArrayName="timesheets">
+                    <tr  *ngFor="let timesheet of addInvoiceForm.controls.crane.controls.timesheets.controls; let i = index;" [formGroupName]="i">
+
+                    <td class="py-3">{{timesheet.value.workorder_no ?timesheet.value.workorder_no:'-'}}</td>
+                    <td>{{timesheet.value.trip_id ?timesheet.value.trip_id:'-'}}</td>
+                    <td>{{timesheet.value?.date |formateDate }}</td>
+                    <td>{{timesheet.value?.vehicle_no ?timesheet.value?.vehicle_no:'-'}}</td>
+                    <td>{{timesheet.value?.timesheet_no ?timesheet.value?.timesheet_no:'-'}}</td>
+                    <td>{{timesheet.value?.start_date |formateDate }}</td>
+                    <td>{{timesheet.value?.end_date |formateDate }}</td>
+                    <td>{{timesheet.value?.billing_hours | numberFormat}}</td>
+                    <td>{{timesheet.value?.billing_rate| numberFormat}}</td>
+                    <td>{{timesheet.value?.billing_amount| numberFormat}}</td>
+                    <td>{{timesheet.value?.extra_hours| numberFormat}}</td>
+                    <td>{{timesheet.value?.extra_rate| numberFormat}}</td>
+                    <td>{{timesheet.value?.extra_amount| numberFormat}}</td>
+                    <td *ngIf="isTax">{{timesheet.value?.tax_amount| numberFormat}}</td>
+                    <td>{{timesheet.value?.amount| numberFormat}}</td>
+                  </tr>
+                  <tr>
+
+                    <td class="fw-semibold text-center py-3" >Total</td>
+                    <td colspan="6"></td>
+                    <td class="fw-semibold">{{totals.craneTimesheet.billingHoursTotal| numberFormat}}</td>
+                    <td ></td>
+                    <td class="fw-semibold">{{totals.craneTimesheet.billingHoursAmountTotal| numberFormat}}</td>
+                    <td  class="fw-semibold">{{totals.craneTimesheet.extraHoursTotal| numberFormat}}</td>
+                    <td></td>
+                    <td class="fw-semibold">{{totals.craneTimesheet.extraHoursAmountTotal| numberFormat}}</td>
+                    <td class="fw-semibold" *ngIf="isTax">{{totals.craneTimesheet.timeSheetTaxTotal| numberFormat}}</td>
+                    <td class="fw-semibold">{{totals.craneTimesheet.timeSheetSubTotal| numberFormat}}</td>
+                    
+                  </tr>
+                   
+                    
+             </tbody>
+              </table>
+          </div>
+
+          </div>   
+
+          <div>
+
+          </div>
+          
+          <div *ngIf="craneTabActiveIndex ==2 && this.craneSOAdditionalCharge.selectedChargeList.length" formGroupName="crane">
+            <!--SO additional charges -->
+            <div class="d-flex justify-content-end p-3 pt-0 "> 
+              <div >
+               <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openCraneAwpAdditionalCharges('crane')" >Manage</button>
+              </div>
+            </div>
+            <div class="addable-row-table m-1 mt-0 ws-nowrap" >
+              <table>
+                  <thead>
+                    <tr>
+                   <th>SO No</th>
+                   <th>SO Date</th>
+                   <th>Additional Charge</th>
+                   <th>Unit of measurement</th>
+                   <th>Units</th>
+                   <th>Rate Per Unit ({{currency_type?.symbol}})</th>
+                   <th>Amount ({{currency_type?.symbol}})</th>
+                   <!-- <th>Discount ({{currency_type?.symbol}})</th> -->
+                   <th *ngIf="isTax">Tax</th>
+                   <th>Total Amount ({{currency_type?.symbol}})</th>
+                  </tr>
+                  </thead>
+                  <tbody formArrayName="additional_charges" >
+                    <tr *ngFor="let additionalCharges of addInvoiceForm.controls.crane.controls.additional_charges.controls; let i = index;" [formGroupName]="i">
+                    <td class="py-3">{{additionalCharges.value.workorder_no ?additionalCharges.value.workorder_no:'-'}}</td>
+                    <td>{{additionalCharges.value.date|formateDate}}</td>
+                    <td>{{additionalCharges.value.charge_name?additionalCharges.value.charge_name:'-'}}</td>                      
+                    <td>{{additionalCharges.value.units | numberFormat}}</td>          
+                    <td >       
+                      <input positiveThreeDigitDecimalNumber type="text" placeholder="Eg.: 1234567"
+                        formControlName="quantity"(change)="calculationsChanged()">
+                   
+                  </td>                      
+                    <td>
+                      <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="unit_cost" (change)="calculationsChanged()">
+                    </td>
+                    <td>
+                      <input positiveThreeDigitDecimalNumber type="text"  placeholder="1000"
+                      formControlName="amount" readonly>
+                    </td>
+                    <!-- <td>
+                      <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="discount" (change)="calculationsChanged()">
+                    </td> -->
+                    <td  *ngIf="isTax" >
+                      <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="{label : additionalCharges.value.tax_label}">
+                          <select #customSelect name="" class="no-style select--modify error-box" formControlName="tax" (change)="calculationsChanged()">
+                          <option *ngFor="let option of taxOptions"
+                              value="{{ option.id }}">{{
+                              option.label }}</option>
+                          </select>
+                        </material-dropdown>
+                  </td>
+                    <td>
+                      <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" 
+                      formControlName="total" [attr.disabled]="true">
+                    </td>
+                   
+                  </tr>    
+                  <tr>
+                    <td class="py-3 fw-semibold">Total</td>
+                    <td colspan="5"></td>
+                    <td class="py-3 fw-semibold">{{totals.craneAdditionalCharges.amountTotal| numberFormat}}</td>
+                    <!-- <td class="py-3 fw-semibold">{{totals.craneAdditionalCharges.discountTotal}}</td> -->
+                    <td class="py-3 fw-semibold" *ngIf="isTax">{{totals.craneAdditionalCharges.taxTotal| numberFormat}}</td>
+                    <td class="py-3 fw-semibold">{{totals.craneAdditionalCharges.total| numberFormat}}</td>
+
+                  </tr>
+             </tbody>
+              </table>
+          </div>
+            
+
+          </div>
+
+          <div *ngIf="craneTabActiveIndex ==3 && this.craneCharges.selectedChargeList.length" formGroupName="crane">
+            <!-- charges -->
+            <div class="d-flex justify-content-end p-3 pt-0 "> 
+              <div class="col-lg-6 document-selected" >
+                <ng-container *ngIf="this.addInvoiceForm.get('attached_document_types').get('crane').get('charge')?.value?.length && craneCharges.selectedChargeList.length > 0">
+                    <div><span class="title">Document Selected </span></div>
+                    <p >
+                      <span *ngFor="let doc of this.addInvoiceForm.get('attached_document_types').get('crane').get('charge')?.value;index as i " class="doc">
+                        {{doc}}{{i!=this.addInvoiceForm.get('attached_document_types').get('crane').get('charge')?.value?.length - 1 ? ",&nbsp;" :""}}
+                      </span>
+                    </p>
+                  </ng-container>
+              </div>
+              <div >
+               <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openCraneAwpCharges('crane')" >Manage</button>
+              </div>
+            </div>
+            <div class="addable-row-table m-1 mt-0 ws-nowrap" >
+              <table>
+                  <thead>
+                    <tr>
+                      <th></th>
+                   <th>SO No</th>
+                   <th>Job No</th>
+                   <th>Job Date</th>
+                   <th>Job Charges</th>
+                   <th>Vehicle No</th>
+                   <th>Charge Amount ({{currency_type?.symbol}})</th>
+                   <!-- <th>Discount ({{currency_type?.symbol}})</th> -->
+                   <th *ngIf="isTax">Tax</th>
+                   <th>Total Amount ({{currency_type?.symbol}})</th>
+                  </tr>
+                  </thead>
+                  <tbody formArrayName="charges" >
+                    <tr *ngFor="let charge of addInvoiceForm.controls.crane.controls.charges.controls; let i = index;" [formGroupName]="i">
+                      <td class="p-0 border-end-0">
+                        <div class="d-flex flex-wrap mx-2" *ngIf="this.addInvoiceForm.get('attached_document_types').get('crane').get('charge')?.value?.length>0">
+                          <i class="bi bi-file-earmark-fill file-icon" [ngStyle]="{ color : selectedDocuemnts?.crane_charges[i]?.length>0 ? '#FF8000' : 'green'}"  [matTooltip]="getTripsDoc(selectedDocuemnts?.crane_charges[i])" matTooltipClass="material-toltip-class" matTooltipPosition="above"></i>
+                         </div>
+                      </td>
+                    <td class="py-3">{{charge.value.workorder_no ?charge.value.workorder_no:'-'}}</td>
+                    <td>{{charge.value.trip_id?charge.value.trip_id:'-'}}</td>
+                    <td>{{charge.value.date|formateDate }}</td>
+                    <td>{{charge.value.name?charge.value.name:'-'}}</td>        
+                    <td>{{charge.value.vehicle_no?charge.value.vehicle_no:'-'}}</td>                 
+                    <td>
+                      <input positiveThreeDigitDecimalNumber type="text"  placeholder="1000"
+                      formControlName="amount" (change)="calculationsChanged()">
+                    </td>
+                    <!-- <td>
+                      <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="discount" (change)="calculationsChanged()">
+                    </td> -->
+                    <td *ngIf="isTax"> 
+                      <div [ngClass]="{disable: disableTax}">
+                      <material-dropdown [searchable]="true" [addable]="false" 
+                        [selectedOption]="{label:charge.value.tax_label,value:''}" [disabled]="disableTax">
+                        <select #customSelect formControlName="tax" 
+                          (change)="taxValueChanged('crane',i);calculationsChanged()">
+                          <option *ngFor="let option of taxOptions" value="{{ option.id }}">
+                            {{ option.label }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                      </div>
+                   </td>   
+                    <td>
+                      <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" 
+                      formControlName="total" readonly>
+                    </td>
+                   
+                  </tr>  
+                  <tr>
+                    <td class="py-3 fw-semibold">Total</td>
+                    <td colspan="5"></td>
+                    <td class="fw-semibold">{{totals.craneCharges.amountTotal| numberFormat}}</td>
+                    <!-- <td class="fw-semibold">{{totals.craneCharges.discountTotal}}</td> -->
+                    <td class="fw-semibold" *ngIf="isTax">{{totals.craneCharges.taxTotal| numberFormat}}</td>
+                    <td class="fw-semibold">{{totals.craneCharges.total| numberFormat}}</td>
+
+
+                  </tr>  
+             </tbody>
+              </table>
+          </div>
+            
+
+          </div>
+          <div *ngIf="craneTabActiveIndex ==4 && this.craneDeductions.selectedDeductionList.length" formGroupName="crane">
+            <!-- charges -->
+            <div class="d-flex justify-content-end p-3 pt-0 "> 
+              <div class="col-lg-6 document-selected" >
+                <ng-container *ngIf="addInvoiceForm.get('attached_document_types').get('crane').get('deduction').value?.length && craneDeductions.selectedDeductionList.length > 0">
+                    <div><span class="title">Document Selected </span></div>
+                    <p >
+                      <span *ngFor="let doc of addInvoiceForm.get('attached_document_types').get('crane').get('deduction').value;index as i " class="doc">
+                        {{doc}}{{i!=addInvoiceForm.get('attached_document_types').get('crane').get('deduction').value?.length - 1 ? ",&nbsp;" :""}}
+                      </span>
+                    </p>
+                  </ng-container>
+              </div>
+              <div >
+               <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openCraneAwpDeductions('crane')" >Manage</button>
+              </div>
+            </div>
+            <div class="addable-row-table m-1 mt-0 ws-nowrap " >
+              <table>
+                  <thead>
+                    <tr>
+                      <th></th>
+                   <th>SO No.</th>
+                   <th>Job No.</th>
+                   <th>Job Date</th>
+                   <th>Job Deductions</th>
+                   <th>Vehicle No.</th>
+                   <th>Deductions Amount ({{currency_type?.symbol}})</th>
+                   <!-- <th>Discount ({{currency_type?.symbol}})</th> -->
+                   <th>Total Amount ({{currency_type?.symbol}})</th>
+                  </tr>
+                  </thead>
+                  <tbody formArrayName="deductions" >
+                    <tr *ngFor="let deductions of addInvoiceForm.controls.crane.controls.deductions.controls; let i = index;" [formGroupName]="i">
+                      <td class="p-0 border-end-0">
+                        <div class="d-flex flex-wrap mx-2" *ngIf="addInvoiceForm.get('attached_document_types').get('crane').get('deduction').value?.length>0">
+                          <i class="bi bi-file-earmark-fill file-icon" [ngStyle]="{ color : selectedDocuemnts?.crane_deductions[i]?.length>0 ? '#FF8000' : 'green'}"  [matTooltip]="getTripsDoc(selectedDocuemnts?.crane_deductions[i])" matTooltipClass="material-toltip-class" matTooltipPosition="above"></i>
+                         </div>
+                      </td>
+                    <td class="py-3">{{deductions.value.workorder_no ?deductions.value.workorder_no:'-'}}</td>
+                    <td>{{deductions.value.trip_id?deductions.value.trip_id:'-'}}</td>
+                    <td>{{deductions.value.date|formateDate }}</td>
+                    <td>{{deductions.value.name?deductions.value.name:'-'}}</td>        
+                    <td>{{deductions.value.vehicle_no?deductions.value.vehicle_no:'-'}}</td>                 
+                    <td>
+                      <input positiveThreeDigitDecimalNumber type="text"  placeholder="1000"
+                      formControlName="amount" (change)="calculationsChanged()">
+                    </td>
+                    <!-- <td>
+                      <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="discount" (change)="calculationsChanged()">
+                    </td> -->
+                    <td>
+                      <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" 
+                      formControlName="total" readonly>
+                    </td>
+                   
+                  </tr>   
+                  <tr>
+                    <td class="py-3 fw-semibold">Total</td>
+                    <td colspan="5"></td>
+                    <td class="fw-semibold">{{totals.craneDeduction.amountTotal| numberFormat}}</td>
+                   
+                    <!-- <td class="fw-semibold">{{totals.craneDeduction.discountTotal}}</td> -->
+                    
+                    <td class="fw-semibold">{{totals.craneDeduction.total| numberFormat}}</td>
+
+
+                  </tr>  
+                  
+             </tbody>
+              </table>
+          </div>
+            
+
+          </div>
+          </mat-tab>
+
+          <mat-tab *ngIf="isAWPDataAvailable">
+            <ng-template mat-tab-label>
+              <span >Job for AWP</span>
+            </ng-template>
+
+            <div class="row mx-0  py-2">
+              <div class="col-lg-3 col-md-6 my-2 " >
+                <div class="box-tab" matRipple [matRippleDisabled]="awpTabActiveIndex==1"(click)="awpTabActiveIndex=1" [ngClass]="{'active':awpTabActiveIndex==1}">
+                  <b>Timesheets </b>
+                  <ng-container *ngIf="awpTimeSheet.selectedSheetList.length==0">
+                    <p *ngIf="awpTimeSheet.sheetList.length>0" >Please select by clicking <span (click)="openCraneAwpTimeSheet('awp')" class="custom-link" [ngClass]="{'disable':awpTabActiveIndex!=1}"> here  </span></p>
+                    <p *ngIf="awpTimeSheet.sheetList.length==0">No Timesheets found.</p>
+                  </ng-container>
+              
+                </div>
+               
+              </div>
+              <div class="col-lg-3 col-md-6 my-2 ">
+                <div class="box-tab" matRipple [matRippleDisabled]="awpTabActiveIndex==2" (click)="awpTabActiveIndex=2" [ngClass]="{'active':awpTabActiveIndex==2}">
+                  <b>Sales Order Additional Charges</b>
+                  <ng-container *ngIf="awpSOAdditionalCharge.selectedChargeList.length==0">
+                    <p *ngIf="awpSOAdditionalCharge.chargeList.length > 0">Please select by clicking <span (click)="openCraneAwpAdditionalCharges('awp')" [ngClass]="{'disable':awpTabActiveIndex!=2}" class="custom-link">  here  </span></p>
+                    <p  *ngIf="awpSOAdditionalCharge.chargeList.length==0" >No Sales Order Additional Charges found.</p>
+                  </ng-container>
+               
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6 my-2">
+                <div class="box-tab" matRipple [matRippleDisabled]="awpTabActiveIndex==3" (click)="awpTabActiveIndex=3" [ngClass]="{'active':awpTabActiveIndex==3}">
+                  <b>Job Charge</b>
+                  <ng-container *ngIf="awpCharges.selectedChargeList.length==0">
+                    <p *ngIf="awpCharges.chargeList.length>0">Please select by clicking <span (click)="openCraneAwpCharges('awp')" class="custom-link" [ngClass]="{'disable':awpTabActiveIndex!=3}">  here  </span></p>
+                    <p  *ngIf="awpCharges.chargeList.length==0" >No Job Charges found.</p>
+                  </ng-container>
+               
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6 my-2 ">
+                <div class="box-tab" matRipple [matRippleDisabled]="awpTabActiveIndex==4" (click)="awpTabActiveIndex=4" [ngClass]="{'active':awpTabActiveIndex==4}">
+                  <b>Job Deduction</b>
+                  <ng-container *ngIf="awpDeductions.selectedDeductionList.length==0" >
+                    <p *ngIf="awpDeductions.deductionList.length>0">Please select by clicking <span (click)="openCraneAwpDeductions('awp')" class="custom-link" [ngClass]="{'disable':awpTabActiveIndex!=4}">  here  </span></p>
+                    <p  *ngIf="awpDeductions.deductionList.length==0" >No Job Deductions found.</p>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="awpTabActiveIndex ==1 && this.awpTimeSheet.selectedSheetList.length" formGroupName="awp">
+
+
+              <div class="d-flex justify-content-between p-3 pt-0">
+                <div >
+                 
+                  <div [ngClass]="{'hiddenContent':!isTax}" class="tabIndexActiveFields">
+                    <div  [ngClass]="{disable: disableTax}">
+                      <div class="tax-input-box ">
+                        <span for="">Tax</span>
+                      <material-dropdown [disabled]="disableTax"
+                        [selectedOption]="initialValues.awpTax">
+                        <select #customSelect class="no-style select--modify" formControlName="timesheet_tax" (change)="onSelectTimeSheetTax('awp')">
+                          <option *ngFor="let option of taxOptions" value="{{ option.id }}">
+                            {{ option.label }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                       
+                      </div>
+                    </div>
+                  </div>
+                </div>
+               
+                <div >
+                 <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openCraneAwpTimeSheet('awp')">Manage</button>
+                </div>
+              </div>
+              <div class="addable-row-table m-1 mt-0 ws-nowrap" >
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="border-start-0" >
+                              Sales Order No.
+                            </th>
+                            <th  rowspan="2">JOB NO. </th>
+                            <th  rowspan="2">JOB Date. </th>
+                            <th rowspan="2">VEHICLE NO.</th>
+                            <th rowspan="2">Timesheet No.</th>
+                            <th rowspan="2">Start Date</th>
+                            <th rowspan="2">End Date</th>
+                            <th colspan="3" class="text-center">Billing Amount ({{currency_type?.symbol}})</th>
+                            <th colspan="3" class="text-center">Extra Amount ({{currency_type?.symbol}})</th>
+                            <th rowspan="2" *ngIf="isTax">Total Tax ({{currency_type?.symbol}})</th>
+                            <th rowspan="2">Total Amount ({{currency_type?.symbol}})</th>
+    
+                        </tr>
+                        <tr>
+                         
+                          <th>Unit</th>
+                          <th>Rate per Unit ({{currency_type?.symbol}})</th>
+                          <th>Amount ({{currency_type?.symbol}})</th>
+                          <th>Unit</th>
+                          <th>Rate per Unit ({{currency_type?.symbol}})</th>
+                          <th>Amount ({{currency_type?.symbol}})</th>  
+                        </tr>
+                    </thead>
+                    <tbody  formArrayName="timesheets">
+                      <tr  *ngFor="let timesheet of addInvoiceForm.controls.awp.controls.timesheets.controls; let i = index;" [formGroupName]="i">
+
+                      <td class="py-3">{{timesheet.value.workorder_no ?timesheet.value.workorder_no:'-'}}</td>
+                      <td>{{timesheet.value.trip_id ?timesheet.value.trip_id:'-'}}</td>
+                      <td>{{timesheet.value?.date |formateDate }}</td>
+                      <td>{{timesheet.value?.vehicle_no ?timesheet.value?.vehicle_no:'-'}}</td>
+                      <td>{{timesheet.value?.timesheet_no ?timesheet.value?.timesheet_no:'-'}}</td>
+                      <td>{{timesheet.value?.start_date |formateDate }}</td>
+                      <td>{{timesheet.value?.end_date |formateDate }}</td>
+                      <td>{{timesheet.value?.billing_hours| numberFormat}}</td>
+                      <td>{{timesheet.value?.billing_rate| numberFormat}}</td>
+                      <td>{{timesheet.value?.billing_amount| numberFormat}}</td>
+                      <td>{{timesheet.value?.extra_hours| numberFormat}}</td>
+                      <td>{{timesheet.value?.extra_rate| numberFormat}}</td>
+                      <td>{{timesheet.value?.extra_amount| numberFormat}}</td>
+                      <td *ngIf="isTax">{{timesheet.value?.tax_amount| numberFormat}}</td>
+                      <td>{{timesheet.value?.amount| numberFormat}}</td>
+                    </tr>
+                    <tr>
+
+                      <td class="fw-semibold text-center py-3" >Total</td>
+                      <td colspan="6"></td>
+                      <td class="fw-semibold">{{totals.awpTimesheet.billingHoursTotal| numberFormat}}</td>
+                      <td ></td>
+                      <td class="fw-semibold">{{totals.awpTimesheet.billingHoursAmountTotal| numberFormat}}</td>
+                      <td  class="fw-semibold">{{totals.awpTimesheet.extraHoursTotal| numberFormat}}</td>
+                      <td></td>
+                      <td class="fw-semibold">{{totals.awpTimesheet.extraHoursAmountTotal| numberFormat}}</td>
+                      <td class="fw-semibold" *ngIf="isTax">{{totals.awpTimesheet.timeSheetTaxTotal| numberFormat}}</td>
+                      <td class="fw-semibold">{{totals.awpTimesheet.timeSheetSubTotal| numberFormat}}</td>
+                      
+                    </tr>
+                     
+                      
+               </tbody>
+                </table>
+            </div>
+
+            </div>   
+
+            <div>
+
+            </div>
+            
+            <div *ngIf="awpTabActiveIndex ==2 && this.awpSOAdditionalCharge.selectedChargeList.length" formGroupName="awp">
+              <!--SO additional charges -->
+              <div class="d-flex justify-content-end p-3 pt-0 "> 
+                <div >
+                 <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openCraneAwpAdditionalCharges('awp')" >Manage</button>
+                </div>
+              </div>
+              <div class="addable-row-table m-1 mt-0 ws-nowrap" >
+                <table>
+                    <thead>
+                      <tr>
+                     <th>SO No</th>
+                     <th>SO Date</th>
+                     <th>Additional Charge</th>
+                     <th>Unit of measurement</th>
+                     <th>Units</th>
+                     <th>Rate Per Unit ({{currency_type?.symbol}})</th>
+                     <th>Amount ({{currency_type?.symbol}})</th>
+                     <!-- <th>Discount ({{currency_type?.symbol}})</th> -->
+                     <th *ngIf="isTax">Tax</th>
+                     <th>Total Amount ({{currency_type?.symbol}})</th>
+                    </tr>
+                    </thead>
+                    <tbody formArrayName="additional_charges" >
+                      <tr *ngFor="let additionalCharges of addInvoiceForm.controls.awp.controls.additional_charges.controls; let i = index;" [formGroupName]="i">
+                      <td class="py-3">{{additionalCharges.value.workorder_no ?additionalCharges.value.workorder_no:'-'}}</td>
+                      <td>{{additionalCharges.value.date|formateDate }}</td>
+                      <td>{{additionalCharges.value.charge_name?additionalCharges.value.charge_name:'-'}}</td>                      
+                      <td>{{additionalCharges.value.units?additionalCharges.value.units:'-'}}</td>          
+                      <td >       
+                        <input positiveThreeDigitDecimalNumber type="text" placeholder="Eg.: 1234567"
+                          formControlName="quantity" (change)="calculationsChanged()">
+                     
+                    </td>                      
+                      <td>
+                        <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="unit_cost" (change)="calculationsChanged()">
+                      </td>
+                      <td>
+                        <input positiveThreeDigitDecimalNumber type="text"  placeholder="1000"
+                        formControlName="amount" readonly>
+                      </td>
+                      <!-- <td>
+                        <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="discount" (change)="calculationsChanged()">
+                      </td> -->
+                      <td  *ngIf="isTax" >
+                        <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="{label : additionalCharges.value.tax_label}">
+                            <select #customSelect name="" class="no-style select--modify error-box" formControlName="tax" (change)="calculationsChanged()">
+                              <option *ngFor="let option of taxOptions"
+                                value="{{ option.id }}">{{
+                                option.label }}
+                              </option>
+                            </select>
+                        </material-dropdown>
+                    </td> 
+                      <td>
+                        <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" 
+                        formControlName="total" readonly>
+                      </td>
+                     
+                    </tr>    
+                    <tr>
+                      <td class="py-3 fw-semibold">Total</td>
+                      <td colspan="5"></td>
+                      <td class="py-3 fw-semibold">{{totals.awpAdditionalCharges.amountTotal| numberFormat}}</td>
+                      <!-- <td class="py-3 fw-semibold">{{totals.awpAdditionalCharges.discountTotal}}</td> -->
+                      <td class="py-3 fw-semibold" *ngIf="isTax">{{totals.awpAdditionalCharges.taxTotal| numberFormat}}</td>
+                      <td class="py-3 fw-semibold">{{totals.awpAdditionalCharges.total| numberFormat}}</td>
+
+                    </tr>
+               </tbody>
+                </table>
+            </div>
+              
+
+            </div>
+            <div *ngIf="awpTabActiveIndex ==3 && this.awpCharges.selectedChargeList.length" formGroupName="awp">
+             
+
+              <!-- charges -->
+              <div class="d-flex justify-content-end p-3 pt-0 ">
+                <div class="col-lg-6 document-selected" >
+                  <ng-container *ngIf="addInvoiceForm.get('attached_document_types').get('awp').get('charge').value?.length && awpCharges.selectedChargeList.length > 0">
+                      <div><span class="title">Document Selected </span></div>
+                      <p >
+                        <span *ngFor="let doc of addInvoiceForm.get('attached_document_types').get('awp').get('charge').value;index as i " class="doc">
+                          {{doc}}{{i!=addInvoiceForm.get('attached_document_types').get('awp').get('charge').value?.length - 1 ? ",&nbsp;" :""}}
+                        </span>
+                      </p>
+                    </ng-container>
+                </div> 
+                <div >
+                 <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openCraneAwpCharges('awp')" >Manage</button>
+                </div>
+              </div>
+              <div class="addable-row-table m-1 mt-0 ws-nowrap" >
+                <table>
+                    <thead>
+                      <tr>
+                        <th></th>
+                     <th>SO No</th>
+                     <th>Job No</th>
+                     <th>Job Date</th>
+                     <th>Job Charges</th>
+                     <th>Vehicle No</th>
+                     <th>Charge Amount ({{currency_type?.symbol}})</th>
+                     <!-- <th>Discount ({{currency_type?.symbol}})</th> -->
+                     <th *ngIf="isTax">Tax</th>
+                     <th>Total Amount ({{currency_type?.symbol}})</th>
+                    </tr>
+                    </thead>
+                    <tbody formArrayName="charges" >
+                      <tr *ngFor="let charge of addInvoiceForm.controls.awp.controls.charges.controls; let i = index;" [formGroupName]="i">
+                        <td class="p-0 border-end-0">
+                          <div class="d-flex flex-wrap mx-2" *ngIf="this.addInvoiceForm.get('attached_document_types').get('awp').get('charge')?.value?.length>0">
+                            <i class="bi bi-file-earmark-fill file-icon" [ngStyle]="{ color : selectedDocuemnts?.awp_charges[i]?.length>0 ? '#FF8000' : 'green'}"  [matTooltip]="getTripsDoc(selectedDocuemnts?.awp_charges[i])" matTooltipClass="material-toltip-class" matTooltipPosition="above"></i>
+                           </div>
+                        </td>
+                      <td class="py-3">{{charge.value.workorder_no ?charge.value.workorder_no:'-'}}</td>
+                      <td>{{charge.value.trip_id?charge.value.trip_id:'-'}}</td>
+                      <td>{{charge.value.date|formateDate }}</td>
+                      <td>{{charge.value.name?charge.value.name:'-'}}</td>        
+                      <td>{{charge.value.vehicle_no?charge.value.vehicle_no:'-'}}</td>                 
+                      <td>
+                        <input positiveThreeDigitDecimalNumber type="text"  placeholder="1000"
+                        formControlName="amount" (change)="calculationsChanged()">
+                      </td>
+                      <!-- <td>
+                        <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="discount" (change)="calculationsChanged()">
+                      </td> -->
+                      <td *ngIf="isTax">
+                        <div [ngClass]="{disable: disableTax}">
+                            <material-dropdown [searchable]="true" [addable]="false" 
+                              [selectedOption]="{label:charge.value.tax_label,value:''}" [disabled]="disableTax">
+                              <select #customSelect formControlName="tax" 
+                                (change)="taxValueChanged('awp',i); calculationsChanged()">
+                                <option *ngFor="let option of taxOptions" value="{{ option.id }}">
+                                  {{ option.label }}
+                                </option>
+                              </select>
+                            </material-dropdown>
+                        </div>
+                      </td> 
+                      <td>
+                        <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" 
+                        formControlName="total" readonly>
+                      </td>
+                     
+                    </tr>  
+                    <tr>
+                      <td class="py-3 fw-semibold">Total</td>
+                      <td colspan="5"></td>
+                      <td class="fw-semibold">{{totals.awpCharges.amountTotal| numberFormat}}</td>
+                      <!-- <td class="fw-semibold">{{totals.awpCharges.discountTotal}}</td> -->
+                      <td class="fw-semibold" *ngIf="isTax">{{totals.awpCharges.taxTotal| numberFormat}}</td>
+                      <td class="fw-semibold">{{totals.awpCharges.total| numberFormat}}</td>
+
+
+                    </tr>  
+               </tbody>
+                </table>
+            </div>
+              
+
+            </div>
+            <div *ngIf="awpTabActiveIndex ==4 && this.awpDeductions.selectedDeductionList.length" formGroupName="awp">
+              <!-- charges -->
+              <div class="d-flex justify-content-end p-3 pt-0 "> 
+                <div class="col-lg-6 document-selected" >
+                  <ng-container *ngIf="addInvoiceForm.get('attached_document_types').get('awp').get('deduction').value?.length && awpDeductions.selectedDeductionList.length > 0">
+                      <div><span class="title">Document Selected </span></div>
+                      <p >
+                        <span *ngFor="let doc of addInvoiceForm.get('attached_document_types').get('awp').get('deduction').value;index as i " class="doc">
+                          {{doc}}{{i!=addInvoiceForm.get('attached_document_types').get('awp').get('deduction').value?.length - 1 ? ",&nbsp;" :""}}
+                        </span>
+                      </p>
+                    </ng-container>
+                </div> 
+
+                <div >
+                 <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openCraneAwpDeductions('awp')" >Manage</button>
+                </div>
+              </div>
+              <div class="addable-row-table m-1 mt-0 ws-nowrap " >
+                <table>
+                    <thead>
+                      <tr>
+                        <th></th>
+                     <th>SO No.</th>
+                     <th>Job No.</th>
+                     <th>Job Date</th>
+                     <th>Job Deductions</th>
+                     <th>Vehicle No.</th>
+                     <th>Deductions Amount ({{currency_type?.symbol}})</th>
+                     <!-- <th>Discount ({{currency_type?.symbol}})</th> -->
+                     <th>Total Amount ({{currency_type?.symbol}})</th>
+                    </tr>
+                    </thead>
+                    <tbody formArrayName="deductions" >
+                      <tr *ngFor="let deductions of addInvoiceForm.controls.awp.controls.deductions.controls; let i = index;" [formGroupName]="i">
+                        <td class="p-0 border-end-0">
+                          <div class="d-flex flex-wrap mx-2" *ngIf="addInvoiceForm.get('attached_document_types').get('awp').get('deduction').value.length>0">
+                            <i class="bi bi-file-earmark-fill file-icon" [ngStyle]="{ color : selectedDocuemnts?.awp_deductions[i]?.length>0 ? '#FF8000' : 'green'}"  [matTooltip]="getTripsDoc(selectedDocuemnts?.awp_deductions[i])" matTooltipClass="material-toltip-class" matTooltipPosition="above"></i>
+                           </div>
+                        </td>
+                      <td class="py-3">{{deductions.value.workorder_no ?deductions.value.workorder_no:'-'}}</td>
+                      <td>{{deductions.value.trip_id?deductions.value.trip_id:'-'}}</td>
+                      <td>{{deductions.value.date|formateDate }}</td>
+                      <td>{{deductions.value.name?deductions.value.name:'-'}}</td>        
+                      <td>{{deductions.value.vehicle_no?deductions.value.vehicle_no:'-'}}</td>                 
+                      <td>
+                        <input positiveThreeDigitDecimalNumber type="text"  placeholder="1000"
+                        formControlName="amount" (change)="calculationsChanged()">
+                      </td>
+                      <!-- <td>
+                        <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="discount" (change)="calculationsChanged()">
+                      </td> -->
+                      <td>
+                        <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" 
+                        formControlName="total" readonly>
+                      </td>
+                     
+                    </tr>   
+                    <tr>
+                      <td class="py-3 fw-semibold">Total</td>
+                      <td colspan="5"></td>
+                      <td class="fw-semibold">{{totals.awpDeduction.amountTotal| numberFormat}}</td>
+                     
+                      <!-- <td class="fw-semibold">{{totals.awpDeduction.discountTotal}}</td> -->
+                      
+                      <td class="fw-semibold">{{totals.awpDeduction.total| numberFormat}}</td>
+
+
+                    </tr>  
+                    
+               </tbody>
+                </table>
+            </div>
+              
+
+            </div>
+            </mat-tab>
+
+            <mat-tab  *ngIf="isContainerDataAvailable">
+              <ng-template mat-tab-label>
+                <span >Job for Container</span>
+              </ng-template>
+  
+              <div class="row mx-0  py-2">
+                <div class="col-lg-3 col-md-6 my-2 ">
+                  <div class="box-tab" matRipple [matRippleDisabled]="containerTabActiveIndex==1" (click)="containerTabActiveIndex=1" [ngClass]="{'active':containerTabActiveIndex==1}">
+                    <b>Jobs</b>
+                    <ng-container>
+                      <p  style="color: #B2B2B2;"  *ngIf="tripChallansListForContainer.length == 0 && doTripChallanExistsForContainer">You can select Jobs by clicking  <span (click)="openDescriptionPopupForContainer()" class="custom-link">  here  </span></p>
+                      <p style="color: #B2B2B2;"  *ngIf="!doTripChallanExistsForContainer">No Jobs Completed for this Customer .</p>
+                    </ng-container>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-md-6 my-2 ">
+                  <div class="box-tab" matRipple [matRippleDisabled]="containerTabActiveIndex==2" (click)="containerTabActiveIndex=2" [ngClass]="{'active':containerTabActiveIndex==2}">
+                    <b>Sales Order Additional Charges</b>
+                    <ng-container *ngIf="containerSOAdditionalCharge.selectedChargeList.length==0">
+                      <p *ngIf="containerSOAdditionalCharge.chargeList.length > 0">Please select by clicking <span (click)="openCraneAwpAdditionalCharges('container')" [ngClass]="{'disable':containerTabActiveIndex!=2}" class="custom-link">  here  </span></p>
+                      <p  *ngIf="containerSOAdditionalCharge.chargeList.length==0" >No Sales Order Additional Charges found.</p>
+                    </ng-container>
+                 
+                  </div>
+                </div>
+                <div class="col-lg-3 col-md-6 my-2">
+                  <div class="box-tab" matRipple [matRippleDisabled]="containerTabActiveIndex==3" (click)="containerTabActiveIndex=3" [ngClass]="{'active':containerTabActiveIndex==3}">
+                    <b>Job Charge</b>
+                    <ng-container *ngIf="containerCharges.selectedChargeList.length==0">
+                      <p *ngIf="containerCharges.chargeList.length>0">Please select by clicking <span (click)="openCraneAwpCharges('container')" class="custom-link" [ngClass]="{'disable':containerTabActiveIndex!=3}">  here  </span></p>
+                      <p  *ngIf="containerCharges.chargeList.length==0" >No Job Charges found.</p>
+                    </ng-container>
+                 
+                  </div>
+                </div>
+                <div class="col-lg-3 col-md-6 my-2 ">
+                  <div class="box-tab" matRipple [matRippleDisabled]="containerTabActiveIndex==4" (click)="containerTabActiveIndex=4" [ngClass]="{'active':containerTabActiveIndex==4}">
+                    <b>Job Deduction</b>
+                    <ng-container *ngIf="containerDeductions.selectedDeductionList.length==0" >
+                      <p *ngIf="containerDeductions.deductionList.length>0">Please select by clicking <span (click)="openCraneAwpDeductions('container')" class="custom-link" [ngClass]="{'disable':containerTabActiveIndex!=4}">  here  </span></p>
+                      <p  *ngIf="containerDeductions.deductionList.length==0" >No Job Deductions found.</p>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+              <div>
+  
+              </div> 
+              <ng-container  *ngIf="containerTabActiveIndex ==1 && tripChallansListForContainer.length > 0" formGroupName="container">
+                <div class="row mx-0 p-3">
+                  <div class="col-lg-4">
+                   
+                    <div [ngClass]="{'hiddenContent':!isTax}" class="tabIndexActiveFields">
+                      <div  [ngClass]="{disable: disableTax}">
+                        <div class="tax-input-box tax-input-box-others">
+                          <span for="" class="ws-nowrap">Tax on freights</span>
+                        <material-dropdown [disabled]="disableTax"
+                          [selectedOption]="tripChallanCommonTaxForContainer">
+                          <select #customSelect class="no-style select--modify" formControlName="trip_challan_tax" (change)="onSelectPopulateTaxForContainer($event.target.value)">
+                            <option *ngFor="let option of taxOptions" value="{{ option.id }}">
+                              {{ option.label }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                         
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-6 document-selected" >
+                    <ng-container *ngIf="this.addInvoiceForm.get('attached_document_types').get('container').get('jobs').value?.length && tripChallansListForContainer.length > 0">
+                    
+                        <div><span class="title">Document Selected </span></div>
+                        <p >
+                          <span *ngFor="let doc of this.addInvoiceForm.get('attached_document_types').get('container').get('jobs').value;index as i " class="doc">
+                            {{doc}}{{i!=this.addInvoiceForm.get('attached_document_types').get('container').get('jobs').value?.length - 1 ? ",&nbsp;" :""}}
+                          </span>
+                        </p>
+                      </ng-container>
+                     
+                  </div>
+                  <div class="col-md-2 ">
+                   <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openManageDescriptionPopupForContainer()">Manage</button>
+                  </div>
+                </div>
+                <div class="addable-row-table m-1 mt-0 ws-nowrap" >
+                  <table>
+                      <thead>
+                          <tr>
+                            <th rowspan="2" class="p-0 border-end-0"></th>
+                              <th rowspan="2" class="border-start-0" >
+                                SALES ORDER NO.
+                              </th>
+                              <th  rowspan="2">JOB NO. DATE</th>
+                              <th  rowspan="2">JOB NO. </th>
+                              <th rowspan="2">VEHICLE NO.</th>
+                              <th rowspan="2">FREIGHT ({{currency_type?.symbol}})</th>
+                              <th rowspan="2" *ngIf="isTax">TOTAL TAX ({{currency_type?.symbol}})</th>
+                              <th rowspan="2">TOTAL AMOUNT ({{currency_type?.symbol}})</th>
+      
+                          </tr>
+                      </thead>
+                      <tbody formArrayName="trip_challan" >
+                        <ng-container *ngFor="let challan of addInvoiceForm.get('container').get('trip_challan').controls;let i_trip = index;"
+                        [formGroupName]="i_trip">
+                        <tr>
+                          <td class="p-0 border-end-0">
+                            <div class="d-flex flex-wrap mx-2" *ngIf="this.addInvoiceForm.get('attached_document_types').get('container').get('jobs').value.length>0">
+                              <i class="bi bi-file-earmark-fill file-icon" [ngStyle]="{ color : selectedDocuemnts?.containerTripChallans[i_trip]?.length>0 ? '#FF8000' : 'green'}"  [matTooltip]="getTripsDoc(selectedDocuemnts?.containerTripChallans[i_trip])" matTooltipClass="material-toltip-class" matTooltipPosition="above"></i>
+                             </div>
+                          </td>
+                          <td class=" border-start-0">
+                            
+                            {{ challan.value?.work_order_no ?challan.value?.work_order_no :'-' }}
+                            
+                          </td>
+                          <td>
+                            {{ challan.value?.date }}                      
+                          </td>
+                          <td>{{challan.value?.trip_id?challan.value?.trip_id:'-' }}   </td>
+                          <td>{{ challan.value?.vehicle }}</td>
+                          <td >
+                            <div class="d-flex justify-content-between align-items-center">{{ challan.value?.freights | numberFormat}} 
+                              <!-- <button mat-icon-button class="ms-2">
+                                <mat-icon class="fs-6 " (click)="editTripFreightForContainer(challan.value?.trip,challan.value?.work_order_no)">create</mat-icon>
+                              </button> -->
+                            </div>
+                        </td>
+                   <td  *ngIf="isTax">{{ challan.value?.tax_amount| numberFormat }}</td>
+                   <td>{{ challan.value?.total_amount | numberFormat}}</td>
+                    </tr>
+                    
+                    
+                  </ng-container>
+                  <tr>
+                    <td class="border-end-0"></td>
+                    <td class="fw-semibold border-start-0 py-3">Total</td>
+                    <td colspan="3"></td>
+                    <td class="fw-semibold">{{totals.container.freightTotal| numberFormat}}</td>
+                    <td class="fw-semibold" *ngIf="isTax">{{totals.container.totaltax| numberFormat}}</td>
+                    <td class="fw-semibold">{{totals.container.totalAmount| numberFormat}}</td>
+                  </tr>
+                 </tbody>
+                  </table>
+              </div>
+    
+              </ng-container>
+              
+              <div *ngIf="containerTabActiveIndex ==2 && this.containerSOAdditionalCharge.selectedChargeList.length" formGroupName="container">
+                <!--SO additional charges -->
+                <div class="d-flex justify-content-end p-3 pt-0 "> 
+                  <div >
+                   <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openCraneAwpAdditionalCharges('container')" >Manage</button>
+                  </div>
+                </div>
+                <div class="addable-row-table m-1 mt-0 ws-nowrap" >
+                  <table>
+                      <thead>
+                        <tr>
+                       <th>SO No</th>
+                       <th>SO Date</th>
+                       <th>Additional Charge</th>
+                       <th>Unit of measurement</th>
+                       <th>Units</th>
+                       <th>Rate Per Unit ({{currency_type?.symbol}})</th>
+                       <th>Amount ({{currency_type?.symbol}})</th>
+                       <!-- <th>Discount ({{currency_type?.symbol}})</th> -->
+                       <th *ngIf="isTax">Tax</th>
+                       <th>Total Amount ({{currency_type?.symbol}})</th>
+                      </tr>
+                      </thead>
+                      <tbody formArrayName="additional_charges" >
+                        <tr *ngFor="let additionalCharges of addInvoiceForm.controls.container.controls.additional_charges.controls; let i = index;" [formGroupName]="i">
+                        <td class="py-3">{{additionalCharges.value.workorder_no ?additionalCharges.value.workorder_no:'-'}}</td>
+                        <td>{{additionalCharges.value.date|formateDate }}</td>
+                        <td>{{additionalCharges.value.charge_name?additionalCharges.value.charge_name:'-'}}</td>                      
+                        <td>{{additionalCharges.value.units?additionalCharges.value.units:'-'}}</td>          
+                        <td >       
+                          <input positiveThreeDigitDecimalNumber type="text" placeholder="Eg.: 1234567"
+                            formControlName="quantity" (change)="calculationsChanged()">
+                       
+                      </td>                      
+                        <td>
+                          <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="unit_cost" (change)="calculationsChanged()">
+                        </td>
+                        <td>
+                          <input positiveThreeDigitDecimalNumber type="text"  placeholder="1000"
+                          formControlName="amount" readonly>
+                        </td>
+                        <!-- <td>
+                          <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="discount" (change)="calculationsChanged()">
+                        </td> -->
+                        <td  *ngIf="isTax" >
+                          <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="{label : additionalCharges.value.tax_label}">
+                              <select #customSelect name="" class="no-style select--modify error-box" formControlName="tax" (change)="calculationsChanged()">
+                                <option *ngFor="let option of taxOptions"
+                                  value="{{ option.id }}">{{
+                                  option.label }}
+                                </option>
+                              </select>
+                          </material-dropdown>
+                      </td> 
+                        <td>
+                          <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" 
+                          formControlName="total" readonly>
+                        </td>
+                       
+                      </tr>    
+                      <tr>
+                        <td class="py-3 fw-semibold">Total</td>
+                        <td colspan="3"></td>
+                        <td> {{totals.containerAdditionalCharges.units| numberFormat}}</td>
+                        <td></td>
+                        <td class="py-3 fw-semibold"> {{totals.containerAdditionalCharges.amountTotal| numberFormat}}</td>
+                        <!-- <td class="py-3 fw-semibold">{{totals.containerAdditionalCharges.discountTotal}}</td> -->
+                        <td class="py-3 fw-semibold" *ngIf="isTax">{{totals.containerAdditionalCharges.taxTotal| numberFormat}}</td>
+                        <td class="py-3 fw-semibold">{{totals.containerAdditionalCharges.total| numberFormat}}</td>
+  
+                      </tr>
+                 </tbody>
+                  </table>
+              </div>
+                
+  
+              </div>
+              <div *ngIf="containerTabActiveIndex ==3 && this.containerCharges.selectedChargeList.length" formGroupName="container">
+               
+  
+                <!-- charges -->
+                <div class="d-flex justify-content-end p-3 pt-0 ">
+                  <div class="col-lg-6 document-selected" >
+                    <ng-container *ngIf="addInvoiceForm.get('attached_document_types').get('container').get('charge').value?.length && containerCharges.selectedChargeList.length > 0">
+                        <div><span class="title">Document Selected </span></div>
+                        <p >
+                          <span *ngFor="let doc of addInvoiceForm.get('attached_document_types').get('container').get('charge').value;index as i " class="doc">
+                            {{doc}}{{i!=addInvoiceForm.get('attached_document_types').get('container').get('charge').value?.length - 1 ? ",&nbsp;" :""}}
+                          </span>
+                        </p>
+                      </ng-container>
+                  </div> 
+                  <div >
+                   <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openCraneAwpCharges('container')" >Manage</button>
+                  </div>
+                </div>
+                <div class="addable-row-table m-1 mt-0 ws-nowrap" >
+                  <table>
+                      <thead>
+                        <tr>
+                          <th></th>
+                       <th>SO No</th>
+                       <th>Job No</th>
+                       <th>Job Date</th>
+                       <th>Job Charges</th>
+                       <th>Vehicle No</th>
+                       <th>Charge Amount ({{currency_type?.symbol}})</th>
+                       <!-- <th>Discount ({{currency_type?.symbol}})</th> -->
+                       <th *ngIf="isTax">Tax</th>
+                       <th>Total Amount ({{currency_type?.symbol}})</th>
+                      </tr>
+                      </thead>
+                      <tbody formArrayName="charges" >
+                        <tr *ngFor="let charge of addInvoiceForm.controls.container.controls.charges.controls; let i = index;" [formGroupName]="i">
+                          <td class="p-0 border-end-0">
+                            <div class="d-flex flex-wrap mx-2" *ngIf="this.addInvoiceForm.get('attached_document_types').get('container').get('charge')?.value?.length>0">
+                              <i class="bi bi-file-earmark-fill file-icon" [ngStyle]="{ color : this.selectedDocuemnts?.containerCharges[i]?.length>0 ? '#FF8000' : 'green'}"  [matTooltip]="getTripsDoc(this.selectedDocuemnts?.containerCharges[i])" matTooltipClass="material-toltip-class" matTooltipPosition="above"></i>
+                             </div>
+                          </td>
+                        <td class="py-3">{{charge.value.workorder_no ?charge.value.workorder_no:'-'}}</td>
+                        <td>{{charge.value.trip_id?charge.value.trip_id:'-'}}</td>
+                        <td>{{charge.value.date|formateDate }}</td>
+                        <td>{{charge.value.name?charge.value.name:'-'}}</td>        
+                        <td>{{charge.value.vehicle_no?charge.value.vehicle_no:'-'}}</td>                 
+                        <td>
+                          <input positiveThreeDigitDecimalNumber type="text"  placeholder="1000"
+                          formControlName="amount" (change)="calculationsChanged()">
+                        </td>
+                        <!-- <td>
+                          <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="discount" (change)="calculationsChanged()">
+                        </td> -->
+                        <td *ngIf="isTax">
+                          <div [ngClass]="{disable: disableTax}">
+                              <material-dropdown [searchable]="true" [addable]="false" 
+                                [selectedOption]="{label:charge.value.tax_label,value:''}" [disabled]="disableTax">
+                                <select #customSelect formControlName="tax" 
+                                  (change)="taxValueChanged('container',i); calculationsChanged()">
+                                  <option *ngFor="let option of taxOptions" value="{{ option.id }}">
+                                    {{ option.label }}
+                                  </option>
+                                </select>
+                              </material-dropdown>
+                          </div>
+                        </td> 
+                        <td>
+                          <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" 
+                          formControlName="total" readonly>
+                        </td>
+                       
+                      </tr>  
+                      <tr>
+                        <td class="py-3 fw-semibold">Total</td>
+                        <td colspan="5"></td>
+                        <td class="fw-semibold">{{totals.containerCharges.amountTotal| numberFormat}}</td>
+                        <!-- <td class="fw-semibold">{{totals.containerCharges.discountTotal}}</td> -->
+                        <td class="fw-semibold" *ngIf="isTax">{{totals.containerCharges.taxTotal| numberFormat}}</td>
+                        <td class="fw-semibold">{{totals.containerCharges.total| numberFormat}}</td>
+  
+  
+                      </tr>  
+                 </tbody>
+                  </table>
+              </div>
+                
+  
+              </div>
+              <div *ngIf="containerTabActiveIndex ==4 && this.containerDeductions.selectedDeductionList.length" formGroupName="container">
+                <!-- charges -->
+                <div class="d-flex justify-content-end p-3 pt-0 "> 
+                  <div class="col-lg-6 document-selected" >
+                    <ng-container *ngIf="addInvoiceForm.get('attached_document_types').get('container').get('deduction').value?.length && containerDeductions.selectedDeductionList.length > 0">
+                        <div><span class="title">Document Selected </span></div>
+                        <p >
+                          <span *ngFor="let doc of addInvoiceForm.get('attached_document_types').get('container').get('deduction').value;index as i " class="doc">
+                            {{doc}}{{i!=addInvoiceForm.get('attached_document_types').get('container').get('deduction').value?.length - 1 ? ",&nbsp;" :""}}
+                          </span>
+                        </p>
+                      </ng-container>
+                  </div> 
+  
+                  <div >
+                   <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openCraneAwpDeductions('container')" >Manage</button>
+                  </div>
+                </div>
+                <div class="addable-row-table m-1 mt-0 ws-nowrap " >
+                  <table>
+                      <thead>
+                        <tr>
+                          <th></th>
+                       <th>SO No.</th>
+                       <th>Job No.</th>
+                       <th>Job Date</th>
+                       <th>Job Deductions</th>
+                       <th>Vehicle No.</th>
+                       <th>Deductions Amount ({{currency_type?.symbol}})</th>
+                       <!-- <th>Discount ({{currency_type?.symbol}})</th> -->
+                       <th>Total Amount ({{currency_type?.symbol}})</th>
+                      </tr>
+                      </thead>
+                      <tbody formArrayName="deductions" >
+                        <tr *ngFor="let deductions of addInvoiceForm.controls.container.controls.deductions.controls; let i = index;" [formGroupName]="i">
+                          <td class="p-0 border-end-0">
+                            <div class="d-flex flex-wrap mx-2" *ngIf="addInvoiceForm.get('attached_document_types').get('container').get('deduction').value.length>0">
+                              <i class="bi bi-file-earmark-fill file-icon" [ngStyle]="{ color : selectedDocuemnts?.containerDeductions[i]?.length>0 ? '#FF8000' : 'green'}"  [matTooltip]="getTripsDoc(selectedDocuemnts?.containerDeductions[i])" matTooltipClass="material-toltip-class" matTooltipPosition="above"></i>
+                             </div>
+                          </td>
+                        <td class="py-3">{{deductions.value.workorder_no ?deductions.value.workorder_no:'-'}}</td>
+                        <td>{{deductions.value.trip_id?deductions.value.trip_id:'-'}}</td>
+                        <td>{{deductions.value.date|formateDate }}</td>
+                        <td>{{deductions.value.name?deductions.value.name:'-'}}</td>        
+                        <td>{{deductions.value.vehicle_no?deductions.value.vehicle_no:'-'}}</td>                 
+                        <td>
+                          <input positiveThreeDigitDecimalNumber type="text"  placeholder="1000"
+                          formControlName="amount" (change)="calculationsChanged()">
+                        </td>
+                        <!-- <td>
+                          <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="discount" (change)="calculationsChanged()">
+                        </td> -->
+                        <td>
+                          <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" 
+                          formControlName="total" readonly>
+                        </td>
+                       
+                      </tr>   
+                      <tr>
+                        <td class="py-3 fw-semibold">Total</td>
+                        <td colspan="5"></td>
+                        <td class="fw-semibold">{{totals.containerDeduction.amountTotal| numberFormat}}</td>
+                       
+                        <!-- <td class="fw-semibold">{{totals.containerDeduction.discountTotal}}</td> -->
+                        
+                        <td class="fw-semibold">{{totals.containerDeduction.total| numberFormat}}</td>
+  
+  
+                      </tr>  
+                      
+                 </tbody>
+                  </table>
+              </div>
+                
+  
+              </div>
+            </mat-tab>
+
+        <mat-tab *ngIf="isOthersDataAvailable">
+          <ng-template mat-tab-label>
+            <span >Job for Loose Cargo</span>
+          </ng-template>
+          <div class="row mx-0  py-2">
+            <div class="col-lg-3 col-md-6 my-2 " >
+              <div class="box-tab" matRipple [matRippleDisabled]="othersTabActiveIndex==1"(click)="othersTabActiveIndex=1" [ngClass]="{'active':othersTabActiveIndex==1}">
+                <b>Jobs </b>
+                <ng-container>
+                  <p *ngIf="tripChallansList.length == 0 && doTripChallanExists">You can select Jobs by clicking  <span (click)="openDescriptionPopup()" class="custom-link">  here  </span></p>
+                  <p *ngIf="!doTripChallanExists">No Jobs Completed for this Customer .</p>
+                </ng-container>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 my-2 ">
+              <div class="box-tab" matRipple [matRippleDisabled]="othersTabActiveIndex==2" (click)="othersTabActiveIndex=2" [ngClass]="{'active':othersTabActiveIndex==2}">
+                <b>Sales Order Additional Charges</b>
+                <ng-container *ngIf="othersSOAdditionalCharge.selectedChargeList.length==0">
+                  <p *ngIf="othersSOAdditionalCharge.chargeList.length > 0">Please select by clicking <span (click)="openCraneAwpAdditionalCharges('others')" [ngClass]="{'disable':othersTabActiveIndex!=2}" class="custom-link">  here  </span></p>
+                  <p  *ngIf="othersSOAdditionalCharge.chargeList.length==0" >No Sales Order Additional Charges found.</p>
+                </ng-container>
+             
+              </div>
+            </div>
+          </div>
+          <ng-container  *ngIf="othersTabActiveIndex==1 && tripChallansList.length > 0" formGroupName="others">
+            <div class="row mx-0 p-3">
+              <div class="col-lg-4">
+               
+                <div [ngClass]="{'hiddenContent':!isTax}" class="tabIndexActiveFields">
+                  <div  [ngClass]="{disable: disableTax}">
+                    <div class="tax-input-box tax-input-box-others">
+                      <span for="" class="ws-nowrap">Tax on freights</span>
+                    <material-dropdown [disabled]="disableTax"
+                      [selectedOption]="itemChallanCommonTax">
+                      <select #customSelect class="no-style select--modify" formControlName="trip_challan_tax" (change)="onSelectPopulateTax($event.target.value)">
+                        <option *ngFor="let option of taxOptions" value="{{ option.id }}">
+                          {{ option.label }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                     
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6 document-selected" >
+                <ng-container *ngIf="this.addInvoiceForm.get('attached_document_types').get('other')?.value?.length && tripChallansList.length > 0">
+                
+                    <div><span class="title">Document Selected </span></div>
+                    <p >
+                      <span *ngFor="let doc of this.addInvoiceForm.get('attached_document_types').get('other')?.value;index as i " class="doc">
+                        {{doc}}{{i!=this.addInvoiceForm.get('attached_document_types').get('other')?.value?.length - 1 ? ",&nbsp;" :""}}
+                      </span>
+                    </p>
+                  </ng-container>
+                 
+              </div>
+              <div class="col-md-2 ">
+               <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openManageDescriptionPopup()">Manage</button>
+              </div>
+            </div>
+            <div class="addable-row-table m-1 mt-0 ws-nowrap" >
+              <table>
+                  <thead>
+                      <tr>
+                        <th rowspan="2" class="p-0 border-end-0"></th>
+                          <th rowspan="2" class="border-start-0" >
+                            SALES ORDER NO.
+                          </th>
+                          <th  rowspan="2">JOB NO. DATE</th>
+                          <th  rowspan="2">JOB NO. </th>
+                          <th rowspan="2">VEHICLE NO.</th>
+                          <th rowspan="2">FREIGHT ({{currency_type?.symbol}})</th>
+                          <th colspan="2" class="text-center">JOB CHARGES ({{currency_type?.symbol}})</th>
+                          <th rowspan="2" class="text-center">JOB DEDUCTION ({{currency_type?.symbol}})</th>
+                          <th rowspan="2" *ngIf="isTax">TOTAL TAX ({{currency_type?.symbol}})</th>
+                          <th rowspan="2">TOTAL AMOUNT ({{currency_type?.symbol}})</th>
+  
+                      </tr>
+                      <tr>
+                       
+                        <th>TAX APPLICABLE</th>
+                        <th>TAX NOT APPLICABLE</th>    
+                      </tr>
+                  </thead>
+                  <tbody formArrayName="trip_challan" >
+                    <ng-container *ngFor="let challan of addInvoiceForm.get('others').get('trip_challan').controls;let i_trip = index;"
+                    [formGroupName]="i_trip">
+                    <tr>
+                      <td class="p-0 border-end-0">
+                        <div class="d-flex flex-wrap mx-2" *ngIf="this.addInvoiceForm.get('attached_document_types').get('other')?.value.length>0">
+                          <i class="bi bi-file-earmark-fill file-icon" [ngStyle]="{ color : selectedDocumentInTrip[i_trip].length>0 ? '#FF8000' : 'green'}"  [matTooltip]="getTripsDoc(selectedDocumentInTrip[i_trip])" matTooltipClass="material-toltip-class" matTooltipPosition="above"></i>
+                         </div>
+                      </td>
+                      <td class=" border-start-0">
+                        
+                        {{ challan.value?.work_order_no ?challan.value?.work_order_no :'-' }}
+                        
+                      </td>
+                      <td>
+                        {{ challan.value?.date }}                      
+                      </td>
+                      <td>{{challan.value?.trip_id?challan.value?.trip_id:'-' }}   </td>
+                      <td>{{ challan.value?.vehicle }}</td>
+                      <td >
+                        <div class="d-flex justify-content-between align-items-center">{{ challan.value?.freights|numberFormat }}<button mat-icon-button class="ms-2">
+                        <mat-icon class="fs-6 " (click)="editTripFreight(challan.value?.trip,challan.value?.work_order_no)">create</mat-icon>
+                      </button></div>
+                    </td>
+                      <td >
+                        <div class="d-flex justify-content-between align-items-center">{{ challan.value?.charges_wt_tax| numberFormat }}<button mat-icon-button class="ms-2">
+                        <mat-icon class="fs-6 " (click)="editTripAddBillCharges(challan.value?.trip)">create</mat-icon>
+                      </button></div>
+                    </td>
+                    <td >
+                      <div class="d-flex justify-content-between align-items-center">{{ challan.value?.charges_wo_tax | numberFormat}}<button mat-icon-button class="ms-2">
+                      <mat-icon class="fs-6 " (click)="editTripAddBillCharges(challan.value?.trip)">create</mat-icon>
+                    </button></div>
+                <td >
+                  <div class="d-flex justify-content-between align-items-center">{{ challan.value?.deductions_wo_tax | numberFormat}}<button mat-icon-button class="ms-2">
+                  <mat-icon class="fs-6 " (click)="editTripReduceBillCharges(challan.value?.trip)">create</mat-icon>
+                </button></div>
+              </td>
+               <td *ngIf="isTax">{{ challan.value?.tax_amount| numberFormat }}</td>
+               <td>{{ challan.value?.total_amount| numberFormat }}</td>
+                </tr>
+                
+                
+              </ng-container>
+              <tr>
+                <td class="border-end-0"></td>
+                <td class="fw-semibold border-start-0 py-3">Total</td>
+                <td colspan="3"></td>
+                <td class="fw-semibold">{{totals.others.freightTotal| numberFormat}}</td>
+                <td class="fw-semibold">{{totals.others.chargesWttax| numberFormat}}</td>
+                <td class="fw-semibold">{{totals.others.chargesWotax| numberFormat}}</td>
+                <td class="fw-semibold">{{totals.others.deduction| numberFormat}}</td>
+                <td class="fw-semibold" *ngIf="isTax">{{totals.others.totaltax| numberFormat}}</td>
+                <td class="fw-semibold">{{totals.others.totalAmount| numberFormat}}</td>
+              </tr>
+             </tbody>
+              </table>
+          </div>
+
+          </ng-container>
+          <div *ngIf="othersTabActiveIndex ==2 && this.othersSOAdditionalCharge.selectedChargeList.length" formGroupName="others">
+            <!--SO additional charges -->
+            <div class="d-flex justify-content-end p-3 pt-0 "> 
+              <div >
+               <button class="gb-edit-btn-secondary ps-3 w-auto ms-auto" (click)="openCraneAwpAdditionalCharges('others')" >Manage</button>
+              </div>
+            </div>
+            <div class="addable-row-table m-1 mt-0 ws-nowrap" >
+              <table>
+                  <thead>
+                    <tr>
+                   <th>SO No</th>
+                   <th>SO Date</th>
+                   <th>Additional Charge</th>
+                   <th>Unit of measurement</th>
+                   <th>Units</th>
+                   <th>Rate Per Unit ({{currency_type?.symbol}})</th>
+                   <th>Amount ({{currency_type?.symbol}})</th>
+                   <!-- <th>Discount ({{currency_type?.symbol}})</th> -->
+                   <th *ngIf="isTax">Tax</th>
+                   <th>Total Amount ({{currency_type?.symbol}})</th>
+                  </tr>
+                  </thead>
+                  <tbody formArrayName="additional_charges" >
+                    <tr *ngFor="let additionalCharges of addInvoiceForm.controls.others.controls.additional_charges.controls; let i = index;" [formGroupName]="i">
+                    <td class="py-3">{{additionalCharges.value.workorder_no ?additionalCharges.value.workorder_no:'-'}}</td>
+                    <td>{{additionalCharges.value.date|formateDate}}</td>
+                    <td>{{additionalCharges.value.charge_name?additionalCharges.value.charge_name:'-'}}</td>                      
+                    <td>{{additionalCharges.value.units?additionalCharges.value.units:'-'}}</td>          
+                    <td >       
+                      <input positiveThreeDigitDecimalNumber type="text" placeholder="Eg.: 1234567"
+                        formControlName="quantity"(change)="calculationsChanged()">
+                   
+                  </td>                      
+                    <td>
+                      <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="unit_cost" (change)="calculationsChanged()">
+                    </td>
+                    <td>
+                      <input positiveThreeDigitDecimalNumber type="text"  placeholder="1000"
+                      formControlName="amount" readonly>
+                    </td>
+                    <!-- <td>
+                      <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="discount" (change)="calculationsChanged()">
+                    </td> -->
+                    <td  *ngIf="isTax" >
+                      <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="{label : additionalCharges.value.tax_label}">
+                          <select #customSelect name="" class="no-style select--modify error-box" formControlName="tax" (change)="calculationsChanged()">
+                          <option *ngFor="let option of taxOptions"
+                              value="{{ option.id }}">{{
+                              option.label }}</option>
+                          </select>
+                        </material-dropdown>
+                  </td>
+                    <td>
+                      <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" 
+                      formControlName="total" [attr.disabled]="true">
+                    </td>
+                   
+                  </tr>    
+                  <tr>
+                    <td class="py-3 fw-semibold">Total</td>
+                    <td colspan="3"></td>
+                    <td class="py-3 fw-semibold">{{totals.othersAdditionalCharges.totalUnits| numberFormat}}</td>
+                    <td></td>
+                    <td class="py-3 fw-semibold">{{totals.othersAdditionalCharges.amountTotal| numberFormat}}</td>
+                    <!-- <td class="py-3 fw-semibold">{{totals.othersAdditionalCharges.discountTotal}}</td> -->
+                    <td class="py-3 fw-semibold" *ngIf="isTax">{{totals.othersAdditionalCharges.taxTotal| numberFormat}}</td>
+                    <td class="py-3 fw-semibold">{{totals.othersAdditionalCharges.total| numberFormat}}</td>
+
+                  </tr>
+             </tbody>
+              </table>
+          </div>
+            
+
+          </div>
+        
+
+         </mat-tab>
+
+        
+
+
+          <mat-tab>
+              <ng-template mat-tab-label>
+                <span >Additional Charges</span>
+              </ng-template>
+              <div class="addable-row-table m-1 " >
+                <table>
+                    <thead>
+                        <tr>
+    
+                            <th  >Additional Charge</th>
+                            <th  >UNIT OF MEASUREMENT</th>
+                            <th  >NO OF UNITS </th>
+                            <th >UNIT COST ({{currency_type?.symbol}})</th>
+                            <th >AMOUNT ({{currency_type?.symbol}})</th>
+                            <!-- <th >DISCOUNT ({{currency_type?.symbol}})</th> -->
+                            <th  *ngIf="isTax">TAX</th>
+                            <th  class="border-end-0" >TOTAL AMOUNT ({{currency_type?.symbol}})</th>
+                            <th  class="border-start-0"></th>
+    
+                        </tr>
+                        
+                    </thead>
+                    <tbody formArrayName="item_others" >
+                      <ng-container  >
+                        <tr  *ngFor="let otherItem of addInvoiceForm.controls.item_others.controls; let i = index;" [formGroupName]="i">
+                          <td>
+                              <material-dropdown [addable]="true"  [maxLength]="36"
+                                [addErrorClass]="addErrorClass(addInvoiceForm.controls.item_others.controls[i].controls.item)"
+                                [addNewOptions]="true" [selectedOption]="initialValues.items[i]"
+                                (addNewOption)="addNewExpenseType($event,otherItem,i)">
+                                <select #customSelect formControlName="item" class="no-style select--modify"
+                                  (change)="onMaterialSelected($event, otherItem,i);">
+                                  <option *ngFor="let option of staticOptions.materialList" value="{{ option.name?.id }}">
+                                    {{ option.name?.name }}
+                                  </option>
+                                </select>
+                              </material-dropdown>
+                            
+                          </td>
+                          <td>
+                           
+                            <material-dropdown [searchable]="true" [addable]="false" [addBlank]="true" 
+                              [selectedOption]="initialValues.units[i]">
+                              <select #customSelect formControlName="units" >
+                                <option *ngFor="let option of staticOptions.itemUnits" value="{{ option.id }}">
+                                  {{ option.label }}
+                                </option>
+                              </select>
+                            </material-dropdown>
+                          
+                        </td>
+                          <td >
+                            
+                              <input positiveThreeDigitDecimalNumber type="text" placeholder="Eg.: 1234567"
+                                formControlName="quantity" (change)="calculateItemOthersAmount(i)">
+                           
+                          </td>
+                          <td>
+                           
+                              <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="unit_cost"
+                                (change)="calculateItemOthersAmount(i)">
+                          
+                          </td>
+                          <td >
+                            
+                              <input positiveThreeDigitDecimalNumber [ngClass]="addErrorClass(otherItem.controls.amount)" type="text"  placeholder="1000"
+                                formControlName="amount" readonly >
+                            
+                          </td>
+                          <!-- <td >
+                           
+                              
+                              <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="discount"
+                                (change)="calculateOtherFinalAmount(i);" [ngClass]="addErrorClass(addInvoiceForm.controls.item_others.controls[i].controls.discount)">
+                            
+                          </td> -->
+                          <td *ngIf="isTax">
+                            <div [ngClass]="{disable: disableTax}">
+                              
+                                <material-dropdown [searchable]="true" [addable]="false" 
+                                  [selectedOption]="initialValues.tax[i]" [disabled]="disableTax">
+                                  <select #customSelect formControlName="tax" 
+                                    (change)="calculationsChanged()">
+                                    <option *ngFor="let option of taxOptions" value="{{ option.id }}">
+                                      {{ option.label }}
+                                    </option>
+                                  </select>
+                                </material-dropdown>
+                              
+                            </div>
+                          </td>
+
+                          <td class="max-wd-120">
+                            
+                              <input positiveThreeDigitDecimalNumber type="text" placeholder="1000" 
+                                formControlName="total_amount" readonly>
+                           
+                          </td>
+
+                          <td class="rc-row-btn-wrap border-start-0 border-end-0">
+                            <div class="d-flex ">
+                                <button  (click)="removeOtherItem(i)" *ngIf="addInvoiceForm.controls.item_others.controls.length !== 1" class="  row-btn row-btn-delete "><span class="material-icons">
+                                        close</span></button>
+
+                                    <button  (click)="addMoreOtherItem()" *ngIf="addInvoiceForm.controls.item_others.controls.length-1== i"
+                                    class="  row-btn row-btn-add "><span class="material-icons">
+                                        add
+                                    </span></button>
+                            </div>
+  
+  
+                        </td>
+                        </tr>
+                        <tr>
+                          <td class="py-3 fw-semibold">Total</td>
+                          <td colspan="3"></td>
+                          <td class="fw-semibold">{{totals.itemOther.amountTotal| numberFormat}}</td>
+                         
+                          <!-- <td class="fw-semibold">{{totals.itemOther.discountTotal}}</td> -->
+                          <td *ngIf="isTax"></td>
+                          
+                          <td class="fw-semibold">{{totals.itemOther.total| numberFormat}}</td>
+                          <td></td>
+    
+    
+                        </tr> 
+                      </ng-container>
+                    </tbody>
+                </table>
+            </div>
+              </mat-tab>
+      </mat-tab-group>
+    </div>
+    <div class="row mx-0 def-color">
+      <div class="col-lg-4 px-0">
+          <div class="gb-fake-tab-wrapper">
+              <span>Term and condition</span>
+          </div>
+
+          <div class="p-4 pb-0">
+
+              <div class="input-wrap clearfix approval-input">
+                  <label for="" class="">Signature</label>
+                  <div>
+                    <material-dropdown [selectedOption]="initialValues.digitalSignature" [addBlank]="true">
+                      <select #customSelect class="no-style select--modify" formControlName="signature">
+                        <option *ngFor="let option of digitalSignature " value="{{option.id}}">{{option.name}}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+              </div>
+              <div class="input-wrap clearfix approval-input">
+                  <label for="" class="">Term and condition</label>
+                  <div>
+                    <material-dropdown [addBlank]="true" [selectedOption]="initialValues.termsAndCondition">
+                    <select #customSelect formControlName="terms_and_condition" class="no-style select--modify">
+                      <option *ngFor="let option of termsAndConditions" value="{{ option.id }}">
+                        {{ option.name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                  </div>
+              </div>
+              <div class="input-wrap clearfix">
+                  <label for="" class="">Narration</label>
+                  <div>
+                    <textarea  class="error-box w-100 p-2" formControlName="narrations" 
+                       min="2" rows="6" placeholder="Enter your business narration"></textarea>
+                  </div>
+              </div>
+
+          </div>
+
+      </div>
+      <div class="col-lg-8 px-0 balance-block">
+          <div class="gb-fake-tab-wrapper">
+              <span>Invoice Total</span>
+          </div>
+          <div class="p-4 pb-0">
+           
+            <div class="d-flex fw-semibold justify-content-between align-items-center mb-3">
+              <span class=" me-5">Subtotal</span>
+              <span>{{ currency_type?.symbol}} {{ totals.subtotal| numberFormat }}</span>
+            </div>
+            <div class="d-flex fw-semibold justify-content-between align-items-center mb-3" *ngIf="isTax">
+              <span class=" me-5">Tax Amount:</span>
+              <span>{{ currency_type?.symbol}} {{ totals.taxTotal | numberFormat}}</span>
+            </div>
+            <!-- <div class="gst-table-wrapper mb-2">
+            <div class="gst-main tabIndexActive">
+              <div class="text-start pt-0 gst-left justify-content-start">
+  
+                  <div class="dropdown select-wrap">
+                      <material-dropdown [selectedOption]="initialValues.adjustmentAccount" class=" text-end">
+                        <select #customSelect formControlName="adjustment_account"
+                          class="no-style select--modify">
+                          <option *ngFor="let option of expenseAccountList" value="{{ option.id }}">
+                            {{ option.name }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                    </div>
+                    <div class="input ms-2"
+                      [ngClass]="addErrorClass(addInvoiceForm.controls.adjustment_amount)">
+                      <input twoDigitDecimalNumber type="text"
+                        class="error-box" placeholder=""
+                        formControlName="adjustment_amount" (change)="calculationsChanged()">
+                    </div>
+  
+                    <div class="select-wrap d-inline-block" id="margin-left">
+                      <select name="" class="no-style select--modify" formControlName="adjustment_choice"
+                        (change)="calculationsChanged();">
+                        <option value="0" selected>%</option>
+                        <option value="1">{{ currency_type?.symbol}}</option>
+                      </select>
+                    </div>
+  
+                  </div>
+                  <div class="px-0 fw-semibold  text-end gst-right"> {{ currency_type?.symbol}} {{ totals.adjustment }} </div>
+              </div>
+            </div> -->
+            <div class="d-flex fw-semibold justify-content-between align-items-center mb-3">
+              <mat-checkbox color="primary"  (change)="onRoundOffEvent($event)"
+                                    formControlName="is_roundoff">Round Off</mat-checkbox>
+              <span>{{ currency_type?.symbol}} {{ totals.roundOffAmount | numberFormat}}</span>
+            </div>
+            
+
+
+          </div>
+          <div class="d-flex fw-semibold justify-content-between align-items-center py-3 px-4 border-top">
+            <span class=" me-5 fs-5">Invoice Total</span>
+            <span class="  fs-5">{{ currency_type?.symbol}} {{ totals.total | numberFormat }}</span>
+          </div>
+      </div>
+  </div>
+  </div>
+  
+</form>
+<div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end">
+    
+
+      <button class="btn btn--sm " type="button" [routerLink]="[preFixUrl+'/income/invoice/list']">Cancel</button>
+      <button class="btn  btn--primary btn--default btn-mg-left btn-w-100 btn--dropdown saveButton"
+        (click)="handleSaveClick()" >{{invoiceId ==''?'Save':'Update'}} Invoice<i
+          class="material-icons" (click)="$event.stopPropagation(); handleSpanClick()">arrow_drop_down</i>
+        <div class="more-actions__menu" [ngClass]="{'show': saveButton}" id="custom-dropdown-top">
+          <button class="more-actions__item  w-100 text-start" type="click" (click)="submitInvoiceForm()">Save & Submit</button>
+          <div *ngIf="invoiceId !==''">
+            <button class="more-actions__item w-100 text-start" type="button" *ngIf="invoiceDetails?.status?.label == 'Draft'"
+              (click)="saveAsDraft()">Save as Draft</button>
+          </div>
+          <div *ngIf="invoiceId ==''">
+            <button class="more-actions__item w-100 text-start" type="button" (click)="saveAsDraft()">Save as Draft</button>
+          </div>
+        </div>
+      </button>
+   
+  </div> 
+
+<app-edit-trip-new-pop-up (dataFromEdit)="editCompleteTripFreight($event)" [showEditPopup]="showFreightPopup" [isAddExpense]="false"
+  *ngIf="showFreightPopup.show"></app-edit-trip-new-pop-up>
+<app-charges-popup (dataFromEdit)="editCompleteTripCharges($event)" [showChargesPopup]="showChargesPopup" [isAddExpense]="isAddExpense" [updateCharges]="true"
+  *ngIf="showChargesPopup.show"></app-charges-popup>
+  <!-- for others -->
+  <app-trip-challan [tripId]="tripId"  paramsCategory = "others" [openDescription]="openDescription" [openManageDescription]="openManageDescription" [showManageDiscription]="false" [showDocument]="true" [alreadySelectedTripChallans]="tripChallansList"
+  [inlineAdd]="tripChallanModelInline" [selectedTripDoc]="selectedTripDoc" [isAdd]="isTripAdd" (checkChallanExist)="checkTripChallanExist($event)"
+  (onAddChallanClicked)="tripChallansSelected($event)" (selectedDocuments)="selectedDocuments($event)" ></app-trip-challan>
+  <!-- for container -->
+  <app-trip-challan paramsCategory = "container" [tripId]="tripId" [pulloutAndDepositTripId]="pulloutAndDepositTripId" [openDescription]="openDescriptionForContainer" [openManageDescription]="openManageDescriptionForContainer" [showManageDiscription]="false" [showDocument]="true" [alreadySelectedTripChallans]="tripChallansListForContainer"
+  [inlineAdd]="tripChallanModelInlineForContainer" [selectedTripDocForContainer]="selectedTripDocForContainer" [isAdd]="isTripAdd" (checkChallanExistForContainer)="checkTripChallanExistForContainer($event)"
+  (onAddChallanClickedForContainer)="tripChallansForContainerSelected($event)" (selectedDocuments)="selectedDocumentsForContainer($event)" ></app-trip-challan>
+  <app-credit-limit *ngIf="creditOnsaveLimit.open" [creditLimitData]="creditOnsaveLimit" (creditLimit)="onCreditLimitOnSave($event)"></app-credit-limit>
+  <app-credit-limit *ngIf="creditOnsaveAsDraftLimit.open" [creditLimitData]="creditOnsaveAsDraftLimit" (creditLimit)="onCreditLimitOnSaveDraft($event)"></app-credit-limit>
+

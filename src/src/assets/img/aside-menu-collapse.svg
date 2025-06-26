@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="22px" viewBox="0 0 16 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>menu icon</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="subnav/vendor-credits" transform="translate(-20.000000, -16.000000)" fill="#9FACB8">
+            <path d="M23.7617188,21.9882812 L26.75,25.0117188 L25.6953125,26.0664062 L20.8789062,21.25 L25.6953125,16.4335938 L26.75,17.4882812 L23.7617188,20.5117188 L35.75,20.5117188 L35.75,21.9882812 L23.7617188,21.9882812 Z M35.75,16.75 L35.75,18.2617188 L28.2617188,18.2617188 L28.2617188,16.75 L35.75,16.75 Z M35.75,24.2382812 L35.75,25.75 L28.2617188,25.75 L28.2617188,24.2382812 L35.75,24.2382812 Z" id="menu-icon"></path>
+        </g>
+    </g>
+</svg>

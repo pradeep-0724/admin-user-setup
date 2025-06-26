@@ -1,0 +1,49 @@
+<div class="def-color px-0">
+    <div class="tyre-layout-overflow pb-2">
+
+        <table style="zoom: 40%;" class="tyre-diagram-wrap w-100">
+            <tbody>
+
+
+                <tr *ngFor="let tyre of tyreDetails?.tyres?.tyre_placements;let i = index;" class="tyre-diagram-row ">
+
+
+                    <td class="tyres-container px-0 ">
+
+                        <div class=" d-flex flex-row-reverse   pt-5">
+                            <div [matTooltip]="'Tyre at '+leftTyre?.name+' already selected for change.'"
+                            [matTooltipDisabled]="!selectedTyres.hasOwnProperty(leftTyre?.name) || (selectedTyres.hasOwnProperty(leftTyre?.name) && formIndex==selectedTyres[leftTyre?.name])" class="tyre-wrap ms-3" [ngClass]="{'active':leftTyre?.name == selectedPosition,'view':isView}" *ngFor="let leftTyre of tyre?.left_tyers;let l = index;">
+                                <div [ngClass]="{'disable':selectedTyres.hasOwnProperty(leftTyre?.name) && formIndex!=selectedTyres[leftTyre?.name]}"> 
+                                <span class="tyre-name fw-semibold">{{leftTyre?.name}}</span>
+                                <div class="tyre" (click)="onTyreClick(leftTyre?.name)" ></div>
+                            </div>
+                            </div>
+                        </div>
+
+                    </td>
+                    <td class=" h-line px-0">
+                        <div class="h-line-btn-group">
+                            <div class="h-line-btn-group-main">
+                                {{tyre?.name}}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="tyres-container px-0 ">
+                        <div class="d-flex pt-5">
+                            <div class=" tyre-wrap me-3"[matTooltip]="'Tyre at '+rightTyre?.name+' already selected for change.'"
+                            [matTooltipDisabled]="!selectedTyres.hasOwnProperty(rightTyre?.name) || (selectedTyres.hasOwnProperty(rightTyre?.name) && formIndex==selectedTyres[rightTyre?.name])" [ngClass]="{'active':rightTyre?.name == selectedPosition,'view':isView}" *ngFor="let rightTyre of tyre?.right_tyers;let r = index;">
+                                <div [ngClass]="{'disable':selectedTyres.hasOwnProperty(rightTyre?.name) && formIndex!=selectedTyres[rightTyre?.name]}"> 
+                                <span class="tyre-name fw-semibold">{{rightTyre?.name}} </span>
+                                <div class="tyre" (click)="onTyreClick(rightTyre?.name)" ></div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                </tr>
+            </tbody>
+
+        </table>
+
+    </div>
+</div>

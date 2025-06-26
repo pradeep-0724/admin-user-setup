@@ -1,0 +1,46 @@
+<div class="custom-table-container m-1 border-start border-end border-bottom"
+>
+  <table >
+    <thead >
+      <tr>
+        <th>Additional Charge</th>
+        <th>UNIT OF MEASUREMENT</th>
+        <th>NO OF UNITS</th>
+        <th>UNIT COST  ({{ currency_type?.symbol}})</th>
+        <th>AMOUNT ({{ currency_type?.symbol}})</th>
+        <!-- <th>DISCOUNT</th> -->
+        <th *ngIf="isTax">TAX</th>
+        <th>TOTAL AMOUNT ({{ currency_type?.symbol}})</th>
+        
+      </tr>
+    </thead>
+    <tbody *ngIf="otherList.length==0">
+      <tr class="border-0">
+        <td class="bg-white" colspan="30">
+          <div class="no-list-data-wrap">
+            <figure>
+              <img src="assets/img/no-content.png" alt="">
+            </figure>
+            <h5 class="mt-3 primary-brand-text">No data found!</h5>
+          </div>
+        </td>
+      </tr>
+
+    </tbody>
+
+    <tbody>
+      <tr *ngFor="let other of otherList ">
+      <td>{{other?.item}}</td>
+      <td>{{other?.unit}}</td>
+      <td>{{other?.quantity}}</td>
+      <td>{{other?.rate_per_unit| numberFormat}}</td>
+      <td>{{other?.amount| numberFormat}}</td>
+      <!-- <td>{{other?.discount}}</td> -->
+      <td *ngIf="isTax">{{other?.tax| numberFormat}}</td>
+      <td>{{other?.total_amount| numberFormat}}</td>
+  </tr>
+ 
+      
+    </tbody>
+  </table>
+</div>

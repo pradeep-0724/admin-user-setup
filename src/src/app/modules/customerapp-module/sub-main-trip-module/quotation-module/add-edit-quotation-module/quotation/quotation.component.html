@@ -1,0 +1,685 @@
+<div class="right-section__header align-items-center justify-content-between ">
+  <h1  *ngIf="!quotationId" class="heading col-10">Add Quotation</h1>
+  <h1   *ngIf="quotationId" class="heading col-10">Edit Quotation</h1>
+</div>
+<div class="right-section__header position-relative mx">
+  <form [formGroup]="quotationForm">
+    <div class="form-layout form-layout--pd">
+      <div class="alert-msg" *ngIf="apiError">
+        <span class="icon-wrap"></span>
+        <p class="message-cont">{{ apiError }}</p>
+      </div>
+      <div class="error-msg-list" *ngIf="globalFormErrorList.length > 0">
+        <p class="message-head">{{ errorHeaderMessage }}</p>
+        <span class="icon-wrap"></span>
+        <ul *ngFor="let error of globalFormErrorList">
+          <li class="message-cont">{{ error }}</li>
+        </ul>
+      </div>
+
+      <div class="row">
+
+        <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+          <div class="input-wrap clearfix error" [ngClass]="addErrorClass(quotationForm.controls.customer)">
+            <label for="" class="input--required">Customer Name</label>
+            <div>
+              <material-dropdown [searchable]="true" [addable]="true" [selectedOption]="initialValues.customer"
+                [party]="true" [maxLength]="46" (addPartyPopup)="openAddPartyModal($event)"
+                (addValueToList)="addValueToPartyPopup($event)" [params]="partyNamePopup">
+                <select #customSelect formControlName="customer" class="no-style select--modify"
+                  (change)="onvendorSelected($event.target.value)">
+                  <option *ngFor="let option of customerNameList" value="{{ option?.id }}">
+                    {{ option?.party_display_name }}
+                  </option>
+                </select>
+              </material-dropdown>
+              <app-error [controlName]="quotationForm.controls.customer"></app-error>
+              <span *ngIf="gstin" class="font-small-blue"> {{terminology.tax_no_type}}: {{gstin}} </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-3 col-6">
+          <div class="input-wrap clearfix">
+            <label for="" class="">Quotation Number</label>
+            <input type="text" class="no-style input--bd" formControlName="quotation_no" placeholder="123456" value=""
+              readonly>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+          <div class="input-wrap error">
+            <label for="" class="input--required">Quotation Date</label>
+            <mat-form-field>
+              <input matInput [matDatepicker]="quotation_date" formControlName="quote_date"
+                (focus)="quotation_date.open()" placeholder="DD/MM/YYYY">
+              <mat-datepicker-toggle matSuffix [for]="quotation_date"></mat-datepicker-toggle>
+              <mat-datepicker #quotation_date></mat-datepicker>
+            </mat-form-field>
+
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+          <div class="input-wrap clearfix">
+            <label for="" class="">Validity Term</label>
+            <div>
+              <material-dropdown [selectedOption]="initialValues.validityTerm">
+                <select #customSelect class="no-style select--modify" formControlName="validity_term"
+                  (change)=" setValidityDate()">
+                  <option *ngFor="let option of validityTerms " value="{{option.id}}">{{option.label}}
+                  </option>
+                </select>
+              </material-dropdown>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+          <div class="input-wrap error" [ngClass]="addErrorClass(quotationForm.controls.validity_date)">
+            <label for="" [ngClass]="{'input--required':isValidityDateRequired}">Validity Date</label>
+            <mat-form-field>
+              <input matInput [matDatepicker]="validity_date" formControlName="validity_date"
+                (focus)="validity_date.open()" placeholder="DD/MM/YYYY" (dateChange)="onValidityDateChange()">
+              <mat-datepicker-toggle matSuffix [for]="validity_date"></mat-datepicker-toggle>
+              <mat-datepicker #validity_date></mat-datepicker>
+            </mat-form-field>
+            <app-error [controlName]="quotationForm.controls.validity_date"></app-error>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+          <div class="input-wrap clearfix">
+            <label for="" class="">Payment Terms</label>
+            <div>
+              <material-dropdown [searchable]="true" [selectedOption]="initialValues.payementTerms" [maxLength]="100" [addable]="true"
+                [postApiUrl]="payementTermUrl" [params]="payementTermsParms" (addValueToList)="addPayementTerm($event)"
+                (postApiResponse)="getPayementTerm($event)">
+                <select formControlName="payment_term" #customSelect class="no-style select--modify">
+                  <option *ngFor="let option of payementTermList" value="{{ option.id }}">
+                    {{ option.label }}
+                  </option>
+                </select>
+              </material-dropdown>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+          <div class="input-wrap clearfix">
+            <label for="" class="">Bank</label>
+            <div>
+              <material-dropdown [selectedOption]="initialValues.bank">
+                <select #customSelect class="no-style select--modify" formControlName="bank_account">
+                  <option *ngFor="let option of bankList" value="{{ option?.id }}">
+                    {{ option?.display_name }}
+                  </option>
+                </select>
+              </material-dropdown>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6" [ngClass]="{'hiddenContent':!isPlaceOfSupply}">
+          <div class="input-wrap error" [ngClass]="addErrorClass(quotationForm.controls.place_of_supply)">
+            <label for="" class="input--required">Place of Supply</label>
+            <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+              [selectedOption]="initialValues.placeOfSupply">
+              <select #customSelect formControlName="place_of_supply" class="no-style select--modify">
+                <option *ngFor="let state of placeOfSupply" value="{{ state.name }}">
+                  {{ state.name }}</option>
+              </select>
+            </material-dropdown>
+            <app-error [controlName]="quotationForm.controls.place_of_supply"></app-error>
+          </div>
+        </div>
+      </div>
+      <div class="row" [ngClass]="{'hiddenContent':!isTax}">
+
+        <div class="col-lg-3 col-sm-6" [ngClass]="{disable:quotationForm.controls?.is_transaction_includes_tax?.value}">
+          <label for="2" class="check-box mg-bottom-30">
+            <input type="checkbox" id="2" formControlName="is_transaction_under_reverse"
+              (change)="onReverseMechanismChange()">
+            <span class="check-mark"></span>
+            <span class="label-text">Is Transaction under reverse mechanism?</span>
+          </label>
+        </div>
+        <div class="col-lg-3 col-sm-6" [ngClass]="{disable:disableTax}">
+          <label for="3" class="check-box mg-bottom-30">
+            <input type="checkbox" id="3" formControlName="is_transaction_includes_tax"
+              (change)="onCalculationsChange()">
+            <span class="check-mark"></span>
+            <span class="label-text">Item rates are tax inclusive</span>
+          </label>
+        </div>
+      </div>
+      <div formArrayName="item_freight">
+        <ng-container *ngFor="let frightGroup of quotationForm['controls'].item_freight['controls']; let i = index;"
+          [formGroupName]="i">
+          <div class="row">
+            <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+              <div class="input-wrap clearfix">
+                <label for="" class="">Freight Billing</label>
+                <div>
+                  <material-dropdown [selectedOption]="initialValues.billingTypes[i]">
+                    <select #customSelect class="no-style select--modify" formControlName="billing_type"
+                      (change)="billingTypeChange(frightGroup)">
+                      <option *ngFor="let option of billingTypes " value="{{option.value}}">{{option.label}}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-1">
+            <div
+              class="table-wrapper table--bd table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow">
+              <table class="table-container" formArrayName="item_freight_meta">
+                <thead>
+                  <tr class="desktop_th">
+                    <th>From</th>
+                    <th>To</th>
+                    <th *ngIf="frightGroup.controls['billing_type'].value!='7'">Unit Cost ({{ currency_type?.symbol}})
+                    </th>
+                    <th *ngIf="frightGroup.controls['billing_type'].value!='7'">Unit ({{ currency_type?.symbol}})</th>
+                    <th>Amount ({{ currency_type?.symbol}})</th>
+                    <th [ngClass]="{'hiddenContent':!isTax}">Tax</th>
+                    <th [ngClass]="{'hiddenContent':!isTax}">Total ({{ currency_type?.symbol}})</th>
+                    <th></th>
+
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container
+                    *ngFor="let item of frightGroup['controls'].item_freight_meta['controls']; let ii = index;"
+                    [formGroupName]="ii">
+                    <tr class="mobile-flex">
+                      <td class="max-wd-120  ps-2">
+                        <h5 class="th_h5_mobile">From</h5>
+                        <div>
+                          <app-places-auto-complte  [editData]="fromData[i][ii]"  (placeDetails)="fromAdressData($event,i,ii,item)" [isFromToInvalid]="isFromToInvalid" [isnameRequired]="isFromToRequired[i][ii]"></app-places-auto-complte>
+                        </div>
+                      </td>
+                      <td class="max-wd-120">
+                        <h5 class="th_h5_mobile">To</h5>
+                        <app-places-auto-complte  [editData]="toData[i][ii]"  (placeDetails)="toAdressData($event,i,ii,item)" [isFromToInvalid]="isFromToInvalid" [isnameRequired]="isFromToRequired[i][ii]"></app-places-auto-complte>
+                      </td>
+                      <td class="max-wd-120 input-wrap error" [ngClass]="addErrorClass(item.controls.unit_cost)"
+                        *ngIf="frightGroup.controls['billing_type'].value!='7'">
+                        <h5 class="th_h5_mobile">Unit Cost ({{ currency_type?.symbol}})</h5>
+                        <div>
+                          <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd"
+                            placeholder="123456" formControlName="unit_cost" value="" class="error-box"
+                            (change)="calculateFeightAmount(item);setValidators(item,i,ii)">
+                        </div>
+                      </td>
+                      <td class="max-wd-120 input-wrap error" [ngClass]="addErrorClass(item.controls.quantity)"
+                        *ngIf="frightGroup.controls['billing_type'].value!='7'">
+                        <h5 class="th_h5_mobile">Unit ({{ currency_type?.symbol}})</h5>
+                        <div>
+                          <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd"
+                            class="error-box" placeholder="123456" formControlName="quantity" value=""
+                            (change)="calculateFeightAmount(item);setValidators(item,i,ii)">
+                        </div>
+                      </td>
+                      <td class="max-wd-120 input-wrap error"
+                        [ngClass]="addErrorClass(item.controls.freight_amount_before_tax)">
+                        <h5 class="th_h5_mobile">Amount ({{ currency_type?.symbol}})</h5>
+                        <div>
+                          <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd"
+                            placeholder="123456" formControlName="freight_amount_before_tax" class="error-box" value=""
+                            [readonly]="frightGroup.controls['billing_type'].value!='7'"
+                            (change)="onCalculationsChange();">
+                        </div>
+                      </td>
+
+                      <td class="max-wd-120" [ngClass]="{'hiddenContent':!isTax}">
+                        <h5 class="th_h5_mobile">Tax</h5>
+                        <div [ngClass]="{disable: disableTax || !companyRegistered}">
+                          <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                            [disabled]="disableTax || !companyRegistered" [selectedOption]="initialValues.tax[i][ii]">
+                            <select #customSelect name="" class="no-style select--modify error-box"
+                              formControlName="tax" (change)="onCalculationsChange()">
+                              <option *ngFor="let option of taxOptions" value="{{ option.id }}">{{
+                                    option.label }}</option>
+                            </select>
+                          </material-dropdown>
+                        </div>
+                      </td>
+
+                      <td class="max-wd-120" [ngClass]="{'hiddenContent':!isTax}">
+                        <h5 class="th_h5_mobile">Total ({{ currency_type?.symbol}})</h5>
+                        <div>
+                          <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd"
+                            placeholder="123456" formControlName="total_amount" value="" readonly>
+                        </div>
+                      </td>
+
+                      <td>
+                        <span class="material-icons delete"
+                          *ngIf="frightGroup['controls'].item_freight_meta['controls'].length>1"
+                          (click)="removeFreightItem(i,ii)">add_circle_outline</span>
+                        <span class="material-icons add" (click)="addMoreFreightItem(i)"
+                          *ngIf="ii === ( frightGroup['controls'].item_freight_meta['controls'].length- 1)">add_circle_outline</span>
+                        <span class="material-icons cursor-pointer ms-1" (click)="item.controls.is_discription.setValue(!item.controls.is_discription.value)">arrow_drop_down </span>
+                      </td>
+                    </tr>
+                    <tr *ngIf="item.controls.is_discription.value">
+                      <td colspan="3" class=" ps-2">
+                        <div>
+                          <input type="text" class="no-style input--bd" placeholder="Description"
+                            formControlName="description" value="">
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="table-footer-actions   text-end  d-block">
+            <button (click)="removeFreightGroupItem(i)"  class="remove-item"
+              *ngIf="quotationForm['controls'].item_freight['controls'].length>1">
+              Remove
+            </button>
+            <button (click)="addMoreFreightGroupItem()" class="clear-item"
+              *ngIf="i === ( quotationForm['controls'].item_freight['controls'].length- 1)">
+              Add
+            </button>
+          </div>
+          <div class="table-footer-actions mb-3">
+            <a class="clear-item" (click)="clearAllItemFrieght(i)">Remove all</a>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="mg-bottom-30">
+        <h6>Others Section</h6>
+        <div
+          class="table-wrapper table--bd table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow">
+          <table class="table-container" formArrayName="item_others">
+            <thead>
+              <tr class="desktop_th">
+                <th>Item</th>
+                <th>Unit Cost ({{ currency_type?.symbol}})</th>
+                <th>Unit ({{ currency_type?.symbol}})</th>
+                <th>Amount ({{ currency_type?.symbol}})</th>
+                <th [ngClass]="{'hiddenContent':!isTax}">Tax</th>
+                <th [ngClass]="{'hiddenContent':!isTax}">Total ({{ currency_type?.symbol}})</th>
+                <th></th>
+
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let item of quotationForm['controls'].item_others['controls']; let ii = index;"
+                [formGroupName]="ii">
+                <tr class="mobile-flex ">
+                  <td class="max-wd-120  ps-2">
+                    <h5 class="th_h5_mobile">Item</h5>
+                    <div>
+                      <material-dropdown [addable]="true" class="dropDownWidth" [item]="true"
+                        (addItemPopup)="openAddItemModal($event, ii)" class="dropDownWidth"
+                        (addValueToList)="addValueToMaterial($event)" [params]="materialParams"
+                        [selectedOption]="initialValues.items[ii]">
+                        <select #customSelect formControlName="item" class="no-style select--modify"
+                          (change)="onMaterialSelected($event, item,ii);">
+                          <option *ngFor="let option of itemList" value="{{ option.id }}">
+                            {{ option.name }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                    </div>
+                  </td>
+                  <td class="max-wd-120 input-wrap error" [ngClass]="addErrorClass(item.controls.unit_cost)">
+                    <h5 class="th_h5_mobile">Unit Cost ({{ currency_type?.symbol}})</h5>
+                    <div>
+                      <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" class="error-box"
+                        placeholder="123456" formControlName="unit_cost" value="" (change)="calculateOtherAmount(item)">
+                    </div>
+                  </td>
+                  <td class="max-wd-120  input-wrap error" [ngClass]="addErrorClass(item.controls.quantity)">
+                    <h5 class="th_h5_mobile">Unit ({{ currency_type?.symbol}})</h5>
+                    <div>
+                      <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456"
+                        formControlName="quantity" class="error-box" value="" (change)="calculateOtherAmount(item)">
+                    </div>
+                  </td>
+                  <td class="max-wd-120 input-wrap error"
+                    [ngClass]="addErrorClass(item.controls.other_amount_before_tax)">
+                    <h5 class="th_h5_mobile">Amount ({{ currency_type?.symbol}})</h5>
+                    <div>
+                      <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" class="error-box"
+                        placeholder="123456" formControlName="other_amount_before_tax" value="" readonly>
+                    </div>
+                  </td>
+
+
+                    <td class="max-wd-120" [ngClass]="{'hiddenContent':!isTax}">
+                      <h5 class="th_h5_mobile" [ngClass]="{'hiddenContent':!isTax}">Tax</h5>
+
+                    <div [ngClass]="{disable: disableTax || !companyRegistered}">
+                      <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                        [disabled]="disableTax || !companyRegistered" [selectedOption]="initialValues.tax2[ii]">
+                        <select #customSelect name="" class="no-style select--modify error-box" formControlName="tax"
+                          (change)="onCalculationsChange()">
+                          <option *ngFor="let option of taxOptions" value="{{ option.id }}">{{
+                                  option.label }}</option>
+                        </select>
+                      </material-dropdown>
+                    </div>
+                  </td>
+
+                  <td class="max-wd-120" [ngClass]="{'hiddenContent':!isTax}">
+                    <h5 class="th_h5_mobile">Total ({{ currency_type?.symbol}})</h5>
+                    <div>
+                      <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456"
+                        formControlName="total_amount" value="" readonly>
+                    </div>
+                  </td>
+
+                  <td>
+                    <span class="material-icons delete"
+                      *ngIf="quotationForm['controls'].item_others['controls'].length>1"
+                      (click)="removeOthersItem(ii)">add_circle_outline</span>
+                    <span class="material-icons add" (click)="addMoreOthersItem()"
+                      *ngIf="ii === ( quotationForm['controls'].item_others['controls'].length - 1)">add_circle_outline</span>
+                    <span class="material-icons cursor-pointer ms-1" (click)="item.controls.is_discription.setValue(!item.controls.is_discription.value)">arrow_drop_down</span>
+
+                  </td>
+                </tr>
+                <tr *ngIf="item.controls.is_discription.value">
+                  <td colspan="3" class=" ps-2">
+                    <div>
+                      <input type="text" class="no-style input--bd" placeholder="Description"
+                        formControlName="description" value="">
+                    </div>
+                  </td>
+
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer-actions mg-top-15">
+          <a class="clear-item" (click)="clearAllOtherItems()">Remove all</a>
+        </div>
+      </div>
+      <div class="gst-table-wrapper mg-top-30">
+
+        <div class="gst-main py-2">
+            <div class="text-end fw-bold gst-left">  Subtotal Trips: </div>
+            <div class="px-0  text-end fw-bold gst-right"> {{ currency_type?.symbol}} {{quotationTotals.subtotal_challan}}</div>
+        </div>
+        <div class="gst-main py-2">
+          <div class="text-end fw-bold gst-left"> Subtotal Others: </div>
+          <div class="px-0  text-end fw-bold gst-right"> {{ currency_type?.symbol}} {{quotationTotals.subtotal_others}}</div>
+        </div>
+        <div class="gst-main py-2">tax
+          <div class="text-end fw-bold gst-left"> Subtotal: </div>
+          <div class="px-0  text-end fw-bold gst-right"> {{ currency_type?.symbol}} {{ quotationTotals.subtotal }}</div>
+        </div>
+        <div class="gst-main">
+          <div class="text-end pt-0 gst-left">
+              <span> Discount</span>
+              <div class="input">
+                <input twoDigitDecimalNumber type="text"
+                  class="error-box" placeholder=""
+                  formControlName="discount_value" (change)="onCalculationsChange()">
+              </div>
+              <div class="select-wrap dropdown">
+                <select name="" class="no-style select--modify custom-select" formControlName="discount_choice"
+                  (change)="onCalculationsChange()">
+                  <option value="0" selected>%</option>
+                  <option value="1">{{ currency_type?.symbol}}</option>
+                </select>
+              </div>
+
+            </div>
+            <div class="px-0  text-end gst-right"> {{ currency_type?.symbol}} {{ quotationTotals.discountTotal }} </div>
+          </div>
+
+          <div class="gst-main"  *ngFor="let percentageTotal of quotationTotals.taxes;"
+                          [ngClass]="{'hiddenContent':!isTax}">
+              <ng-container *ngIf="percentageTotal.total">
+                <div class="text-end gst-left"> Include {{terminology.tax_type}} @{{ percentageTotal.value }}% on
+                  <span>{{ percentageTotal.total }}</span>:
+                </div>
+                <div class="px-0  text-end gst-right"> {{ percentageTotal.taxAmount }} </div>
+              </ng-container>
+          </div>
+          <div class="gst-main" [ngClass]="{'hiddenContent':!isTax}">
+            <div class="gst-left text-end pt-0">
+                <span>Discount after Tax </span>
+                <div class="input"
+                    [class.disabled]="disableTax || !companyRegistered">
+                    <input positiveThreeDigitDecimalNumber type="text" class="error-box" placeholder="0.00"
+                    formControlName="discount_value_after_tax"
+                    [attr.disabled]="disableTax || !companyRegistered ? '': null"
+                    (change)="onCalculationsChange()">
+                </div>
+                <div class="select-wrap dropdown">
+                    <select name="" class="no-style select--modify custom-select"
+                        formControlName="discount_choice_after_tax"
+                        (change)="onCalculationsChange()">
+                        <option value="0">%</option>
+                        <option value="1">{{ currency_type?.symbol}}</option>
+                    </select>
+                </div>
+              </div>
+              <div class="px-0 gst-right text-end">{{ currency_type?.symbol}} {{ quotationTotals.discountAfterTaxTotal }}</div>
+            </div>
+            <div class="gst-main" >
+              <div class="text-end pt-0 gst-left">
+                <mat-checkbox [disableRipple]="true" (change)="onRoundOffEvent($event)"
+                  formControlName="is_roundoff">Round Off</mat-checkbox>
+              </div>
+
+              <div class="px-0 gst-right text-end">{{ currency_type?.symbol}} {{ quotationTotals.roundOffAmount }}</div>
+            </div>
+            <div class="text-end gst-main">
+              <div class="text-end h5"> <strong> Total: </strong></div>
+              <div class="px-0 text-end ms-3 h5"><strong> {{ currency_type?.symbol}} {{ quotationTotals.total }} </strong></div>
+          </div>
+      </div>
+      <hr>
+      <!-- <div class="form-layout__card mg-top-30">
+        <div class="table-wrapper table--nobg table-wrapper--mobile">
+          <table class="table-container tableTotal">
+            <tbody>
+              <tr class="border-top-0 border-bottom-0">
+                <td class="p-0 disp-none"></td>
+                <td class="p-0">
+                  <div class="table-wrapper table-wrapper--type1 table--nobg">
+                    <table class="table-container mobileFlexResult">
+                      <tbody>
+                        <tr class="border-top-0">
+                          <td class="disp-none"></td>
+                          <td class="disp-none"></td>
+                          <td class=" text-end bill-item">Subtotal Trips:
+                          </td>
+                          <td class="rupee-symbol rupee-symbol--sm px-0  text-end bill-value">
+                            {{ currency_type?.symbol}} {{quotationTotals.subtotal_challan}}
+                          </td>
+                        </tr>
+                        <tr class="border-top-0">
+                          <td class="disp-none"></td>
+                          <td class="disp-none"></td>
+                          <td class=" text-end bill-item">
+                            Subtotal Others:
+                          </td>
+                          <td class="rupee-symbol rupee-symbol--sm px-0  text-end bill-value">
+                            {{ currency_type?.symbol}} {{quotationTotals.subtotal_others}}
+                          </td>
+                        </tr>
+                        <tr class="border-top-0">
+                          <td class="disp-none"></td>
+                          <td class="disp-none"></td>
+                          <td class=" text-end bill-item">
+                            Subtotal:
+                          </td>
+                          <td class="rupee-symbol rupee-symbol--sm px-0  text-end bill-value">
+                            {{ currency_type?.symbol}} {{ quotationTotals.subtotal }}
+                          </td>
+                        </tr>
+                        <tr class="border-top-0">
+                          <td colspan="3" class=" text-end pt-0">
+                            <div class="gst mobileBlockSingle">
+                              Discount:
+                              <div class="input-wrap">
+                                <input twoDigitDecimalNumber type="text"
+                                  class=" ms-0  d-inline-block rounded-right error-box max-width-100" placeholder=""
+                                  formControlName="discount_value" (change)="onCalculationsChange()">
+                              </div>
+
+                              <div class="select-wrap d-inline-block" id="margin-left">
+                                <select name="" class="no-style select--modify" formControlName="discount_choice"
+                                  (change)="onCalculationsChange()">
+                                  <option value="0" selected>%</option>
+                                  <option value="1">{{ currency_type?.symbol}}</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </td>
+                          <td class="rupee-symbol px-0  text-end pt-0 rupee-symbol--sm" style="pointer-events: none;">
+                            {{ currency_type?.symbol}} {{ quotationTotals.discountTotal }}
+                          </td>
+                        </tr>
+                        <tr class="border-top-0" *ngFor="let percentageTotal of quotationTotals.taxes;"
+                          [ngClass]="{'hiddenContent':!isTax}">
+                          <ng-container *ngIf="percentageTotal.total">
+                            <td class="disp-none"></td>
+                            <td class="disp-none"></td>
+                            <td class=" text-end">
+                              Include GST @{{ percentageTotal.value }}% on
+                              <span class="rupee-symbol rupee-symbol--sm">{{ percentageTotal.total }}</span>:
+                            </td>
+                            <td class="rupee-symbol rupee-symbol--sm px-0  text-end">
+                              {{ percentageTotal.taxAmount }}
+                            </td>
+                          </ng-container>
+                        </tr>
+
+                        <tr class="border-top-0 mobileFlex" [ngClass]="{'hiddenContent':!isTax}">
+                          <td   class=" text-end pt-0" colspan="3">
+                                  <div class="gst">
+                                      <span class="mobileBlock"> Discount after Tax </span>
+                                          <div class="input-wrap width-100"
+                                              [class.disabled]="disableTax || !companyRegistered">
+                                              <input positiveThreeDigitDecimalNumber type="text" class="mg-left-10 error-box" placeholder="0.00"
+                                              formControlName="discount_value_after_tax"
+                                              [attr.disabled]="disableTax || !companyRegistered ? '': null"
+                                              (change)="onCalculationsChange()">
+                                          </div>
+                                          <div class="select-wrap d-inline-block">
+                                              <select name="" class="no-style select--modify custom-select"
+                                                  formControlName="discount_choice_after_tax"
+                                                  (change)="onCalculationsChange()">
+                                                  <option value="0">%</option>
+                                                  <option value="1">{{ currency_type?.symbol}}</option>
+                                              </select>
+                                          </div>
+                                  </div>
+
+
+                          </td>
+                          <td class="rupee-symbol rupee-symbol--sm px-0  text-end">
+                            {{ currency_type?.symbol}} {{ quotationTotals.discountAfterTaxTotal }}
+                          </td>
+                        </tr>
+
+                        <tr class="border-top-0">
+                          <td colspan="3" class=" text-end pt-0">
+                            <div class="gst">
+                              <mat-checkbox [disableRipple]="true" (change)="onRoundOffEvent($event)"
+                                formControlName="is_roundoff">Round Off</mat-checkbox>
+                            </div>
+                          </td>
+                          <td class="rupee-symbol px-0  text-end pt-0 rupee-symbol--sm" style="pointer-events: none;">
+                            {{ currency_type?.symbol}} {{ quotationTotals.roundOffAmount }}
+                          </td>
+                        </tr>
+                        <tr class="">
+                          <td colspan="3" class=" text-end bill-total">
+                            Total:
+                          </td>
+                          <td class="rupee-symbol px-0  text-end bill-total">
+                            {{ currency_type?.symbol}} {{ quotationTotals.total }} </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div> -->
+
+      <div class="row mt-5">
+        <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+          <div class="input-wrap clearfix">
+            <label for="" class="">Terms and condition</label>
+            <div>
+              <material-dropdown [selectedOption]="initialValues.termsAndConditions">
+                <select #customSelect class="no-style select--modify" formControlName="terms_and_condition">
+                  <option *ngFor="let option of tersmAndConditions " value="{{option.id}}">{{option.name}}
+                  </option>
+                </select>
+              </material-dropdown>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+          <div class="input-wrap clearfix">
+            <label for="" class="">Client Approval Status</label>
+            <div>
+              <material-dropdown [selectedOption]="initialValues.clientApprovalStatus">
+                <select #customSelect class="no-style select--modify" formControlName="status">
+                  <option *ngFor="let option of quotationApprovalStatus " value="{{option.value}}">{{option.label}}
+                  </option>
+                </select>
+              </material-dropdown>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mg-top-30">
+        <div class="col-xl-6 col-lg-6  col-md-3 col-6">
+          <div class="input-wrap clearfix">
+            <label for="" class="">Narration</label>
+            <div>
+              <input type="text" class="no-style input--bd" placeholder="Narration" formControlName="narration"
+                value="">
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+          <div class="input-wrap clearfix">
+            <label for="" class="">Signature</label>
+            <div>
+              <material-dropdown [selectedOption]="initialValues.digitalSignature">
+                <select #customSelect class="no-style select--modify" formControlName="signature">
+                  <option *ngFor="let option of digitalSignature " value="{{option.id}}">{{option.name}}
+                  </option>
+                </select>
+              </material-dropdown>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </form>
+</div>
+<div class="section-footer mg-bottom-30 mt-5">
+  <div class="btn-wrap mg-bottom-100 row mx-0">
+    <button class="btn col-5 MaxWidth-150" type="button" [routerLink]="[preFixUrl+'/trip/quotation/list']">Cancel</button>
+    <button class="btn col-6 MaxWidth-150 btn--primary btn--default btn-mg-left btn-w-100 btn--dropdown saveButton"
+      (click)="saveQuotation()">Save Quotation</button>
+  </div>
+</div>
+<app-add-party-popup [popDetail]="showAddPartyPopup" [isVendor]="false" (closeModal)="closePartyPopup()"
+  (partyAdded)="addPartyToOption($event)"></app-add-party-popup>
+<app-add-item [itemPopDetail]="showAddItemPopup" (closeModal)="closeItemPopup()" [units]="unitList"
+  (itemAdded)="addDropDownMaterial($event)"></app-add-item>

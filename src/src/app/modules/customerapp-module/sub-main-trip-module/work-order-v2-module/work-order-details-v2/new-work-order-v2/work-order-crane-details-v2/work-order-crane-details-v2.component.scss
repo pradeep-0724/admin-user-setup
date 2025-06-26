@@ -1,0 +1,62 @@
+.shadow-circle {
+    width: 50px;
+    height: 50px;
+
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .bi {
+        font-size: 25px;
+    }
+
+}
+
+.green-shadow {
+    box-shadow: 0px 0px 8px #64B164A6;
+
+    .bi {
+        color: #64B164
+    }
+
+    &:hover {
+        box-shadow: 0px 0px 20px rgba(100, 177, 100, 1.6509803922);
+
+    }
+}
+
+.red-shadow {
+    box-shadow: 0px 0px 8px #FF0000A6;
+    color: #FF0000;
+
+    &:hover {
+        box-shadow: 0px 0px 20px #FF0000A6;
+
+    }
+
+
+    &::after {
+        content: "";
+        display: block;
+        position: absolute;
+        height: 100%;
+        width: 1.5px;
+        border-radius: 10px;
+        background-color: #B9B9B9;
+        right: 0;
+
+    }
+
+    &::before {
+        content: "";
+        display: block;
+        position: absolute;
+        height: 100%;
+        width: 1.5px;
+        border-radius: 10px;
+        background-color: #B9B9B9;
+        left: 0;
+
+    }
+}

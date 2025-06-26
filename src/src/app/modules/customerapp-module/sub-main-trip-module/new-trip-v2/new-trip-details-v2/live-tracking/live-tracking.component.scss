@@ -1,0 +1,12 @@
+.map-close-btn {
+    position: absolute;
+    right: 7px;
+    top: 7px;
+    z-index: 2;
+
+    .bi {
+        font-size: 22px;
+        -webkit-text-stroke: 0.7px;
+
+    }
+}

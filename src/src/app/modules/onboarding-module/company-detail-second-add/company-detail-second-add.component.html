@@ -1,0 +1,137 @@
+<div style="overflow-y:auto;">
+  <form [formGroup]="address"  (keydown.enter)="$event.preventDefault();">
+    <div class=" form-layout--pd">
+        <div class="form-layout__card" [ngClass]="{'active': billing}">
+            <div class="form-layout__header">
+                <h2 class="sub-heading">
+                    Billing Address
+                </h2>
+                <span class="collapse-line"></span>
+            </div>
+            <div class="form-body" formGroupName="billing_address">
+              <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                  <div class="input-wrap error" [ngClass]="addErrorClass(address.controls['billing_address'].get('address_line_1'))">
+                    <label for="" class="">Address Line 1</label>
+                    <input type="text" autocomplete="street-address" formControlName="address_line_1" class="no-style input--bd" placeholder="No. 10/2 Ground Floor"
+                    value="" (change)="checkBillingSameAsShipping()">
+                    <app-error [controlName]="address.controls['billing_address'].get('address_line_1')"></app-error>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="input-wrap error" [ngClass]="addErrorClass(address.controls['billing_address'].get('street'))">
+                    <label for="" class="">Address Line 2</label>
+                    <input type="text"  formControlName="street" class="no-style input--bd" placeholder="2nd Cross Road" value="" (change)="checkBillingSameAsShipping()">
+                    <app-error [controlName]="address.controls['billing_address'].get('street')"></app-error>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="input-wrap error" [ngClass]="addErrorClass(address.controls['billing_address'].get('country'))">
+                      <label for="" class="">Country</label>
+                      <material-dropdown [searchable]="false" [addable]="false" class="dropDownWidth" [selectedOption]="initialDetails?.country1">
+                          <select #customSelect formControlName="country" class="no-style select--modify" (change)="getStates();checkBillingSameAsShipping()">
+                              <option *ngFor="let option of country" value="{{ option?.name }}">
+                                  {{ option?.name }}
+                              </option>
+                          </select>
+                      </material-dropdown>
+                      <app-error [controlName]="address.controls['billing_address'].get('country')"></app-error>
+                  </div>
+              </div>
+                    <div class="col-lg-3 col-sm-6" >
+                        <div class="input-wrap error" [ngClass]="addErrorClass(address.controls['billing_address'].get('state'))">
+                            <label for="" class="">State</label>
+                            <material-dropdown [searchable]="false" [addable]="false" class="dropDownWidth"[selectedOption]="initialDetails?.state1">
+                                <select #customSelect formControlName="state" class="no-style select--modify" (change)="checkBillingSameAsShipping()">
+                                    <option *ngFor="let option of statesBilling" value="{{ option?.name}}">
+                                        {{ option?.name }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <app-error [controlName]="address.controls['billing_address'].get('state')"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(address.controls['billing_address'].get('pincode'))">
+                            <label for="" class="">ZipCode</label>
+                            <input type="text" maxlength="70" autocomplete="postal-code" formControlName="pincode" class="no-style input--bd" placeholder="Eg:234155" value="" (change)="checkBillingSameAsShipping()">
+                            <app-error [controlName]="address.controls['billing_address'].get('pincode')"></app-error>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-layout__card" [ngClass]="{'active': shipping}">
+            <div class="form-layout__header">
+                <h2 class="sub-heading">
+                    Shipping Address
+                </h2>
+                <span class="collapse-line"></span>
+            </div>
+            <div class="form-body">
+                <div class="toggle-wrapper mg-bottom-30">
+                    <span class="toggle-label">Same as billing Address</span>
+                    <label for="toggle" class="toggle-switch">
+                        <input type="checkbox" id="toggle" value="" formControlName="is_same_as_billing" (change)="toggleSameAddress()">
+                        <span class="toggle-box">
+                            <span class="toggle-circle"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="row" formGroupName="shipping_address" >
+                  <div class="col-lg-3 col-sm-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(address.controls['shipping_address'].get('address_line_1'))">
+                      <label for="" class="">Address Line 1</label>
+                      <input type="text" formControlName="address_line_1" (change)="checkBillingSameAsShipping()" class="no-style input--bd" placeholder="No. 10/2 Ground Floor"
+                      value="">
+                      <app-error [controlName]="address.controls['shipping_address'].get('address_line_1')"></app-error>
+                    </div>
+                  </div>
+                  <div class="col-lg-3 col-sm-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(address.controls['shipping_address'].get('street'))">
+                      <label for="" class="">Address Line 2</label>
+                      <input type="text" formControlName="street" class="no-style input--bd" placeholder="2nd Cross Road" value=""  (change)="checkBillingSameAsShipping()">
+                      <app-error [controlName]="address.controls['shipping_address'].get('street')"></app-error>
+                    </div>
+                  </div>
+                  <div class="col-lg-3 col-sm-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(address.controls['shipping_address'].get('country'))">
+                        <label for="" class="">Country</label>
+                        <material-dropdown [searchable]="false" [addable]="false"  class="dropDownWidth" [selectedOption]="initialDetails?.country2">
+                            <select #customSelect formControlName="country" class="no-style select--modify" (change)="checkBillingSameAsShipping();getStateShipping()">
+                                <option *ngFor="let option of country" value="{{ option?.name }}">
+                                    {{ option?.name }}
+                                </option>
+                            </select>
+                        </material-dropdown>
+                        <app-error [controlName]="address.controls['shipping_address'].get('country')"></app-error>
+                    </div>
+                </div>
+                      <div class="col-lg-3 col-sm-6">
+                          <div class="input-wrap error" [ngClass]="addErrorClass(address.controls['shipping_address'].get('state'))">
+                              <label for="" class="">State</label>
+                              <material-dropdown [searchable]="false" [addable]="false" class="dropDownWidth" [selectedOption]="initialDetails?.state2">
+                                  <select #customSelect formControlName="state" class="no-style select--modify" (change)="checkBillingSameAsShipping()">
+                                      <option *ngFor="let option of statesShipping" value="{{ option?.name}}">
+                                          {{ option?.name }}
+                                      </option>
+                                  </select>
+                              </material-dropdown>
+                              <app-error [controlName]="address.controls['shipping_address'].get('state')"></app-error>
+                          </div>
+                      </div>
+                      <div class="col-lg-3 col-sm-6">
+                          <div class="input-wrap error" [ngClass]="addErrorClass(address.controls['shipping_address'].get('pincode'))">
+                              <label for="" class="">ZipCode</label>
+                              <input type="text" maxlength="70" autocomplete="postal-code" formControlName="pincode" class="no-style input--bd" placeholder="Eg:234155" value="" (change)="checkBillingSameAsShipping()">
+                              <app-error [controlName]="address.controls['shipping_address'].get('pincode')"></app-error>
+                          </div>
+                      </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+  </form>
+</div>

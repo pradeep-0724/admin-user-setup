@@ -1,0 +1,25 @@
+<div class="vehicle-nav-wrap calc-height">
+    <nav class="vehicle-nav">
+        <ul class="vehicle-nav__list d-flex">
+            <li class="vehicle-nav__item w-50 text-center">
+                <div class="row h-100">
+                    <div class="col-sm-12">
+                        <p class="text-uppercase fs-14 fw-bold vehicle-nav__sub-item w-100"
+                         [routerLink]="['prefrence']" routerLinkActive="active">preference</p>
+                    </div>
+                </div>
+            </li>
+            <!-- <li class="vehicle-nav__item w-50 text-center">
+                <div class="row h-100">
+                    <div class="col-sm-12">
+                        <p class="text-uppercase fs-14 fw-bold vehicle-nav__sub-item w-100"
+                         [routerLink]="['permit/list']" routerLinkActive="active" >permit</p>
+                    </div>
+                </div>
+            </li> -->
+        </ul>
+    </nav>
+  </div>
+  <div class="shadow-inset-top-lg ">
+  <router-outlet></router-outlet>
+</div>

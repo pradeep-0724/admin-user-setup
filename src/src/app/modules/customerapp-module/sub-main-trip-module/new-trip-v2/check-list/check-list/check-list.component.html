@@ -1,0 +1,159 @@
+<button class="form-control checklist-btn" (click)="openCheckList()" [disabled]="disabled">
+  {{ selectedList.length ? selectedList.length : "" }} <span *ngIf="selectedList.length">Job Task</span> <span
+    *ngIf="selectedList.length==0">Select</span>
+  <span class="right-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right"
+      viewBox="0 0 16 16">
+      <path fill-rule="evenodd"
+        d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+    </svg>
+  </span>
+</button>
+
+<div class="modal fade" [ngClass]="{ show: isAddContentList }" id="AddChacklistModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Add Job Task</h5>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addCheckList">
+          <div class="input-wrap">
+            <div>
+              <label for="" class="input--required">Task Name </label>
+              <input type="text" placeholder="Name" value="" formControlName="field_label" />
+              <p style="color: red" *ngIf="
+                  addCheckList.get('field_label').hasError('required') &&
+                  addCheckList.get('field_label').touched
+                ">
+                This field is required
+              </p>
+            </div>
+
+            <div>
+              <label for="" class="input--required">Job Task Type</label>
+              <material-dropdown [searchable]="true" [selectedOption]="selectedOption">
+                <select #customSelect formControlName="field_type">
+                  <option *ngFor="let option of contentTypeList" [value]="option?.value">
+                    {{ option?.label }}
+                  </option>
+                </select>
+              </material-dropdown>
+              <p style="color: red" *ngIf="
+                  addCheckList.get('field_type').hasError('required') &&
+                  addCheckList.get('field_type').touched
+                ">
+                This field is required
+              </p>
+            </div>
+          </div>
+
+          <div class="checkbox-wrap">
+            <input type="checkbox" value="" formControlName="mandatory" />
+            <label for="" class="">Make as Mandatory field</label>
+          </div>
+
+          <div class="checkbox-wrap">
+            <input type="checkbox" value="" formControlName="employee_app_show" />
+            <label for="" class="">Show in employee App </label>
+          </div>
+        </form>
+        <div class="modal-bottom">
+          <button class="btn" (click)="cancelAddChecklist()">Close</button>
+          <button class="btn btn--primary" (click)="saveAddCheckList()">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="isAddContentList" class="modal-backdrop fade show"></div>
+
+<!--  -->
+
+<div class="modal fade" [ngClass]="{ show: isContentList && !isAddContentList }" id="checklist-modal" tabindex="-1"
+  role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog  dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Job Task</h5>
+      </div>
+
+      <div class="modal-body">
+        <div class="search-input-wrap">
+          <input type="search" class="no-style search-bar input-search" [(ngModel)]="search" />
+          <button class="btn btn--primary" (click)="isAddContentList = true">
+            Add New Job Task
+          </button>
+        </div>
+
+        <div class="" [formGroup]="checkListForm">
+          <div
+            class="table-wrapper table-wrapper--type1 table-wrapper--type2 table--bd table--nobg table-wrapper--scroll">
+
+
+            <table class="table-container">
+              <thead>
+                <tr>
+                  <th class="text-center">Choose</th>
+                  <th>Task Name</th>
+                  <th class="position-relative">Job Task type <app-tool-tip
+                      [totalSlides]="taskTypesToolTip.content.length" class="task-type-tool-tip" position="bottom"
+                      [toolTipContent]="taskTypesToolTip"></app-tool-tip>
+                  </th>
+                  <th class="text-center position-relative">Mandatory Task <app-tool-tip class="task-mandatory-tool-tip"
+                      [totalSlides]="mandatoryTaskToolTip.content.length" position="bottom"
+                      [toolTipContent]="mandatoryTaskToolTip"></app-tool-tip></th>
+                  <th class="text-center position-relative">Operator Task <app-tool-tip class="task-driver-tool-tip"
+                      [totalSlides]="driverTaskToolTip.content.length" position="left"
+                      [toolTipContent]="driverTaskToolTip"></app-tool-tip>
+                  </th>
+                </tr>
+              </thead>
+              <tbody formArrayName="checkList">
+                <ng-container *ngFor="
+                    let control of checkListForm.controls.checkList['controls']
+                      | checkListSearch : search;
+                    let i = index
+                  ">
+                  <tr [formGroupName]="i">
+                    <td>
+                      <input type="checkbox" class="table-checkbox" formControlName="selected" />
+                    </td>
+                    <td class="text-align-left">
+                      {{ control.get("field_label").value }}
+                    </td>
+                    <td class="text-align-left">
+                      {{ control.get("field_type").value["name"] }}
+                    </td>
+                    <td
+                      [ngClass]="{'disabled':control.get('selected').value==false||control.get('selected').value=='false'}">
+                      <input type="checkbox"
+                        [readonly]="control.get('selected').value==false||control.get('selected').value=='false'"
+                        formControlName="mandatory" />
+                    </td>
+                    <td
+                      [ngClass]="{'disabled':control.get('selected').value==false||control.get('selected').value=='false'}">
+                      <input type="checkbox"
+                        [readonly]="control.get('selected').value==false||control.get('selected').value=='false'"
+                        formControlName="employee_app_show" />
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-bottom">
+          <button class="btn" (click)="cancelCheckList()">Cancel</button>
+          <button class="btn btn--primary" (click)="addCheckListToDestination()">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="isContentList && !isAddContentList" class="modal-backdrop fade show"></div>

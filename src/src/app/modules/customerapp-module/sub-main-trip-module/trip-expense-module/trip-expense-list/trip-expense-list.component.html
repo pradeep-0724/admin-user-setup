@@ -1,0 +1,125 @@
+<div class="calc-height" [ngClass]="{'border-bottom':routeToDetail}">
+  <app-list-widget [isFilter]="true" [isDateRangeText]="true" [isDateRange]="false" [isDropDown]="true"  [isExport]="true"   [isSettings]="true"     [settingsUrl]="settingsUrl"
+    [isAddButton]="true" [filterUrl]="filterUrl" [subtractDays]="30" [isDateDropDown]="true"
+     [tabSelectionList]="tabSelectionList" (listWidgetData)="listWidgetData($event)"   (exportList)="exportList($event)"  (settingsApplied)="settingsApplied($event)"
+    [buttonData]="buttonData">
+    <button class="gb-video-play me-2" id="custom-button-left" (click)="openGothrough()">
+      <i class="bi bi-play-circle-fill"></i>
+    </button>
+  </app-list-widget>
+</div>
+
+  <div class="row mx-0">
+
+    <div class="custom-table-container  bg-white  trip-expense-list-wrap  p-0" id="trip-expense-list"
+      [ngClass]="routeToDetail?'col-lg-4':'col-lg-12'" (scroll)="onScroll($event)">
+      <table [ngClass]="{'h-100':tripExpenseList.length==0}">
+
+        <thead *ngIf="!routeToDetail">
+          <ng-container *ngFor="let heading of tripExpenseListHeader">
+            <th> {{heading}} </th>
+          </ng-container>
+          <th></th>
+        </thead>
+        <tbody *ngIf="tripExpenseList.length == 0">
+          <tr class="border-0">
+            <td class="bg-white" colspan="30">
+              <div class="no-list-data-wrap">
+                <figure>
+                  <img src="assets/img/no-content.png" alt="">
+                </figure>
+                <h5 class="mt-3 primary-brand-text">No data found!</h5>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+
+        <tbody>
+          
+
+
+          <tr *ngFor="let data of tripExpenseList" [ngClass]="{'activated-row':selectedId==data.id && routeToDetail}" class="def-color">
+
+           <ng-container  *ngIf="routeToDetail" >
+            <ng-container  >
+              <td (click)="createQueryParems(data.id)" class="cursor-pointer">
+                <ng-container *ngFor="let item  of data['extras'];let i =index">
+                <div class=" mb-3 fs-6 fw-semibold "    *ngIf="item?.name =='Vendor'">{{item?.value?.name}}</div>
+                </ng-container>
+                
+                <div>
+                  <ng-container *ngFor="let item  of data['extras'];let i =index">
+                  <span class="link fw-medium "   *ngIf="item?.name =='Bill No'" > {{item?.value}}</span>
+                  </ng-container>
+                  <ng-container *ngFor="let item  of data['extras'];let i =index">
+                  <span    *ngIf="item?.name =='Bill Date'"class='detail-date' > {{item?.value}}</span>
+                </ng-container>
+                </div>
+              </td>
+              <td (click)="createQueryParems(data.id)" class="cursor-pointer">
+                <ng-container *ngFor="let item  of data['extras'];let i =index">
+                <div class=" mb-3 fs-6 fw-semibold text-end"     *ngIf="item?.name =='Bill Amount'" >{{currency_type.symbol}} {{item?.value}}</div>
+              </ng-container>
+              <ng-container *ngFor="let item  of data['extras'];let i =index">
+                <div class=" text-end"     *ngIf="item?.name == 'Payment Status'" >
+                  {{item?.value}}
+                </div>
+              </ng-container>
+  
+              </td>
+
+            </ng-container>
+           </ng-container>
+
+           <ng-container  *ngIf="!routeToDetail">
+            <ng-container *ngFor="let item of data['extras'];let i =index">
+              <td class="ws-nowrap" *ngIf="item?.name !='Bill No' && item?.name !='Vendor' && item?.id !='balance_amount' && item?.id !='bill_amount' "> {{item?.value ? item?.value : '-'}} </td>
+              <td class="ws-nowrap" *ngIf="item?.id =='balance_amount' || item?.id =='bill_amount'"> {{item?.value | numberFormat}} </td>
+              <ng-container *ngIf="item?.name=='Vendor'">
+                <td class="td-2l">
+                  <div class="text-2l">
+                 <a class="py-0 custom-link " target="_blank" [routerLink]="[prefixUrl+'/onboarding/party/details/vendor/',item?.value?.id]" > {{item?.value?.name}} </a>
+                </div>
+                </td>
+              </ng-container>
+              <ng-container  *ngIf="item?.name =='Bill No'">
+                <td class="custom-link" (click)="createQueryParems(data.id)">{{item?.value}}</td>
+              </ng-container>
+             </ng-container>
+            <td class="icon-box  tabIndexActive" >
+              <div class="d-flex justify-content-center align-items-center">
+                <div class="position-relative">
+                  <i class="material-icons more-icon" (click)="optionsList($event, 'list_'+data.id)" *ngxPermissionsOnly="[tripExpensePermission[1],tripExpensePermission[2]]">more_vert</i>
+              <ul class="more-actions__menu table-popup" [ngClass]="{show: showOptions === 'list_'+data.id}">
+                  <li class="more-actions__item"*ngxPermissionsOnly="tripExpensePermission[1]"
+                  [routerLink]="[prefixUrl+'/trip/trip-expense/edit',data.id]"><i
+                          class="material-icons">edit</i>Edit</li>
+                          <ng-container *ngIf="data.payment_status!='Partial Paid'">
+                            <li *ngxPermissionsOnly="tripExpensePermission[2]" class="more-actions__item" (click)="popupFunction(data, i)"><i
+                              class="material-icons">delete</i>Delete</li>
+                          </ng-container>
+              </ul>
+                </div>
+              </div>
+
+            </td>
+           </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-lg-8 p-0" >
+      
+        <app-details-trip-expense *ngIf="routeToDetail" [expenseId]="expenseDetailId"  [routeToDetail]="routeToDetail"
+        (openDetailsEmitter)="openListDetailsData($event)"></app-details-trip-expense>
+
+    </div>
+
+  </div>
+
+
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>
+
+<app-go-through [goThroughDetais]="goThroughDetais"></app-go-through>

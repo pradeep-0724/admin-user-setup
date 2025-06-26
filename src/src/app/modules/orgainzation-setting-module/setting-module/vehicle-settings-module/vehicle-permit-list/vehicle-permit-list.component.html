@@ -1,0 +1,66 @@
+<div class="row mx-0 p-3 calc-height" >
+    <div class="col-md-6">
+      </div>
+    <div class="col-md-6">
+      <button class="btn btn--primary py-2 w-auto" style="float: right;" [routerLink]="[perfixUrl+'/organization_setting/settings/vehicle/permit/add']"> + Add Permit</button>
+    </div>
+
+  </div>
+  <div  class="gb-border-table-wrap mx-1 " id="veh-permit-list">
+    <table [ngClass]="{'h-100':vehiclePermitList.length == 0}">
+        <thead>
+            <tr>
+            <th class="text-center">S.NO</th>
+            <th>PERMIT NAME</th>
+            <th>COUNTRY</th>
+            <th>STATE</th>
+            <th class="text-center border-end-0">EXPIRY DATE MANDATORY</th>
+            <th class="border-start-0"></th>
+        </tr>
+        </thead>
+        <tbody *ngIf="vehiclePermitList.length == 0">
+            <tr class="border-0">
+                <td class="bg-white" colspan="30">
+                    <div class="no-list-data-wrap">
+                        <figure>
+                            <img src="assets/img/no-content.png" alt="">
+                        </figure>
+                        <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                    </div>
+                </td>
+            </tr>
+
+        </tbody>
+
+        <tbody>
+            <tr *ngFor="let area of vehiclePermitList;let i = index;trackBy: trackById;">
+                <td class="text-center">
+                    {{i+1}}
+                </td>
+                <td>{{area?.name}}</td>
+                <td>{{area?.country}}</td>
+                <td>{{area?.state ? area?.state : '-'}}</td>
+                <td class="text-center border-end-0">
+                    <mat-checkbox color="primary" (change)="expiryMandatoryChanged($event.checked,area)"  [checked]="area.expiry_date_mandatory"></mat-checkbox>
+                </td>
+                <td class="text-end border-start-0">
+                    <button class="gb-btn-hover "  [routerLink]="[perfixUrl + '/organization_setting/settings/vehicle/permit/edit',area.id]">
+                        <span class="no-style px-2">
+                            <i class="material-icons def-color fs-6" 
+                            >edit</i>
+                        </span>
+                    </button>
+                    <button class="gb-btn-hover " (click)="popupFunction(area.id,i)">
+                        <span class="no-style px-2 " >
+                            <i class="material-icons text-danger fs-6">delete</i>
+                        </span>
+                    </button>
+                </td>
+               
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  
+
+  <alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

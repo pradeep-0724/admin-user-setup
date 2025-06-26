@@ -1,0 +1,20 @@
+<div class="modal fade" [ngClass]="{'show':show}" id="exampleModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" [class]="{'first-popup':!openOnboardingDetails}">
+        <div class="modal-content">
+          <div class="modal-body p-0 first-bill-popup">
+
+            <div class="p-3" >
+              <p class="pt-3">Hi {{userName|titlecase}}, It looks you are about to create your first bill/Job, Please confirm your company details before you proceed</p>
+              <div class="row mx-0 justify-content-between mt-5 pt-3">
+               <button class="btn w-auto " (click)="cancel()">Cancel</button>
+               <button class="btn btn--primary w-auto" (click)="isUserAgreed()">Proceed</button>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="show" class="modal-backdrop fade show"></div>

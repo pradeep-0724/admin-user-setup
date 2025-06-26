@@ -1,0 +1,101 @@
+<app-list-widget
+[isDetailsEnable]="true"
+[isSearchEnable]="true"
+[isShowingEnable]="true"
+[isFilterEnable]="true"
+(searchValueEmitter)="searchFilter($event)"
+(showItemByEmitter)="filterListBy($event)"
+(openDetailsEmitter)="openListDetailsData($event)"
+(filteredDataEmitter) ="filteredData($event)"
+[openListDetails]="openListDetails"
+[apiError]="apiError"
+[isMobile]="isMobile"
+[filterOptions]="options"
+[filterDataList]="allData">
+  <div id="tableList">
+
+
+<div class="table-wrapper-list" [ngClass]="{'table-wrapper-init':!routeToDetail , 'table-wrapper-auto':routeToDetail}" id="table-height">
+  <table class="table-container" matSort (matSortChange)="sortData($event)">
+        <thead>
+            <tr>
+                <th mat-sort-header="stock_date">DATE</th>
+                <th mat-sort-header="item">ITEM NAME</th>
+                <th  mat-sort-header="quantity_available">QUANTITY AVAILABLE</th>
+                <th  mat-sort-header="new_quantity">NEW QUANTITY</th>
+                <th  mat-sort-header="adjustment">ADJUSTMENT</th>
+                <th  mat-sort-header="rate">RATE ({{ currency_type?.symbol}})</th>
+                <th  mat-sort-header="total">TOTAL ({{ currency_type?.symbol}})</th>
+
+            </tr>
+        </thead>
+        <tbody class="inner-table-main-body">
+          <tr *ngIf="(sortedData | inventoryAdjustmentSpareSearch:search)?.length == 0">
+            <td colspan="10" class="white">
+              <div class="no-content-wrapper">
+                  <figure class="no-content-pic">
+                      <img src="assets/img/no-content.png" alt="">
+                  </figure>
+                  <div class="no-content-txt">
+                      <h5 class="heading">No data found!</h5>
+                  </div>
+              </div>
+            </td>
+          </tr>
+          <ng-container class="table-body-main" *ngFor="let data of sortedData |inventoryAdjustmentSpareSearch:search |  paginate: { itemsPerPage: filter_by, currentPage: p } ; let i = index;">
+              <tr [ngClass]="{'viewActive':(data.id==selectedId)&&routeToDetail }">
+                <td>{{ dateChange(data.stock_date)}}</td>
+                <td colspan="6" class="inner-table-td">
+                  <table class="table-container inner-table">
+                    <tbody>
+                      <tr *ngFor="let tyre of data.spares  ;let innerIndex = index">
+                          <td style="width: 18%;"> {{tyre?.item}}</td>
+                          <td style="width: 23%;">{{ tyre?.quantity_available }}</td>
+                          <td  style="width: 19%;">{{ tyre?.new_quantity }}</td>
+                          <td   style="width: 16%;" class="rupee-symbol rupee-symbol--sm">{{ tyre?.adjustment }}</td>
+                          <td style="width: 8%;"> {{ tyre?.rate }}</td>
+                          <td  class="rupee-symbol rupee-symbol--sm">{{ tyre?.total }}</td>
+
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="table-action2" style="text-align: center;">
+                    <i class="material-icons more-icon justify-content-center"  *ngxPermissionsOnly="[inventoryAdjustmentPermission[1],inventoryAdjustmentPermission[2]]"
+                        (click)="optionsList($event, 'list_'+data.id)">more_vert</i>
+                    <ul class="more-actions__menu table-popup"
+                        [ngClass]="{show: showOptions === 'list_'+data.id}" >
+                        <li  *ngxPermissionsOnly="inventoryAdjustmentPermission[1]" class="more-actions__item" [routerLink]="[prefixUrl+'/inventory/edit/inventory-adjustment/', data.id]"  ><i
+                                class="material-icons">edit</i>Edit</li>
+                        <li *ngxPermissionsOnly="inventoryAdjustmentPermission[2]" class="more-actions__item" (click)="popupFunction(data.id, i)"><i
+                                  class="material-icons">delete</i>Delete</li>
+                                  <li class="more-actions__item" (click)="routeToDetailById(data.id)"><i class="material-icons">info</i> Details</li>
+                    </ul>
+                </td>
+              </tr>
+            </ng-container>
+        </tbody>
+    </table>
+</div>
+<div class="table-page-no">
+  <pagination-controls
+  previousLabel=''
+  nextLabel=''
+  directionLinks="true"
+  class="my-pagination"
+  (pageChange)="p = $event"
+  (pageBoundsCorrection)="p=$event">
+  </pagination-controls>
+</div>
+  </div>
+
+  <div id="listWebDetails">
+    <app-detail-inventory *ngIf="routeToDetail && !isMobile" [expenseId]="inventoryDetailId"></app-detail-inventory>
+  </div>
+  <div id="listMobileDetails">
+    <app-detail-inventory *ngIf="routeToDetail && isMobile" [expenseId]="inventoryDetailId"></app-detail-inventory>
+  </div>
+</app-list-widget>
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>
+
+

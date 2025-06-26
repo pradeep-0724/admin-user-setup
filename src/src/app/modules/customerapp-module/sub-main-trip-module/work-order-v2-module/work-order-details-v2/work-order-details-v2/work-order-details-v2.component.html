@@ -1,0 +1,229 @@
+<ng-container  *ngIf="workOrderDetails|async as workOrderDetail" >
+<div   *ngIf='workOrderDetail?.vehicle_category==1 || workOrderDetail?.vehicle_category==2'  >
+<app-work-order-crane-details-v2 [workOrderId]="workOrderId" [workOrderDetail]="workOrderDetail"></app-work-order-crane-details-v2>
+</div>
+
+<div *ngIf="!workOrderDetail?.vehicle_category" >
+  <app-work-order-header-details-v2 [workOrderDetail]="workOrderDetail"
+    [workOrderId]="workOrderId"></app-work-order-header-details-v2>
+    <div class="statusMainWrap px-lg-5 pt-2">
+      <div class=" py-4 mx-5">
+        <p class="mb-4"><b>Route :</b>{{workOrderDetail?.route_code?workOrderDetail?.route_code:'-'}}</p>
+        <app-trip-v2-status [statusDetails]="workOrderDetail?.paths" statusType="workorder"></app-trip-v2-status>
+  
+      </div>
+    </div>
+    <app-expected-tenure-work-order-dates [workOrderDetail]="workOrderDetail"
+    [workOrderId]="workOrderId"></app-expected-tenure-work-order-dates>
+    <div class="details-tab">
+      <mat-tab-group mat-stretch-tabs="false" class="mat-group" animationDuration="0ms" mat-align-tabs="start">
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span>Job Info</span>
+          </ng-template>
+          <app-work-order-trip-info [workOrderDetail]="workOrderDetail"
+            [workOrderId]="workOrderId"></app-work-order-trip-info>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span 
+              >Additional Charge</span
+            >
+          </ng-template>
+          <div class="pt-1">
+    
+            <div class="custom-table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ADDITIONAL CHARGE</th>
+                      <th *ngIf="isTax">TAX</th>
+                      
+                      <th>UNIT OF MEASUREMENT</th>
+                      <th>UNIT</th>
+                      <th>UNIT COST ({{ currency_type?.symbol}})</th>
+                     
+                      <th>TOTAL AMOUNT ({{ currency_type?.symbol}})</th>
+                    </tr>
+                  </thead>
+                  <tbody *ngIf="workOrderDetail?.additional_charge?.length == 0 ">
+                    <tr class="border-0">
+                      <td colspan="30" class="bg-white">
+                        <div class="no-list-data-wrap">
+                          <figure>
+                            <img src="assets/img/no-content.png" alt="" />
+                          </figure>
+                          <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tbody >
+                    <tr *ngFor="let item of workOrderDetail?.additional_charge; index as i;">
+                      <td>{{item?.name?.label}}</td>
+                      <td *ngIf="isTax">{{item?.tax?.label}}</td>
+                      <td>{{item?.unit_of_measurement?.label}}</td>
+                      <td>{{item?.quantity}}</td>
+                      <td>{{item?.unit_cost|numberFormat}}</td>
+                      <td>{{item?.total|numberFormat}}</td>
+                  
+                      
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+    
+          </div>  
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span>Material Info</span>
+          </ng-template>
+          <app-work-order-cargo-material-tab 
+            [workOrderId]="workOrderId"></app-work-order-cargo-material-tab>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span>Custom Fields</span>
+          </ng-template>
+          <div class="row mx-0 p-4 def-color">
+            <p class="primary-brand-text fs-6 text-center p-5 fw-semibold" *ngIf="customFields.length == 0">No Custom Fields Added !!</p>
+            <div class="col-lg-4 py-2" *ngFor="let item of customFields">
+              <span class="fw-semibold me-2">{{item?.field_label}}:</span>
+              <span *ngIf="item.field_type.data_type!='date'" >{{item?.value}}</span>
+              <span *ngIf="item.field_type.data_type=='date'" >{{item?.value | formateDate}}</span>
+            </div>
+            
+          </div>
+        </mat-tab>
+        <mat-tab >
+          <ng-template mat-tab-label>
+            <span>Route Info</span>
+          </ng-template>
+          <app-work-order-route-info [workOrderDetail]="workOrderDetail"></app-work-order-route-info>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span>Upload Documents</span>
+          </ng-template>
+          <div>
+            <div class="fw-semibold px-4 mb-4 mt-3 def-color fs-6"> Upload Document</div>
+            <div class="d-flex flex-wrap gap-3 px-4" style="zoom:95%">
+              <file-uploader-v2 (onFileUploaded)="fileUploader($event)" fileName="Document Unknown" [uploaderId]="'1234'"
+                [isShowOnlyUpload]="false"></file-uploader-v2>
+              <app-file-delete-view [showInlineEdit]="true" [fileData]="document" *ngFor="let document of workOrderDocuments"
+                (fileDeleted)="fileDeleted($event)"></app-file-delete-view>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+</div>
+<div *ngIf="workOrderDetail?.vehicle_category ==4">
+  <app-work-order-header-details-v2 [workOrderDetail]="workOrderDetail" [workOrderId]="workOrderId"></app-work-order-header-details-v2>
+  <div class="statusMainWrap px-lg-5 pt-2">
+    <div class=" py-4 mx-5">
+      <p class="mb-4"><b>Route :</b>{{workOrderDetail?.route_code?workOrderDetail?.route_code:'-'}}</p>
+      <app-trip-v2-status [statusDetails]="workOrderDetail?.paths" statusType="workorder"></app-trip-v2-status>
+    </div>
+  </div>
+  <app-expected-tenure-work-order-dates [workOrderDetail]="workOrderDetail" [workOrderId]="workOrderId"></app-expected-tenure-work-order-dates>
+  <div class="gb-tab-wrapper">
+    <mat-tab-group mat-stretch-tabs="false" class="mat-group" animationDuration="0ms" mat-align-tabs="start">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span >Container info</span>
+        </ng-template>
+          <app-work-order-view-container-add-edit [workOrderId]="workOrderId"></app-work-order-view-container-add-edit>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span>Job Info</span>
+          </ng-template>
+            <app-workorder-container-info  [workOrderId]="workOrderId"></app-workorder-container-info>
+
+        </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span>Additional Charges</span>
+        </ng-template>
+        <div class="pt-1">
+  
+          <div class="custom-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ADDITIONAL CHARGE</th>
+                    <th *ngIf="isTax">TAX</th>
+                    
+                    <th>UNIT OF MEASUREMENT</th>
+                    <th>UNIT</th>
+                    <th>UNIT COST ({{ currency_type?.symbol}})</th>
+                   
+                    <th>TOTAL AMOUNT ({{ currency_type?.symbol}})</th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="workOrderDetail?.additional_charges?.length == 0 ">
+                  <tr class="border-0">
+                    <td colspan="30" class="bg-white">
+                      <div class="no-list-data-wrap">
+                        <figure>
+                          <img src="assets/img/no-content.png" alt="" />
+                        </figure>
+                        <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody >
+                  <tr *ngFor="let item of workOrderDetail?.additional_charges; index as i;">
+                    <td>{{item?.name?.label}}</td>
+                    <td *ngIf="isTax">{{item?.tax?.label}}</td>
+                    <td>{{item?.unit_of_measurement?.label}}</td>
+                    <td>{{item?.quantity}}</td>
+                    <td>{{item?.unit_cost}}</td>
+                    <td>{{item?.total}}</td>
+                
+                    
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+  
+        </div>  
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span>Route Info</span>
+        </ng-template>
+        <app-work-order-route-info [workOrderDetail]="workOrderDetail"></app-work-order-route-info>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span>Material Info</span>
+        </ng-template>
+        <app-work-order-cargo-material-tab 
+          [workOrderId]="workOrderId"></app-work-order-cargo-material-tab>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span>Upload Documents</span>
+        </ng-template>
+        <div>
+          <div class="fw-semibold px-4 mb-4 mt-3 def-color fs-6"> Upload Document</div>
+          <div class="d-flex flex-wrap gap-3 px-4" style="zoom:95%">
+            <file-uploader-v2 (onFileUploaded)="fileUploader($event)" fileName="Document Unknown" [uploaderId]="'1234'"
+              [isShowOnlyUpload]="false"></file-uploader-v2>
+            <app-file-delete-view [showInlineEdit]="true" [fileData]="document" *ngFor="let document of workOrderDocuments"
+              (fileDeleted)="fileDeleted($event)"></app-file-delete-view>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+
+
+
+</ng-container>

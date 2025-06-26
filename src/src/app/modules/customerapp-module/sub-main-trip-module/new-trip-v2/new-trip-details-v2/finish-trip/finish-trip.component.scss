@@ -1,0 +1,143 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+
+
+.finish-trip-popup {
+  background-color: $layout-bg;
+  border-radius: 8px;
+}
+
+.popup-header {
+  background-color: #F2F4F7;
+  border-radius: 8px 8px 0 0;
+  padding: 15px 20px;
+  color: $primary-brand-color;
+
+}
+
+.popup-body {
+  padding: 20px;
+  padding-bottom: 15px;
+
+}
+
+.input-wrap label {
+  font-weight: 600;
+  color: $text-color ;
+  font-weight: 13px;
+
+}
+
+.trip-task-tab {
+  border-bottom: 2px solid #B8B8B8;
+
+
+  span {
+    height: 40px;
+    color: $text-color;
+    font-size: 13px;
+    border-bottom: 3.5px solid $primary-brand-color;
+    display: flex;
+    padding: 5px;
+    align-items: center;
+
+    // width: 160px;
+    font-weight: 500;
+    margin-bottom: -1px;
+    cursor: pointer;
+    margin-bottom: -1px;
+
+  }
+}
+
+.halt-time-wrap {
+  margin-top: -4px;
+  display: flex;
+  justify-content: space-between;
+
+
+
+  .time-input-field {
+    position: relative;
+    width: 28%;
+
+
+    .time-input-label {
+      position: absolute;
+      top: 0%;
+      left: 7px;
+      z-index: 1;
+      font-size: 10px;
+      font-weight: 600;
+      transform: translateY(-50%);
+      background-color: $layout-bg;
+
+      padding: 0 3px;
+      opacity: 1;
+      transition: all 300ms ease;
+      color: #676A6E;
+
+    }
+  }
+
+
+
+  div {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  input {
+    width: 100%;
+    height: 100%;
+
+    &::placeholder {
+      text-align: center;
+    }
+
+    &:focus+.time-input-label {
+      opacity: 1 !important;
+
+    }
+
+    &:placeholder-shown+.time-input-label {
+      opacity: 0;
+    }
+
+
+
+    &:focus::-webkit-input-placeholder {
+      opacity: 0;
+    }
+  }
+
+  input[value=""] {}
+}
+
+.input-wrap label {
+  font-weight: 600;
+  color: #676a6e;
+}
+
+
+
+.time-input-field .input--bd.sm-time-input {
+  padding: 5.5px 7px;
+  font-size: 14px;
+  border: 1.4px solid #A4B1BC;
+  border-radius: 6px;
+
+
+  &::placeholder {
+    font-size: 13px;
+    text-align: center;
+  }
+}
+.invalid {
+  color: red;
+}
+.sm-time-input-error {
+  border: 1.5px solid red !important;
+}

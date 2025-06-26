@@ -1,0 +1,19 @@
+<div class="quotation-section" *ngIf="quotationDetails | async as quotationDetail">
+   <ng-container *ngIf="vehicle_category==0">
+    <app-quotation-v2-header-section [quotationDetail]="quotationDetail"></app-quotation-v2-header-section>
+    <app-quotation-v2-route-section [quotationDetail]="quotationDetail"></app-quotation-v2-route-section>
+    <app-quotation-v2-billing-section [quotationDetail]="quotationDetail"></app-quotation-v2-billing-section>
+   </ng-container>
+   <ng-container  *ngIf="vehicle_category=='AWP' || vehicle_category== 'Crane'">
+    <app-new-quotation-v2-crane-header [quotationDetail]="quotationDetail"></app-new-quotation-v2-crane-header>
+     <app-new-quotation-v2-crane-charge-section [quotationDetail]="quotationDetail"></app-new-quotation-v2-crane-charge-section>
+    <app-new-quotation-v2-crane-balance-terms [quotationDetail]="quotationDetail"></app-new-quotation-v2-crane-balance-terms>
+
+   </ng-container>
+   <ng-container  *ngIf="vehicle_category=='3' || vehicle_category== '4'">
+      <app-quotation-v2-header-section [quotationDetail]="quotationDetail"></app-quotation-v2-header-section>
+      <app-quotation-v2-route-section [quotationDetail]="quotationDetail"></app-quotation-v2-route-section>
+       <app-new-quotation-v2-trailer-charge-section [quotationDetail]="quotationDetail"></app-new-quotation-v2-trailer-charge-section>
+     </ng-container>
+    
+</div>

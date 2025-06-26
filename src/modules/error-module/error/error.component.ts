@@ -30,12 +30,18 @@ export class ErrorComponent implements OnInit,OnChanges {
 	};
 
   listOfErrors(){
-    this.errorsList = [];
-    Object.keys(this.controlName.errors).map((error)=>{
-      if(this.controlName.touched || this.controlName.dirty){
-        this.errorsList.push(this.errorMessages[error] (this.controlName.errors[error]))
-      }
-    })
-   return this.errorsList 
+    if(this.controlName.errors){
+      this.errorsList = [];
+      Object.keys(this.controlName.errors).map((error)=>{
+        if(this.controlName.touched || this.controlName.dirty){
+          this.errorsList.push(this.errorMessages[error] (this.controlName.errors[error]))
+        }
+      })
+      return this.errorsList 
+    }else{
+      return []
+    }
+    
+   
   }
 }

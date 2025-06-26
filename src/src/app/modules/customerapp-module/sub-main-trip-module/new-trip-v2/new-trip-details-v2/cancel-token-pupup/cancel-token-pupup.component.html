@@ -1,0 +1,43 @@
+<div class="driver-allowance-popup">
+  <div class="popup-header ">
+    <h6 class="d-inline">Cancel Token</h6>
+  </div>
+  <div class="popup-body px-3 py-4 ">
+
+
+    <form [formGroup]="cancelToken">
+      <div class="row mx-0">
+        <div class="custom-box-input-wrap col-12 mb-4 ">
+          <label for="reason">Reason</label>
+          <input type="text" id="reason" formControlName="reason" class="box-input"  placeholder="Enter reason for cancellation">
+        </div>
+        <div class="col-12 ">
+          <div class="custom-box-input-wrap" [ngClass]="{'disabled':!cancelToken.get('is_editable').value}">
+            <label for="">Cancel Customer Charge Linked to Token</label>
+            <material-dropdown [disabled]="!cancelToken.get('is_editable').value" [searchable]="true" [selectedOption]="{label: 'Yes', value: 0}" >
+              <select
+                #customSelect
+                formControlName="cancel_charge"
+                class="no-style select--modify" >
+                <option  value="0">
+                 Yes
+                </option>
+                <option  value="1">
+                  No
+                 </option>
+              </select>
+            </material-dropdown>
+          </div>
+       </div>
+       
+      </div>
+     
+    </form>
+
+  </div>
+  <div class="d-flex justify-content-space-between px-4 pb-4 ">
+    <button class="btn w-auto " (click)="cancel()">Cancel</button>
+    <button class="btn btn--primary w-auto" (click)="save()">Save</button>
+</div>
+
+</div>

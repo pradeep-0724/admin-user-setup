@@ -1,0 +1,73 @@
+<div class="right-section__header">
+    <h1 class="heading">Spare Summary</h1>
+  </div>
+<div class="form-layout" id="form-height">
+<div class="table-section">
+  <div class="table-header" >
+    <div class="row">
+        <div class="col-md-4">
+            <div class="table-header__left">
+                <div id="demo-2">
+                    <input type="search" placeholder="Search" [(ngModel)]="search">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="table-header__right">
+
+                <div class="select-wrap">
+                    <span class="show-text">Showing</span>
+                    <select [(ngModel)]="filter_by" name="" class="no-style select--modify">
+                        <option *ngFor="let num of filter" value="{{num.value}}">{{num.key}}</option>
+                    </select>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+  <div class="table-wrapper-list" id="table-height">
+      <table class="table-container" matSort (matSortChange)="sortValues($event)">
+          <thead>
+              <tr>
+                  <th mat-sort-header="name">Name</th>
+                  <th mat-sort-header="inventory_count">Inventory Count</th>
+                  <th mat-sort-header="critical_limit">Critical Limit</th>
+                  <th mat-sort-header="hsn_code">HSN Code</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr *ngIf="(sortedData | materialListPipe:search)?.length == 0">
+                  <td colspan="10" style="background-color: #fff">
+                      <div class="no-content-wrapper">
+                          <figure class="no-content-pic">
+                              <img src="assets/img/no-content.png" alt="">
+                          </figure>
+                          <div class="no-content-txt">
+                              <h5 class="heading">No data found!</h5>
+                          </div>
+                      </div>
+                  </td>
+              </tr>
+              <tr
+                  *ngFor="let data of sortedData | materialListPipe:search | paginate: { itemsPerPage: filter_by, currentPage: p } ; let i = index;">
+                  <td class="link" (click)="routeToEditById(data.id)">{{data.name}}</td>
+                  <td>{{data.inventory_count}}</td>
+                  <td>{{data.critical_limit}}</td>
+                  <td>{{ data['hsn_code'] }}</td>
+              </tr>
+          </tbody>
+      </table>
+  </div>
+  <div class="table-page-no">
+    <pagination-controls
+    previousLabel=''
+    nextLabel=''
+    directionLinks="true"
+    class="my-pagination"
+    (pageChange)="p = $event"
+    (pageBoundsCorrection)="p=$event">
+    </pagination-controls>
+  </div>

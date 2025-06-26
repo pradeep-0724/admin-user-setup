@@ -1,0 +1,115 @@
+<div class=" designation-section ">
+    
+  <div class="row mx-0 p-3 pt-4">
+    <div class="col-lg-4 col-6 ">
+      <p class="py-2">
+        <span class="label ">Zone :  </span> {{locationDetails?.zone?locationDetails?.zone?.name:'Data not Available'}}
+      </p>
+
+    </div>
+    <div class="col-lg-4 col-6 ">
+      <p class="py-2">
+        <span class="label ">Location :  </span> {{locationDetails?.area?.label?locationDetails?.area?.label:'Data not Available'}}
+      </p>
+
+    </div>
+    <div class="col-lg-4 col-6 ">
+        <p class="py-2">
+          <span class="label "> Map Coordinate: </span> {{locationDetails?.location?locationDetails?.location?.name:'Data not Available'}}
+        </p>
+
+      </div>
+      <div class="col-lg-4 col-6 ">
+        <p class="py-2">
+          <span class="label ">Scheduled Start Job Date : </span> {{dateChange(locationDetails?.scheduled_start_date)}}
+        </p>
+
+      </div>
+
+      <div class="col-lg-4 col-6 ">
+        <p class="py-2">
+          <span class="label ">Scheduled End Job Date : </span>  {{ dateChange(locationDetails?.scheduled_end_date)}}
+        </p>
+
+      </div>
+      <div class="col-lg-4 col-6 ">
+        <p class="py-2">
+          <span class="label ">Actual Start Job Date : </span>  {{ dateChange(locationDetails?.start_date)}}
+        </p>
+
+      </div>
+      <div class="col-lg-4 col-6 ">
+        <p class="py-2">
+          <span class="label ">Actual End job Date : </span>  {{ dateChange(locationDetails?.end_date)}}
+        </p>
+
+      </div>
+
+      <div class="col-lg-4 col-6 ">
+        <p class="py-2">
+          <span class="label ">Point Of Contact (Name) : </span> {{locationDetails?.contact_name?locationDetails?.contact_name : 'Data not Available'}}
+        </p>
+
+      </div>
+
+      <div class="col-lg-4 col-6 ">
+        <p class="py-2">
+          <span class="label ">Point Of Contact (Mobile) : </span> ({{locationDetails?.contact_no?.code}})   {{locationDetails?.contact_no?.number ? locationDetails?.contact_no?.number :'Data not Available' }}
+        </p>
+
+      </div>
+
+  </div>
+
+
+  <div class="row mx-0 px-3 pb-4">
+    <div class="col-lg-4 col-6 ">
+
+      <div>
+        <p class="mb-3">
+          <span class="label primary-label">Odometer KMs</span>
+        </p>
+        <p class="mb-3">
+          <span class="label ">Start Job : </span>{{locationDetails?.odometer?.start ? locationDetails?.odometer.start + ' KM':'Data not Available'}} 
+        </p>
+        <p class="mb-3">
+          <span class="label ">End of Job : </span>{{locationDetails?.odometer?.end ? locationDetails?.odometer.end + ' KM':'Data not Available'}} 
+        </p>
+        
+      </div>
+
+    </div>
+
+    <div class="col-lg-4 col-6 ">
+
+        <div>
+          <p class="mb-3">
+            <span class="label primary-label">Odometer Hours</span>
+          </p>
+          <p class="mb-3">
+            <span class="label ">Start Job : </span> {{locationDetails?.hour?.start ? locationDetails?.hour.start+ ' Hour':'Data not Available'}} 
+          </p>
+          <p class="mb-3">
+            <span class="label ">End of Job : </span> {{locationDetails?.hour?.end ? locationDetails?.hour.end+ ' Hour':'Data not Available'}} 
+          </p>
+          
+        </div>
+
+      </div>
+  
+   
+  </div>
+
+</div>
+
+<div class="destination-wrapper" *ngIf="locationDetails?.checklist?.length">
+
+<div class="trip-task-tab px-4">
+  <span >Job Task &nbsp;&nbsp;
+    <app-tool-tip class="tool-tip-position trip-no" [totalSlides]="trip_Task.content.length" position="right"
+      [toolTipContent]="trip_Task"></app-tool-tip></span>
+</div>
+<app-add-edit-view-trip-task [isMandatory]="false" [tripId]="locationDetails.id" [inlineUpdate]="true" [destinationIndex]="1"  [tripTaskList]="locationDetails?.checklist"></app-add-edit-view-trip-task>
+
+</div>
+

@@ -1,0 +1,539 @@
+<form [formGroup]="craneFormGroup" class="def-color">
+    <div class="quotation-edit-route-pop flex-lg-row flex-column ">
+        <div class="form-wrap position-relative">
+            <div class="gb-fake-tab-wrapper">
+                <span>Location Details</span>
+
+            </div>
+            <div>
+                <div formGroupName="location_details">
+                    <div class="row  p-4 mx-0">
+                        <div class="col-xl-4 col-lg-3 col-md-4 col-6">
+                            <div class="input-wrap dropdownArrow ">
+                                <label class="input">Zone</label>
+
+                                <material-dropdown [selectedOption]="initialValues.zone" [addBlank]="true"
+                                    [searchable]="true" class="dropDownWidth">
+                                    <select #customSelect formControlName="zone" class="no-style select--modify"
+                                        (change)="onZoneChange()">
+                                        <option *ngFor="let option of zonesList" value="{{ option?.id }}">
+                                            {{ option?.name }}
+                                        </option>
+                                    </select>
+                                </material-dropdown>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-3 col-md-4 col-6" >
+                            <div class="input-wrap clearfix dropdownArrow " [ngClass]="addErrorClass(craneFormGroup.controls.location_details.get('area'))">
+                                <div class="location-input">
+                                    <label class="input--required">Location 
+                                    </label>
+                                    <div class="show-in-invoice" >
+                                        <mat-checkbox  class="fw-semibold def-color" formControlName="show_in_invoice"  color="primary" >Show In Invoice</mat-checkbox>
+                                    </div>
+                                </div>  
+                                <div>
+                                    <material-dropdown [searchable]="true" [addable]="true"
+                                    [postApiUrl]="areaApi"
+                                    [params]="areaParams"
+                                    (postApiResponse)="getNewArea($event)"
+                                    (addValueToList)="addNewArea($event)"
+                                      [selectedOption]="initialValues?.area">
+                                      <select #customSelect formControlName="area" class="no-style select--modify" >
+                                        <option *ngFor="let option of areaList" value="{{ option?.id }}">
+                                          {{ option?.label }}
+                                        </option>
+                                      </select>
+                                    </material-dropdown>
+                                    <app-error [controlName]="craneFormGroup.controls.location_details.get('area')"></app-error>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-6">
+                            <div class="input-wrap clearfix  ">
+                                <label>Map Coordinate </label>
+                                <app-tool-tip class="tool-tip-position lower" [totalSlides]="locationToolTip.content.length"
+                                    position="top" [toolTipContent]="locationToolTip"></app-tool-tip>
+                                <app-location-v2 [isnameRequired]="false" [isFromToInvalid]="isLocationValid"
+                                    [placeForm]="craneFormGroup.get('location_details')['controls'].location"
+                                    (placeDetails)="locationSelected($event)"></app-location-v2>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <div class="input-wrap clearfix ">
+                                <label for="" class="">Job Task</label>
+                                <app-tool-tip class="tool-tip-position" [totalSlides]="tripTaskToolTip.content.length"
+                                    position="right" [toolTipContent]="tripTaskToolTip"></app-tool-tip>
+                                <app-check-list
+                                    (selectedCheckList)="selectedCheckList($event,craneFormGroup.get('location_details'))"
+                                    [selectedList]="craneFormGroup.get('location_details').get('checklist').value"></app-check-list>
+                            </div>
+                        </div>
+                        <div class=" col-lg-4 col-md-6">
+                            <div class="input-wrap dropdownArrow">
+                                <label for="">Point Of Contact (Name)</label>
+                                <material-dropdown [selectedOption]="initialValues.contactName" [disableLastInput]="true" (nonOptionSetValue)="setContactPerson($event)">
+                                    <select #customSelect class="no-style select--modify"
+                                        formControlName="contact_name" (change)="onContactPersonSelection($event.target.value)">
+                                        <option *ngFor="let option of contactPersonList " value="{{option.name}}">{{option.name}}
+                                        </option>
+                                    </select>
+                                </material-dropdown>
+                            </div>
+                        </div>
+
+                        <div class=" col-lg-4 col-md-6 input-wrap mb-0">
+                            <label [ngClass]="{'input--required':craneFormGroup.get('location_details.contact_name')?.value!=''}">Point Of Contact
+                                (Mobile)</label>
+                            <div class="mobile-no-wrapper d-flex align-items-start" formGroupName="contact_no">
+                                <img [src]="craneFormGroup.get('location_details').get('contact_no').value['flag']" />
+                                <div class="input-wrap m-no-prefix clearfix country-prefix">
+
+                                    <material-dropdown [searchable]="true" [selectedOption]="initialValues.countryCode">
+                                        <select #customSelect formControlName="code" class="no-style select--modify" (change)="onCountryCodeSelection(craneFormGroup.get('location_details'))">
+                                            <option *ngFor="let option of countryPhoneCodeList" [value]="option?.phone_code">
+                                                {{ option?.phone_code }}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                </div>
+                                <div class="input-wrap clearfix error mobile-no" [ngClass]="addErrorClass(craneFormGroup.get('location_details.contact_no.number'))">
+                                    <input type="text" class="no-style input--bd" placeholder="Number" value=""
+                                        formControlName="number" />
+                                    <app-error [controlName]="craneFormGroup.get('location_details.contact_no.number')"></app-error>
+                                </div>
+                               
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+        <div class="map-wrap">
+            <div class="map-top">
+                <div>
+                    <div> </div>
+                </div>
+            </div>
+            <div class="google-map-box">
+                <google-map height="100%" width="100%" *ngIf="zoom" [zoom]="zoom" [center]="center">
+                    <map-marker *ngFor="let markerPosition of markerPositions" [position]="markerPosition"
+                        [options]="markerOptions"></map-marker>
+                </google-map>
+            </div>
+
+        </div>
+    </div>
+    <div class="quotation-customFields">
+        <div class="gb-tab-wrapper">
+            <app-tool-tip class="work-order-custom-field-tooltip" [totalSlides]="customfield_Info.content.length"
+            position="right" [toolTipContent]="customfield_Info"></app-tool-tip>
+            <mat-tab-group mat-stretch-tabs="false" class="mat-group" animationDuration="0ms" mat-align-tabs="start">
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span [ngClass]="{ taberror:isRentalChargesTabError  }">Rental Charge</span>
+                    </ng-template>
+                    <div formGroupName="rental_charge">
+                        <div class="row px-4 pt-4 mx-0">
+                            <div class="col-lg-2 col-6">
+                                <div class="input-wrap clearfix">
+                                    <label for="" >Billing Unit</label>
+                                    <material-dropdown [selectedOption]="initialValues.billingUnit">
+                                        <select #customSelect formControlName="billing_unit" (change)="onBillingUnitChange()"
+                                        
+                                            class="no-style select--modify">
+                                            <option *ngFor="let option of rateCardBillingList" value="{{ option?.value}}">
+                                                {{ option?.label }}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                               </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="input-wrap dropdownArrow ">
+                                    <label class="input">No. of Shift</label>
+
+                                    <material-dropdown [searchable]="true" [selectedOption]="initialValues.shifType"
+                                        class="dropDownWidth">
+                                        <select #customSelect formControlName="no_of_shifts"
+                                            class="no-style select--modify" (change)="onShiftChange()">
+                                            <option *ngFor="let option of shiftType" [value]="option?.value">
+                                                {{ option?.label }}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="input-wrap dropdownArrow ">
+                                    <label class="input">Fuel Provision</label>
+
+                                    <material-dropdown [searchable]="true" [selectedOption]="initialValues.fuelType"
+                                        class="dropDownWidth">
+                                        <select #customSelect formControlName="fuel_type"
+                                            class="no-style select--modify" (change)="onShiftChange();getAndSetRentalCharge()">
+                                            <option *ngFor="let option of fuelType" [value]="option?.value">
+                                                {{ option?.label }}
+                                            </option>
+                                        </select>
+                                    </material-dropdown>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+
+                                <div class="input-wrap clearfix" formGroupName="working_duration">
+                                    <label for="" class="">Working Duration</label>
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <input type="text" value="0" formControlName="duration" positiveDigitNumber [ngClass]="{'invalid-input':craneFormGroup.get('rental_charge.working_duration').get('duration')?.invalid&&craneFormGroup.get('rental_charge.working_duration').get('duration')?.touched }"
+                                            class="no-style input--bd w-25" (change)="onChangeWorkingDuration()" />
+
+                                        <div class=" border-1 mx-2 border" style="height: 15px;"></div>
+
+                                        <div class="flex-grow-1">
+                                            <material-dropdown [searchable]="true"
+                                                [selectedOption]="initialValues.working" [addable]="false"
+                                                class="dropDownWidth">
+                                                <select #customSelect formControlName="working"
+                                                    class="no-style select--modify"
+                                                    (change)="onChangeWorkingDuration();getAndSetRentalCharge()">
+                                                    <option *ngFor="let option of durationType"
+                                                        value="{{ option.value }}">
+                                                        {{ option.label }}
+                                                    </option>
+                                                </select>
+                                            </material-dropdown>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="input-wrap">
+                                    <ng-container *ngIf="saleorderBasedOn=='hour'">
+                                        <label for="">Total Working Hours</label>
+                                    </ng-container>
+                                    <ng-container *ngIf="saleorderBasedOn=='day'">
+                                        <label for="">Total Working Days</label>
+                                    </ng-container>
+                                   
+                                    {{totalSalesHours}}
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="addable-row-table m-4 mt-0">
+                            <table>
+                                <thead>
+                                    <tr>
+
+                                        <th class="input">
+                                            Specification
+                                        </th>
+                                        <th>RENTAL CHARGE</th>
+                                        <th>TOTAL AMOUNT  ({{ currency_type?.symbol}})</th>
+                                        <th>
+                                            <ng-container *ngIf="saleorderBasedOn=='hour'">
+                                              EXTRA HOURS
+                                            </ng-container>
+                                            <ng-container *ngIf="saleorderBasedOn=='day'">
+                                               EXTRA DAYS
+                                            </ng-container>
+                                        </th>
+                                        <th>VEHICLE NO.</th>
+                                        <th *ngIf="isMarketVehicle">VEHICLE PROVIDER</th>
+                                        <th *ngIf="isMarketVehicle">LPO</th>
+                                        <th>JOB START DATE</th>
+                                        <th>JOB END DATE</th> 
+
+                                    </tr>
+
+                                </thead>
+                                <tbody formArrayName="rental_charges">
+
+                                    <ng-container
+                                        *ngFor="let control of craneFormGroup.controls['rental_charge'].get('rental_charges')['controls'];let i = index"
+                                        [formGroupName]="i">
+
+
+                                        <tr>
+                                            <td [ngClass]="{'invalid-input':control.get('specification').invalid && control.get('specification').touched}">
+                                                <material-dropdown [searchable]="true"
+                                                   [selectedOption]="initialValues.specifications[i]">
+                                                    <select #customSelect formControlName="specification" (change)="getRateCard(control,i);getVehicleList(control,i);vehicelAndDateChanged()">
+                                                        <option *ngFor="let option of vechileSpecifications"
+                                                            value="{{ option?.id }}">
+                                                            {{ option?.specification }}
+                                                        </option>
+                                                    </select>
+                                                </material-dropdown>
+                                            </td>
+
+                                            <td>
+                                                <div>
+                                                    <input type="text" positiveThreeDigitDecimalNumber
+                                                        formControlName="rental_charge" class="error-box"
+                                                        placeholder="Eg.: 1234567" value="0" (change)="onchangeRentalCharge()">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <input type="text" positiveThreeDigitDecimalNumber
+                                                        formControlName="total_amount" class="error-box"
+                                                        placeholder="Eg.: 1234567" value="0" readonly>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <input type="text" positiveThreeDigitDecimalNumber
+                                                        formControlName="extra_hours" class="error-box"
+                                                        placeholder="Eg.: 1234567" value="0">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <material-dropdown [searchable]="true" [selectedOption]="initialValues.vehicle[i]">
+                                                    <select #customSelect formControlName="vehicle_no" (change)="vehicelAndDateChanged();onVehicleSelection(control,i)">
+                                                        <option *ngFor="let option of initialValues.vehicleList[i]" value="{{ option?.id }}">
+                                                            {{ option?.reg_number }}
+                                                        </option>
+                                                    </select>
+                                                </material-dropdown>
+                                            </td>
+                                            <td *ngIf="isMarketVehicle">
+                                                <ng-container *ngIf="control.get('is_transporter').value">
+                                                    <material-dropdown [searchable]="true"
+                                                    [addBlank]="true" [selectedOption]="initialValues.vehicleProvider[i]" >
+                                                    <select #customSelect formControlName="vehicle_provider" (change)="onVehicleProviderChange(control,i)">
+                                                      <option *ngFor="let option of partyListVendor" value="{{ option?.id }}">
+                                                        {{ option?.party_display_name }}
+                                                      </option>
+                                                    </select>
+                                                  </material-dropdown>
+                                                </ng-container>
+                                             
+                                            </td>
+                                            <td *ngIf="isMarketVehicle">
+                                                <ng-container *ngIf="control.get('is_transporter').value">
+                                                    <material-dropdown [searchable]="true" [selectedOption]="initialValues.lpo[i]"
+                                                    [addBlank]="true" >
+                                                    <select #customSelect formControlName="lpo">
+                                                      <option *ngFor="let option of  this.initialValues.lpoList[i]" value="{{ option?.id }}">
+                                                        {{ option?.name }}
+                                                      </option>
+                                                    </select>
+                                                  </material-dropdown>
+                                                </ng-container>
+                                             
+                                            </td>
+                                            <td [ngClass]="{'invalid-input':control.get('job_start_date').invalid && control.get('job_start_date').touched}">
+                                                <mat-form-field class="date-input">
+                                                    <input [min]="startDate" [max]="endDate" matInput readonly [matDatepicker]="job_start_date" 
+                                                        formControlName="job_start_date" (focus)="job_start_date.open()"  (dateChange)="vehicelAndDateChanged()"
+                                                        placeholder="DD/MM/YYYY">
+                                                    <mat-datepicker-toggle matSuffix
+                                                        [for]="job_start_date"></mat-datepicker-toggle>
+                                                    <mat-datepicker #job_start_date ></mat-datepicker>
+                                                </mat-form-field>
+                                            </td>
+                                            <td [ngClass]="{'invalid-input':control.get('job_end_date').invalid && control.get('job_end_date').touched}">
+                                                <mat-form-field class="date-input">
+                                                    <input matInput readonly [matDatepicker]="job_end_date" [min]="control.get('job_start_date').value"  [max]="endDate"
+                                                        formControlName="job_end_date" (focus)="job_end_date.open()"
+                                                        placeholder="DD/MM/YYYY">
+                                                    <mat-datepicker-toggle matSuffix
+                                                        [for]="job_end_date"></mat-datepicker-toggle>
+                                                    <mat-datepicker #job_end_date></mat-datepicker>
+                                                </mat-form-field>
+                                            </td>
+
+
+
+                                        </tr>
+                                        <tr>
+
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <ng-container *ngIf="isMarketVehicle">
+                                            <td class="border-start-0 border-end-0"></td>
+                                            <td class="border-start-0 border-end-0"></td>
+                                            </ng-container>
+                                            <td class="rc-row-btn-wrap border-start-0 border-end-0">
+                                                <div class="d-flex justify-content-end">
+                                                    <button (click)="removeRentalChareItem(i)"
+                                                        *ngIf="this.craneFormGroup.controls['rental_charge'].get('rental_charges')['controls'].length !== 1"
+                                                        class="  row-btn row-btn-delete "><span class="material-icons">
+                                                            close
+                                                        </span></button>
+                                                    <button (click)="addMoreRentalChargeItem()" *ngIf="this.craneFormGroup.controls['rental_charge'].get('rental_charges')['controls'].length-1 ==i "
+                                                        class=" row-btn row-btn-add "><span class="material-icons">
+                                                            add
+                                                        </span></button>
+
+
+                                                </div>
+
+
+                                            </td>
+
+                                        </tr>
+                                    </ng-container>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span [ngClass]="{ taberror:isAddChargesTabError  }">Additional Charges</span>
+                    </ng-template>
+                    <div class="p-4">
+                        <div class="mb-3">
+                            <button class="btn btn--primary ms-auto w-auto" (click)="addCharges()">+ Add Additional
+                                charge</button>
+
+                        </div>
+                        <div class="addable-row-table " formArrayName="additional_charge">
+
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>
+                                            Additional Charge
+                                        </th>
+                                        <th *ngIf="isTax">Tax</th>
+                                        <th>Unit Of Measurement </th>
+                                        <th>No. Of Units </th>
+                                        <th>Unit Cost ( {{ currency_type?.symbol}})</th>
+                                        <th>Total Amount  ({{ currency_type?.symbol}})</th>
+
+                                    </tr>
+
+                                </thead>
+                                <tbody>
+                                    <tr class="border-0" *ngIf="this.craneFormGroup.controls['additional_charge']['controls'].length==0">
+                                        <td class="bg-white" colspan="30">
+                                          <div class="no-list-data-wrap">
+                                            <figure>
+                                              <img src="assets/img/no-content.png" alt="">
+                                            </figure>
+                                            <h5 class="mt-3 primary-brand-text">No additional charges added!</h5>
+                                          </div>
+                                        </td>
+                                    </tr>
+                                    <tr *ngFor="let control of this.craneFormGroup.controls['additional_charge']['controls'];let i = index"
+                                        [formGroupName]="i">
+                                        <td class="ps-4"> <mat-checkbox formControlName="is_checked" (change)="onChangeAdditionalChargeCheckBox(control)"
+                                                color="primary"></mat-checkbox></td>
+                                        <td>{{control.get('name').value?.['name']}}</td>
+                                        <td  *ngIf="isTax" [ngClass]="{'invalid-input':control.get('tax').invalid && control.get('tax').touched ,'disable':!control.get('is_checked').value}">
+                                            <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="initialValues.additionalTax[i]" [disabled]="!control.get('is_checked').value">
+                                                <select #customSelect name="" class="no-style select--modify error-box" formControlName="tax" (change)="onCalculationChange()">
+                                                <option *ngFor="let option of taxOptions"
+                                                    value="{{ option.id }}">{{
+                                                    option.label }}</option>
+                                                </select>
+                                              </material-dropdown>
+                                        </td>
+                                        <td [ngClass]="{'invalid-input':control.get('unit_of_measurement').invalid && control.get('unit_of_measurement').touched ,'disable':!control.get('is_checked').value}">
+                                            <material-dropdown [disabled]="!control.get('is_checked').value" [searchable]="true" [selectedOption]="initialValues.unit[i]">
+                                                <select #customSelect formControlName="unit_of_measurement">
+                                                    <option *ngFor="let option of unitOfMeasurementList" [ngValue]="option">
+                                                        {{ option?.label }}
+                                                    </option>
+                                                </select>
+                                            </material-dropdown>
+                                        </td>
+                                        <td [ngClass]="{'invalid-input':control.get('quantity').invalid && control.get('quantity').touched ,'disable':!control.get('is_checked').value}">
+                                            <div>
+                                                <input type="text" [readonly]="!control.get('is_checked').value" [ngClass]="{'disable':!control.get('is_checked').value}" positiveThreeDigitDecimalNumber formControlName="quantity" class="error-box"
+                                                    placeholder="Eg.: 1234567" value="0" (change)="onCalculationChange()" >
+                                            </div>
+                                        </td>
+
+                                        <td [ngClass]="{'invalid-input':control.get('unit_cost').invalid && control.get('unit_cost').touched ,'disable':!control.get('is_checked').value}">
+                                            <div>
+                                                <input [ngClass]="{'disable':!control.get('is_checked').value}" [readonly]="!control.get('is_checked').value" type="text" positiveThreeDigitDecimalNumber formControlName="unit_cost" class="error-box"
+                                                    placeholder="Eg.: 1234567" value="0" (change)="onCalculationChange()">
+                                            </div>
+                                        </td>
+                                        <td [ngClass]="{'disable':!control.get('is_checked').value}">
+                                            <div>
+                                                <input [ngClass]="{'disable':!control.get('is_checked').value}" type="text" positiveThreeDigitDecimalNumber formControlName="total" class="error-box"
+                                                    placeholder="Eg.: 1234567" readonly>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                      <span [ngClass]="{ taberror: iscustomFieldTabError }">Custom Field </span>
+                    </ng-template>
+                    <app-custom-field [isTrip]="false" [editData]="customFieldData" [parentForm]="craneFormGroup"
+                      [isFormValid]="isFormValidCustomField"></app-custom-field>
+                  </mat-tab>
+            
+         </mat-tab-group>
+        </div>
+    </div>
+    <div class="row mx-0 def-color">
+        <div class="col-lg-5 px-0">
+
+            <div class="gb-fake-tab-wrapper">
+                
+            </div>
+        </div>
+        <div class="col-lg-7 px-0 " style="box-shadow: -5px 0px 10px -10px #aaaaaa;">
+            <div class="gb-fake-tab-wrapper">
+                <span>Balance</span>
+            </div>
+
+            <div class="p-4 pb-0 row mx-0" *ngIf="isTax">
+                <div class="col-lg-6">
+                    <label for="" class="">&nbsp;</label>
+                    <div class="tax-input-box ">
+                        <span for="">Rental</span>
+                        <material-dropdown [searchable]="true" [selectedOption]="initialValues.tax" [addable]="false"
+                            class="dropDownWidth">
+                            <select #customSelect name="" formControlName="tax" (change)="onCalculationChange()">
+                                <option *ngFor="let option of taxOptions" value="{{ option.id }}">{{
+                                    option.label }}</option>
+                            </select>
+                        </material-dropdown>
+
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="p-3 px-4 ">
+                <p class="fw-semibold d-flex justify-content-between py-3"><span>Rental Charges </span> <span>{{ currency_type?.symbol}} {{calculations.rental_charges|numberFormat}}</span></p>
+                <p class="fw-semibold d-flex justify-content-between py-3"><span>Additional Charges </span> <span>{{ currency_type?.symbol}} {{calculations.additional_charges|numberFormat}}</span></p>
+
+                <p class="fw-semibold d-flex justify-content-between py-3"><span>VAT Amount </span> <span>{{ currency_type?.symbol}} {{calculations.VAT_amount|numberFormat}}</span></p>
+
+
+            </div>
+            <p class="fw-semibold d-flex justify-content-between border-top fs-6 py-3 px-4"><span>Total Amount </span> <span>{{ currency_type?.symbol}} {{calculations.total_amount|numberFormat}}</span></p>
+
+        </div>
+    </div>
+</form>

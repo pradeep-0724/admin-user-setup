@@ -1,0 +1,88 @@
+<div>
+    <div class="right-section__header">
+        <div class="d-flex align-items-center">
+            <p class="quotation-id" (click)="historyBack()"><button><i
+                        class="bi bi-chevron-left"></i></button>&nbsp;{{quotationDetail?.quotation_no}}</p>
+                        <div class="veh-type driver-active px-3 me-2  rounded-pill">
+                            <img class="veh-icon" *ngIf="quotationDetail?.vehicle_category== 'Crane'" src="../../.././../../../../../assets/img/icons/green-crane.png"/>
+                             <img *ngIf="quotationDetail?.vehicle_category=='AWP'" class="veh-icon" src="../../.././../../../../../assets/img/icons/awp-green.png"/> 
+                
+                            {{quotationDetail?.vehicle_category}}</div>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center">
+            <ng-container *ngIf="quotationDetail.status.status_screen_to_show !=='client_approved' && quotationDetail.status.status_screen_to_show !=='client_rejected' && quotationDetail.status.status_screen_to_show !=='void'">
+                <button class="gb-edit-btn-secondary ms-2"  *ngIf="isQuotationEdit" [routerLink]="[prefixUrl+'/trip/quotation/edit',quotationDetail?.id]">
+                    <span  class="material-icons"> create </span>Edit</button>
+            </ng-container>
+            <button class="gb-edit-btn-secondary ms-2" (click)="editRequest()"> <span  class="material-icons"> create </span>Edit Request</button>
+            <ng-container  *ngIf="quotationDetail.status.status_screen_to_show =='client_approved'">
+                <button class="btn btn--primary w-auto d-inline py-2 ms-2 rounded-2" (click)="createWorKorderOrJob(false)">Convert to Sales
+                    Order</button> 
+                <button class="btn btn--primary w-auto d-inline py-2 ms-2 rounded-2" (click)="createWorKorderOrJob(true)">Convert to Job </button> 
+            </ng-container>
+
+            <button class="gb-btn gb-btn-red ms-2" (click) = "openVoidQuotation()"  *ngIf="quotationDetail.status.status_screen_to_show !='void' && quotationDetail.status.status_screen_to_show !='client_approved' && quotationDetail.status.status_screen_to_show !='client_rejected'">Void Quotation</button>
+            <button class="btn   w-auto ms-2" style="padding-left: 15px;"   *ngIf="quotationDetail.status.status_screen_to_show =='client_approved'" [routerLink]="[prefixUrl+'/trip/site-inspection/add']"[queryParams]="{quotationId: quotationDetail.id}">Schedule Inspection </button>
+
+            <!-- <button class="btn  w-auto d-inline py-2 rounded-2 me-3 comment-btn" *ngIf="quotationDetail?.can_comment" (click)="openComments()"><i
+                    class="bi bi-chat-dots-fill me-2 "></i>Client Chat</button> -->
+            <button class="btn  w-auto d-inline py-2 rounded-2 me-3 view-btn ms-2"  (click)="openPdf()"><i
+                    class="bi bi-eye-fill me-2"></i>View
+                PDF</button>
+             
+        
+        </div>
+    </div>
+
+
+
+    <div class="details">
+
+
+        <app-add-trip-v2-documents-expiry
+        [documentExpiryData]="documentExpiryData"></app-add-trip-v2-documents-expiry>
+    <app-new-quotation-v2-status-block [quotationDetail]="quotationDetail"></app-new-quotation-v2-status-block>
+
+
+    
+        
+        <div class=" px-4 py-3 row shadow-inset-bottom mx-0">
+          
+
+                    <p class="col-lg-4 col-md-5 "><b>Quotation Date
+                            :</b>{{changeDatetoNormalFormat(quotationDetail?.quote_date)}}</p>
+                    <p class="col-lg-4 col-md-5"><b>Customer :</b><a class="custom-link" target="_blank"
+                            [routerLink]="[prefixUrl+'/onboarding/party/details/client/',quotationDetail?.customer?.id]">{{quotationDetail?.customer?.display_name}}</a>
+                    </p>
+                    <p class="col-lg-4 col-md-5"><b>Validity Term :</b>{{quotationDetail?.validity_term ? quotationDetail?.validity_term : '-' }}
+                    <p class="col-lg-4 col-md-5"><b>Validity Date
+                            :</b>{{changeDatetoNormalFormat(quotationDetail?.validity_date)}}
+                    </p>
+                    <p class="col-lg-4 col-md-5"><b>Payment Terms :</b>{{quotationDetail?.payment_term ? quotationDetail?.payment_term: '-'}}
+                    </p>
+                    <p class="col-lg-4 col-md-5"><b>Employee In Charge :</b>
+                        <a class="py-0 custom-link" target="_blank" [routerLink]="[prefixUrl+'/onboarding/employee/view/',quotationDetail.employee_in_charge?.id]"> {{ quotationDetail?.employee_in_charge?.display_name ? quotationDetail.employee_in_charge?.display_name : '-' }}</a></p>
+                    <p class="col-lg-4 col-md-5"><b>Reference No :</b>{{quotationDetail?.ref_no ? quotationDetail?.ref_no : '-'}}
+                    </p>
+                    <p class="col-lg-4 col-md-5"><b>Site Inspection No. :
+                    </b>  <a class="custom-link" target="_blank" [routerLink]="[prefixUrl+'/trip/site-inspection/view/',quotationDetail?.site_inspection_no?.id]"> {{ quotationDetail?.site_inspection_no ? quotationDetail?.site_inspection_no?.site_inspection_no : '-' }} </a></p>
+                    <p class="col-lg-4 col-md-5"><b>Customer POC :</b> {{quotationDetail?.poc ? quotationDetail?.poc?.display_name:'-'}}</p>
+                  
+        </div>
+        <div class="px-4 py-3 row mx-0">
+           
+
+                    <p class="col-lg-12 col-md-5 "><b>Location Details</b></p>
+                    <p class="col-lg-4 col-md-5 "><b>Zone:</b>{{vehObject.location_details?.zone ? vehObject.location_details?.zone : '-'}}</p>
+                    <p class="col-lg-4 col-md-5 "><b>Location:</b>{{vehObject.location_details?.area? vehObject.location_details?.area?.label: '-'}}</p>
+                    <p class="col-lg-4 col-md-5 "><b>Map Coordinate:</b>{{vehObject.location_details?.location ? vehObject?.location_details?.location : '-'}}</p>
+
+
+                   
+             
+        </div>
+
+    </div>
+
+</div>

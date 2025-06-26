@@ -1,0 +1,423 @@
+<div class="p-4 shadow-inset-top-bottom approvel-view">
+    <!------------- approver action ------------------>
+    <div class="row mx-0"  *ngIf="tripStatusDetails.status_screen_to_show ==='approver_action'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon" *ngIf="tripStatusDetails.show_approval_button">
+                <img src="../../../../../../../assets/img/icons/approve.svg" alt="">
+            </div>
+            <div class="approve-status-icon" *ngIf="!tripStatusDetails.show_approval_button">
+                <img src="../../../../../../../assets/img/icons/watch.svg" alt="">
+            </div>
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="approval-details" *ngIf="tripStatusDetails.show_approval_button">
+                        <div class="header">Waiting for L{{tripStatusDetails.approver_level}} Approval</div>
+                        <p>This job has been submitted for approval.</p>
+                    </div>
+                    <div class="approval-details" *ngIf="!tripStatusDetails.show_approval_button">
+                        <div class="header">Waiting for L{{tripStatusDetails.approver_level}} Approval</div>
+                        <p>This job has been submitted for approval, You’ll be notified once its approved.</p>
+                    </div>
+                    <div class="pt-3 ps-0 def-color body">
+                        <ng-container   *ngIf="tripStatusDetails.validations.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of tripStatusDetails.validations"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name}} :</span><span>{{item?.message}}</span></p>
+                        </ng-container>
+                        <ng-container *ngIf="tripStatusDetails.remarks.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of tripStatusDetails.remarks"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name ?item?.name : '-'}} :</span><span>{{item?.message ? item?.message : '-'}}</span></p>
+                        </ng-container>
+    
+                    </div>
+    
+                </div>
+                <div class="col-lg-4">
+                    <div   *ngIf="tripStatusDetails.show_approval_button">
+                        <div class="d-flex justify-content-end align-items-center mt-2">
+                            <button class="btn btn--primary py-2 w-auto btn--sm"  (click)="openQuotationRejectPopup('Approved',false)">Approve</button>
+                            <button class="btn py-2 w-auto ms-3 btn--sm" (click)="openQuotationRejectPopup('Rejected',true)">Reject</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mx-0 mt-3"  >
+
+                <div class="col-lg-8 px-0">
+                    <div class="d-flex flex-wrap" >
+                        <div class="me-5">
+                            <p class="mb-2 fs-12px">Submitted by</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter blue"> {{ findfingFirstName(tripStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{tripStatusDetails.submitter ? tripStatusDetails.submitter : '-'}}</p>
+                            </div>
+                        </div>
+                        <div class="ps-4">
+                            <p class="mb-2 fs-12px">Current Approver</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter green"> {{ findfingFirstName(tripStatusDetails.last_action_taken_by)}}</div>
+                                <p class="fw-semibold"> {{tripStatusDetails.last_action_taken_by ? tripStatusDetails.last_action_taken_by : '-'}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 d-flex justify-content-end align-items-end" *ngIf="tripStatusDetails.timeline.length >0">
+        
+                    <button class="fw-semibold primary-brand-text  mt-3 custom-link" (click)="openSideBar()" data-bs-toggle="offcanvas"
+                        data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">View Approval Details</button>
+        
+                </div>
+        
+            </div>
+
+        </div>
+
+    </div>
+    
+    <!-------------- approver rejected --------------->
+    <div class="row mx-0"  *ngIf="tripStatusDetails.status_screen_to_show ==='approval_rejected'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon">
+                <img src="../../../../../../../assets/img/icons/rejected.svg" alt="">
+            </div>
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="approval-details">
+                        <div class="header">Job is Rejected</div>
+                    </div>
+                    <div class="pt-3 def-color body">
+                        <ng-container   *ngIf="tripStatusDetails.validations.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of tripStatusDetails.validations"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name}} :</span><span>{{item?.message}}</span></p>
+                        </ng-container>
+                        <ng-container *ngIf="tripStatusDetails.remarks.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of tripStatusDetails.remarks"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name ?item?.name : '-'}} :</span><span>{{item?.message ? item?.message : '-'}}</span></p>
+                        </ng-container>
+
+                    </div>
+    
+                </div>
+                <div class="col-lg-4" >
+                    <div class="d-flex justify-content-end align-items-center mt-2"  *ngIf="is_Approval_configured && tripStatusDetails.show_approval_button">
+                        <button class="btn btn--primary py-2 w-auto btn--sm custom-link"  (click)="saveQuotation('send_for_approval','Send Approval',true)">Send for Approval</button>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="row mx-0 mt-3"  >
+
+                <div class="col-lg-6 px-0">
+                    <div class="d-flex flex-wrap" >
+                        <div class="me-5">
+                            <p class="mb-2 fs-12px">Submitted by</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter blue"> {{ findfingFirstName(tripStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{tripStatusDetails.submitter ? tripStatusDetails.submitter : '-'}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex justify-content-end align-items-end"  *ngIf="tripStatusDetails.timeline.length >0">
+        
+                    <button class="fw-semibold primary-brand-text  mt-3" (click)="openSideBar()" data-bs-toggle="offcanvas"
+                        data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">View Approval Details</button>
+        
+                </div>
+        
+            </div>
+
+        </div>
+
+    </div>
+    <!---------------ongoing  ------------------->
+    <div class="row mx-0"  *ngIf="tripStatusDetails.status_screen_to_show ==='Ongoing'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon" >
+                <img src="../../../../../../../assets/img/icons/blue-person.svg" alt="">
+            </div>
+           
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                   
+                    <div class="approval-details">
+                        <div class="header">Ongoing</div>
+                        <p>This Job is ongoing.</p>
+                    </div>
+                    <div class="pt-3 ps-0 def-color body">
+                        <ng-container   *ngIf="tripStatusDetails.validations.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of tripStatusDetails.validations"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name}} :</span><span>{{item?.message}}</span></p>
+                        </ng-container>
+                        <ng-container *ngIf="tripStatusDetails.remarks.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of tripStatusDetails.remarks"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name ?item?.name : '-'}} :</span><span>{{item?.message ? item?.message : '-'}}</span></p>
+                        </ng-container>
+    
+                    </div>
+    
+                </div>
+                
+            </div>
+            <div class="row mx-0 mt-3"  *ngIf="tripStatusDetails.status_screen_to_show ==='Ongoing'">
+
+                <div class="col-lg-6 px-0">
+                    <div class="d-flex flex-wrap" >
+                        <div class="me-5">
+                            <p class="mb-2 fs-12px">Submitted by</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter blue"> {{ findfingFirstName(tripStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{tripStatusDetails.submitter ? tripStatusDetails.submitter : '-'}}</p>
+                            </div>
+                        </div>
+                        <div class="ps-4" *ngIf="tripStatusDetails.last_action_taken_by">
+                            <p class="mb-2 fs-12px">Approved By</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter green"> {{ findfingFirstName(tripStatusDetails.last_action_taken_by)}}</div>
+                                <p class="fw-semibold"> {{tripStatusDetails.last_action_taken_by ? tripStatusDetails.last_action_taken_by : '-'}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex justify-content-end align-items-end" *ngIf="tripStatusDetails.timeline.length>0">
+        
+                    <button class="fw-semibold primary-brand-text  mt-3" (click)="openSideBar()" data-bs-toggle="offcanvas"
+                        data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">View Approval Details</button>
+        
+                </div>
+        
+            </div>
+
+        </div>
+
+    </div>
+    <!-- -------------completed  ----------------->
+    <div class="row mx-0"  *ngIf="tripStatusDetails.status_screen_to_show ==='Completed'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon">
+                <img src="../../../../../../../assets/img/icons/green-person.svg" alt="">
+            </div>
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="approval-details">
+                        <div class="header">Completed</div>
+                        <p>This job has been completed.</p>
+                    </div>
+                    <div class="pt-3 def-color body">
+                        <ng-container   *ngIf="tripStatusDetails.validations.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of tripStatusDetails.validations"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name}} :</span><span>{{item?.message}}</span></p>
+                        </ng-container>
+                        <ng-container *ngIf="tripStatusDetails.remarks.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of tripStatusDetails.remarks"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name ?item?.name : '-'}} :</span><span>{{item?.message ? item?.message : '-'}}</span></p>
+                        </ng-container>
+
+                    </div>
+    
+                </div>
+                <div class="col-lg-4">
+                    <div class="d-flex justify-content-end align-items-center mt-2">
+                       
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="row mx-0 mt-3"  >
+
+                <div class="col-lg-6 px-0">
+                    <div class="d-flex flex-wrap" >
+                        <div class="me-5">
+                            <p class="mb-2 fs-12px">Submitted by</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter blue"> {{ findfingFirstName(tripStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{tripStatusDetails.submitter ? tripStatusDetails.submitter : '-'}}</p>
+                            </div>
+                        </div>
+                        <div class="ps-4">
+                            <p class="mb-2 fs-12px">Approved By</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter green"> {{ findfingFirstName(tripStatusDetails.last_action_taken_by)}}</div>
+                                <p class="fw-semibold"> {{tripStatusDetails.last_action_taken_by ? tripStatusDetails.last_action_taken_by : '-'}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex justify-content-end align-items-end"  *ngIf="tripStatusDetails.timeline.length>0">
+        
+                    <button class="fw-semibold primary-brand-text  mt-3" (click)="openSideBar()" data-bs-toggle="offcanvas"
+                        data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">View Approval Details</button>
+        
+                </div>
+        
+            </div>
+
+        </div>
+
+    </div>
+    <!---------------- scheduled ---------------->
+    <div class="row mx-0"  *ngIf="tripStatusDetails.status_screen_to_show ==='Scheduled'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon">
+                <img src="../../../../../../../assets/img/icons/blue-person.svg" alt="">
+            </div>
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="approval-details">
+                        <div class="header">Scheduled</div>
+                        <p>This job has been scheduled.</p>
+                    </div>
+                    <div class="pt-3 def-color body">
+                        <ng-container   *ngIf="tripStatusDetails.validations.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of tripStatusDetails.validations"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name}} :</span><span>{{item?.message}}</span></p>
+                        </ng-container>
+                        <ng-container *ngIf="tripStatusDetails.remarks.length>0">
+                            <p class="line-height-normal py-2" *ngFor="let item of tripStatusDetails.remarks"><span
+                                class="material-icons dot me-2">
+                                fiber_manual_record
+                            </span><span class="fw-semibold me-2">{{item?.name ?item?.name : '-'}} :</span><span>{{item?.message ? item?.message : '-'}}</span></p>
+                        </ng-container>
+
+                    </div>
+    
+                </div>
+                <div class="col-lg-4">
+                    <div class="d-flex justify-content-end align-items-center mt-2">
+                       
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="row mx-0 mt-3"  >
+
+                <div class="col-lg-6 px-0">
+                    <div class="d-flex flex-wrap" >
+                        <div class="me-5">
+                            <p class="mb-2 fs-12px">Submitted by</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter blue"> {{ findfingFirstName(tripStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{tripStatusDetails.submitter ? tripStatusDetails.submitter : '-'}}</p>
+                            </div>
+                        </div>
+                        <div class="ps-4" *ngIf="tripStatusDetails.last_action_taken_by">
+                            <p class="mb-2 fs-12px">Approved By</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter green"> {{ findfingFirstName(tripStatusDetails.last_action_taken_by)}}</div>
+                                <p class="fw-semibold"> {{tripStatusDetails.last_action_taken_by ? tripStatusDetails.last_action_taken_by : '-'}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex justify-content-end align-items-end"  *ngIf="tripStatusDetails.timeline.length>0">
+        
+                    <button class="fw-semibold primary-brand-text  mt-3" (click)="openSideBar()" data-bs-toggle="offcanvas"
+                        data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">View Approval Details</button>
+        
+                </div>
+        
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--------------- void state ------------------------>
+    
+    <div class="row mx-0"  *ngIf="tripStatusDetails.status_screen_to_show ==='void'">
+
+        <div class="col ps-0 status-icon-wrap d-flex justify-content-end">
+            <div class="approve-status-icon" >
+                <img src="../../../../../../../assets/img/icons/rejected.svg" alt="">
+            </div>
+           
+
+        </div>
+
+        <div class="col">
+            <div class="row">
+                <div class="col-lg-8">
+                   
+                    <div class="approval-details">
+                        <div class="header">Job is Void</div>
+                        <!-- <p>This place will show the message is given by approver after void</p> -->
+                    </div>
+                    
+    
+                </div>
+                
+            </div>
+            <div class="row mx-0 mt-3" >
+
+                <div class="col-lg-6 px-0">
+                    <div class="d-flex flex-wrap" >
+                        <div class="me-5">
+                            <p class="mb-2 fs-12px">Submitted by</p>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="first-letter blue"> {{ findfingFirstName(tripStatusDetails.submitter)}}</div>
+                                <p class="fw-semibold"> {{tripStatusDetails.submitter ? tripStatusDetails.submitter : '-'}}</p>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex justify-content-end align-items-end"  *ngIf="tripStatusDetails.timeline.length>0">
+                    <button class="fw-semibold primary-brand-text  mt-3" (click)="openSideBar()" data-bs-toggle="offcanvas"
+                        data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">View Approval Details</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+   
+
+
+    
+</div>
+
+
+
+<app-approval-timeline [show]="isShow"  [timeline]="timeline" (isClose)="isClose($event)"></app-approval-timeline>

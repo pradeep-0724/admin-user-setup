@@ -1,0 +1,97 @@
+<div class="p-4 pt-0 def-color">
+  <div class="row mx-0">
+    <div class="col-lg-12">
+      <hr class="m-0 mb-4" />
+    </div>
+  </div>
+
+  <div class="row mx-0">
+    <div class="col-lg-12 fs-6 fw-semibold mb-4">Terms And Conditions</div>
+    <div class="col-lg-4 col-md-6">
+      <div class="customSelect">
+        <label><strong>Display T&C in</strong></label>
+        <div class="customdropdown">
+          <select
+            class="no-style select--modify w-100"
+            [(ngModel)]="selectedValue"
+            (change)="setDisplayIn()"
+          >
+            <option value="same_page">Same Page</option>
+            <option value="next_page">Next Page</option>
+          </select>
+          <span class="material-icons matPosition">arrow_drop_down</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-12 mb-4">
+      <button
+        class="btn btn--primary w-auto"
+        type="button"
+        routerLinkActive="router-link-active"
+        (click)="addTCModal()"
+      >
+        + Add T&C
+      </button>
+    </div>
+    <div class="col-lg-12">
+      <div
+        class="custom-shadow-md rounded-3 mb-3"
+        *ngFor="let tc of tcs; index as i"
+      >
+        <div class="p-3 d-flex justify-content-between align-items-space-evenly">
+          <button
+            type="button"
+            class="custom-collapse-toggle"
+            data-bs-toggle="collapse"
+            [attr.data-bs-target]="'#' + 'ppp' + i"
+            aria-expanded="true"
+            [attr.aria-controls]="'ppp' + i"
+          >
+            <button class="collapse-arrow">
+              <i class="bi bi-chevron-down"></i>
+            </button>
+            <span class="ms-3">{{ tc.name }}</span>
+          </button>
+
+          <div class="d-flex flex-wrap align-items-center">
+            <div class="d-flex align-items-center">
+              <label [for]="'radio'+i" class="ws-nowrap fw-semibold me-2 cursor-pointer">Mark as default : </label><input  [id]="'radio'+i" *ngIf="!canSaveInline" type="radio"  [checked]="tc.is_default" (change)="defaultTNCChecked($event,tc.id)" class="me-4">
+            </div>
+      
+          <div class="d-flex align-items-center position-relative">
+            <span>
+              <span class="table-action">
+                <i
+                  class="material-icons more-icon justify-content-center"
+                  (click)="optionsList($event, 'list_' + tc.id)"
+                  >more_vert</i
+                >
+                <ul
+                  class="more-actions__menu table-popup"
+                  [ngClass]="{ show: showOptions === 'list_' + tc.id }"
+                >
+                  <li class="more-actions__item" (click)="editTCModal(tc)">
+                    <i class="material-icons">edit</i>Edit
+                  </li>
+                  <li class="more-actions__item" (click)="deleteTCModal(tc)">
+                    <i class="material-icons">delete</i>Delete
+                  </li>
+                </ul>
+              </span>
+            </span>
+          </div>
+        </div>
+ 
+        </div>
+
+        <div class="collapse custom-collapse-content show" [attr.id]="'ppp' + i">
+          <div class="tnc-content def-color pb-4 px-5 line-height-normal">
+            <div [innerHtml]="tc?.content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

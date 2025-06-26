@@ -1,0 +1,80 @@
+<div class="modal fade" [ngClass]="{'show': expenseItemPopDetail.status}" id="exampleModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal--wd" role="document">
+    <div class="modal-content">
+      <form [formGroup]="addItemForm" (ngSubmit)="addNewItem(addItemForm)"
+        (keydown.enter)="$event.preventDefault();">
+
+        <div class="modal-header">
+          <h6 class="modal-title" id="exampleModalLabel">Add Expense Item</h6>
+          <button type="button" class="close" data-dismiss="modal" (click)="close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body pd-20">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="input-wrap error clearfix" [ngClass]="addErrorClass(addItemForm.get('sku'))">
+                <label for="" class="input">SKU</label>
+                <input type="text" class="no-style input--bd" [maxlength]="20" formControlName="sku" (change)="skumessageError=''" placeholder="SKU">
+                <span class="border-anim"></span>
+                <app-error [controlName]="addItemForm.get('sku')"></app-error>
+                <span class="error-reg" *ngIf="skumessageError">{{skumessageError}}</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="input-wrap error clearfix" [ngClass]="addErrorClass(addItemForm.get('name'))">
+                <label for="" class="input--required">Name</label>
+                <input type="text" class="no-style input--bd" (change)="namemessageError=''" formControlName="name" placeholder="Name" value="{{ expenseItemPopDetail?.name }}"
+                  required>
+                <span class="border-anim"></span>
+                <app-error [controlName]="addItemForm.get('name')"></app-error>
+                <span class="error-reg" *ngIf="namemessageError">{{namemessageError}}</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+                    <div class="input-wrap  clearfix" [ngClass]="addErrorClass(addItemForm.get('unit'))">
+                      <label for="" class="input--required">Unit</label>
+                      <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialValues.unit">
+                        <select #customSelect formControlName="unit" class="no-style select--modify">
+                          <option *ngFor="let option of units" value="{{ option.id }}">
+                            {{ option.label }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                     <app-error [controlName]="addItemForm.get('unit')"></app-error>
+                    </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="input-wrap clearfix" [ngClass]="addErrorClass(addItemForm.get('rate_per_unit'))">
+                <label for="" class="input--required">Unit Cost</label>
+                <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" formControlName="rate_per_unit" placeholder="Rate per unit" value="">
+                <span class="border-anim"></span>
+                <app-error [controlName]="addItemForm.get('rate_per_unit')"></app-error>
+              </div>
+            </div>
+            <div class="col-sm-6" *ngIf="!isServiceType">
+              <div class="input-wrap  error clearfix" [ngClass]="addErrorClass(addItemForm.get('account'))">
+                <label for="" class="input--required">Account</label>
+                <material-dropdown [selectedOption]="initialValues.account">
+                  <select #customSelect formControlName="account" class="no-style select--modify">
+                    <option *ngFor="let option of accountList" value="{{ option.id }}">
+                      {{ option.name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="addItemForm.get('account')"></app-error>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer no-border">
+          <button type="button" class="btn" data-dismiss="modal" (click)="close()">Close</button>
+          <button type="submit" class="btn btn--primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div *ngIf="expenseItemPopDetail.status" class="modal-backdrop fade show"></div>

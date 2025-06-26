@@ -1,0 +1,123 @@
+<div [formGroup]="biltySetForm" class="biltyTop">
+  <div class="mt-4 pt-2" formGroupName="builty_set_settings">
+    <label for="enableBilty" class="d-inline checkbox-15 cursor-pointer">
+      <input type="checkbox" formControlName="enable" id="enableBilty" class="w-auto d-inline"
+        (change)="enableChange()">
+      <span class="h6"><strong>Enable Bilty Sets</strong></span></label>
+    <div class="row mx-0 my-4" *ngIf="biltySetForm.controls.builty_set_settings.get('enable').value.toString()=='true'">
+      <div class="error col-sm-6" [ngClass]="addErrorClass(biltySetForm.get('builty_set_settings').get('prefix'))">
+        <label>Bilty Prefix</label>
+        <input type="text" placeholder="123456" value="" formControlName="prefix" [ngClass]="{'disabled':!biltySetForm.controls.builty_set_settings.get('is_editable').value}" [readonly]="!biltySetForm.controls.builty_set_settings.get('is_editable').value">
+        <app-error class="CustomError" [controlName]="biltySetForm.controls.builty_set_settings.get('prefix')">
+        </app-error>
+
+      </div>
+      <div class="error col-sm-6" [ngClass]="addErrorClass(biltySetForm.controls.builty_set_settings.get('serial_no'))">
+        <label>Serial No</label>
+        <input type="text" placeholder="123456" value="" [ngClass]="{'disabled':!biltySetForm.controls.builty_set_settings.get('is_editable').value}" [readonly]="!biltySetForm.controls.builty_set_settings.get('is_editable').value"
+          (change)="changeSerialNumber(biltySetForm.controls.builty_set_settings.get('serial_no').value)"
+          formControlName="serial_no">
+        <app-error class="CustomError" [controlName]="biltySetForm.controls.builty_set_settings.get('serial_no')">
+        </app-error>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div *ngIf="biltySetForm.controls.builty_set_settings.get('enable').value.toString()=='true'">
+
+    <div>
+      <div class="scrollBilty mt-3">
+        <p><strong>Bilty Set Configuration</strong></p>
+        <div class="parentBilty" formArrayName="builty_sets">
+          <ng-container *ngFor="let item of biltySetForm['controls'].builty_sets['controls']; let i = index;"
+            [formGroupName]="i">
+
+            <div class="blockDiv">
+              <h3>Bilty Set Name</h3>
+              <div class="error  " [ngClass]="addErrorClass(item.controls.name)">
+                <input type="text" class="" [ngClass]="{'disabled':!item.controls.is_editable.value}"
+                  placeholder="123456" [readonly]="!item.controls.is_editable.value" value=""
+                  (change)="isbiltyNameUnique(item,i)" formControlName="name">
+                <app-error class=" " [controlName]="item.controls.name"></app-error>
+                <p class="errorMsg" *ngIf="!item.controls.is_name_unique.value">Please enter Unique bilty set name</p>
+
+              </div>
+            </div>
+            <div class="blockDiv">
+              <h3>Bilty Set Type</h3>
+              <div [ngClass]="{'disabled':!item.controls.is_type_editable.value}">
+                <select formControlName="type" (change)="changeInBiltySetType(item,i,item.controls.is_type_editable.value)">
+                  <option *ngFor="let biltyoption of biltySetType " [value]="biltyoption.id">{{biltyoption.label}}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <ng-container formArrayName="builty_set_list">
+              <span *ngFor="let startEnd of item['controls'].builty_set_list['controls']; let j= index;"
+                [formGroupName]="j" class="dataRepeat">
+
+                <div class="blockDiv">
+                  <h3>Set Start No</h3>
+                  <div class="error" [ngClass]="addErrorClass(startEnd.controls.start_no)">
+                    <input type="number" [ngClass]="{'disabled':!startEnd.controls.is_editable.value}" class="error-box"
+                      placeholder="123" formControlName="start_no" [readonly]="!startEnd.controls.is_editable.value"
+                      (change)="setEndNoValue(startEnd,i,j)">
+                    <app-error class=" " [controlName]="startEnd.controls.start_no"></app-error>
+                    <p class="errorMsg" *ngIf="!startEnd.controls.is_new_range.value">Please enter Unique field
+                      range</p>
+                  </div>
+                </div>
+                <div class="blockDiv">
+                  <h3>Set End No</h3>
+                  <div class="error  " [ngClass]="addErrorClass(startEnd.controls.end_no)">
+                    <input type="number" [ngClass]="{'disabled':!startEnd.controls.is_editable.value}" class="error-box"
+                      placeholder="123" formControlName="end_no" [readonly]="!startEnd.controls.is_editable.value" (change)="checkSetOverLap(startEnd)">
+                    <app-error class=" " [controlName]="startEnd.controls.end_no"></app-error>
+                    <p class="errorMsg" *ngIf="!startEnd.controls.is_new_range.value">Please enter Unique field
+                      range</p>
+                  </div>
+                </div>
+                <div class="blockDiv extraAdd">
+                  <span class="material-icons delete"
+                    *ngIf="item['controls'].builty_set_list['controls'].length>1 && startEnd.controls.is_editable.value"
+                    (click)="removeRangeItem(i,j)">highlight_off</span>
+                  <span class="material-icons clear" *ngIf="startEnd.controls.is_editable.value"
+                    (click)="clearRange(startEnd)">remove_circle_outline</span>
+                  <span class="material-icons add" (click)="addStartEndSet([{is_editable:true}],i)"
+                    [ngClass]="{'hiddenButton':item['controls'].type.value=='0'}"
+                    *ngIf="j===( item['controls'].builty_set_list['controls'].length - 1)">add_circle_outline</span>
+                </div>
+
+              </span>
+            </ng-container>
+            <div class="table-footer-actions addRemove d-block">
+              <button class="remove-item"
+                *ngIf="biltySetForm['controls'].builty_sets['controls'].length>1 && item.controls.is_editable.value"
+                (click)="removeBiltySet(i)">Remove</button>
+              <button class="clear-item" *ngIf="i===( biltySetForm['controls'].builty_sets['controls'].length - 1)"
+                (click)="addNewBiltySet()">Add new set</button>
+
+            </div>
+
+          </ng-container>
+        </div>
+        <div class="row">
+          <div class="col-md-6  pe-0 col-4">
+            <div class="table-footer-actions mt-2">
+              <a class="clear-item" (click)="clearAllClient()" *ngIf="biltySetForm.controls.builty_set_settings.get('is_editable').value">Remove all</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p *ngIf="apiError" style="color: red;" class="pb-3">{{apiError}}</p>
+    <button class="updateMark" (click)="update()">
+    <span class="updateText" [ngClass]="{'updatemark': updateText!='Update'}">{{updateText}}</span>
+    <span class="successTest" [ngClass]="{'successTickmark': !successMsg==''}">{{successMsg}}</span>
+  </button>
+  </div>
+
+</div>
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

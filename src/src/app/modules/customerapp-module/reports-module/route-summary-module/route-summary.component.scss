@@ -1,0 +1,54 @@
+.mobile-calender {
+
+
+  input {
+    background: url(/assets/img/icons/calendar-bw.svg) 95% center no-repeat;
+
+  }
+}
+.excelIcon:focus{
+  background-color: unset;
+}
+.table-wrapper-list tbody tr:nth-child(even) tr {
+  background: #fff;
+}
+.table-wrapper-list th{
+  white-space: unset;
+}
+.tableParentStyles {
+  position: relative;
+  >tr:nth-child(even){
+    background: #fff;
+  }
+
+  .removeBorder {
+    border: none;
+
+    tr {
+      border: none;
+    }
+
+    td {
+      padding: 10px 5px;
+    }
+  }
+
+}
+@media (max-width:1025px) {
+  .table-wrapper-list th{
+    white-space: nowrap
+  }
+}
+@media (max-width: 1025px) {
+  .mobile-calender {
+   font-size:0;
+    input {
+      font-size: 0;
+      background: url(/assets/img/icons/calendar-bw.svg) center center no-repeat;
+      background-size: contain;
+      width: auto;
+      padding: 13px;
+      border: none;
+    }
+  }
+}

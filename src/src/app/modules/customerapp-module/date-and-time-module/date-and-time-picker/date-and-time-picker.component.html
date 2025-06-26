@@ -1,0 +1,16 @@
+<div class="input-wrap clearfix" [ngClass]="addErrorClass(control)">
+    <div class="border-bottom-custom position-relative" [ngClass]="{'time-date-error':control.touched && control.invalid}">
+        <p *ngIf="control?.value" (click)="toggle._open($event)">{{control.value|dateandTimeFormat}}</p>
+        <p *ngIf="!control?.value" (click)="toggle._open($event)" style="color: #999;">DD/MM/YYYY</p>
+        <mat-datepicker-toggle matSuffix [for]="datepicker" #toggle
+            class="position-absolute customized-datepicker-component"></mat-datepicker-toggle>
+        <ngx-mat-datetime-picker #datepicker [showSpinners]="true" [showSeconds]="false" [stepHour]="1" [stepMinute]="1"
+            [touchUi]="false" [color]="'primary'" [enableMeridian]="true"
+            (opened)="onPickerOpen(datepicker)">
+        </ngx-mat-datetime-picker>
+
+        <input [ngxMatDatetimePicker]="datepicker" [min]="min" [disabled]="disabled" (dateChange)="dateSelected()" [formControl]="control" />
+    </div>
+    <app-error [controlName]="control"></app-error>
+
+</div>

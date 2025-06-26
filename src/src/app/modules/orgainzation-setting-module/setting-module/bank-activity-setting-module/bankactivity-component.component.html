@@ -1,0 +1,23 @@
+<div class="vehicle-nav-wrap">
+  <nav class="vehicle-nav">
+      <ul class="vehicle-nav__list d-flex">
+          <li class="vehicle-nav__item w-50 text-center">
+              <div class="row h-100">
+                  <div class="col-sm-12">
+                      <p class="text-uppercase fs-14 fw-bold vehicle-nav__sub-item w-100"
+                       [routerLink]="['prefrence']" routerLinkActive="active">preference</p>
+                  </div>
+              </div>
+          </li>
+
+          <li class="vehicle-nav__item w-50 text-center">
+              <div class="row">
+                  <div class="col-sm-12">
+                      <!-- <h6 class="text-uppercase fs-14 fw-bold vehicle-nav__sub-item w-100" [routerLink]="['custom-field']" routerLinkActive="active">Custom Field</h6> -->
+                  </div>
+              </div>
+          </li>
+      </ul>
+  </nav>
+</div>
+<router-outlet></router-outlet>

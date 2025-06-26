@@ -1,0 +1,191 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+@import "../../../../../../../assets/styles/helpers/placeholder";
+@import "../../../../../../../assets/styles/helpers/mixins";
+.consignment-pd-50 {
+    padding-top: 50px !important;
+}
+
+.consignment-table-wrapper {
+    .table-container {
+        width: 100%;
+        @include respond-to(tablet) {
+        }
+      }
+
+    table, tr, td {
+        border: 1px solid $secondary-border-color;
+    }
+    td {
+        text-align: left;
+        padding-left: 10px !important;
+    }
+}
+
+.consignment-pd-100 {
+    padding-top: 100px !important;
+}
+
+.consignment-pd-50 {
+    padding-top: 50px !important;
+}
+
+.noscroll {
+    overflow: hidden !important;
+}
+.heading {
+  color: #45505B;
+  font-family: "Noto Sans";
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 24px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.rectangle {
+  box-sizing: border-box;
+  border-radius: 3px;
+  background-color: #FEFEFE;
+  border: 1px solid #D8E1E9;
+  min-width: unset !important;
+  margin: 10px;
+}
+.employee_section {
+  box-sizing: border-box;
+  width:100%;
+  border-radius: 3px 3px 0 0;
+  background-color: #FFF;
+  border: 1px solid #000;
+}
+.employee_section p{
+  font-size: 14px;
+  line-height: 24px;
+  display: inline-block;
+  padding: 5px 0px 5px 10px;
+}
+.accounting-details{
+  color: #45505B;
+  font-family: "Noto Sans";
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 24px;
+  text-align: center;
+}
+
+.accounting-details p{
+  text-decoration-line:underline;
+  text-decoration-color: #45505B;
+  padding: 20px 0px;
+  text-transform: uppercase;
+}
+
+.gstin-ci {
+  width:100%;
+  color: #34393E;
+  font-family: "Noto Sans";
+  font-size: 14px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 24px;
+  margin-bottom: 15px;
+}
+.labour-charges{
+  box-sizing: border-box;
+  width: 100%;
+  border-radius: 0 3px 0 0;
+  background-color: #FFF;
+  border: 1px solid #000;
+}
+
+.labour-charges ul li{
+  display: inline-block;
+  width: 25%;
+  padding:10px 20px;
+  text-align: center;
+}
+.labour-charges ul{
+  list-style: none;
+}
+li span,
+th span,
+.employee_section p span,
+.last-section p
+{
+  font-weight: 700;
+  color: #45505B;
+}
+
+
+.table thead{
+  border: 2px solid #5D5D5D !important;
+}
+
+.table tbody td{
+  border-top: 1px solid #5D5D5D!important;
+  text-align: center;
+}
+
+
+.tr-heading{
+  border-bottom: 2px solid #5D5D5D!important;
+}
+
+.table tbody{
+  border: 1px solid #5D5D5D!important;
+}
+
+th{
+  border: unset !important;
+  color: #45505B;
+  font-family: "Noto Sans";
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 700;
+}
+
+hr{
+  box-sizing: border-box;
+  height: 0;
+  width: 100%;
+  border-radius: 0 3px 0 0;
+  border: 0.5px solid #000;
+
+}
+
+.last-section :first-child{
+  display: inline-block;
+  font-style: italic;
+}
+.last-section :last-child{
+  float: right;
+  display: inline-block;
+  font-style: italic;
+}
+.additional-note{
+  width: 25%;
+  font-weight: 600;
+  font-size: 12px;
+  margin-top: 10px;
+}
+.additional-note span{
+ font-weight: 100;
+}
+.tr-heading td{
+  font-weight: 700;
+}
+.unique-number{
+  color: #0283E5;
+  font-family: "Noto Sans";
+  font-size: 14px;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+.overflow-auto{
+  height: 57vh;
+  @media only screen and (min-width: 1900px) {
+  height: 63vh;
+    }
+}
+
+

@@ -1,0 +1,398 @@
+<div class="parent-wrap layout-bg">
+  <div class="sub-header d-flex justify-content-between align-items-center px-3 layout-bg">
+    <div class="d-flex align-items-center">
+      <!-- <button class="back-btn" ><i class="bi bi-chevron-left"></i></button> -->
+      <span class="primary-brand-text fw-bold fs-6 me-3 ms-2">{{
+        jobCardDetails?.job_card_no
+        }}</span>
+
+      <div class="driver-veh-no px-3 me-3 rounded-pill fw-semibold">
+        <span class="material-icons" *ngIf="jobCardDetails?.category == 'Others'">
+          local_shipping
+        </span>
+        <img src="../../../../../../assets/img/icons/dollie-green.png" alt="trailer-icon" class="me-2"
+          style="width: 50px" *ngIf="jobCardDetails?.category == 'Dolly'" />
+        <img src="../../../../../../assets/img/icons/trailer-green.png" alt="trailer-icon" class="me-2"
+          style="width: 65px" *ngIf="jobCardDetails?.category == 'Trailer'" />
+        <img src="../../../../../../assets/img/icons/awp-green.png" alt="trailer-icon" class="me-2" style="width: 24px"
+          *ngIf="jobCardDetails?.category == 'AWP'" /><img src="../../../../../../assets/img/icons/green-crane.png"
+          alt="trailer-icon" class="me-2" style="width: 24px" *ngIf="jobCardDetails?.category == 'Crane'" />
+        <img src="../../../../../../assets/img/icons/trailer-head-green.png" alt="trailer-icon" class="me-2"
+          style="width: 24px" *ngIf="jobCardDetails?.category == 'Trailer Head'" />
+        {{ jobCardDetails?.vehicle?.reg_number }}
+      </div>
+      <div class="driver-name pe-3 me-3 rounded-pill fw-semibold" [ngStyle]="{
+          border: '2px solid' + jobCardStatusColor,
+          color: jobCardStatusColor
+        }">
+        <i class="bi bi-dot sky-blue-text fs-2" [ngStyle]="{ color: jobCardStatusColor }"></i>
+        {{ jobcardStatus }}
+      </div>
+
+      <div class="driver-name pe-3 me-3 rounded-pill fw-semibold"
+        [ngStyle]="{ border: '2px solid' + jobCardColor, color: jobCardColor }">
+        <img [src]="
+            '../../../../../../assets/img/icons/priority-' +
+            jobCardPriority +
+            '.png'
+          " class="priority-icon" alt="" />
+        {{ jobCardPriority }}
+      </div>
+    </div>
+    <div class="d-flex align-items-center">
+      <button class="edit-btn me-2" *ngxPermissionsOnly="maintenancePermission[1]" (click)="editJobCard()">
+        <i class="bi bi-pencil-fill"></i>Edit
+      </button>
+    </div>
+  </div>
+
+  <div class="row layout-bg def-color px-4 pt-3 pb-4 job-details-wrap">
+    <div class="col-lg-3 pe-0 col-md-6 del">
+      <div class="mb-3"><span class="fake-tab fw-semibold">Details</span></div>
+
+      <p class="mb-3">
+        <span class="fw-semibold me-1">Employee In charge: </span>{{ jobCardDetails?.employee ? jobCardDetails?.employee
+        : "-" }}
+      </p>
+
+      <p class="mb-3">
+        <span class="fw-semibold me-1">Odometer KMS: </span>{{ jobCardDetails?.kms }} KMS
+      </p>
+      <p>
+        <span class="fw-semibold me-1">Odometer Hours: </span>{{ jobCardDetails?.hour_min?.hour }} Hours
+      </p>
+    </div>
+    <div class="col-lg-5 pe-0 col-md-6">
+      <div class="mb-3"><span class="fake-tab fw-semibold">Job Card</span></div>
+
+      <div class="d-flex align-items-center mb-3">
+        <p class="w-50">
+          <span class="fw-semibold me-1">Scheduled Date: </span>{{ jobCardDetails?.start_date }}
+        </p>
+        <p class="w-50">
+          <span class="fw-semibold me-1">Completion Date: </span>{{ jobCardDetails?.end_date }}
+        </p>
+      </div>
+      <div class="d-flex align-items-center">
+        <p class="w-50">
+          <span class="fw-semibold me-1">Start Date: </span>{{
+          jobCardDetails?.actual_start_date
+          ? jobCardDetails?.actual_start_date
+          : "-"
+          }}
+        </p>
+
+        <p class="w-50">
+          <span class="fw-semibold me-1">Completed Date (Actual): </span>{{
+          jobCardDetails?.actual_end_date
+          ? jobCardDetails?.actual_end_date
+          : "-"
+          }}
+        </p>
+      </div>
+    </div>
+    <div class="col-lg-4 pe-0 col-md-6">
+      <div class="mb-3">
+        <span class="fake-tab fw-semibold">Job Card Amount</span>
+      </div>
+
+      <p class="mb-3">
+        <span class="fw-semibold me-1">Total Services Amount: </span>{{ currency_type?.symbol }} {{
+        jobCardDetails?.service_total | numberFormat}}
+      </p>
+      <p class="mb-3">
+        <span class="fw-semibold me-1">Total Labour Amount: </span>{{ currency_type?.symbol }} {{
+        jobCardDetails?.labour_total | numberFormat}}
+      </p>
+
+      <p>
+        <span class="fw-semibold me-1">Total Amount: </span>{{ currency_type?.symbol }} {{ jobCardDetails?.total | numberFormat}}
+      </p>
+    </div>
+  </div>
+  <div class="shadow-inset-bottom pb-4 layout-bg" *ngIf="jobCardDetails">
+    <div class="d-flex mx-0 align-items-center pt-4 px-3 shadow-inset-top gap-3">
+      <div [style.pointer-events]="'all'" class="flex-grow-1"
+        matTooltip="Please start the Job to add a Service, Tyre Change or Upload a Document."
+        [matTooltipDisabled]="jobCardDetails?.status != 1" [matTooltipHideDelay]="200" [matTooltipShowDelay]="100"
+        matTooltipClass="material-toltip-class">
+        <button class="btn w-100 rounded-2 flex-fill border-2 fw-bold service-btn"
+          [disabled]="jobCardDetails?.status == 1" *ngxPermissionsOnly="maintenancePermission[0]"
+          (click)="addNewService()">
+          Service
+        </button>
+      </div>
+      <div [style.pointer-events]="'all'" class="flex-grow-1"
+        matTooltip="Please start the Job to add a Service, Tyre Change or Upload a Document."
+        [matTooltipDisabled]="jobCardDetails?.status != 1" matTooltipClass="material-toltip-class"
+        [matTooltipHideDelay]="200" [matTooltipShowDelay]="100">
+        <button class="btn w-100 rounded-2 flex-fill border-2 fw-bold tyre-change-btn"
+          [disabled]="jobCardDetails?.status == 1" *ngxPermissionsOnly="maintenancePermission[0]"
+          (click)="addNewTyreChange()">
+          Tyre Change
+        </button>
+      </div>
+      <div [style.pointer-events]="'all'" class="flex-grow-1"
+        matTooltip="Please start the Job to add a Service, Tyre Change or Upload a Document."
+        [matTooltipHideDelay]="200" [matTooltipShowDelay]="100" [matTooltipDisabled]="jobCardDetails?.status != 1"
+        matTooltipClass="material-toltip-class">
+        <button class="btn w-100 rounded-2 flex-fill border-2 fw-bold upload-btn"
+          [disabled]="jobCardDetails?.status == 1" *ngxPermissionsOnly="maintenancePermission[0]"
+          (click)="addDocuments.show = !addDocuments.show">
+          Upload
+        </button>
+      </div>
+
+      <ng-container *ngIf="jobCardDetails?.status == 1">
+        <button class="btn btn--primary rounded-2 flex-fill border-2 fw-bold mt-2 mt-md-0 green-btn"
+          *ngxPermissionsOnly="[
+            maintenancePermission[1],
+            maintenancePermission[2]
+          ]" (click)="startJobCard()">
+          <i class="bi bi-check-circle d-inline-block align-middle me-1 fs-5"></i>
+          Start
+        </button>
+      </ng-container>
+      <ng-container *ngIf="jobCardDetails?.status > 1">
+        <button class="btn btn--primary rounded-2 flex-fill border-2 fw-bold mt-2 mt-md-0"
+          [disabled]="jobCardDetails?.status == 3" [ngStyle]="{
+            'background-color': jobCardDetails?.status == 3 ? '#c1c4c7' : ''
+          }" [ngClass]="{ 'blue-btn': jobCardDetails?.status < 3 }" *ngxPermissionsOnly="[
+            maintenancePermission[1],
+            maintenancePermission[2]
+          ]" (click)="openJobCard()">
+          <i class="bi bi-check-circle d-inline-block align-middle me-1 fs-5"></i>{{ jobCardDetails?.status == 3 ?
+          "Completed" : "Complete" }}
+        </button>
+      </ng-container>
+    </div>
+  </div>
+
+  <ng-container *ngIf="serviceList.length == 0 && jobCardDetails?.documents?.length == 0">
+    <div class="no-list-data-wrap">
+      <figure>
+        <img src="assets/img/no-content.png" alt="" />
+      </figure>
+      <h5 class="mt-3 primary-brand-text">No data found!</h5>
+    </div>
+  </ng-container>
+  <ng-container *ngFor="let service of serviceList; index as i">
+    <div class="def-color layout-bg" *ngIf="service?.is_service; else tyre">
+      <div class="col-12">
+        <div class="px-4 py-3 d-flex justify-content-between align-items-center">
+          <p class="fw-semibold">
+            <span *ngIf="service?.head_str?.service">Service: {{ service?.head_str?.service }}</span>
+            &nbsp;<span *ngIf="service?.head_str?.party">(Party:
+              <a class="custom-link" target="_blank" [routerLink]="[
+                  prefixUrl + '/onboarding/party/details/vendor/',
+                  service?.head_str?.party?.id
+                ]">{{ service?.head_str?.party?.name }}</a>)</span>
+            &nbsp;<span *ngIf="service?.head_str?.bill">(Bill: {{ service?.head_str?.bill }})</span>
+            &nbsp;<span *ngIf="service?.head_str?.status">(Status: {{ service?.head_str?.status }})</span>
+          </p>
+          <div class="d-flex justify-content-center align-items-center">
+            <div class="position-relative">
+              <i class="material-icons more-icon" (click)="optionsList($event, 'list_' + service.id)">more_vert</i>
+              <ul class="more-actions__menu table-popup" [ngClass]="{ show: showOptions === 'list_' + service.id }">
+                <li class="more-actions__item" *ngxPermissionsOnly="maintenancePermission[1]"
+                  (click)="servicesEdit(service)">
+                  <i class="material-icons">edit</i>Edit
+                </li>
+                <ng-container *ngIf="service?.can_delete">
+                  <li *ngxPermissionsOnly="maintenancePermission[2]" class="more-actions__item"
+                    (click)="deleteServicePopUp(service.id)">
+                    <i class="material-icons">delete</i>Delete
+                  </li>
+                </ng-container>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="custom-table-container bg-white p-0 no-scroll-table">
+          <table>
+            <thead>
+              <tr>
+                <th>SERVICE NAME</th>
+                <th>SERVICE AMOUNT ({{ currency_type?.symbol }})</th>
+                <th>LABOUR AMOUNT ({{ currency_type?.symbol }})</th>
+                <th>TOTAL AMOUNT ({{ currency_type?.symbol }})</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let data of service?.data" class="bg-white">
+                <td>{{ data?.service }}</td>
+                <td>{{ data?.service_amount | numberFormat}}</td>
+                <td>{{ data?.labour_amount | numberFormat}}</td>
+                <td>{{ data?.total | numberFormat}}</td>
+              </tr>
+              <tr class="bg-white border-bottom-0">
+                <td></td>
+                <td class="fw-semibold fs-6">{{ service?.service_amount | numberFormat}}</td>
+                <td class="fw-semibold fs-6">{{ service?.labour_amount | numberFormat}}</td>
+                <td class="fw-semibold fs-6">{{ service?.total | numberFormat}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="seperator" *ngIf="i != serviceList.length - 1"></div>
+    </div>
+    <ng-template #tyre>
+      <div class="def-color layout-bg">
+        <div class="col-12">
+          <div class="px-4 py-3 d-flex justify-content-between align-items-center">
+            <p class="fw-semibold">
+              <span *ngIf="service?.head_str?.service">Service: {{ service?.head_str?.service }}</span>
+              &nbsp;<span *ngIf="service?.head_str?.party">(Party:
+                <a class="custom-link" target="_blank" [routerLink]="[
+                    prefixUrl + '/onboarding/party/details/vendor/',
+                    service?.head_str?.party?.id
+                  ]">{{ service?.head_str?.party?.name }}</a>)</span>
+              &nbsp;<span *ngIf="service?.head_str?.bill">(Bill: {{ service?.head_str?.bill }})</span>
+              &nbsp;<span *ngIf="service?.head_str?.status">(Status: {{ service?.head_str?.status }})</span>
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+              <div class="position-relative">
+                <i class="material-icons more-icon" (click)="optionsList($event, 'list_' + service.id)">more_vert</i>
+                <ul class="more-actions__menu table-popup" [ngClass]="{ show: showOptions === 'list_' + service.id }">
+                  <li class="more-actions__item" *ngxPermissionsOnly="maintenancePermission[1]"
+                    (click)="editTyreChange(service)">
+                    <i class="material-icons">edit</i>Edit
+                  </li>
+                  <ng-container *ngIf="service?.can_delete">
+                    <li class="more-actions__item" *ngxPermissionsOnly="maintenancePermission[2]"
+                      (click)="deleteServicePopUp(service.id)">
+                      <i class="material-icons">delete</i>Delete
+                    </li>
+                  </ng-container>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="row mx-0 border-top border-bottom px-3 py-1">
+            <div class="col-lg-4 col-md-6 line-height-normal py-1">
+              <b class="me-1">Payment Type:</b>
+              <span *ngIf="service?.head_str?.paid_employee">Paid By Employee({{service?.head_str?.paid_employee}})</span>
+              <span *ngIf="!service?.head_str?.paid_employee">{{service?.head_str?.payment_mode}}</span>
+              <span *ngIf="!service?.head_str?.paid_employee && !service?.head_str?.payment_mode && service?.head_str?.status != 'Pay Later'">-</span>
+              <span *ngIf="service?.head_str?.status == 'Pay Later'">Pay Later</span>
+            </div>
+            <div class="col-lg-4 col-md-6 line-height-normal py-1">
+              <b class="me-1">Service Date:</b> <span *ngIf="service?.head_str?.service_date">{{service?.head_str?.service_date }}</span>
+                <span *ngIf="!service?.head_str?.service_date">-</span>
+            </div>
+            <div class="col-lg-4 col-md-6 line-height-normal py-1">
+              <b class="me-1">Subtotal: </b>{{service?.sub_total | numberFormat}} {{currency_type?.symbol}}
+            </div>
+            <div class="col-lg-4 col-md-6 line-height-normal py-1">
+              <b class="me-1">Tax Amount: </b>{{service?.tax_amount | numberFormat}} {{currency_type?.symbol}}
+            </div>
+            <div class="col-lg-4 col-md-6 line-height-normal py-1 primary-brand-text">
+              <b class="me-1">Total Amount: </b>{{service?.total | numberFormat}} {{currency_type?.symbol}}
+            </div>
+          </div>
+          <div class="row mx-0 border-bottom" *ngFor="let data of service?.data;index as jj" >
+            <div class="py-2 col-md-6 col-lg-3 border-end" *ngIf="tyreMasterDetails?.tyres_info?.length !=0" >
+              <app-tyre-details-view [selectedPosition]="data?.position_name" [isView]="true" [tyreDetails]="tyreMasterDetails"></app-tyre-details-view>
+            </div>
+            <div class="col-12 px-3 py-3 def-color details"  [ngClass]="{'col-lg-9 px-0':tyreMasterDetails?.tyres_info?.length !=0}">
+              <div class="row mx-0 ">
+              <div class="col-lg col-md-6 px-1  " >
+                <p ><b >
+                  Position 
+                </b> {{data?.position_name || '-'}}</p>
+              </div>
+              <div class="col-lg col-md-6 px-1  " >
+                <p ><b >
+                  Tyre Number 
+                </b> {{data?.tyre_number || '-'}}</p>
+              </div>
+              <div class="col-lg col-md-6 px-1  " >
+                <p ><b >
+                  Tyre Amount 
+                </b> {{data?.tyre_amount | numberFormat}}</p>
+              </div>
+              <div class="col-lg col-md-6 px-1  " >
+                <p ><b >
+                  Labour Amount 
+                </b> {{data?.labour_amount | numberFormat}}</p>
+              </div>
+              <div class="col-lg col-md-6 px-1  " >
+                <p ><b >
+                  Total 
+                </b> {{data?.total | numberFormat}}</p>
+              </div>
+            </div>
+            <div class="row mx-0">
+              <div class="col-lg col-md-6 px-1  " >
+                <p ><b >
+                  Brand 
+                </b> {{data?.brand || '-'}}</p>
+              </div>
+              <div class="col-lg col-md-6 px-1  " >
+                <p ><b >
+                  Model 
+                </b> {{data?.model || '-'}}</p>
+              </div>
+              <div class="col-lg col-md-6 px-1  " >
+                <p ><b >
+                  Date of Installation 
+                </b> <span *ngIf="data?.installation_date">{{data?.installation_date| date:'dd-MM-yyyy' }}</span>
+                <span *ngIf="!data?.installation_date">-</span></p>
+              </div>
+              <div class="col-lg col-md-6 px-1  " >
+                <p ><b >
+                  Permitted Date 
+                </b> <span *ngIf="data?.permitted_date">{{data?.permitted_date| date:'dd-MM-yyyy' }}</span>
+                <span *ngIf="!data?.permitted_date">-</span>
+              </p>
+              </div>
+              <div class="col-lg col-md-6 px-1  " >
+                <p ><b >
+                  Thread Depth 
+                </b> {{data?.thread_depth || '-'}}</p>
+              </div>
+            </div>
+              </div>
+           </div>
+        </div>
+        <div class="seperator" *ngIf="i != serviceList.length - 1"></div>
+      </div>
+      <div>
+      </div>
+    </ng-template>
+  </ng-container>
+
+  <div>
+    <div class="layout-bg def-color p-0" *ngIf="jobCardDetails?.documents?.length">
+      <div class="seperator" *ngIf="serviceList?.length != 0"></div>
+      <h5 class="fw-semibold fs-5 px-4 py-3">Upload</h5>
+
+      <ng-container *ngFor="let document of jobCardDetails?.documents; let index">
+        <div class="w-100 border-top border-bottom">
+          <p class="fs-6 fw-semibold px-4 py-3 document-note">
+            <span class="me-1">Note:</span> {{ document?.note }}
+          </p>
+        </div>
+
+        <div class="d-flex p-4 gap-2">
+          <app-file-delete-view [fileData]="document" (fileDeleted)="fileDeleted($event)"></app-file-delete-view>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+<div class="row justify-content-end bottom-btn-wrap py-2">
+  <button class="btn btn--primary btn--sm" (click)="navigateToMaintenanceList()">
+    Done
+  </button>
+</div>
+<app-close-jobcard *ngIf="isOpenJobcardClose" [jobCardDetails]="jobCardDetails"
+  (dataFromJobCardClose)="dataFromJobCardClose($event)" [isOpenJobcardClose]="isOpenJobcardClose"></app-close-jobcard>
+<app-upload-document-pop-up *ngIf="addDocuments.show" (dataFromUpload)="dataFromUpload($event)"
+  [jobCardDetails]="jobCardId"></app-upload-document-pop-up>
+<app-start-job-card [jobCardStart]="jobCardStart" *ngIf="jobCardStart.open"
+  (dataFromJobCardStart)="dataFromJobCardStart($event)"></app-start-job-card>
+<alert-popup [inputData]="servicesInputData" (outputData)="confirmServicesButton($event)"></alert-popup>
+<alert-popup [inputData]="servicesEditInfo" (outputData)="editInfo($event)"></alert-popup>

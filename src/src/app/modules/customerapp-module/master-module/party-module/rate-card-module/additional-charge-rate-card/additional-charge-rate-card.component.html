@@ -1,0 +1,126 @@
+<div class="add-rate-card-wrap">
+    <div class="right-section__header align-items-center justify-content-between ">
+        <h1 class="heading col-10">{{rateCardId?'Edit':'Add'}} Additional Charges</h1>
+    </div>
+
+    <div class=" position-relative  add-edit-quotation-wrap">
+        <form [formGroup]="rateCardForm">
+            <div class="shadow-inset-top-lg ">
+                <div class="row px-4 pt-4">
+                    <div class="col-lg-3 col-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(rateCardForm.controls.date)">
+                            <label for="" class="input--required">Date</label>
+                            <mat-form-field>
+                                <input matInput [matDatepicker]="date" formControlName="date" (focus)="date.open()"
+                                    placeholder="DD/MM/YYYY" readonly>
+                                <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                                <mat-datepicker #date></mat-datepicker>
+                            </mat-form-field>
+                            <app-error [controlName]="rateCardForm.controls.date"></app-error>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fake-tab-bar"><span>Additional Charge</span></div>
+                <div class="p-4 pb-0 d-flex justify-content-end">
+                  <button class="btn btn--primary w-auto" (click)="addAdditionalCharge()">+Add Additional Charge</button>
+
+                </div>
+                <div class="m-4" id="scroll-to-bottom" >
+                    
+                        <div class="addable-row-table">
+                            <table>
+                              <thead>
+                                <tr>
+                                  <th></th>
+                                  <th >
+                                    ADDITIONAL CHARGE
+                                  </th>
+                                  <th *ngIf="isTax">TAX</th>
+                                  <th >UNIT OF MEASUREMENT</th>
+                                  <th>UNIT COST ({{ currency_type?.symbol}})</th>
+                                  <th>VEHICLE CATEGORY</th>
+                                </tr>
+                                
+                              </thead>
+                              <tbody formArrayName="additionalcardmeta">
+                                <tr *ngFor="let rateCard of rateCardForm.controls.additionalcardmeta['controls']; let i = index;"
+                                [formGroupName]="i">
+                                  <td>
+                                    <div>
+                                      <mat-checkbox color="primary" (change)="chargeSelected($event,i)"  formControlName = "is_checked"></mat-checkbox>
+                                    
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <span class="ws-nowrap">{{rateCard?.get('name')?.value}}</span>
+                                  </td>
+                                  <td>
+                                    <div [ngClass]="addErrorClass(rateCard.controls.tax)">
+                                      <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="initialValues.tax[i]"  [ngClass]="{'disableInput': !rateCard.get('is_checked').value}">
+                                        <select #customSelect name="" class="no-style select--modify error-box" formControlName="tax">
+                                        <option *ngFor="let option of taxOptions"
+                                            value="{{ option.id }}">{{
+                                            option.label }}</option>
+                                        </select>
+                                      </material-dropdown>
+                                  </div>
+                                  </td>
+                                  <td>
+                                    <div>
+                                      <div [ngClass]="addErrorClass(rateCard.controls.unit_of_measurement)">
+                                          <material-dropdown [searchable]="true" [addable]="false" [ngClass]="{'disableInput': !rateCard.get('is_checked').value}"
+                                              [party]="true" [addErrorClass]="addErrorClass(rateCard.controls.unit_of_measurement)" [selectedOption]="initialValues.unit_of_measurement[i]">
+                                              <select #customSelect formControlName="unit_of_measurement" class="no-style select--modify">
+                                                  <option *ngFor="let option of staticOptions.itemUnits" value="{{ option.id }}">
+                                                      {{ option.label }}
+                                                  </option>
+                                              </select>
+                                          </material-dropdown>
+                                      </div>
+                                  </div>
+                                  </td>
+                                  <td   [ngClass]="{'disableInput': !rateCard.get('is_checked').value}">
+                                    <input positiveThreeDigitDecimalNumber class="error-box" type="text" [ngClass]="addErrorClass(rateCard.controls.rate)"
+                                    placeholder="Eg.: 1234567"  formControlName="rate" (keyup)="rateChanged($event.target.value,i)">
+                                  </td> 
+                                  <td><input type="text" disabled formControlName="selected_vehicle_category"></td>
+                                  <!-- <td class="icon-box  tabIndexActive"  >
+                                    <div class="d-flex justify-content-center align-items-center" >
+                                        <div class="position-relative">
+                                          <button class="p-0 material-icons more-icon"
+                                          (click)="optionsList( 'list_'+rateCard.get('id').value)">more_vert</button>
+                                      <div class="more-actions__menu table-popup"
+                                          [ngClass]="{show: showOptions === 'list_'+rateCard.get('id').value}">
+                                          <button  class="more-actions__item w-100 text-start" (click)="editParty(rateCard.value,i)"><i
+                                                  class="material-icons">edit</i>Edit</button>
+                                                  <button  class="more-actions__item w-100 text-start" (click)="deleteCard(rateCard.value)"><i
+                                                    class="material-icons">delete</i>Delete</button>
+                                      </div>
+                                        </div>
+                                    </div>
+                
+                                </td> -->
+                
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div> 
+
+
+                    
+                </div>
+            </div>
+            
+        </form>
+    </div>
+
+</div>
+<div class="custom-footer-bg d-flex justify-content-end py-2 px-4" id="page-bottom" #pageBottom>
+
+    <button class="btn  btn--sm me-3" type="button" (click)="navigateToDetails()">Cancel</button>
+    <button class="btn btn--primary btn--sm" (click)="saveRateCard()">Save </button>
+  
+  </div>
+
+  <alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

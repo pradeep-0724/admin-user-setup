@@ -1,0 +1,79 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+
+
+
+.accept,
+.decline {
+    width: 80px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 3px;
+    font-size: 12px;
+
+    .bi {
+        font-size: 17px;
+        margin-right: 5px;
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+}
+
+.accept {
+    background: #04ce1f;
+    color: #fff;
+    border: 1px solid #04ce1f;
+}
+
+.decline {
+    color: #DC3545;
+    background: #fff;
+    border: 1px solid #DC3545;
+
+}
+
+.decline-text {
+    color: #DC3545;
+    font-weight: 600;
+}
+
+.draft-text {
+    color: #4CACFE;
+    font-weight: 600;
+}
+
+.accept-text {
+    color: #04ce1f;
+    font-weight: 600;
+}
+
+.due-text {
+    color: #FFB900;
+    font-weight: 500;
+}
+
+.pending-text {
+    color: #FFB900;
+    font-weight: 600;
+}
+
+.overdue-text {
+    color: #DC3545;
+    font-weight: 500;
+}
+
+.del-btn {
+    transition: all 100ms ease-in-out;
+
+    &:hover {
+        transform: scale(1.2);
+    }
+}
+
+.min-height-26 {
+    min-height: 26px;
+}

@@ -1,0 +1,22 @@
+<div class="modal fade " [ngClass]="{'show':creditLimitData.open}" id="exampleModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal--sm modal-vertical-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body p-0">
+                <div  class="popup-header">
+                    <h6  class="d-inline">Credit Limit Reached </h6>
+                    </div>
+                    
+                <p class="def-color p-4 ">
+                    {{creditLimitData.msg}}
+                </p>
+                <div class="credit-btn">
+                    <button class="btn  btn--primary btn--sm d-block m-auto mt-3" (click)="onYes()" type="submit">Yes</button>
+                    <button class="btn  btn--primary btn--sm d-block m-auto mt-3" (click)="onCancel()" type="submit">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="creditLimitData.open" class="modal-backdrop fade show"></div>
+

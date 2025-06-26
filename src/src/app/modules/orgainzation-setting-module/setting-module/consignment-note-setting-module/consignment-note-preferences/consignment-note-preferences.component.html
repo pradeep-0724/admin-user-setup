@@ -1,0 +1,57 @@
+<app-add-prefix [key]='consignmentnote'> </app-add-prefix>
+<form class="mt-4 p-0"  *ngIf="activate_advance">
+  <h5> Company Vehicle Advances Received</h5>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+     <span class="max-width-150 my-2"> <strong>Fuel Advance: </strong> </span>
+      <label for="active_fuel" class="d-inline-block checkbox-15"><input type="checkbox" id="active_fuel" [(ngModel)]="consignmentAdvance.fuel_op" (change)="consignmentAdvance.fuel_view=consignmentAdvance.fuel_op" name="fuelactive"> <span  class="h6" > Active </span>
+        <div class="d-inline"[class.disabled]="!consignmentAdvance.fuel_op">
+          <label for="active_fuel_pdf" class="d-inline-block checkbox-15 ms-3"><input id="active_fuel_pdf" type="checkbox" [(ngModel)]="consignmentAdvance.fuel_view" [readOnly]="!consignmentAdvance.fuel_op"  name="fuelshowpdf"> <span class="h6">Show in PDF</span></label>
+        </div>
+      </label>
+    </div>
+
+  </div>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+     <span class="max-width-150 my-2"><strong>Cash Advance: </strong> </span>
+     <label for="Cash_Advance" class="d-inline-block checkbox-15"><input type="checkbox" id="Cash_Advance" [(ngModel)]="consignmentAdvance.cash_op" (change)="consignmentAdvance.cash_view=consignmentAdvance.cash_op" name="cashactive"> <span class="h6"> Active </span>
+      <div class="d-inline " [class.disabled]="!consignmentAdvance.cash_op">
+        <label for="Cash_Advance_pdf" class="d-inline-block checkbox-15 ms-3"><input type="checkbox" id="Cash_Advance_pdf" [(ngModel)]="consignmentAdvance.cash_view" [readOnly]="!consignmentAdvance.cash_op" name="cashshowpdf"> <span class="h6">Show in PDF</span></label>
+      </div>
+    </label>
+    </div>
+
+  </div>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+     <span  class="max-width-150 my-2"><strong>Driver Advance: </strong> </span>
+     <label for="Driver_Advance" class="d-inline-block checkbox-15"><input type="checkbox" id="Driver_Advance"  [(ngModel)]="consignmentAdvance.batta_op" (change)="consignmentAdvance.batta_view=consignmentAdvance.batta_op" name="battaactive"> <span class="h6"> Active </span>
+
+      <div class="d-inline "  [class.disabled]="!consignmentAdvance.batta_op">
+        <label for="Driver_Advance_pdf" class="d-inline-block checkbox-15 ms-3"><input type="checkbox" id="Driver_Advance_pdf"  [(ngModel)]="consignmentAdvance.batta_view" [readOnly]="!consignmentAdvance.batta_op" name="battashowpdf"> <span class="h6">Show in PDF</span></label>
+      </div>
+
+    </label>
+    </div>
+
+  </div>
+  <h5 class="mt-4"> Markect Vehicle Advances Received</h5>
+  <div class="row mt-4 ms-2">
+    <div class="col-12">
+     <span class="max-width-150 my-2"><strong>Cash Advance: </strong> </span>
+     <label for="_Cash_Advance" class="d-inline-block checkbox-15"><input type="checkbox" id="_Cash_Advance"  [(ngModel)]="consignmentAdvance.cash_rc_op" (change)="consignmentAdvance.cash_rc_view=consignmentAdvance.cash_rc_op" name="cashrcactive"> <span class="h6"> Active </span>
+
+      <div class="d-inline " [class.disabled]="!consignmentAdvance.cash_rc_op">
+        <label for="_Cash_Advance_pdf" class="d-inline-block checkbox-15 ms-3"><input type="checkbox" id="_Cash_Advance_pdf"  [(ngModel)]="consignmentAdvance.cash_rc_view" [readOnly]="!consignmentAdvance.cash_rc_op" name="cashrcshowpdf"> <span class="h6">Show in PDF</span></label>
+      </div>
+
+    </label>
+    </div>
+
+  </div>
+
+
+</form>
+<button type="button" *ngIf="activate_advance" class="btn btn-primary mt-4" (click)="updateAdvances()">Update Advances</button>
+

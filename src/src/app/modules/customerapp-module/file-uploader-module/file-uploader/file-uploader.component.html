@@ -1,0 +1,34 @@
+<div class="col-md-12 upload-thumbnail-wrap">
+    <div class="row">
+        <div class="col-md-6"  *ngFor="let file of files; let i = index">
+            <div class="upload-thumbnail__list">
+                <figure class="thumbnail-pic"  (click)="goToLink(file.url)"> <!--onError="this.src='assets/img/upload-file'"-->
+                    <img [src]="getExt(file.url, file.name)" alt="{{file.name}}" title="{{file.name}}"/>
+                </figure>
+                <p class="thumbnail-name me-auto ms-2">{{file.name}}</p>
+                <a class="thumbnail-close-btn" (click)="removeFile(i)"><i class="material-icons">close</i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="margin-30 m-0">
+    <div class="upload-proof-wrap tabIndexActive">
+        <div class="browse-file">
+            <span class="material-icons upload-icon">cloud_upload</span>
+            <div class="browse-file__content ms-4" (drop)="dropHandler($event)"
+            (dragover)="dragOverHandler($event)">
+                <span class="fw-bold">
+                    Drag Files here or
+
+                        <input #fileInput type="file" id="browse-{{uploaderId}}" accept="{{accept}}" (change)=readFile($event) multiple={{multiple}}>
+                        <label for="browse-{{uploaderId}}" class="browse-file__link">Browse</label>
+                    <span class="border-anim"></span>
+                <p *ngIf="image_error" class="image_error">{{image_error}}</p>
+                </span>
+                <p class="info">We currently support JPG, PNG, PDF make sure your
+                    file size is no
+                    more than 2MB.</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,113 @@
+@import "../../../../../../assets/styles/helpers/variable.scss";
+@import "../../../../../../assets/styles/helpers/mixins.scss";
+
+
+.balance-sheet{
+    @include respond-to(mobile-ls){
+        &-wrap{
+
+            overflow-x: auto;
+        }
+        &-table{
+            min-width: 800px;
+        }
+    }    
+}
+.balance-header{
+    @include respond-to(mobile){
+        .actions-wrap{
+            width: 100%;
+            > .btn{
+                width: 100%;
+            }
+        }
+    }    
+}
+.header-actions {
+    @include respond-to(mobile){
+        width: 100%;
+        @include flex-wrap(initial);
+    }
+}
+
+::ng-deep bs-daterangepicker-container{
+   
+    left: unset !important;
+    transform: unset !important;
+    top: 210px !important;
+    z-index: 0;
+    right:0;
+    }
+    @media (max-width: 992px){
+  
+    ::ng-deep bs-daterangepicker-container{
+      top:145px !important
+    }
+}
+.mg-right-10{
+    margin-right: 10px;
+}
+.export-mobile-icon span{
+    display:none;
+}
+.flex-box{
+  .name{
+    // overflow-x: auto;
+    // overflow-y: hidden;
+    // max-width: unset;
+    // width: auto;
+    // min-height: 20px;
+  }
+}
+ @media (max-width: 1040px){
+    .container{
+        max-width:100% !important;
+        padding:0;
+    }
+ }
+  @media only screen and (max-width: 768px) {
+    .mobile-calender {
+        font-size:0;
+         input {
+           font-size: 0;
+           background: url(/assets/img/icons/calendar-bw.svg) center center no-repeat;
+           background-size: contain;
+           width: auto;
+           padding: 13px;
+           border: none;
+         }
+       }
+
+       .export-mobile-icon{
+        border: none;
+        font-size: 0;
+        width: auto;
+        padding: 0;
+        background: none;
+        line-height:1;
+        .mobile-hide{
+          display:none;
+        }
+        &:focus{
+          background:none;
+        }
+        ul{
+          font-size:13px;
+        
+          li{
+            padding:8px;
+          }
+        }
+        span{
+    
+          display: inline-block;
+          vertical-align: middle;
+          color: #595fab;
+          padding: 0;
+          i{
+            font-size:22px
+          }
+        }
+      }
+       
+  }

@@ -1,0 +1,213 @@
+<div class="modal fade" [ngClass]="{'show':addInventory?.show && !isInventorySpareListOpen && !isInventoryTyreListOpen}" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog screen-center modal--xls" style="max-width: 900px;" role="document">
+    <div class="modal-content p-3">
+
+      <!-- service main popup -->
+
+      <ng-container >
+        <div class="tabIndexActive top-header row mx-0 justify-content-between pt-2">
+          <h1 class="heading col-9" *ngIf="!isInventoryEdit">Add Inventory</h1>
+          <h1 class="heading col-9" *ngIf="isInventoryEdit">Edit Inventory</h1>
+
+        <button class="close-icon material-icons w-auto ms-auto text-end py-0" (click)="onClickCancel()"> highlight_off </button></div>
+        <form class="px-0" [formGroup]="addInventoryForm">
+          <div class="row mx-0 mt-3">
+            <div class="row mx-0 tabIndexActive add-buttons row mx-0 ps-md-3 px-0">
+              <button class="w-auto btn-parrot-green ms-0 px-4 rounded-3" *ngxPermissionsOnly="maintenancePermission[0]" (click)="openAddSpare()">Add Spares</button>
+              <button class="w-auto btn-parrot-green px-4 rounded-3" *ngxPermissionsOnly="maintenancePermission[0]" (click)="addTyreChange()">Add Tyre change</button>
+           </div>
+           </div>
+
+         <div *ngIf="initialValues.errorMessage.position">
+          <div class="alert-msg">
+              <span class="icon-wrap"></span>
+              <p class="message-cont">Please Note: No information about the Vehicle Tyre Position is available to display,
+                  Please add Tyre Master Infomation About the Vehicle Make and Model</p>
+          </div>
+            <br>
+         </div>
+
+        <ng-container *ngIf="addInventoryForm['controls'].spare_inventory['controls'].length>0" >
+          <!-- services  -->
+             <h5 class="heading-right-line m-3">Spares</h5>
+          <div class="mg-bottom-30 mx-sm-3">
+            <div class="box-shadow table-wrapper table--bd table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow">
+              <table class="table-container" formArrayName="spare_inventory">
+                <thead>
+                  <tr class="desktop_th">
+                    <th>Spare Name</th>
+                    <th>Quantity</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody *ngFor="let item of addInventoryForm['controls'].spare_inventory['controls']; let i = index;"
+                [formGroupName]="i">
+                  <tr class="mobile-flex">
+                    <td class="max-wd-120 ">
+                      <h5 class="th_h5_mobile">Spare Name</h5>
+                      <div>
+                        <input type="text" readonly value="{{initialValues.item[i].label}}"/>
+                      </div>
+                    </td>
+                    <td class="max-wd-120">
+                      <h5 class="th_h5_mobile">Quantity</h5>
+                      <div class="input-wrap" [ngClass]="addErrorClass(item.controls.quantity)">
+                      <input positiveThreeDigitDecimalNumber type="text" class="error-box"  placeholder="123456" formControlName="quantity">
+                      </div>
+                    </td>
+                  <td>
+                    <span class="material-icons delete" (click)="removeInventorySpare(i)">add_circle_outline</span>
+                </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </ng-container>
+
+
+
+        <ng-container *ngIf="addInventoryForm['controls'].tyre_change_inventory['controls'].length>0" >
+          <!-- Tyre Change  -->
+             <h5 class="heading-right-line m-3">Tyre Change</h5>
+             <div class="form-body">
+              <div *ngIf="initialValues.errorMessage.position_no">
+                  <div class="alert-msg">
+                      <span class="icon-wrap"></span>
+                      <p class="message-cont">Vehicle Position already used</p>
+                  </div>
+                  <br>
+              </div>
+
+
+              <div *ngIf="positionError">
+                <div class="alert-msg">
+                    <span class="icon-wrap"></span>
+                    <p class="message-cont">Cannot select {{positionError}} position</p>
+                </div>
+                <br>
+            </div>
+              <div *ngIf="initialValues.errorMessage.unique_no">
+                <div class="alert-msg">
+                    <span class="icon-wrap"></span>
+                    <p class="message-cont">Unique number already exists</p>
+                </div>
+                <br>
+            </div>
+              <div class="box-shadow table-wrapper table--bd table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow mx-sm-3">
+
+                  <table class="table-container formResponsiveTable" formArrayName="tyre_change_inventory">
+                      <thead>
+                          <tr class="desktop_th">
+                            <th>Tyre Number</th>
+                            <th>Make</th>
+                            <th>Model</th>
+                            <th >Position</th>
+                            <th ></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                      <ng-container *ngFor="let tyreChange of addInventoryForm.controls['tyre_change_inventory']['controls']; let i = index;"[formGroupName]="i" >
+                          <tr class="mobile-flex ">
+                             <!-- unique_no -->
+
+                             <td  class="max-wd-120 ">
+                              <h5 class="th_h5_mobile">Tyre Number</h5>
+                              <div class="input-wrap" [ngClass]="addErrorClass(tyreChange.controls.changed_unique_no)">
+                                  <input type="text" placeholder="1000" formControlName="changed_unique_no" class="error-box" readonly>
+                              </div>
+                          </td>
+                          <!-- unique_no -->
+                              <td  class="max-wd-120 mobile-width-3">
+                                  <h5 class="th_h5_mobile">Make</h5>
+                                  <div class="select-wrap">
+                                  <material-dropdown [searchable]="true" [addable]="false"
+                                  [postApiUrl]="vehicleMakeUrl" [params]="vehicleMakeParam" [selectedOption]="initialValues.make[i]"
+                                  [addErrorClass]="addErrorClass(tyreChange.controls.manufacturer)"
+                                  (postApiResponse)="getNewVehicleMake($event,i,tyreChange)" (addValueToList)="addNewVehicleMake($event)">
+                                          <select #customSelect formControlName="manufacturer" class="no-style select--modify"
+                                          (change)="onMakeChange(tyreChange, i)">
+                                          <option *ngFor="let make of tyreManufacturer" value="{{make.id}}">
+                                              {{ make.label}}
+                                          </option>
+                                          </select>
+                                      </material-dropdown>
+                                  </div>
+                              </td>
+                              <td  class="max-wd-120  mobile-width-3">
+                                  <div class="select-wrap join-field">
+                                      <material-dropdown [searchable]="true" [addable]="true"
+                                      [params]="modelParams"
+                                      [postApiUrl]="modelApi[i]"
+                                      [selectedOption]="initialValues.model[i]"
+                                      [addErrorClass]="addErrorClass(tyreChange.controls.tyre_model)"
+                                      (postApiResponse)="getNewModel($event,i, tyreChange)"
+                                      (addValueToList)="addNewModel($event)">
+                                          <select #customSelect formControlName="tyre_model" class="no-style select--modify">
+                                              <option *ngFor="let model of modelList[i] " value="{{model.id}}">
+                                                  {{ model.name}}
+                                              </option>
+                                          </select>
+                                      </material-dropdown>
+                                  </div>
+                              </td>
+                              <!-- position -->
+                              <td  class="max-wd-120 ">
+                                  <h5 class="th_h5_mobile">Position</h5>
+                                  <div>
+                                      <div class="select-wrap">
+                                          <material-dropdown  [searchable]="true" [selectedOption]="initialValues.position[i]"  [addErrorClass]="addErrorClass(tyreChange.controls.position)" [addable]="false" class="dropDownWidth">
+                                              <select #customSelect formControlName="position" class="no-style select--modify" (change)="onTyreSelect(tyreChange,i)">
+                                                  <option *ngFor="let option of initialValues.vehicleTyrePositions" value="{{option.id}}" >
+                                                      {{option?.tyre_position?.label}}
+                                                  </option>
+                                              </select>
+                                          </material-dropdown>
+                                      </div>
+                                  </div>
+                              </td>
+                              <td>
+                                <span class="material-icons delete" (click)="removeTyreChange(i)">add_circle_outline</span>
+                            </td>
+                          </tr>
+                          <tr style=" border-top: none;">
+                            <td class="pt-0"></td>
+                            <td class="pt-0"></td>
+                            <td class="pt-0"></td>
+                            <td class="pt-0" >
+                              <div class="input-wrap">
+                                <p  class="unique-number"><span (click)="tyreChange.controls.present_unique_no_edit.value=!tyreChange.controls.present_unique_no_edit.value" >Tyre No : </span>
+                                   <span *ngIf="!tyreChange.controls.present_unique_no_edit.value" >{{tyreChange.controls.present_unique_no.value}}</span>
+                                <span> <input *ngIf="(tyreChange.controls.present_unique_no_edit.value) || (tyreChange.controls.present_unique_no.hasError('required') && tyreChange.controls.present_unique_no.touched)" type="text"
+                                  [ngClass]="{'vechclePositionerror':tyreChange.controls.present_unique_no_status.value == true || (tyreChange.controls.present_unique_no.hasError('required') && tyreChange.controls.present_unique_no.touched)}"
+                                      formControlName="present_unique_no"
+                                       (focusout)="changeOldUniqueNo(tyreChange);
+                                       tyreChange.controls.present_unique_no_edit.value=!tyreChange.controls.present_unique_no_edit.value"
+                                      > </span></p>
+                            </div>
+                            </td>
+                            <td class="pt-0"></td>
+                          </tr>
+                          </ng-container>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+        </ng-container>
+        </form>
+
+         <div class="row mx-0 tabIndexActive justify-content-end px-3 mt-5">
+          <button class="btn btn-primary  me-3" (click)="onClickCancel()">Cancel</button>
+          <button class="btn btn-primary btn--primary " (click)="saveMaintenance()">Save</button>
+         </div>
+
+      </ng-container>
+
+  </div>
+</div>
+</div>
+<div *ngIf="addInventory?.show && !isInventorySpareListOpen && !isInventoryTyreListOpen" class="modal-backdrop fade show"></div>
+<app-inventory-spare-list [isInventorySpareListOpen]="isInventorySpareListOpen" *ngIf="isInventorySpareListOpen" (inventorySpareDetails)="inventorySpareDetails($event)"></app-inventory-spare-list>
+<app-inventory-tyre-list [isInventoryTyreListOpen]="isInventoryTyreListOpen" *ngIf="isInventoryTyreListOpen" (inventoryTyreDetails)="inventoryTyreDetails($event)"></app-inventory-tyre-list>
+

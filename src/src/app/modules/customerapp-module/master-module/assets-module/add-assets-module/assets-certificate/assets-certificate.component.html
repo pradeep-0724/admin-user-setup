@@ -1,0 +1,154 @@
+
+<form [formGroup]="assetsDetailsForm">
+    <div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-3 col-lg-3 p-0">
+            <aside class="upload-menu-wrapper h-500px pb-2">
+               
+                   
+                    <button class="gb-document-add  primary-brand-text border-bottom" matRipple type="button"
+                    (click)="addCertifiacte()">
+                    <i class="material-icons material-icons--al-top me-2 primary-brand-text">add</i>
+                    Add Certificate</button>
+                
+                <nav class="upload-menu border-bottom-0">
+                    <ul>
+                        <li class="upload-menu__item d-flex justify-content-between align-items-center"
+                            *ngFor="let document of documentList; let i = index;"
+                            [ngClass]="{'active': i==activeDoc,  'error':assetsDetailsForm.controls.certificates.controls[i].invalid && assetsDetailsForm.controls.certificates.controls[i].touched}"
+                            (click)="changeDocument(i)">
+                            <a class="flex-grow-1" [id]="'certificate-id'+document.name">{{ document.name }}</a>
+                        <div *ngIf="i>1"> 
+                            <button class="gb-btn-hover" (click)="editCertificate(document.name,i)">
+                                <span class="no-style px-2">
+                                    <i class="material-icons def-color ">edit</i>
+                                </span>
+                            </button>
+                            <button class="gb-btn-hover" (click)="deleteDocuments(document.name,i)">
+                                <span class="no-style px-2" >
+                                    <i class="material-icons text-danger ">delete</i>
+                                </span>
+                            </button>
+                        </div>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+        </div>
+
+        <div class="col-lg-9 h-500px" formArrayName="certificates">
+            <div  *ngFor="let document of documentList; let i = index;" [formGroupName]="i"
+                [ngClass]="{'active': i==activeDoc}">
+                <div class="form-layout__card " [ngClass]="{'active': i==activeDoc}">
+                    <div class="form-body">
+
+                        <div class="px-3 py-4">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class=" col-lg-4 col-md-6">
+                                            <div class="input-wrap error"
+                                                [ngClass]="addErrorClass(assetsDetailsForm.controls.certificates.controls[i].controls.number)">
+                                                <label for="" class="input">{{document.name}}
+                                                    No</label>
+                                                <input  type="text" class="no-style input--bd" placeholder="AA00-1122"
+                                                    value="" formControlName="number"  appUpperCase  (change)="onChangeNumber(assetsDetailsForm.controls.certificates.controls[i])">
+                                                <app-error
+                                                    [controlName]="assetsDetailsForm.controls.certificates.controls[i].controls.number">
+                                                </app-error>
+                                            </div>
+                                        </div>
+                                        <div class=" col-lg-4 col-md-6">
+                                            <div class="input-wrap error error--type-1"
+                                                [ngClass]="addErrorClass(assetsDetailsForm.controls.certificates.controls[i].controls.issue_date)">
+                                                <label for="">Issue Date</label>
+                                                <mat-form-field class="width--100">
+                                                    <input matInput  placeholder="DD/MM/YYYY"
+                                                        [matDatepicker]="issue_date" (focus)="issue_date.open()"
+                                                        formControlName="issue_date">
+                                                    <mat-datepicker-toggle matSuffix [for]="issue_date">
+                                                    </mat-datepicker-toggle>
+                                                    <mat-datepicker #issue_date startView="multi-year"></mat-datepicker>
+                                                </mat-form-field>
+                                                <app-error
+                                                    [controlName]="assetsDetailsForm.controls.certificates.controls[i].controls.expiry_date">
+                                                </app-error>
+                                            </div>
+                                        </div>
+                                        <div class=" col-lg-4 col-md-6">
+                                            <div class="input-wrap error error--type-1"
+                                                [ngClass]="addErrorClass(assetsDetailsForm.controls.certificates.controls[i].controls.expiry_date)">
+                                                <label for="" [ngClass]="{'input--required':assetsDetailsForm.controls.certificates.controls[i].controls.is_expiry_mandatory.value && assetsDetailsForm.controls.certificates.controls[i].controls.number.value}">Expiry Date</label>
+                                                <mat-form-field class="width--100">
+                                                    <input matInput [min]="assetsDetailsForm.controls.certificates.controls[i].controls.issue_date.value" placeholder="DD/MM/YYYY"
+                                                        [matDatepicker]="expiry_date" (focus)="expiry_date.open()"
+                                                        formControlName="expiry_date">
+                                                    <mat-datepicker-toggle matSuffix [for]="expiry_date">
+                                                    </mat-datepicker-toggle>
+                                                    <mat-datepicker #expiry_date startView="multi-year"></mat-datepicker>
+                                                </mat-form-field>
+                                                <app-error [controlName]="assetsDetailsForm.controls.certificates.controls[i].controls.expiry_date">
+                                                </app-error>
+                                            </div>
+                                        </div>
+                                        <div class=" col-lg-4 col-md-6">
+                                                <div class="input-wrap error"
+                                                    [ngClass]="addErrorClass(assetsDetailsForm.controls.certificates.controls[i].controls.vendor)">
+                                                    <label for="" class="input">Certificate Issued By</label>
+                                                    <material-dropdown [searchable]="true" [addBlank]="true" [addable]="true" [party]="true" 
+                                                    (addPartyPopup)="openAddPartyModal($event)" [params]="partyNamePopup" (addValueToList)="addValueToPartyPopup($event)"
+                                                    [selectedOption]="{label:assetsDetailsForm.controls.certificates.controls[i].controls.vehdor_label.value,value:''}"
+                                                        class="dropDownWidth">
+                                                        <select #customSelect formControlName="vendor"
+                                                            class="no-style select--modify">
+                                                            <option *ngFor="let vendor of vendorList"
+                                                                value="{{ vendor.id }}">
+                                                                {{ vendor.party_display_name }}</option>
+                                                        </select>
+                                                    </material-dropdown>
+                                                    <app-error
+                                                        [controlName]="assetsDetailsForm.controls.certificates.controls[i].controls.vendor"></app-error>
+                                                </div>
+                                            </div>
+                                            <div class=" col-lg-4 col-md-6" *ngIf="i==1">
+                                                <div class="input-wrap">
+                                                    <label for="" class="input">Insurance Type</label>
+                                                    <material-dropdown [searchable]="true"  [selectedOption]="initialvalues.insuranceType" [addBlank]="true"  class="dropDownWidth">
+                                                        <select #customSelect formControlName="insurance_type"
+                                                            class="no-style select--modify">
+                                                            <option *ngFor="let option of insuranceType"
+                                                                value="{{ option.value }}">
+                                                                {{ option.label }}</option>
+                                                        </select>
+                                                    </material-dropdown>
+                                                </div>
+                                            </div>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-4 pt-4 border-top">
+                                        
+                                            <file-uploader-v2 (onFileUploaded)="fileUploader($event,i)" [uploaderId]="'vehicle-document-'+i"
+                                            [isShowOnlyUpload]="false"></file-uploader-v2>
+                                     
+                                        <div  *ngFor="let document of assetsDetailsForm.controls.certificates.controls[i].controls.files.value">
+                                            <app-file-delete-view [showInlineEdit]="false" [fileData]="document" 
+                                            (fileDeleted)="fileDeleted($event,i)"></app-file-delete-view>
+                                        </div>
+                                      
+                                    </div>
+                                </div>
+                             
+                                
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+    </div>
+    </div>
+</form>
+

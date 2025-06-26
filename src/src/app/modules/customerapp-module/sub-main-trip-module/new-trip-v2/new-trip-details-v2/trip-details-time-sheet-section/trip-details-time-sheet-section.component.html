@@ -1,0 +1,209 @@
+
+<div *ngIf="tripTimeSheets |async as tripTimeSheet">
+    <div class="row def-color mx-0 py-4 px-3">
+        <div class="col-lg-4">
+            <p class="mb-4 "><b>No. of shift:</b>{{tripTimeSheet?.no_of_shifts}}</p>
+            <p class="mb-4 "><b>Rental Charges:</b>{{tripTimeSheet?.rental_charges|numberFormat}} {{ currency_type?.symbol}}</p>
+            <ng-container *ngIf="tripTimeSheet?.billing_unit=='hour'">
+                <p class="mb-4 "><b>Total Billed Hours:</b>{{tripTimeSheet?.approved_billed_hours}} / <span class="green-text">{{tripTimeSheet?.billed_hours}}</span></p>
+            </ng-container>
+            <ng-container *ngIf="tripTimeSheet?.billing_unit=='day'">
+                <p class="mb-4 "><b>Total Billed Days:</b>{{tripTimeSheet?.approved_billed_hours}} / <span class="green-text">{{tripTimeSheet?.billed_hours}}</span></p>
+            </ng-container>
+            <p class="mb-4 "><b>Working Duration:</b>{{tripTimeSheet?.working_duration}}</p>
+        </div>
+        <div class="col-lg-3">
+            <p class="mb-4 "><b>Billing Unit:</b>{{getBillingUnitName(tripTimeSheet?.billing_unit)}}</p>
+            <p class="mb-4 "><b>Fuel Provision:</b>{{tripTimeSheet?.fuel_type}}</p>
+            <ng-container *ngIf="tripTimeSheet?.billing_unit=='hour'">
+                <p class="mb-4 "><b>Rate per hour:</b>{{tripTimeSheet?.rental_rate}} {{ currency_type?.symbol}}</p>
+            </ng-container>
+            <ng-container *ngIf="tripTimeSheet?.billing_unit=='day'">
+                <p class="mb-4 "><b>Rate per Day:</b>{{tripTimeSheet?.rental_rate | numberFormat}} {{ currency_type?.symbol}}</p>
+            </ng-container>
+            <p class="mb-4 "><b>Total Estimate Amount:</b>{{tripTimeSheet?.total_amount | numberFormat}} {{ currency_type?.symbol}}</p>
+        </div>
+        <div class="col-lg-5">
+            <ng-container *ngIf="tripTimeSheet?.billing_unit=='hour'">
+                <p class="mb-4 "><b>Extra Hrs:</b>{{tripTimeSheet?.extra_hours}} {{ currency_type?.symbol}}</p>
+                <p class="mb-4 "><b>Total Extra Hours:</b>{{tripTimeSheet?.approved_extra_hours}}</p>
+            </ng-container>
+            <ng-container *ngIf="tripTimeSheet?.billing_unit=='day'">
+                <p class="mb-4 "><b>Extra Days:</b>{{convertToCommaSeparated(tripTimeSheet?.extra_hours) }} {{ currency_type?.symbol}}</p>
+                <p class="mb-4 "><b>Total Extra Days:</b>{{convertToCommaSeparated(tripTimeSheet?.approved_extra_hours) }}</p>
+            </ng-container>
+           
+
+            <div class="d-flex  gap-2">
+                <button class="gb-btn gb-btn-blue gb-btn-blue-fill" [disabled]="isAllDisabled" (click)="openUploadTimesheet()">Upload Timesheet</button>
+                <button class="gb-btn gb-btn-blue " [disabled]="!partyTransaction?.can_create_invoice" (click)="makeInvoice()" >Create Invoice</button>
+                <button class="gb-btn gb-btn-blue " [disabled]="!partyTransaction?.can_create_invoice" (click)="makeVehiclePayment()"  *ngIf="isTransporter">Create Vehicle Payment</button>
+            </div>
+        </div>
+    </div>
+    <div class="row def-color mx-0 py-4 px-3" *ngIf="isTransporter">
+        <div class="content row">
+            <p class="mb-4 col-2"><b>Market Rental Charges </b></p>
+            <hr class="full-width-line col-9">
+          </div>
+          
+        <div class="col-lg-4">
+            <p class="mb-4 "><b>Rental Charges:</b>{{tripTimeSheet?.market_rental_charges|numberFormat}} {{ currency_type?.symbol}}</p>
+        </div>
+        <div class="col-lg-3">
+            <ng-container *ngIf="tripTimeSheet?.billing_unit=='hour'">
+                <p class="mb-4 "><b>Rate per hour:</b>{{tripTimeSheet?.market_rental_rate}} {{ currency_type?.symbol}}</p>
+            </ng-container>
+            <ng-container *ngIf="tripTimeSheet?.billing_unit=='day'">
+                <p class="mb-4 "><b>Rate per Day:</b>{{tripTimeSheet?.market_rental_rate | numberFormat}} {{ currency_type?.symbol}}</p>
+            </ng-container>
+            <p ><b>Total Estimate Amount:</b>{{tripTimeSheet?.market_total_amount| numberFormat}} {{ currency_type?.symbol}}</p>
+
+        </div>
+        <div class="col-lg-5">
+            <ng-container *ngIf="tripTimeSheet?.billing_unit=='hour'">
+                <p class="mb-4 "><b>Extra Hrs:</b>{{tripTimeSheet?.market_extra_hours}} {{ currency_type?.symbol}}</p>
+            </ng-container>
+            <ng-container *ngIf="tripTimeSheet?.billing_unit=='day'">
+                <p class="mb-4 "><b>Extra Days:</b>{{tripTimeSheet?.market_extra_hours}} {{ currency_type?.symbol}}</p>
+            </ng-container>
+        </div>
+    </div>
+
+    
+    <div class="def-color">
+        <div class="addable-row-table mx-2 mb-2 def-color addable-row-table-display">
+            <table>
+                <thead>
+                    <tr class="text-center">
+    
+                        <th>NO.</th>
+                        <th>TIMESHEET No.</th>
+                        <th>START DATE</th>
+                        <th>END DATE </th>
+                        <ng-container *ngIf="tripTimeSheet?.billing_unit=='hour'">
+                            <th>BILLING HOURS</th>
+                            <th>EXTRA HOURS</th>
+                        </ng-container>
+                        <ng-container *ngIf="tripTimeSheet?.billing_unit=='day'">
+                            <th>BILLING DAYS</th>
+                            <th>EXTRA DAYS</th>
+                        </ng-container>
+                      
+                        <th>OPERATOR</th>
+                        <th>TOTAL COMMISSION</th>
+                        <th>ATTACHMENT</th>
+                        <th>STATUS</th> 
+                        <th *ngIf="showInvoiceNoColumn">INVOICE NO.</th> 
+                        <th></th>
+    
+                    </tr>
+                </thead>
+                <tbody *ngIf="tripTimeSheet?.timesheets.length==0">
+                    <tr class="border-0">
+                        <td class="bg-white" colspan="30">
+                            <div class="no-list-data-wrap">
+                                <figure>
+                                    <img src="assets/img/no-content.png" alt="">
+                                </figure>
+                                <h5 class="mt-3 primary-brand-text">No Time Sheets found!</h5>
+                            </div>
+                        </td>
+                    </tr>
+    
+                </tbody>
+                <tbody >
+    
+                        <tr class="text-center" *ngFor="let timeSheet of  tripTimeSheet?.timesheets;let i=index" >
+                            <td >{{i+1}}</td>
+                            <td>{{timeSheet?.timesheet_no ? timeSheet?.timesheet_no : '-'}}</td>
+                            <td style="white-space: nowrap;">{{timeSheet.start_date}}</td>
+                            <td  style="white-space: nowrap;">{{timeSheet.end_date}}</td>
+                            <td>
+                                {{convertToCommaSeparated(timeSheet.billing_hours) }}
+                                
+                            </td>
+                            <td >
+                                {{convertToCommaSeparated(timeSheet.extra_hours)}}
+                            </td>
+                            <td >{{timeSheet.operator ? timeSheet.operator : '-'}}</td>
+                            <td class="custom-link"  (click)="openCommssion(timeSheet.id,timeSheet.total_commission)"
+                            >{{timeSheet.total_commission | numberFormat}}</td>
+                            <td class="p-0">
+                                <div class="d-flex justify-content-center align-items-center" *ngIf="timeSheet.documents.length">
+                                <span class="material-icons sky-blue-text cursor-pointer"  (click)="viewUploadedDocument(timeSheet.documents)" > image </span>
+                                </div>
+                            </td>
+
+                            <td class="p-0" *ngIf="timeSheet.show_approval_buttons">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <button class="btn btn--primary py-2 w-auto btn-sm" (click)="onApprovalAction(timeSheet.id, true)">Approve</button>
+                                    <button class="btn py-2 w-auto ms-3 btn-sm" (click)="onApprovalAction(timeSheet.id, false)">Reject</button>
+                                </div>
+                            </td>
+
+                            <td *ngIf="!timeSheet.show_approval_buttons && timeSheet.status == 0">
+                                <div class="d-flex justify-content-center align-items-center" >
+                                    <span class="pending-text">{{timeSheet.status_str}}</span>
+                                </div>
+                            </td>
+
+                            <td *ngIf="!timeSheet.show_approval_buttons && timeSheet.status == 1">
+                                <div class="d-flex justify-content-center align-items-center" >
+                                    <span class="accept-text">{{timeSheet.status_str}}</span>
+                                </div>
+                            </td>
+
+                            <td *ngIf="!timeSheet.show_approval_buttons && timeSheet.status == 2">
+                                <div class="d-flex justify-content-center align-items-center" >
+                                    <span class="decline-text">{{timeSheet.status_str}}</span>
+                                </div>
+                            </td>
+
+                            <td *ngIf="!timeSheet.show_approval_buttons && timeSheet.status == 3">
+                                <div class="d-flex justify-content-center align-items-center" >
+                                    <span class="accept-text"> {{timeSheet.status_str}}</span>
+                                </div>
+                            </td>
+                            <td *ngIf="showInvoiceNoColumn">
+                                <a class="custom-link fw-semibold" target="_blank"
+                                [routerLink]="[preFixUrl+'/income/invoice/view/'+timeSheet?.invoice?.id]">{{timeSheet?.invoice?.no ? timeSheet?.invoice?.no : '-'}}</a>
+                            </td>
+
+                            <td class="p-0">
+
+
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <button class="fw-semibold primary-brand-text custom-link fw-semibold" (click)="openApprovalTimeline(timeSheet.timeline)" data-bs-toggle="offcanvas"
+                                    data-bs-target="#timesheet" aria-controls="staticBackdrop">View Approval Details</button>                 
+
+                                    <button mat-icon-button [matMenuTriggerFor]="menu" [disabled]="!timeSheet.is_editable_deletable" >
+                                        <mat-icon>more_vert</mat-icon>
+                                      </button>
+                                      <mat-menu #menu="matMenu" class="py-2">
+                                        <button mat-menu-item *ngIf="timeSheet.is_editable_deletable" (click)="editTimesheet(timeSheet.id)">
+                                          <mat-icon>edit</mat-icon>
+                                          <span>Edit </span>
+                                        </button>
+                                        <button *ngIf="timeSheet.is_editable_deletable" mat-menu-item (click)="deleteTimesheet(timeSheet.id)">
+                                          <mat-icon>delete</mat-icon>
+                                          <span>Delete</span>
+                                        </button>
+                                        
+                                      </mat-menu>
+
+
+                                </div>
+    
+    
+                            </td>
+                         
+                           
+                        </tr>
+                   
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,19 @@
+<div class="pdf-viewer-container" *ngIf="pdfSrc">
+    <div class="right-section__header py-2 px-md-3 px-1 mb-0 justify-content-between pdf-viewer-header">
+      <h1 class="heading col-8">Vehicle Payment</h1>
+      <div class="header-actions mt-0 ms-auto">
+          <div class="dropdown-menu-details v-align ms-0">
+            <button class="btn--action mg-left-10" (click)="downloadPdf(fleetData)">
+              <i class="material-icons">cloud_download</i>
+            </button>
+          </div>
+          <button class="btn--action  mg-left-10" (click)="openDetails()"><i class="material-icons">close</i></button>
+      </div>
+    </div>
+      <pdf-viewer [src]="pdfSrc"
+      [render-text]="true"
+      [stick-to-page]="true"
+      [autoresize]="true"
+      [original-size]="false"
+      [show-all]="true"></pdf-viewer>
+    </div>

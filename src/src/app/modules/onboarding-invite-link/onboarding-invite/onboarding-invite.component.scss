@@ -1,0 +1,22 @@
+.onboarding-img {
+  background: #fff;
+  margin: auto;
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  .image-flex{
+    opacity: 1;
+  }
+
+  img {
+    max-width: 350px;
+  }
+  p{
+    color: gray;
+    font-size: calc(16px + 1.2vw);
+    line-height: 1.5;
+  }
+}

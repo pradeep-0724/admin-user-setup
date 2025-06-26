@@ -1,0 +1,154 @@
+<div class="right-section__header">
+  <h1 class="heading">Quotation List</h1>
+  <div class="mx-0 row align-items-center">
+    <button class="add-button btn--rounded w-auto"  *ngxPermissionsOnly="quotation[0]"  [routerLink]="[prefixUrl+'/trip/quotation/add']"
+                  routerLinkActive="router-link-active"> Add Quotation</button>
+    <div class="mobile-calender w-auto">
+      <input type="text" class="form-control date-range" [ngModelOptions]="{ standalone: true }" bsDaterangepicker
+        [(ngModel)]="selectedRange" (bsValueChange)="filterWorkOrder($event)" [bsConfig]="{
+            rangeInputFormat: 'DD MMM YYYY',
+            showWeekNumbers: false}" />
+    </div>
+</div>
+</div>
+<div class="alert-msg" *ngIf="apiError">
+  <span class="icon-wrap"></span>
+  <p class="message-cont">{{ apiError }}</p>
+</div>
+<div class="form-layout" [ngClass]="{'invoice-list': routeToDetail}" id="form-height">
+  <div class="table-section" [ngClass]="{'table-section--sm': routeToDetail && !isMobile}">
+    <div class="table-header" [ngClass]="{'table-header--shrinked': routeToDetail && !isMobile}">
+      <div class="row">
+        <div class="col-2">
+          <div class="table-header__left">
+            <div id="demo-2" class="search">
+              <input type="search" placeholder="Search" [(ngModel)]="search">
+            </div>
+          </div>
+
+        </div>
+        <div class="col-10">
+
+          <div class="table-header__right table-header__right--nopd justify-content-end">
+            <ng-container *ngIf="allData?.length">
+              <button class="btn--action mg-left-10 hide_onClick" [ngClass]="{'filterOpen':showFilter ||isFilterApplied}" (click)="showFilter = !showFilter">
+                <span  *ngIf="isFilterApplied && !showFilter" class="material-icons filterBullet">
+                  fiber_manual_record
+                  </span>
+                  <img *ngIf="!isFilterApplied && !showFilter" src="assets/img/filter-icon.svg" alt="">
+                  <img *ngIf="isFilterApplied && !showFilter" src="assets/img/filter_icon_2.svg" alt="">
+                  <img *ngIf="showFilter" src="assets/img/filter-icon-svg-3.svg" alt="">
+              </button>
+                <app-filter [config]="options" [data]="allData" [visible]="showFilter"
+                    (onApplied)="filterApplied($event)" (onClear)="filterApplied($event)"></app-filter>
+            </ng-container>
+            <div class="select-wrap">
+              <span class="show-text">Showing</span>
+              <select [(ngModel)]="filter_by" name="" class="no-style select--modify">
+                <option *ngFor="let num of filter" value="{{num.value}}">{{num.key}}</option>
+              </select>
+            </div>
+            <div>
+              <button *ngIf="routeToDetail" class="btn--action mg-left-10" (click)="menueButton()"><i  class="material-icons">close</i></button>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="table-wrapper-list"
+      [ngClass]="{'table-wrapper-init':!routeToDetail , 'table-wrapper-auto':routeToDetail}" id="table-height">
+      <table class="table-container">
+        <thead>
+          <tr>
+            <th>Quotation No</th>
+            <th >Quotation Date</th>
+            <th >Customer</th>
+            <th>Validity Date</th>
+            <th >Validity Term</th>
+            <th >Total Amount</th>
+            <th>Approval Status</th>
+            <th width=5% class="justify-content-end"></th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr *ngIf="(sortedData| quotationSearchPipe:search)?.length == 0">
+            <td colspan="10" style="background-color: #fff">
+              <div class="no-content-wrapper">
+                <figure class="no-content-pic">
+                  <img src="assets/img/no-content.png" alt="">
+                </figure>
+                <div class="no-content-txt">
+                  <h5 class="heading">No data found!</h5>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr
+            *ngFor="let data of sortedData | quotationSearchPipe:search | paginate: { itemsPerPage: filter_by, currentPage: p }; let i = index;" [ngClass]="{'viewActive':(data.id==selectedId)&&routeToDetail}">
+
+            <td (click)="routeToDetailById(data.id)" class="link">{{ data?.quotation_no }}</td>
+            <td>{{ dateChange(data.quote_date) }}</td>
+            <td><a class="link" target="_blank" [routerLink]="[prefixUrl+'/onboarding/party/details/client/'+data.customer.id]">{{ data?.customer?.display_name }}</a></td>
+            <td>{{ dateChange(data.validity_date) }}</td>
+            <td>{{ data?.validity_term?.label }}</td>
+            <td>{{ data?.total_amount }}</td>
+            <td>{{ data?.status?.label }}</td>
+
+            <ng-container *ngIf=" data?.status?.index!='2' && data?.status?.index!='3'">
+              <td class="table-action"  *ngxPermissionsOnly="[quotation[1],quotation[2]]">
+                <i class="material-icons more-icon justify-content-center"
+                  (click)="optionsList('list_'+data.id)">more_vert</i>
+                <ul class="more-actions__menu table-popup" [ngClass]="{show: showOptions === 'list_'+data.id}">
+
+                  <ng-container >
+                    <li class="more-actions__item" *ngxPermissionsOnly="quotation[1]"
+                    [routerLink]="[prefixUrl+'/trip/quotation/edit', data.id]"><i
+                      class="material-icons">edit</i>Edit</li>
+
+                  </ng-container>
+                  <ng-container>
+                    <li class="more-actions__item" *ngxPermissionsOnly="workOrderPermission[1]"(click)="openDialog(data)"><i class="material-icons">change_circle</i> Change Status</li>
+                  </ng-container>
+
+
+                  <ng-container >
+                    <li class="more-actions__item" *ngxPermissionsOnly="quotation[2]"
+                    (click)="popupFunction(data.id, i)"><i class="material-icons">delete</i>Delete</li>
+                  </ng-container>
+                </ul>
+              </td>
+            </ng-container>
+
+
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+    <div class="table-page-no">
+      <pagination-controls previousLabel='' nextLabel="" directionLinks="true" class=" my-pagination"
+        (pageChange)="p = $event" (pageBoundsCorrection)="p=$event">
+      </pagination-controls>
+    </div>
+  </div>
+  <div *ngIf="routeToDetail && !isMobile" class="table-section table-section--lg ">
+    <app-quotation-view [quotationId]="quotationId"></app-quotation-view>
+
+   </div>
+
+   <div class="modal fade" [ngClass]="{'show':routeToDetail &&isMobile}" id="exampleModal" tabindex="-1" role="dialog"
+      aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal--xls" role="document">
+        <div class="modal-content">
+          <button class="close-icon" (click)="onClickCancel()"><mat-icon>highlight_off</mat-icon></button>
+          <app-quotation-view *ngIf="routeToDetail &&isMobile" [quotationId]="quotationId"></app-quotation-view>
+        </div>
+      </div>
+      </div>
+      <div *ngIf="routeToDetail &&isMobile" class="modal-backdrop fade show"></div>
+
+</div>
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

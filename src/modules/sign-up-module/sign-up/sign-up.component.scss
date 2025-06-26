@@ -1,18 +1,62 @@
 @import "../../../../public/styles/helpers/global";
-.main-body{
-    background: linear-gradient(
-    to right,
-    #e883e5,#fd1d1d,#fcb045
-  );
 
-    height: 1000px;
-    width: auto;
-}
+$color : #595fab;
 .login-card{
     display: block;
     height: 600px;
+    align-items: center;
     background-color: aquamarine !important;
 }
 h4{
-  background-color: chartreuse;
+  color: $color;
+  padding: 8px;
+
+}
+
+
+.header-row{
+  display: flex;
+  background-color: grey;
+  justify-content: space-evenly;
+  align-items: center;
+}
+// i:hover {
+//   border: 2px solid #e9ecef;
+//   border-radius: 12px;
+// }
+.btn-active{
+  color: #fff;
+  margin : 0px 8px 0px 0px;
+  padding: 8px 15px;
+  background-color: #07c060;
+  border-radius: 15px ;
+  border: 2px solid #07c060;
+}
+
+.left-chevron{
+  padding: 8px;
+  margin: 4px;
+  box-sizing:border-box;
+  border: 1px solid transparent; // 👈 keep
+  &:hover{
+    background-color: x#fff;
+    border-radius: 8px;
+    border : 1px solid black
+    // color: #fff;
+  }
+}
+.child-elements2{
+  margin-bottom: 0px !important;
+  font-weight: 500;
+  color: $color;
+  // position: relative;
+}
+.box-shadow{
+  box-shadow: 11px 0px 19px 5px rgb(198, 192, 192)
+}
+.parent-row{
+  // position: absolute;
+}
+.highlight-bottom{
+  border-bottom: 5px solid blue;
 }

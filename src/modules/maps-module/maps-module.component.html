@@ -1,0 +1,48 @@
+<p>maps-module works!</p>
+<!-- <google-map
+      height="500px"
+      width="100%"
+      [center]="center"
+      [zoom]="zoom">
+    </google-map> -->
+
+    <div class="container">
+        <h2>Route Planner</h2>
+        <form [formGroup]="locationForm" class="form-container">
+          <div class="form-group">
+            <label for="startLocation">Start Location:</label>
+            <select id="startLocation" formControlName="startLocation" class="form-control">
+              <option value="">Select start location</option>
+              <option *ngFor="let location of locations" [value]="location.id">
+                {{ location.name }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="endLocation">End Location:</label>
+            <select id="endLocation" formControlName="endLocation" class="form-control">
+              <option value="">Select end location</option>
+              <option *ngFor="let location of locations" [value]="location.id">
+                {{ location.name }}
+              </option>
+            </select>
+          </div>
+          
+          <button type="button" (click)="drawRoute()" class="btn-draw-route">
+            Draw Route
+          </button>
+        </form>
+        
+        <div class="map-container">
+          <google-map
+            height="500px"
+            width="100%"
+            [center]="center"
+            [zoom]="zoom"
+            [options]="mapOptions"
+            (mapInitialized)="onMapInitialized($event)">
+          </google-map>
+        </div>
+      </div>
+      

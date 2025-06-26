@@ -1,0 +1,244 @@
+<div [ngClass]="{'border-bottom':routeToDetail}" class="calc-height">
+  <app-list-widget [isFilter]="true" [isDateRangeText]="true" [isDateRange]="false"  [isDateDropDown]="true"
+    [isAddButton]="true" [filterUrl]="filterUrl" [subtractDays]="30" [end_date]="end_date"
+    listTitle="Vendor Advance List" (listWidgetData)="listWidgetData($event)" [buttonData]="buttonData">
+    <button class="gb-video-play me-2" id="custom-button-left" (click)="openGothrough()">
+      <i class="bi bi-play-circle-fill"></i>
+    </button>
+  </app-list-widget>
+  <div class="alert-msg" *ngIf="apiError">
+    <span class="icon-wrap"></span>
+    <p class="message-cont">{{ apiError }}</p>
+  </div>
+</div>
+
+
+  <div class="row mx-0">
+
+    <div class="custom-table-container  fuel-list-wrap  p-0" id="vendor-advance"
+      [ngClass]="routeToDetail?'col-lg-4':'col-lg-12'" (scroll)="onScroll($event)">
+      <table [ngClass]="{'h-100':vendorAdvanceList.length==0}">
+
+        <thead *ngIf="!routeToDetail">
+          <tr>
+            <th>DATE</th>
+            <th>PAYMENT NO</th>
+            <th>VENDOR</th>
+            <th>PAYMENT MODE</th>
+            <th>PAID AMOUNT  ({{currency_type.symbol}})</th>
+            <th>AMOUNT ({{currency_type.symbol}})</th>
+            <th class="icon-box"></th>
+          </tr>
+        </thead>
+        <tbody *ngIf="vendorAdvanceList.length == 0">
+          <tr class="border-0">
+            <td class="bg-white" colspan="30">
+              <div class="no-list-data-wrap">
+                <figure>
+                  <img src="assets/img/no-content.png" alt="">
+                </figure>
+                <h5 class="mt-3 primary-brand-text">No data found!</h5>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+
+        <tbody>
+          <tr *ngFor="let data of vendorAdvanceList" [ngClass]="{'activated-row':selectedId==data.id && routeToDetail}">
+            <ng-container *ngIf="routeToDetail">
+              <td (click)="createQueryParems(data.id)" class="cursor-pointer">
+                <div class=" mb-3 fs-6 fw-semibold ">{{data.party.display_name}}</div>
+                <div>
+                  <span class="link fw-medium " >{{data.advance_number}}</span>
+                  <span class="detail-date"> {{data.date}}</span>
+                </div>
+              </td>
+              <td (click)="createQueryParems(data.id)" class="cursor-pointer">
+                <div class=" mb-3 fs-6 fw-semibold text-end">{{currency_type.symbol}} {{data.amount | numberFormat}}</div>
+                <div class=" text-end">
+                  {{data.payment_mode.name}}
+                </div>
+
+              </td>
+            </ng-container>
+
+            <ng-container *ngIf="!routeToDetail">
+              <td>{{data.date}}</td>
+              <td><a class="custom-link" (click)="createQueryParems(data.id)">{{data.advance_number}}</a>
+              </td>
+              <td class="td-2l"><div class="text-2l"><a target="_blank" class="custom-link" [routerLink]="[prefixUrl+'/onboarding/party/details/vendor/'+data.party.id]">{{data.party.display_name}}</a></div>
+              </td>
+              <td>{{data.payment_mode.name}}</td>
+              <td>{{paidAmount(data.amount, data.balance)}}</td>
+              <td>{{data.amount | numberFormat}}</td>
+              <td class="icon-box  tabIndexActive">
+                <div class="d-flex justify-content-center align-items-center">
+                  <div class="position-relative">
+                    <i class="material-icons more-icon" (click)="optionsList(data.id)"
+                      *ngxPermissionsOnly="[vendorAdvancePermission[1],vendorAdvancePermission[2]]">more_vert</i>
+                    <ul class="more-actions__menu table-popup" [ngClass]="{show: showOptions === data.id}">
+                      <li class="more-actions__item" *ngxPermissionsOnly="vendorAdvancePermission[1]"
+                      [routerLink]="[prefixUrl+'/payments/edit/advance/', data.id]"><i
+                          class="material-icons">edit</i>Edit</li>
+                            <li *ngxPermissionsOnly="vendorAdvancePermission[2]" class="more-actions__item"
+                              (click)="popupFunction(data, i)"><i class="material-icons">delete</i>Delete</li>
+                    </ul>
+                  </div>
+                </div>
+
+              </td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-lg-8 p-0  pdf-viewer">
+      <app-details-vendor-advance *ngIf="routeToDetail" [routeToDetail]="routeToDetail" [vendorId]="vendorAdvanceId"  (openDetailsEmitter)="openListDetailsData($event)">
+      </app-details-vendor-advance>
+    </div>
+
+  </div>
+
+
+
+
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>
+
+<app-go-through [goThroughDetais]="goThroughDetais"></app-go-through>
+
+
+<!-- <div class="right-section__header">
+  <h1 class="heading">Vendor Advance List</h1>
+  <div class="header-actions header-actions--type1  w-auto mt-0 ">
+      <button class="add-button btn--rounded"  *ngxPermissionsOnly="vendorAdvancePermission[0]" [routerLink]="[prefixUrl+'/payments/advance']"
+       routerLinkActive="router-link-active">Add Vendor Advance</button>
+       <button class="gb-video-play float-right ms-2"  (click)="openGothrough()">
+        <i class="bi bi-play-circle-fill"></i>
+    </button>
+    
+    
+  </div>
+</div>
+<div [ngClass]="{'empty-state': !allData?.length}"></div>
+<div class="alert-msg" *ngIf="apiError">
+  <span class="icon-wrap"></span>
+  <p class="message-cont">{{ apiError }}</p>
+</div>
+<div class="form-layout" *ngIf="allData?.length" [ngClass]="{'invoice-list': routeToDetail}">
+  <div class="table-section" [ngClass]="{'table-section--sm': routeToDetail&&!isMobile}">
+    <div class="table-header" [ngClass]="{'table-header--shrinked': routeToDetail&&!isMobile}">
+      <div class="row mobile-position-relative tabIndexActive">
+        <div class="col-12">
+          <div class="table-header__right table-header__right--nopd justify-content-end">
+            <div class="w-auto flex-grow-1" id="demo-2">
+              <input type="search" placeholder="Search" [(ngModel)]="search">
+            </div>
+            <div class="select-wrap">
+              <span class="show-text">Showing</span>
+              <select [(ngModel)]="filter_by" name="" class="no-style select--modify">
+                <option *ngFor="let num of filter" value="{{num.value}}">{{num.key}}</option>
+              </select>
+            </div>
+            <button class="btn--action mg-left-10 py-1" [ngClass]="{'filterOpen':showFilter ||isFilterApplied}"
+              (click)="showFilter = !showFilter">
+              <span *ngIf="isFilterApplied && !showFilter" class="material-icons filterBullet">
+                fiber_manual_record
+              </span>
+              <img *ngIf="!isFilterApplied && !showFilter" src="assets/img/filter-icon.svg" alt="">
+              <img *ngIf="isFilterApplied && !showFilter" src="assets/img/filter_icon_2.svg" alt="">
+              <img *ngIf="showFilter" src="assets/img/filter-icon-svg-3.svg" alt="">
+            </button>
+            <app-filter [config]="options" [data]="allData" [visible]="showFilter" (onApplied)="filterApplied($event)"
+              (onClear)="filterApplied($event)"></app-filter>
+            <button *ngIf="routeToDetail" class="btn--action mg-left-10 py-1" (click)="menueButton()">
+              <i class="material-icons">close</i>
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="table-wrapper-list"
+      [ngClass]="{'table-wrapper-init':!routeToDetail , 'table-wrapper-auto':routeToDetail}" id="table-height">
+      <table class="table-container">
+        <thead>
+          <tr>
+
+            <th>Date</th>
+            <th>Payment No.</th>
+            <th>Party Name</th>
+            <th>Payment Mode</th>
+            <th>Paid Amount ({{ currency_type?.symbol}})</th>
+            <th>Amount ({{ currency_type?.symbol}})</th>
+            <th width=10%>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="(vendorData | vendorAdvanceListFilter:search)?.length == 0">
+            <td colspan="10" style="background-color: #fff">
+              <div class="no-content-wrapper">
+                <figure class="no-content-pic">
+                  <img src="assets/img/no-content.png" alt="">
+                </figure>
+                <div class="no-content-txt">
+                  <h5 class="heading">No data found!</h5>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr
+            *ngFor="let data of vendorData | vendorAdvanceListFilter: search  | paginate: { itemsPerPage: filter_by, currentPage: p }; let i = index"
+            [ngClass]="{'viewActive':(data.id==selectedId)&&routeToDetail }">
+
+            <td>{{ dateChange(data.date)}}</td>
+            <td class="tabIndexActive"><button class="link p-0" (click)="createQueryParems(data.id)">{{ data.advance_number }}</button> </td>
+            <td><a target="_blank" class="link" [routerLink]="[prefixUrl+'/onboarding/party/details/vendor/'+data.party.id]">{{ data.party ? data.party.display_name : '-'}}</a></td>
+            <td>{{ data.payment_mode ? data.payment_mode.name : '-' }}</td>
+            <td class="rupee-symbol rupee-symbol--sm">{{paidAmount(data.amount, data.balance)}}</td>
+            <td class="rupee-symbol rupee-symbol--sm">{{ data.amount }}</td>
+            <td class="table-action tabIndexActive">
+              <button class="material-icons more-icon p-0"
+                *ngxPermissionsOnly="[vendorAdvancePermission[1],vendorAdvancePermission[2]]"
+                (click)="optionsList($event, 'list_'+data.id)">more_vert</button>
+              <div class="more-actions__menu table-popup" [ngClass]="{show: showOptions === 'list_'+data.id}">
+                <button class="more-actions__item w-100" *ngxPermissionsOnly="vendorAdvancePermission[1]"
+                  [routerLink]="[prefixUrl+'/payments/edit/advance/', data.id]"><i
+                    class="material-icons">edit</i>Edit</button>
+                <button *ngxPermissionsOnly="vendorAdvancePermission[2]" class="more-actions__item w-100"
+                  (click)="popupFunction(data.id, i)"><i class="material-icons">delete</i>Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-page-no">
+      <pagination-controls previousLabel='' nextLabel="" directionLinks="true" class="my-pagination tabIndexActive"
+        (pageChange)="p = $event" (pageBoundsCorrection)="p=$event">
+      </pagination-controls>
+    </div>
+  </div>
+  <div class="table-section table-section--lg" *ngIf="routeToDetail&&!isMobile">
+    <app-details-vendor-advance [vendorId]="vendorAdvanceId"></app-details-vendor-advance>
+  </div>
+  <div class="modal fade" [ngClass]="{'show':routeToDetail &&isMobile}" id="exampleModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal--xls" role="document">
+      <div class="modal-content">
+        <button class="close-icon ms-auto" (click)="onClickCancel()">
+          <mat-icon>highlight_off</mat-icon>
+        </button>
+        <app-details-vendor-advance *ngIf="routeToDetail &&isMobile" [vendorId]="vendorAdvanceId">
+        </app-details-vendor-advance>
+
+      </div>
+    </div>
+  </div>
+  <div *ngIf="routeToDetail &&isMobile" class="modal-backdrop fade show"></div>
+</div>
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>
+
+
+<app-go-through  [goThroughDetais]="goThroughDetais"></app-go-through> -->

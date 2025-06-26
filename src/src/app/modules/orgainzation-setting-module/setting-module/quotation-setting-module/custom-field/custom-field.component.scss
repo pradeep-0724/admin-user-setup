@@ -1,0 +1,51 @@
+@import "../../../../../../assets/styles/helpers/variable";
+.des-list{
+    list-style: unset;
+    li{
+        margin-bottom: 12px;
+    };
+    ul{
+        margin: 20px 50px;
+        list-style: unset;
+    }
+    
+}
+
+.eye{
+    font-size: 20px;
+    margin-right: 0 4px;
+    vertical-align: middle;
+    &_off{
+        color: #4E515C;
+    }
+    &_hide{
+        color: #ACB5BD;
+    }
+}
+.tab-btn{
+    width: 100%;
+    border-radius: 6px;
+    text-align: center;
+    border: 1px solid #ACB5BD;
+    color: #868687;
+    font-weight: 600;
+    padding: 14px;
+    transition: all 200ms ease-in-out;
+    &:hover{
+        background-color:#ACB5BD ;
+        color: #fff;
+    }
+    &.active{
+        color: $primary-brand-color;
+        border-color: $primary-brand-color;
+
+    }
+    &.active:hover{
+        background-color: $primary-brand-color;
+        color: #fff;
+        
+    }
+
+}
+
+

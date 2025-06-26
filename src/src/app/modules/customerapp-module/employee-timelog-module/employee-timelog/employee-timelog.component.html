@@ -1,0 +1,53 @@
+<div class="right-section__header">
+  <h4 class="col-6 text-align-center">Employee Timelog</h4>
+  <div class="col-6">
+  <div id="demo-2" class="search d-flex justify-content-end">
+    <input type="search" placeholder="enter employee name" [(ngModel)]="search">
+</div>
+</div>
+
+</div>
+
+<div class="form-layout" id="form-height">
+  <div class="table-header form-layout--pd">
+    <div class="nav-list tabIndexActive">
+    <button  (click)="allTabData('All')" class="nav-list__item anim-border px-0" [ngClass]="{active: selectedTab === 'All'}">All
+      ({{employeeAll}})</button>
+    <button (click)="empInandOut('IN')" class="nav-list__item anim-border px-0" [ngClass]="{active: selectedTab === 'IN'}">In
+      ({{employeeIn}})</button>
+    <button (click)="empInandOut('OUT')" class="nav-list__item anim-border px-0" [ngClass]="{active: selectedTab === 'OUT'}">Out
+      ({{employeeOut}})</button>
+    </div>
+<table class="table bg-white table-wrapper-list">
+
+    <tbody>
+      <tr *ngIf="tabData.length == 0">
+        <td colspan="10" class="white">
+            <div class="no-content-wrapper">
+                <figure class="no-content-pic">
+                    <img src="assets/img/no-content.png" alt="">
+                </figure>
+                <div class="no-content-txt">
+                    <h5 class="heading">No data found!</h5>
+                </div>
+            </div>
+        </td>
+    </tr>
+        <tr *ngFor="let emp of tabData |employeetimelogpipe:search">
+            <td class="w-60px"><span class="test"></span></td>
+            <td class="empdata">
+                <p>{{emp.employee_name}}</p>
+                <span>{{emp.time}}</span>
+            </td>
+            <td class="w-20px" >
+              <span *ngIf="selectedTab !='OUT'" class="dot" [style.background]="emp.color"></span>
+            </td>
+            <td class="w-20px ps-5 arrow"><button [routerLink]="[preFixUrl + '/emp-timelog/' + emp.employee_id + '/timesheet']"><span class="material-icons">
+              arrow_forward_ios </span></button></td>
+        </tr>
+
+
+    </tbody>
+</table>
+</div>
+</div>

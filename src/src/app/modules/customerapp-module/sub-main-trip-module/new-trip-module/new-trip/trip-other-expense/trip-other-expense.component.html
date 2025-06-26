@@ -1,0 +1,104 @@
+<div class="form-layout__card formResponsiveTable tabIndexActive">
+  <div action=""  [formGroup]="tripOtherExpenseForm">
+      <div>
+      <div
+        class="table-wrapper table--bd table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow">
+        <table class="table-container" formArrayName="other_expense">
+          <thead>
+            <tr class="desktop_th">
+              <th>Expense Type</th>
+              <th>Chart of account</th>
+              <th>Amount </th>
+              <th>Payment Mode</th>
+              <th *ngIf="!isTripCode">Transaction Date</th>
+              <th *ngIf="!singleEntry"></th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let item of tripOtherExpenseForm['controls'].other_expense['controls']; let i = index;"
+          [formGroupName]="i">
+            <tr class="mobile-flex">
+              <td class="max-wd-120 tabIndexActiveFields">
+                <h5 class="th_h5_mobile">Expense Type </h5>
+                <div>
+                  <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth" [addBlank]="false"
+                                [postApiUrl]="expenseApi"
+                                [params]="addExpenseType"
+                                [addErrorClass]="addErrorClass(item.controls.expense_type)"
+                                [selectedOption]="initialDetails?.expenseType[i]"
+                                (postApiResponse)="getNewExpenseType($event,i,item)"
+                                (addValueToList)="addNewExpenseType($event)">
+                                <select #customSelect formControlName="expense_type" class="no-style select--modify" (change)="onAmountChange(item)">
+                                    <option *ngFor="let option of expenseTypeList" value="{{ option?.id }}">
+                                        {{ option?.label }}
+                                    </option>
+                                </select>
+                    </material-dropdown>
+                </div>
+              </td>
+              <td class="max-wd-120 tabIndexActiveFields">
+                <h5 class="th_h5_mobile">Chart of account </h5>
+                <div>
+                  <material-dropdown [searchable]="true" [addable]="true" [selectedOption]="initialDetails?.expenseAccount[i]"
+                  [addErrorClass]="addErrorClass(item.controls.account)"
+                  [chartOfAccount]="true" (addChartOfAccount)="openAddCoaModal($event, i)"
+                  [params]="coaParams" (addValueToList)="addParamsCoaItem($event)">
+                    <select #customSelect formControlName="account" class="no-style select--modify">
+                      <option *ngFor="let option of expenseAccountList" value="{{ option?.id }}">
+                        {{ option?.name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </td>
+              <td class="max-wd-120 tabIndexActive">
+                <h5 class="th_h5_mobile">Amount </h5>
+                <div>
+                  <input positiveThreeDigitDecimalNumber [ngClass]="{'showInvalid':item.controls.amount.invalid&&item.controls.amount.touched}" type="text" class="no-style input--bd" placeholder="123456" value="" (change)="onAmountChange(item)"  formControlName="amount">
+                </div>
+              </td>
+              <td class="max-wd-120 tabIndexActiveFields">
+                <h5 class="th_h5_mobile"> Payment Mode</h5>
+                <div class="max-wd-120" [ngClass]="{disableInput:item.controls.is_driver_added.value}">
+                  <material-dropdown [searchable]="true"
+                  [addErrorClass]="addErrorClass(item.controls.payment_mode)"
+                  [disabled]="item.controls.is_driver_added.value"
+                  [addable]="false" [selectedOption]="initialDetails?.paymentModeOp[i]">
+                    <select #customSelect formControlName="payment_mode" class="no-style select--modify"
+                    (change)="onAmountChange(item)">
+                      <option value="paid_By_Driver" *ngIf="isDriverSelected">Paid By Driver</option>
+                      <option *ngFor="let option of accountList" value="{{ option?.id }}">
+                      {{ option?.name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </td>
+              <td class="table-datepicker max-wd-140 max-wd-120" *ngIf="!isTripCode">
+                <h5 class="th_h5_mobile">Transaction Date </h5>
+                <mat-form-field>
+                  <input matInput [matDatepicker]="transactionDate" (change)="onAmountChange(item)"
+                         (focus)="transactionDate.open()" formControlName="transaction_date" placeholder="DD/MM/YYYY">
+                  <mat-datepicker-toggle matSuffix [for]="transactionDate">
+                  </mat-datepicker-toggle>
+                  <mat-datepicker #transactionDate></mat-datepicker>
+                </mat-form-field>
+              </td>
+            <td *ngIf="!singleEntry" class="tabIndexActive">
+              <button class="material-icons delete p-0" *ngIf="tripOtherExpenseForm['controls'].other_expense['controls'].length>1"
+                (click)="removeItem(i)">add_circle_outline</button>
+              <button class="material-icons add p-0" (click)="addMoreItem()"
+                *ngIf="i === ( tripOtherExpenseForm['controls'].other_expense['controls'].length - 1)">add_circle_outline</button>
+            </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="!singleEntry" class="table-footer-actions mg-top-20 tabIndexActive" >
+        <a class="clear-item" tabindex="0" (click)="clearAllClient()">Remove all</a>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <add-new-coa [popDetail]="showAddCoaPopup" *ngIf="showAddCoaPopup.status" (closeModal)="closeCoaPopup" (coaAdded)="addExpenseToOption($event)">
+  </add-new-coa>

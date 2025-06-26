@@ -1,0 +1,38 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+
+.big-btn-outline {
+    font-size: 13px;
+    white-space: nowrap;
+    width: 240px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-radius: 30px;
+    border-width: 2px;
+    font-weight: 600;
+    background-color: #F6F7FF;
+}
+
+.wrap {
+    background-color: $layout-bg;
+    padding-top: 28px;
+    padding-bottom: 28px;
+}
+
+
+
+::ng-deep {
+    .change-deduction-menu-wrapper {
+        width: 190px;
+
+        .mat-menu-item {
+            text-align: center;
+            color: $primary-brand-color;
+            font-weight: 600;
+
+
+        }
+
+    }
+
+}

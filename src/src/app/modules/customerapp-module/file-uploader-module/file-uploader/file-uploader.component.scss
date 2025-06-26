@@ -1,0 +1,22 @@
+.thumbnail-name {
+    width: 75%;
+    text-overflow: ellipsis;
+    word-break: break-all;
+}
+
+.upload-thumbnail-wrap .thumbnail-pic {
+    padding: 0px;
+    overflow: hidden;
+    background-color: transparent;
+}
+
+.upload-thumbnail-wrap .thumbnail-pic > img {
+    height: auto;
+    max-height: 100%;
+    cursor: pointer;
+
+}
+.image_error {
+    color: #eb1e4a;
+    font-size: 12px;
+}

@@ -1,0 +1,89 @@
+<div  class="popup-header"><h6  class="d-inline">Add Vehicle Document &nbsp;</h6></div>
+
+<div class="bg-white container-fluid popup-body">
+    <form [formGroup]="addVehicleDocForm" class="row">
+        <div class="input-wrap input-box col-lg-4 col-md-6  custom-outline-dropdown">
+            <label for="" class="input--required ">VEHICLE NUMBER</label>
+
+         
+
+            <material-dropdown [searchable]="true" [isUpperCaseAllowed]="true"  [addErrorClass]="addErrorClass(addVehicleDocForm.controls.vehicle_no)" [addable]="false" >
+              <select #customSelect formControlName="vehicle_no" class="no-style select--modify" (change)="vehcileNumberChanged($event)">
+                <option *ngFor="let account of vehicleList" value="{{ account.id }}">
+                  {{ account.reg_number }}</option>
+              </select>
+            </material-dropdown>    
+        </div>
+        <div class="input-wrap  input-box col-lg-4 col-md-6  custom-outline-dropdown" [class.disabled]="!addVehicleDocForm.controls.vehicle_no.value">
+            <label for="" class="input--required ">DOCUMENT NAME</label>
+            <material-dropdown [searchable]="true"  [disabled]="!addVehicleDocForm.controls.vehicle_no.value" [addErrorClass]="addErrorClass(addVehicleDocForm.controls.name)" [addable]="true"
+              [party]="true" (addPartyPopup)="openAddPartyModal($event)" [selectedOption]="initialValues.name"
+              (addValueToList)="addValueToPartyPopup($event)" [params]="partyNamePopup">
+              <select #customSelect formControlName="name" class="no-style select--modify" (change)="docNameChanged($event)">
+                <option *ngFor="let account of documentData" value="{{ account.id }}">
+                  {{ account.name }}</option>
+              </select>
+            </material-dropdown>    
+        </div>
+
+        <div class="input-wrap error col-lg-4 col-md-6  custom-outline-input" [ngClass]="addErrorClass(addVehicleDocForm.controls.number)">
+            <label class="">DOCUMENT NUMBER</label>
+            <input appUpperCase type="text" class="error-box input--bd"  placeholder="Enter Document Number" value=""
+              formControlName="number" />
+        </div>
+        <div class="input-wrap error col-lg-4 col-md-6  custom-outline-input">
+            <label for="name">EXPIRY DATE</label>
+            <mat-form-field appearance="outline">
+              <input matInput [matDatepicker]="transactionDate"  (focus)="transactionDate.open()"
+                formControlName="expiry_date" placeholder="DD/MM/YYYY">
+              <mat-datepicker-toggle matSuffix [for]="transactionDate"></mat-datepicker-toggle>
+              <mat-datepicker #transactionDate></mat-datepicker>
+            </mat-form-field>
+        </div>
+       
+            <div class="col-lg-4 col-md-6 "  >
+              <div  class="input-wrap error custom-outline-input" [ngClass]="addErrorClass(addVehicleDocForm.controls.amount)">
+                <label for=""class=""
+                  [ngClass]="{'input--required':addVehicleDocForm.controls.pass_journal_entry.value==true,'input':addVehicleDocForm.controls.pass_journal_entry.value==false}">AMOUNT</label>
+                <input type="text" class="error-box w-100 input--bd" placeholder="123456" positiveThreeDigitDecimalNumber
+                  value="" formControlName="amount">
+               
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 " *ngIf="addVehicleDocForm.controls.pass_journal_entry.value">
+              <div class="input-wrap input-box custom-outline-dropdown" >
+                <label for="" class=""
+                  [ngClass]="{'input--required':addVehicleDocForm.get('pass_journal_entry').value==true}">BANK</label>
+                <material-dropdown [searchable]="true" [addErrorClass]="addErrorClass(addVehicleDocForm.controls.bank)"  [addable]="false">
+                  <select #customSelect formControlName="bank" >
+                    <option *ngFor="let account of paymentAccountList" value="{{ account.id }}">
+                      {{ account.name }}</option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="addVehicleDocForm.controls.bank"></app-error>
+              </div>
+            </div>
+            <div>
+              <label class="check-box d-inline-block">
+                <input type="checkbox" placeholder="123456" value="" class="w-auto d-inline-block"
+                  formControlName="pass_journal_entry" id="pass_journal_entry" (change)="passJournalEntryChange()">
+                <span class="check-mark"></span>
+                <span class="label-text check-label">PASS JOURNAL ENTRY</span>
+              </label>
+          </div>
+         
+      
+          <div class="col-12 d-flex flex-wrap gap-4 py-4 ">
+            <file-uploader-v2 (onFileUploaded)="fileUploader($event)" [uploaderId]="'1234'"
+                [isShowOnlyUpload]="false"></file-uploader-v2>
+            <app-file-delete-view [fileData]="document" *ngFor="let document of tripDocuments"
+                (fileDeleted)="fileDeleted($event)"></app-file-delete-view>
+        </div>
+    </form>
+  
+    <div class="d-flex justify-content-space-between align-items-center">
+        <button class="btn w-auto " (click)="cancel()">Cancel</button>
+        <button class="btn btn--primary w-auto " (click)="save()">Save</button>
+    </div>
+</div>

@@ -1,0 +1,200 @@
+<form [formGroup]="checklistForm">
+
+  <div class="row mx-0" *ngIf="checklistForm['controls']['site_details']['controls'].length == 0">
+    <div class="border-0">
+      <div class="bg-white" colspan="30">
+        <div class="no-list-data-wrap" *ngxPermissionsOnly="['super_user'];else elseBlock">
+          <p *ngIf="!isPageRefresh" (click)="linkClicked()"> No {{inspectionScreen}} Inspection Details added. Please add from settings<a class="cursor-pointer text-primary"
+            target="_blank"
+            [href]="[prefixUrl + settingsRoute]"> Here</a> .Refresh the page after adding.</p>
+            <!-- <p *ngIf="isPageRefresh" (click)="refresh()">  Please click <span class="cursor-pointer text-primary"> Here</span> if you can't see the already added {{inspectionScreen}} Details  </p> -->
+        </div>
+        <ng-template #elseBlock>
+          <div class="no-list-data-wrap" >
+            <p >Contact Super Admin to Add Inspection Details .</p>
+          </div>
+        </ng-template>
+    </div>
+    </div>
+  </div>
+
+    <div class="row mx-0 mh-450px" *ngIf="checklistForm['controls']['site_details']['controls'].length>0">
+      <div class="col-xl-3 col-lg-3 p-0 ps-1">
+        <aside class="upload-menu-wrapper  pb-2">
+          <nav class="upload-menu border-bottom-0" formArrayName="site_details">
+            <ul>
+              <li class="upload-menu__item d-flex justify-content-between align-items-center"
+                *ngFor="let control of checklistForm['controls']['site_details']['controls']; let i= index;"
+                [formGroupName]="i" [ngClass]="{'active': i==activeDoc,  'error':control.invalid && control.touched}"
+                (click)="changeDocument(i)">
+                <a class="flex-grow-1" [id]="'certificate-id'+control.get('name').value">{{ control.get('name').value
+                  }}</a>
+              </li>
+            </ul>
+          </nav>
+        </aside>
+      </div>
+
+      <div class="col-lg-9 p-4 pb-3" formArrayName="site_details">
+        <ng-container *ngFor="let control of checklistForm['controls']['site_details']['controls']; let ii= index;"
+          [formGroupName]="ii">
+
+          <div  *ngIf="activeDoc==ii">
+            <ng-container *ngIf="control.get('documents').value.length>0">
+              <p class="fw-semibold">Attached Image</p>
+              <div class="d-flex flex-wrap gap-4 py-3  left--section attech-img-wrap">
+
+                <div  *ngFor="let document of control.get('documents').value">
+                  <app-file-delete-view [showInlineEdit]="false" [showDelete]="false"
+                    [fileData]="document"></app-file-delete-view>
+                </div>
+              </div>
+            </ng-container>
+            <div class="row mx-0 pt-3 left--section">
+
+
+              <div class="col-lg-4 ps-0 pb-3" formArrayName="checklist" *ngIf="isOtherTripTasks[ii]">
+                <ng-container
+                  *ngFor="let checkListControl of control['controls']['checklist']['controls']; let iii = index;"
+                  [formGroupName]="iii">
+
+                  <!-- string -->
+                  <div  *ngIf="checkListControl.controls.field_type.value =='string'">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(checkListControl.controls.value)">
+                      <label for="" class="input"
+                        [ngClass]="{'input--required':checkListControl.controls.mandatory.value}">{{checkListControl.controls.field_label.value}}
+                      </label>
+                      <input type="text" class="no-style input--bd" placeholder="ABC123" value=""
+                        formControlName="value">
+
+                      <app-error [controlName]="checkListControl.controls.value"></app-error>
+                    </div>
+
+                  </div>
+                  <!-- number -->
+                  <div 
+                    *ngIf="checkListControl.controls.field_type.value =='decimal' ||checkListControl.controls.field_type.value =='number'">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(checkListControl.controls.value)">
+                      <label for="" class="input"
+                        [ngClass]="{'input--required':checkListControl.controls.mandatory.value}">{{checkListControl.controls.field_label.value}}</label>
+                      <input type="text" class="no-style input--bd" positiveThreeDigitDecimalNumber placeholder="12345"
+                        value="" formControlName="value">
+                      <app-error [controlName]="checkListControl.controls.value"></app-error>
+                    </div>
+                  </div>
+                  <!-- date -->
+
+                  <div  *ngIf="checkListControl.controls.field_type.value =='date'">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(checkListControl.controls.value)">
+                      <label for="" class="input"
+                        [ngClass]="{'input--required':checkListControl.controls.mandatory.value}">{{checkListControl.controls.field_label.value}}</label>
+
+                      <div class="trip-task-date-wrap">
+                        <mat-form-field>
+                          <input matInput [matDatepicker]="date" (focus)="date.open()" formControlName="value"
+                            placeholder="DD/MM/YYYY" readonly>
+                          <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                          <mat-datepicker #date></mat-datepicker>
+                        </mat-form-field>
+                      </div>
+                      <app-error [controlName]="checkListControl.controls.value"></app-error>
+                    </div>
+                  </div>
+                  <!-- checkbox -->
+                  <div 
+                    *ngIf="checkListControl.controls.field_type.value =='checkbox'">
+                    <div class="input-wrap error m-0 w-100 mb-3"
+                      [ngClass]="addErrorClass(checkListControl.controls.value)">
+
+                      <p class="check-box"><label for="consinId"
+                          [ngClass]="{'input--required':checkListControl.controls.mandatory.value}"
+                          class="input w-auto d-inline">
+                          <input type="checkbox" class=" w-auto d-inline me-2" placeholder="" value=""
+                            formControlName="value"> <span class="check-mark d-inline-block align-middle"></span> <span
+                            class="label-text">
+                            {{checkListControl.controls.field_label.value}}</span></label></p>
+
+                      <app-error [controlName]="checkListControl.controls.value"></app-error>
+                    </div>
+                  </div>
+                  <!-- dropdown -->
+                  <div 
+                    *ngIf="checkListControl.controls.field_type.value =='dropdown'">
+                    <div class="input-wrap error m-0 w-100 mb-3"
+                      [ngClass]="addErrorClass(checkListControl.controls.value)">
+                      <label for="" class="input"
+                        [ngClass]="{'input--required':checkListControl.controls.mandatory.value}">{{checkListControl.controls.field_label.value}}</label>
+                      <material-dropdown [searchable]="true" [addable]="true" [addNewOptions]="true"
+                        (addNewOption)="addNewOption($event,control,checkListControl)"
+                        [selectedOption]="{label:checkListControl.controls.value.value}" class="quotation-dropdown-cf">
+                        <select #customSelect formControlName="value">
+                          <option *ngFor="let option of checkListControl.controls.option_list.value"
+                            value="{{ option}}">
+                            {{ option }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                      <app-error [controlName]="checkListControl.controls.value"></app-error>
+                    </div>
+                  </div>
+
+
+                </ng-container>
+              </div>
+
+
+
+              <div class="col-lg-8 " [ngClass]='{"border-start":isOtherTripTasks[ii]}' *ngIf="isFileUploads[ii]">
+                <p class="fw-semibold mb-3">UPLOAD DOCUMENTS</p>
+                <div class="row mx-0" [ngStyle]="{'border-left':!this.isOtherTripTasks[ii]?'unset':''}" formArrayName="checklist">
+                  <ng-container
+                        *ngFor="let checkListControl of control['controls']['checklist']['controls']; let iiii = index;"
+                        [formGroupName]="iiii">
+                        <div class="col-lg-12 mb-2" *ngIf="checkListControl.controls.field_type.value =='upload'">
+                         
+                            <div class="d-flex align-items-center">
+                              <span class="material-icons green-text me-2" *ngIf="checkListControl.controls.value.value.length>0">
+                                check_circle
+                                </span>
+                                <span class="material-icons def-color me-2" *ngIf="checkListControl.controls.value.value.length<=0">
+                                  radio_button_unchecked
+                                  </span>
+                              <p class="me-2 flex-grow-1 fw-semibold line-height-normal"
+                                [ngClass]="{'input--required':checkListControl.controls.mandatory.value}">{{checkListControl.controls.field_label.value}}</p>
+
+                              <file-uploader-v2 (onFileUploaded)="fileUploader($event,checkListControl)"
+                                [fileNumber]="checkListControl.controls.value.value.length"
+                                [fileName]="checkListControl.controls.field_label.value" [multiple]="true"
+                                [uploaderId]="iiii" [showFileName]="false" [isShowOnlyUpload]="true"></file-uploader-v2>
+                            </div>
+                            <app-error [controlName]="checkListControl.controls.value" class="warn-text"></app-error>
+                         
+                        </div>
+                      </ng-container>
+
+                  <div class="d-flex col-lg-12 gap-2 flex-wrap mt-3">
+                      <ng-container
+                        *ngFor="let checkListControl of control['controls']['checklist']['controls']; let iiiii = index;"
+                        [formGroupName]="iiiii">
+                        <ng-container *ngIf="checkListControl.controls.field_type.value =='upload'">
+                          <app-file-delete-view [fileData]="file"
+                            *ngFor="let file of checkListControl.controls.value.value"
+                            (fileDeleted)="fileDeleted($event,checkListControl)"></app-file-delete-view>
+                        </ng-container>
+                      </ng-container>
+                    </div>
+
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+
+        </ng-container>
+
+      </div>
+
+    </div>
+ 
+</form>

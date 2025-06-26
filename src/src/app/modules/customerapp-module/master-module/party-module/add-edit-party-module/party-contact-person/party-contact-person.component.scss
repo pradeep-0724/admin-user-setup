@@ -1,0 +1,35 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+.error input{
+    color: $error-txt;
+    border: 1px solid $error-txt;
+    &::placeholder{
+        color: $error-txt;
+    }
+    
+}
+table th{
+    font-size: 12px  !important;
+}
+
+:host ::ng-deep .cp-phone-code-wrap{
+    position: relative;
+    input{
+        padding-left: 40px;
+        max-width: 100px;
+        
+        
+        
+    }
+    .flag{
+        position: absolute;
+        left: 5px;
+       transform: translateY(-50%);
+       top: 50%;
+        width: 30px;
+        z-index: 2;
+        border-radius: 2px;
+
+    }
+
+
+}

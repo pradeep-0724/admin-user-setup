@@ -1,0 +1,122 @@
+
+<div class="rounded-3   layout-bg def-color custom-shadow-md  ">
+    <app-table-widget tableTitle="Employee Ledger " [isCollapsable]="true" [selectedDateRangeType]="10" [isExpanded]="true"[isDateRange]="true" [isShowDateRangeText]="true"
+    (dateRangeEmitter)="dateRangeEmployeeLedger($event)"
+        (expandCollapseEvent)="expandCollapseEmployeeLedger($event)" 
+        [isSearch]="true" (searchedData)="searchedDataEmployeeLedger($event)">
+        <div id="custom-button" class="d-flex flex-wrap justify-content-between align-items-center">
+            <button id="custom-export" (click)="fileExportEventForJobCard()" class="save-file ms-2">
+                <span class="material-icons">save_alt</span></button>
+            <button class="in-out-btn in" (click)="openMoneyINoUT('Money In','money_in')">Money In</button>
+            <button class="in-out-btn out"  (click)="openMoneyINoUT('Money Out','money_out')">Money Out</button>
+            <button class="in-out-btn reset"  (click)="openMoneyINoUT('Reset Balance','reset')">Reset Balance</button>
+        </div>
+    </app-table-widget>
+
+    <div class=" p-0 pb-3" [@collapse]="isExpandEmpLedger">
+
+        <div class="custom-table-container   employee_ledger_details_scroll" (scroll)="onScrollEmployeeLedger($event)">
+            <table>
+                <thead>
+                    <tr>
+                     <th>Date</th>
+                     <th>Description</th>
+                     <th>Money In ({{ currency_type?.symbol}})</th>
+                     <th>Money Out ({{ currency_type?.symbol}})</th>
+                     <th>Balance ({{ currency_type?.symbol}})</th>
+                     <th></th>
+                    </tr>
+                </thead>
+                <tbody  *ngIf="employeeLedgerList.length==0">
+                    <tr class="border-0">
+                        <td class="bg-white" colspan="30">
+                            <div class="no-list-data-wrap">
+                                <figure>
+                                    <img src="assets/img/no-content.png" alt="">
+                                </figure>
+                                <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                            </div>
+                        </td>
+                    </tr>
+
+                </tbody>
+
+                <tbody>
+                 <tr *ngFor="let data of employeeLedgerList">
+                           <td> {{formatdate(data?.date)}}</td>
+                           <td [ngClass]="{'balance-font':!data.id || data?.type=='reset'}" > {{data?.reason}}</td>
+                           <td>{{data?.type=='in'?fixedTo3DecimalPlaces(data?.amount):'-'}}</td>
+                           <td>{{data?.type=='out'?fixedTo3DecimalPlaces(data?.amount):'-'}}</td>
+                           <td [ngClass]="{'balance-font':!data.id || data?.type=='reset'}">{{data?.balance|numberFormat}}</td>
+                           <td class="icon-box  tabIndexActive">
+                            <div class="d-flex justify-content-center align-items-center" *ngIf="data.id && data.is_self">
+                              <div class="position-relative">
+                                <i class="material-icons more-icon" (click)="optionsList($event, 'list_'+data.id)" >more_vert</i>
+                                <ul class="more-actions__menu table-popup" [ngClass]="{show: showOptions === 'list_'+data.id}">
+                                  <li class="more-actions__item" (click)="editMoneyInOutReset(data)" ><i class="material-icons" >edit</i>Edit</li>
+                                      <li  class="more-actions__item"
+                                      (click)="popupFunction(data.id)"><i class="material-icons">delete</i>Delete</li>
+                                </ul>
+                              </div>
+                            </div>
+            
+                          </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+<div class="rounded-3   layout-bg def-color custom-shadow-md  mt-3 ">
+    <app-table-widget tableTitle="Salary " [selectedDateRangeType]="10" [isCollapsable]="true" [isExpanded]="true"[isDateRange]="true" [isShowDateRangeText]="true"
+    (dateRangeEmitter)="dateRangeEmployeeSalary($event)"
+        (expandCollapseEvent)="expandCollapseEmployeeSalary($event)" 
+        [isSearch]="true" (searchedData)="searchedDataEmpSalary($event)">
+        <button id="custom-export" (click)="fileExportEventForServices()" class="save-file ms-2">
+            <span class="material-icons">save_alt</span></button>
+    </app-table-widget>
+    
+    <div class="col-12 p-0 pb-3" [@collapse]="isExpandEmpSalary">
+    
+        <div class="custom-table-container sticky-table-container p-0 employee_salary_scroll" (scroll)="onScrollEmployeeSalary($event)">
+            <table>
+                <thead>
+                    <tr>
+                        <ng-container *ngFor="let header of employeeSalaryHeaderList ; let i = index">
+                            <th class="fixed-left" *ngIf="i==0">{{header}}</th>
+                            <th [ngClass]="{'fixed-right':i==employeeSalaryHeaderList.length-1}" *ngIf="i!=0">{{header}}</th>
+                        </ng-container>
+                    </tr>
+                </thead>
+                <!-- do-data-component -->
+                <tbody  *ngIf="employeeSalaryList.length==0">
+                    <tr class="border-0">
+                        <td class="bg-white" colspan="30">
+                            <div class="no-list-data-wrap">
+                                <figure>
+                                    <img src="assets/img/no-content.png" alt="">
+                                </figure>
+                                <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                            </div>
+                        </td>
+                    </tr>
+    
+                </tbody>
+    
+                <tbody>
+                    <!-- Rows -->
+                    <tr *ngFor="let tripDetail of employeeSalaryList  ; let j = index">
+                        <ng-container *ngFor="let trip of tripDetail ; let i = index">
+                            <td [ngClass]="{'fixed-left ':i==0,'fixed-right ':i==tripDetail.length-1}" *ngIf="i==0">{{trip}}</td>
+                            <td [ngClass]="{'fixed-left ':i==0,'fixed-right ':i==tripDetail.length-1}" *ngIf="i!=0">{{trip}}</td>
+                        </ng-container>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    
+    </div>
+</div>
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>
+

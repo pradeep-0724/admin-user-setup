@@ -1,0 +1,146 @@
+
+<div style="overflow-y: auto;max-height: 74vh; padding: 10px;">
+  <form  [formGroup]="userDetails" class="form-input" (keydown.enter)="$event.preventDefault();">
+
+    <div class="alert-msg" *ngIf="apiError">
+      <span class="icon-wrap"></span>
+      <p class="message-cont">{{ apiError }}</p>
+    </div>
+
+    <div class="form-layout form-layout--pd">
+        <div class="form-layout__card active">
+          <div class="form-layout__card">
+
+            <div class="form-body">
+              <div class="row">
+                <div class="col-xl-4 col-lg-4 col-sm-6">
+                  <profile-pic (onFileRead)="onImageUploaded($event)" (onFileUploaded)="imageUpload($event,i)"
+                      [accept]="'image/jpeg,image/x-jpg,image/png, capture=camera'" [uploaderId]="ii" [imagePreview]="profile_img_url">
+                  </profile-pic>
+              </div>
+
+              </div>
+            </div>
+        </div>
+            <div class="form-body">
+                <div class="row">
+
+                    <!-- <div class="col-xl-8 col-lg-8">
+                        <profile-pic (onFileRead)="onImageUploaded($event)" (onFileUploaded)="imageUpload($event,i)"
+                            [accept]="'image/*'" [uploaderId]="ii" [imagePreview]="profile_img_url">
+                        </profile-pic>
+                    </div> -->
+                    <div class="col-xl-4 col-lg-4 col-sm-6">
+                        <div class="input-wrap error company-name"
+                            [ngClass]="addErrorClass(userDetails.controls.first_name)">
+                            <label for="" class="input--required">First Name</label>
+                            <input  formControlName="first_name" type="text" class="no-style input--bd"
+                                placeholder="Your first Name" value="" required>
+                            <span class="border-anim"></span>
+                            <app-error [controlName]="userDetails.controls.first_name"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-sm-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(userDetails.controls.last_name)">
+                            <label for="" class="input--required">Last Name</label>
+                            <input  formControlName="last_name" type="text" class="no-style input--bd"
+                                placeholder="Your last name" value="" required>
+                            <span class="border-anim"></span>
+                            <app-error [controlName]="userDetails.controls.last_name"></app-error>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-sm-6">
+                      <div class="input-wrap error" [ngClass]="addErrorClass(userDetails.controls.username)">
+                          <label for="" class="input--required">User Name</label>
+                          <input minlength="4" formControlName="username" type="text" class="no-style input--bd"
+                              placeholder="User Name" value="" required>
+                          <span class="border-anim"></span>
+                          <app-error [controlName]="userDetails.controls.username"></app-error>
+                      </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-layout__card">
+            <div class="form-layout__header">
+                <h2 class="sub-heading">
+                    Contact User Details
+                </h2>
+                <span class="collapse-line"></span>
+
+            </div>
+            <div class="form-input">
+              <div class="row">
+                <div class="col-xl-6 col-lg-6 col-sm-6">
+                  <div class="row">
+
+                    <div class="col-xl-4">
+                      <div class="input-wrap">
+                          <label for="" class="input--required">Country code</label>
+                      <material-dropdown  class="dropDownWidth">
+                        <select #customSelect formControlName="primary_mobile_number_code" class="no-style select--modify">
+                          <option *ngFor="let phone_code of countryPhoneCode" value="{{ phone_code }}">
+                            {{phone_code}}
+                          </option>
+                        </select>
+                      </material-dropdown>
+
+                      </div>
+                    </div>
+
+                    <div class="col-xl-8">
+                      <div class="input-wrap error" [ngClass]="addErrorClass(userDetails.controls.primary_mobile_number)">
+                          <label for="" class="input--required">Primary Mobile Number</label>
+                          <input formControlName="primary_mobile_number" type="text"
+                              class="no-style input--bd" placeholder="**********" value="" maxlength="10" required>
+                          <span class="border-anim"></span>
+                          <app-error [controlName]="userDetails.controls.primary_mobile_number"></app-error>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-sm-6">
+                  <div class="row">
+
+
+                    <div class="col-xl-4">
+                      <div class="input-wrap">
+                          <label for="">Country code</label>
+                      <material-dropdown  class="dropDownWidth">
+                        <select #customSelect formControlName="alternate_mobile_number_code" class="no-style select--modify">
+                          <option *ngFor="let phone_code of countryPhoneCode" value="{{ phone_code }}">
+                            {{phone_code}}
+                          </option>
+                        </select>
+                      </material-dropdown>
+
+                      </div>
+                    </div>
+
+                    <div class="col-xl-8">
+                      <div class="input-wrap error"
+                          [ngClass]="addErrorClass(userDetails.controls.alternate_mobile_number)">
+                          <label for="">Alternate Mobile Number</label>
+                          <input formControlName="alternate_mobile_number" type="text"
+                              class="no-style input--bd" placeholder="**********" value="" maxlength="10">
+                          <span class="border-anim"></span>
+                          <app-error [controlName]="userDetails.controls.alternate_mobile_number"></app-error>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div class="mg-top-30 section-footer mb-0">
+        <div class="btn-wrap">
+            <!-- <button class="btn" type="button" [routerLink]="backUrl" *ngIf="backButtonEnable">Back</button> -->
+            <button class="btn btn--primary btn-mg-left"  (click)="submitForm()">Next</button>
+        </div>
+    </div>
+  </form>
+</div>
+
+

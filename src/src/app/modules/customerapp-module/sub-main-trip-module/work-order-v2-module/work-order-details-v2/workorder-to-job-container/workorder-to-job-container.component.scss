@@ -1,0 +1,159 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+.charge-popup {
+  background-color: white;
+  border-radius: 6px;
+}
+
+.input-wrap label {
+  color: $text-color;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.search-filter {
+  color: #676A6E;
+  height: 35px;
+  border: 1px solid #ACB5BD !important;
+  border-radius: 35px;
+  padding: 7px;
+  padding-right: 32px;
+  transition: all 200ms ease;
+}
+
+.search-icon {
+  position: absolute;
+  font-size: 16px;
+  right: 16px;
+  top: 9px;
+  -webkit-text-stroke: 1px;
+  color: #979696;
+}
+
+.search-filter:focus {
+
+  border-color: $primary-brand-color !important;
+  background-color: white;
+  box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+
+
+}
+
+.search-filter:focus+.search-icon {
+  color: $primary-brand-color;
+}
+.select-container-wrap {
+  
+  &.active {
+    outline: 1px solid #595fab;
+    
+  }
+
+
+}
+#setHeight2{
+  overflow: auto;
+}
+.no-container-sm{
+  width: 40px;
+  margin: 0 14px 0 0;
+}
+
+.row-btn {
+
+  margin-left: 10px;
+  padding: 7px;
+  transition: all 100ms ease-in-out;
+  border-radius: 4px;
+  color: $white;
+
+  .material-icons {
+    font-size: 16px;
+  }
+
+  &-add {
+    background: $green;
+  }
+
+  &-delete {
+    background: $error-txt;
+  }
+
+  &-copy {
+    background: $sky-blue;
+  }
+
+
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.zo-85{
+  zoom: 85%;
+}
+hr{
+  opacity: 1;
+  color: #5a6b7b80;
+}
+:host ::ng-deep{
+  .schedule-live-load .filter-dropdown.show{
+    top: 8px;
+  }
+  .date-time-input-wrap{
+    .input-wrap{
+        margin-bottom: 0px;
+        padding-left: 10px;
+        min-width: 180px;
+        border-radius: 5px;
+        height: 40px;
+        border: 1px solid rgba(90,107,123,.5);
+      
+    }
+    p{
+        padding-bottom: 0px !important;
+        padding-top: 10px !important;
+
+    }
+    input{
+        border: 0px !important;
+        width: 0px !important;
+        height: 0px !important;
+        padding: 0px !important;
+    }
+    .border-bottom-custom{
+        border-bottom:  0px !important;
+    }
+
+    
+
+}
+  .location-input{
+    position: relative;
+    .input--bd{
+      border: 1px solid rgba(90,107,123,.5);
+      height: 40px;
+      border-radius:5px;
+      padding: 0px 10px;
+    }
+    .material-wrap {
+      margin-top: 0px;
+    }
+    .info-icon{
+      top: 10px;
+      right: 2px;
+    }
+    .coordinates-wrap {
+      top: -6px;
+      right: 10px;
+      font-size: 13px;
+      background: white;
+      z-index: 1;
+    }
+  }
+}
+.alert-message{
+  margin: 0px !important;
+}

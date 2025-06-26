@@ -1,0 +1,71 @@
+<div class="row mx-0 p-3" >
+    <div class="col-md-6">
+        <!-- <div class="toggle-wrapper d-flex align-items-center h-100">
+            <span class="toggle-label">Show Custom Fields in Party</span>
+            <label for="toggle" class="toggle-switch">
+                <mat-checkbox color="primary" (change)="showInParty($event.checked)" [(ngModel)]="isDisplayInParty"  [checked]="isDisplayInParty"></mat-checkbox>
+            </label>
+        </div> -->
+      </div>
+    <div class="col-md-6">
+      <button class="btn btn--primary py-2 w-auto" style="float: right;" (click)="addNewField()"> + Add Field</button>
+    </div>
+
+  </div>
+  <div  class="addable-row-table m-1 mt-0 overflow-hidden">
+    <table >
+        <thead>
+            <tr>
+            <th class="text-center">SHOW</th>
+            <th>FIELD NAME</th>
+            <th>FIELD TYPE</th>
+            <th class="text-center border-end-0">MANDATORY</th>
+            <th class="border-start-0"></th>
+        </tr>
+        </thead>
+        <tbody *ngIf="partyCustomFields.length == 0">
+            <tr class="border-0">
+                <td class="bg-white" colspan="30">
+                    <div class="no-list-data-wrap">
+                        <figure>
+                            <img src="assets/img/no-content.png" alt="">
+                        </figure>
+                        <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                    </div>
+                </td>
+            </tr>
+
+        </tbody>
+
+        <tbody>
+            <tr *ngFor="let field of partyCustomFields;let i = index;trackBy: trackById;">
+                <td class="text-center">
+                    <mat-checkbox color="primary" (change)="showInPartyAndMakeMandatory($event.checked,field,'display')"   [checked]="field.display"></mat-checkbox>
+                </td>
+                <td>{{field?.field_label}}</td>
+                <td>{{field?.field_type?.name}}</td>
+                <td class="text-center border-end-0">
+                    <mat-checkbox color="primary" (change)="showInPartyAndMakeMandatory($event.checked,field,'mandatory')"  [checked]="field.mandatory"></mat-checkbox>
+                </td>
+                <td class="text-end border-start-0">
+                    <button class="gb-btn-hover " (click)="edit(field.id)">
+                        <span class="no-style px-2">
+                            <i class="material-icons def-color fs-6" 
+                            >edit</i>
+                        </span>
+                    </button>
+                    <button class="gb-btn-hover " (click)="popupFunction(field.id,i,field?.field_label)">
+                        <span class="no-style px-2 " >
+                            <i class="material-icons text-danger fs-6">delete</i>
+                        </span>
+                    </button>
+                </td>
+               
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  
+
+  <app-add-custom-fields [url]="url" [editData]="editData" [isFieldTypeChange]="isFieldTypeChange" [showNoteModal]="isOpenDialog" (modalClosed)="modelClose($event)"></app-add-custom-fields>
+  <alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

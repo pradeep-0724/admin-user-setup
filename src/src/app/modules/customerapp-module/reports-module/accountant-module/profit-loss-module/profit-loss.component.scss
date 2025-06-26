@@ -1,0 +1,127 @@
+@import "../../../../../../assets/styles/helpers/variable.scss";
+@import "../../../../../../assets/styles/helpers/mixins.scss";
+::ng-deep .parent-row {
+  font-style: inherit;
+  .flex-box {
+    padding: 12px 8px;
+    .name {
+      font-style: inherit;
+      span {
+        display: inline-block;
+        max-width: 300px;
+        overflow-y: hidden;
+        overflow-x: auto;
+        a{
+          margin-bottom: unset;
+          &::after{
+          height: auto;
+          width: auto;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%,-50%);
+          right: auto;
+        }
+      }}
+    }
+  }
+}
+ 
+.balance-sheet {
+  @include respond-to(mobile-ls) {
+    &-wrap {
+      overflow-x: auto;
+    }
+    &-table {
+      min-width: 800px;
+    }
+    &-container {
+      @include flex-wrap(wrap);
+    }
+  }
+}
+.balance-header {
+  @include respond-to(mobile) {
+    .actions-wrap {
+      width: 100%;
+      >.btn {
+        width: 100%;
+      }
+    }
+  }
+}
+.header-actions {
+  @include respond-to(mobile) {
+    width: 100%;
+    @include flex-wrap(initial);
+  }
+}
+.btn-wrap {
+  display: flex !important;
+  justify-content: flex-end !important;
+  flex-wrap: wrap !important;
+}
+.mg-right-10 {
+  margin-right: 10px;
+}
+::ng-deep bs-daterangepicker-container {
+  left: unset !important;
+  transform: unset !important;
+  top: 190px !important;
+  z-index: 9;
+  right: 0;
+}
+.export-mobile-icon span {
+  display: none;
+}
+@media (max-width: 992px) {
+  ::ng-deep bs-daterangepicker-container {
+    top: 145px !important
+  }
+  .container {
+    max-width: 100%;
+    padding: 0 5px !important;
+  }
+  .export-mobile-icon {
+    border: none;
+    font-size: 0;
+    width: auto;
+    padding: 0;
+    background: none;
+    line-height: 1;
+    .mobile-hide {
+      display: none;
+    }
+    &:focus {
+      background: none;
+    }
+    ul {
+      font-size: 13px;
+      min-width: 100px;
+      li {
+        padding: 8px;
+      }
+    }
+    span {
+      display: inline-block;
+      vertical-align: middle;
+      color: #595fab;
+      padding: 0;
+      i {
+        font-size: 22px
+      }
+    }
+  }
+}
+@media (max-width:768px) {
+  .mobile-calender {
+    font-size: 0;
+    input {
+      font-size: 0;
+      background: url(/assets/img/icons/calendar-bw.svg) center center no-repeat;
+      background-size: contain;
+      width: auto;
+      padding: 13px;
+      border: none;
+    }
+  }
+}

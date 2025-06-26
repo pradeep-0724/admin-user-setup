@@ -1,0 +1,4 @@
+<div class="alert alert-warning text-center" role="alert" *ngIf="!(vehicleCategories.includes(1)||vehicleCategories.includes(2))">
+    Please add Crane or AWP vehicle categories to gain access to this feature.
+</div>
+<app-add-prefix [key]="'vehicleinspection'" *ngIf="vehicleCategories.includes(1)||vehicleCategories.includes(2)"> </app-add-prefix>

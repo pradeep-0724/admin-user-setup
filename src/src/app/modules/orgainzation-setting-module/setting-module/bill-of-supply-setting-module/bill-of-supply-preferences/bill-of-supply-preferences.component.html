@@ -1,0 +1,19 @@
+<app-add-prefix [key]='billOfsupply'> </app-add-prefix>
+
+<div class="p-4 def-color">
+<form  *ngIf="activate_advance">
+  <h5 class="">Advances Received</h5>
+  <div class="row mt-3 mx-0">
+    <div class="col-12 d-flex">
+      <span class="me-4 d-inline"><strong>Advances: </strong> </span>
+      <label for="Advances" ><mat-checkbox color="primary" id="Advances" [(ngModel)]="bos.fuel_view" (change)="advancesChange(bos.fuel_view)" name="fuelshowpdf" class="me-3"></mat-checkbox> <span >Show in PDF</span></label>
+    </div>
+  </div>
+</form>
+<button type="button" *ngIf="activate_advance" class="updateMark mt-4" (click)="updateAdvances()">
+  <span class="updateText">{{updateAdvancesText}}</span>
+  <span class="successTest" [ngClass]="{'successAdvancesTickmark': successAdvancesMsg!=''}"></span>
+</button>
+<app-add-tac [key]="'bos'"></app-add-tac>
+
+</div>

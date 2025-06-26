@@ -1,0 +1,151 @@
+<div class="p-4 def-color" [formGroup]="balanceBilling">
+            <div class="row mx-0" >
+                <div class="info-msg mg-bottom-30">
+                       <ng-container *ngIf="isClient">
+                        <p class="message-cont">Info:Editing balances are not allowed here. Change balance from Opening Balance Screen, Grace period will be applied on the overdue invoices</p>
+
+                       </ng-container>
+                       <ng-container *ngIf="!isClient" >
+                        <p class="message-cont">Info:Editing balances are not allowed here. Change balance from Opening Balance Screen</p>
+
+                       </ng-container>
+                </div>
+                <div class="col-xl-12">
+                    
+                        <p class="fw-semibold mb-3 ">Balance</p>
+                    
+                </div>
+
+                <div *ngIf="!isEdit" class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="input-wrap">
+                        <label for="" class="">Opening Balance ({{ currency_type?.symbol}})</label>
+                        <input type="text" class="no-style input--bd" positiveTwoDigitDecimalNumber placeholder="" value=""
+                            formControlName="opening_balance"
+                            (change)="roundOffValue(balanceBilling.get('opening_balance'))">
+                    </div>
+                </div>
+
+                <div *ngIf="isEdit" class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="input-wrap disabled">
+                        <label for="" class="">Opening Balance ({{ currency_type?.symbol}})</label>
+                        <div class="no-style input--bd">{{balanceBilling.get('opening_balance').value}}</div>
+                    </div>
+                </div>
+
+                <div *ngIf="!partyId" class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="input-wrap" [ngClass]="{'disabled': opening_balance_present}">
+                        <label for="" class="">Opening Date</label>
+                        <mat-form-field class="width--100">
+                            <input matInput [matDatepicker]="openingDate" [disabled]="opening_balance_present" (focus)="openingDate.open()"
+                                formControlName="opening_balance_date" placeholder="DD/MM/YYYY">
+                            <mat-datepicker-toggle matSuffix [for]="openingDate"></mat-datepicker-toggle>
+                            <mat-datepicker #openingDate></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div *ngIf="partyId" class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="input-wrap disabled">
+                        <label for="" class="">Opening Date</label>
+                        <div class="no-style input--bd">{{openingBalanceDate}}</div>
+                    </div>
+                </div>
+
+                <div class="col-xl-12">
+                    
+                    <p class="fw-semibold mb-3 ">Billing</p>
+                
+                </div>
+               
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                    
+                        <div class="input-wrap max-height-150">
+                            <label for="" class="">Preferred payment method</label>
+                            <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialValues.paymentMethod"
+                                class="dropDownWidth">
+                                <select #customSelect formControlName="billing_payment_method"
+                                    class="no-style select--modify">
+                                    <option *ngFor="let option of accountList" value="{{ option?.id }}">
+                                        {{ option?.name }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                        </div>
+                        
+                    
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                <div class="input-wrap max-height-150">
+                    <label for="" class="">Payment Mode</label>
+                    <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialValues.paymentMode"
+                        class="dropDownWidth">
+                        <select #customSelect formControlName="payment_mode"
+                            class="no-style select--modify">
+                            <option *ngFor="let option of paymentMode" value="{{ option?.value }}">
+                                {{ option?.label }}
+                            </option>
+                        </select>
+                    </material-dropdown>
+                </div>
+            </div>
+
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="input-wrap max-height-150">
+                        <label for="" class="">Terms</label>
+                        <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialValues.terms"
+                            class="dropDownWidth">
+                            <select #customSelect formControlName="terms" class="no-style select--modify" (change)="onChangepaymentTerm()" >
+                                <option *ngFor="let option of paymentTerm" value="{{ option?.id }}">
+                                    {{ option?.label }}
+                                </option>
+                            </select>
+                        </material-dropdown>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6" *ngIf="termsCustom ==balanceBilling.get('terms').value">
+                    <div class="input-wrap max-height-150">
+                        <label for="" class="">Due In (Days)</label>
+                        <input type="text" positiveDigitNumber  class="no-style input--bd" placeholder="" value=""
+                        formControlName="terms_days">
+                    </div>
+                </div>
+
+
+               <ng-container *ngIf="isClient" >
+                <div class="col-xl-12">
+                    
+                    <p class="fw-semibold mb-3 ">Credit Limit</p>
+               </div>
+                
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="input-wrap max-height-150">
+                        <label for="" class="">Grace Period</label>
+                        <input type="text" positiveDigitNumber  class="no-style input--bd" placeholder="" value=""
+                        formControlName="grace_period">
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-lg-3 col-md-6">
+                    <div class="input-wrap max-height-150">
+                        <label for="" class="">Credit Limit ({{ currency_type?.symbol}})</label>
+                        <input type="text" positiveThreeDigitDecimalNumber  class="no-style input--bd" placeholder="" value=""
+                        formControlName="credit_limit">
+                    </div>
+                </div>
+
+                <div class="col-xl-12">
+                    
+                    <div class="d-flex  align-items-center ">
+                        <span class="fs-6 fw-bold ">KYC</span>
+    
+                        <div class="kyc-toggle-switch ms-4" (click)="changeKyc()" [ngClass]="balanceBilling.get('kyc').value?'checked':'not-checked'">
+                            <div class="switch-text rounded-pill "  >{{balanceBilling.get('kyc').value?'Yes':'No'}}</div>
+                        </div>
+    
+                    </div>
+                </div>
+               </ng-container>
+             
+
+            </div>
+        </div>

@@ -1,0 +1,11 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+.custom-field-tab-form {
+    overflow: hidden;
+}
+
+label {
+    color: $text-color;
+    font-weight: 600;
+    font-size: 13px;
+}

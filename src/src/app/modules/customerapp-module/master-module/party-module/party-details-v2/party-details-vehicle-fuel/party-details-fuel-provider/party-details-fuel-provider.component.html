@@ -1,0 +1,14 @@
+
+<div>
+    <app-party-details-fuel-provider-header [partInfoDetails]="partInfoDetails" ></app-party-details-fuel-provider-header>
+</div>
+    <div class="fake-tab">
+        <p (click)="selectedTab=1 " class="tab" [ngClass]="{'active-tab':selectedTab==1}">Party Info.</p>
+        <p (click)="selectedTab=2" class="tab" [ngClass]="{'active-tab':selectedTab==2}">Transactions</p>
+        <p (click)="selectedTab=3" class="tab" [ngClass]="{'active-tab':selectedTab==3}">Fuel Summary</p>
+    </div>
+    <div class=" shadow-inset-top tab-content ">
+        <app-party-details-fuel-provider-info [partyId]="partyId" [partInfoDetails]="partInfoDetails" *ngIf="selectedTab==1"></app-party-details-fuel-provider-info>
+        <app-party-details-fuel-provider-transactions [partyId]="partyId" *ngIf="selectedTab==2"></app-party-details-fuel-provider-transactions>
+        <app-party-details-fuel-provider-summary [partyId]="partyId" *ngIf="selectedTab==3"></app-party-details-fuel-provider-summary>
+    </div>

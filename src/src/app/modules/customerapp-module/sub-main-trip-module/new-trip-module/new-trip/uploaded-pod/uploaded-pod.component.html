@@ -1,0 +1,8 @@
+<div [formGroup]="documentForm">
+    <file-uploader (onFileUploaded)="fileUploader($event)"
+    (onFileDeleted)="fileDeleted($event)" [multiple]="true"
+    [accept]="'capture=camera, image/jpeg,image/x-jpg,image/png, application/pdf'"
+    [showFileName]="false" [patchFileUrls]="patchFileUrls">
+    </file-uploader>
+</div>
+

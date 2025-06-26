@@ -1,0 +1,85 @@
+
+<div class="right-section__header">
+  <h1 class="heading">Edit Spares</h1>
+</div>
+
+<form [formGroup]="editInventoryForm">
+  <div class="form-body form-layout form-layout--pd">
+    <div class="error-msg-list" *ngIf="globalFormErrorList.length > 0">
+      <p class="message-head">{{ errorHeaderMessage }}</p>
+      <span class="icon-wrap"></span>
+      <ul *ngFor="let error of globalFormErrorList">
+        <li class="message-cont">{{ error }}</li>
+      </ul>
+    </div><br>
+    <div class="form-layout__header">
+      <h2 class="sub-heading">Spares Information</h2>
+      <span class="collapse-line"></span>
+    </div>
+    <div class="form-layout__card active">
+        <div class="form-body">
+
+          <div class="row">
+            <!-- Stock Date -->
+              <div class="col-lg-3 col-sm-6">
+                  <div  class=" input-wrap disabled" [ngClass]="addErrorClass(editInventoryForm.controls.stockDate)">
+                      <label for="" class="input--required">Stock Date</label>
+                      <mat-form-field>
+                          <input matInput [matDatepicker]="stockDate" (focus)="stockDate.open()" formControlName="stockDate" placeholder="DD/MM/YYYY">
+                          <mat-datepicker-toggle matSuffix [for]="stockDate"></mat-datepicker-toggle>
+                          <mat-datepicker #stockDate></mat-datepicker>
+                      </mat-form-field>
+                      <app-error [controlName]="editInventoryForm.controls.stockDate"></app-error>
+                  </div>
+              </div>
+              <div class="col-lg-3 col-sm-6">
+                <div  class=" input-wrap">
+                    <label for="" class="input">Reason</label>
+                    <input type="text" class="no-style input--bd" placeholder="Reason" formControlName="reason">
+                </div>
+            </div>
+         <!-- Employee Name -->
+              <div class="col-lg-3 col-sm-6">
+                <div  class=" input-wrap">
+                    <label for="" class="input">Employee Name</label>
+                    <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="editInventoryForm.controls.employee_options.value">
+                       <select #customSelect formControlName="employee" class="no-style select--modify" >
+                    <option *ngFor="let employee of employeeList" value="{{employee.id}}">
+                       {{ employee.first_name}}  {{ employee.last_name}}
+                        </option>
+                  </select>
+                  </material-dropdown>
+                </div>
+            </div>
+          </div>
+          <div class="form-layout__card mg-top-30 ms-3">
+            <mat-radio-group formControlName="selectedOptionType" (change)="onButtonChange()">
+              <mat-radio-button *ngFor="let option of radioOptions" value="{{option.value}}" [ngClass]="{disable:editInventoryForm.controls.selectedOptionType.value!=option.value}">{{option.name}}</mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <div class="form-layout__card mg-top-30 " *ngIf="editInventoryForm.controls.selectedOptionType.value=='new_spares'">
+            <app-edit-spare (addSpareData)="ItemsDataForm($event)" [isFormValid]="isFormValid" [spareData]="spareData" [inventoryData]="inventoryData"></app-edit-spare>
+          </div>
+          <div class="form-layout__card mg-top-30" *ngIf="editInventoryForm.controls.selectedOptionType.value=='new_tyres'">
+            <app-tyre-spare (addTyreData)="ItemsDataForm($event)" [isFormValid]="isFormValid" [tyreData]="tyreData" [inventoryData]="inventoryData"></app-tyre-spare>
+          </div>
+
+          <div class="row mg-top-30">
+            <div class="col-sm-6">
+              <div class="input-wrap mb-0 pb-3">
+                  <label for="" class="">Remarks</label>
+                  <input type="text" class="no-style input--bd" placeholder="Comments" formControlName="comments">
+              </div>
+          </div>
+          </div>
+        </div>
+    </div>
+  </div>
+  <div class="mg-top-30 section-footer">
+    <div class="btn-wrap mg-bottom-100">
+        <button class="btn" [routerLink]="[prefixUrl+'/inventory/list/inventory-adjustment-spare']">Cancel</button>
+        <button class="btn btn--primary" (click)="saveSpare()">Add Spares</button>
+    </div>
+</div>
+</form>

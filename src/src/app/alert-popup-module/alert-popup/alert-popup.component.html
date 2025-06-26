@@ -1,0 +1,56 @@
+<div class="modal fade" [ngClass]="{'show':inputData.show}" id="exampleModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal--sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center pd-20">
+                <span *ngIf="inputData.type == 'success'" class="material-icons check">check_circle_outline</span>
+                <span *ngIf="inputData.type == 'warning'" class="material-icons popup-warning">warning</span>
+                <span *ngIf="inputData.type == 'login-warning'" class="material-icons popup-warning">warning</span>
+                <span *ngIf="inputData.type == 'document-warning'" class="material-icons popup-warning">warning</span>
+                <span *ngIf="inputData.type == 'warning-proceed'" class="material-icons popup-warning">warning</span>
+                <span *ngIf="inputData.type == 'warning-work-order'" class="material-icons popup-warning">warning</span>
+                <span *ngIf="inputData.type == 'error'" class="material-icons popup-error">error_outline</span>
+                <p class="fs-14 alertMsg">
+                    {{ inputData.msg }}
+                </p>
+                <div *ngIf="inputData.type == 'document-warning'" style="margin-top: 20px;">
+                  <input type="checkbox" [(ngModel)]="isdeleteDocument"><span> Delete this document for all the {{documetType}}</span>
+                </div>
+                <div *ngIf="inputData.type == 'success'" class="okButton">
+                    <button class="btn btn- btn--primary wd-105" (click)="onOkButtonClick()" type="submit">Ok</button>
+                </div>
+                <div *ngIf="inputData.type == 'warning'" class="okButton">
+                    <button class="btn btn- btn--primary wd-105 mg-right-5" (click)="cancelButtonClick()" type="submit">Cancel</button>
+                    <button class="btn btn- btn--primary wd-105 mg-left-5" (click)="onOkButtonClick()" type="submit">Confirm</button>
+                </div>
+
+                <div *ngIf="inputData.type == 'document-warning'" class="okButton">
+                  <button class="btn btn- btn--primary wd-105 mg-right-5" (click)="cancelButtonClick()" type="submit">Cancel</button>
+                  <button class="btn btn- btn--primary wd-105 mg-left-5" (click)="onOkButtonClick()" type="submit">Confirm</button>
+              </div>
+
+              <div *ngIf="inputData.type == 'login-warning'" class="okButton">
+                <button class="btn btn- btn--primary wd-700 mg-right-5" (click)="logOutDevices('logOutOthers')" type="submit">Logout of other Devices</button>
+                <button class="btn btn- btn--primary wd-700 mg-left-5" (click)="logOutDevices('logInUsingOther')" type="submit">Login using other Credentials</button>
+            </div>
+
+                <div *ngIf="inputData.type == 'warning-proceed'" class="okButton">
+                    <button class="btn btn- btn--primary wd-105 mg-right-5" (click)="cancelButtonClick()" type="submit">Cancel</button>
+                    <button class="btn btn- btn--primary wd-105 mg-left-5" (click)="onOkButtonClick()" type="submit">Proceed</button>
+                </div>
+                <div  *ngIf="inputData.type == 'warning-work-order'" class="okButton">
+                    <button class="btn btn- btn--primary wd-105 mg-right-5" (click)="workOrderYes()" type="submit">Yes</button>
+                    <button class="btn btn- btn--primary wd-105 mg-left-5" (click)="workOrderCancel()" type="submit">Cancel</button>
+                </div>
+                <div  *ngIf="inputData.type == 'warning-driver-allowance'" class="okButton">
+                  <button class="btn btn- btn--primary wd-105 mg-right-5" (click)="workOrderYes()" type="submit">Yes</button>
+                  <button class="btn btn- btn--primary wd-105 mg-left-5" (click)="workOrderCancel()" type="submit">No</button>
+              </div>
+                <div *ngIf="inputData.type == 'error'" class="okButton">
+                  <button class="btn btn- btn--primary wd-105 mg-left-5" (click)="onOkButtonClick()" type="submit">Ok</button>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="inputData.show" class="modal-backdrop fade show"></div>

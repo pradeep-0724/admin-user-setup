@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="22px" viewBox="0 0 20 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53 (72520) - https://sketchapp.com -->
+    <title>Group 9</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon/main-nav/calendar" transform="translate(-2.000000, -1.000000)">
+            <g id="Group-9" transform="translate(2.280000, 1.200000)">
+                <polygon id="Fill-1" fill="#EAEAEA" points="2.160108 6.480216 2.160108 6.480216 17.280108 6.480216 17.280108 4.320216 2.160108 4.320216"></polygon>
+                <polygon id="Fill-3" fill="#939BA4" points="4.32 11.88 6.48 11.88 6.48 9.72 4.32 9.72"></polygon>
+                <g id="Group-8" fill="#939BA4">
+                    <path d="M2.16,6.48 L17.28,6.48 L17.28,4.32 L2.16,4.32 L2.16,6.48 Z M2.16,19.44 L17.28,19.44 L17.28,8.64 L2.16,8.64 L2.16,19.44 Z M17.28,2.16 L16.2,2.16 L16.2,0 L14.04,0 L14.04,2.16 L5.4,2.16 L5.4,0 L3.24,0 L3.24,2.16 L2.16,2.16 C0.9612,2.16 0.0108,3.132 0.0108,4.32 L0,19.44 C0,20.628 0.9612,21.6 2.16,21.6 L17.28,21.6 C18.468,21.6 19.44,20.628 19.44,19.44 L19.44,4.32 C19.44,3.132 18.468,2.16 17.28,2.16 L17.28,2.16 Z" id="Fill-4"></path>
+                    <polygon id="Fill-6" points="12.96 11.88 15.12 11.88 15.12 9.72 12.96 9.72"></polygon>
+                    <polygon id="Fill-7" points="8.64 11.88 10.8 11.88 10.8 9.72 8.64 9.72"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

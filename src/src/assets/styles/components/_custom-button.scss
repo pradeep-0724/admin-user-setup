@@ -1,0 +1,198 @@
+@import"../helpers/variable";
+
+
+button:disabled{
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.gb-btn {
+    display: block;
+    text-align: center;
+    padding: 12px 15px;
+    border-radius: 4px;
+    transition: all 200ms ease-in-out;
+    position: relative;
+    font-size: 13px;
+
+   
+    &-basic{
+        border: 1px solid $primary-brand-color;
+    color: $primary-brand-color;
+    &:hover {
+        background-color: $primary-brand-color;
+        color: white;
+    }
+
+    }
+
+    &-icon {
+        padding-left: 40px;
+
+
+        .material-icons {
+            vertical-align: middle;
+            font-size: 17px;
+            
+            left: 15px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+    }
+    &-blue{
+        color: $sky-blue;
+        border: 1px solid $sky-blue;
+        &:hover{
+            background-color:#15a4f614;
+            
+        color: $sky-blue;
+
+        }
+        &-fill{
+            background-color: $sky-blue;
+        color: white;
+            
+        &:hover{
+            color: $sky-blue;
+        border: 1px solid $sky-blue;
+        background-color: transparent;
+            
+
+        }
+
+        }
+    }
+    &-green{
+        color: $green;
+        border: 1px solid $green;
+        &:hover{
+            background-color: $green;
+        color: white;
+
+        }
+        &-fill{
+            background-color: $green;
+        color: white;
+            
+        &:hover{
+            color: $green;
+        border: 1px solid $green;
+        background-color: transparent;
+            
+
+        }
+
+        }
+    }
+    &-red{
+        color: $error-txt;
+        border: 1px solid $error-txt;
+        &:hover{
+            background-color: #eb1e4a0f;
+        color: $error-txt;
+
+        }
+        &-fill{
+            background-color: $error-txt;
+        color: white;
+        font-weight: 500;
+            
+        &:hover{
+            color: $error-txt;
+        border: 1px solid $error-txt;
+        background-color: transparent;
+            
+
+        }
+
+        }
+        
+    }
+    &-grey{
+        color: $text-color;
+        border: 1px solid $text-color;
+        &:hover{
+            background-color: #676a6e29;
+    color: #676a6e;
+
+        }
+        &-fill{
+            background-color: $error-txt;
+        color: white;
+        font-weight: 500;
+            
+        &:hover{
+            color: $error-txt;
+        border: 1px solid $error-txt;
+        background-color: transparent;
+            
+
+        }
+
+        }
+        
+    }
+
+
+
+}
+.gb-btn.no-effect{
+    pointer-events: none;
+}
+.gb-btn-hover{
+    transition: transform 200ms ease-in-out;
+    &:hover{
+        transform:scale(1.2);
+    }
+}
+.gb-document-add{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    font-size: 15px;
+    width: 100% ;
+    font-weight: 600;
+    position: sticky;
+    background-color: #fff;
+    top: 0px;
+    z-index: 5;
+    &:hover{
+        background-color: rgba(242, 242, 242);
+    }
+    
+
+}
+.gb-edit-btn-secondary{
+    display: block;
+    text-align: center;
+    padding: 12px 15px;
+    padding-left: 40px;
+    border-radius: 4px;
+    transition: all 200ms ease-in-out;
+    position: relative;
+    font-size: 13px;
+    border: 1px solid #B8B8B8;
+    color: $text-color;
+    
+    
+
+
+    .material-icons {
+        vertical-align: middle;
+        font-size: 17px;
+        
+        left: 15px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    &:hover{
+        background-color: #f2f2f2cd;
+    }
+
+   
+
+}

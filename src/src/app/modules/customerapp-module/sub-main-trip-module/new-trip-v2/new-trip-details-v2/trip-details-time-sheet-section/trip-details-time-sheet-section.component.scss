@@ -1,0 +1,35 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+*{
+    line-height: normal;
+}
+
+b{
+    margin-right: 8px;
+}
+
+.addable-row-table-display table td {
+    padding: 15px 10px !important;
+}
+
+.decline-text {
+    color: #DC3545;
+    font-weight: 600;
+}
+
+.accept-text {
+    color: #04ce1f;
+    font-weight: 600;
+}
+
+.pending-text {
+    color: #FFB900;
+    font-weight: 600;
+}
+
+.full-width-line {
+    border: 0;
+    height: 1px;
+    background-color: #000; /* You can change the color if needed */
+    margin-top: 10px;
+  }
+  

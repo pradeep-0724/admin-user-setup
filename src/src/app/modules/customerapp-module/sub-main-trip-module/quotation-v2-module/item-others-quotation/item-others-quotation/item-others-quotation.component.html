@@ -1,0 +1,121 @@
+<form [formGroup]="itemOthersForm" class="mb-4">
+    <div class="d-flex py-4 px-4 align-items-center justify-content-between">
+      <!-- <div class="tax-input-box">
+        <ng-container *ngIf="isTax">
+          <span for="">Tax</span>
+          <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialValues.tax" class="dropDownWidth">
+            <select #customSelect name="" formControlName="tax" (change)="onTaxChanges()">
+              <option *ngFor="let option of taxOptions" value="{{ option.id }}">{{
+                option.label }}</option>
+            </select>
+          </material-dropdown>
+        </ng-container>
+       
+      </div> -->
+  
+      <div class="d-flex flex-wrap">
+      <!-- <button class="btn w-auto me-3"><a target="_blank" [routerLink]="[prefixUrl+'/organization_setting/settings/quotation/custom-field/']"><i class="bi bi-layout-three-columns fs-6 me-2"></i>Modify Column </a> </button> -->
+      <!-- <button class="btn w-auto btn--secondary" *ngIf="isShowRefresh" (click)="refresh()"><i class="bi bi-arrow-clockwise fs-6 me-2"></i>Refresh</button> -->
+        
+      </div>
+    </div>
+  
+    <div class="px-4">
+      <div class="overflow-auto">
+        <table>
+          <thead>
+            <tr>
+              <th >ADDITIONAL CHARGE</th>
+              <th *ngIf="isTax">TAX</th>
+              <th>UNIT OF MEASUREMENT</th>
+              <th >NO OF UNITS</th>
+              <th>UNIT COST ({{currency.symbol}})</th>
+              <th>TOTAL AMOUNT  ({{currency.symbol}})</th>
+            </tr>
+          </thead>
+          <tbody formArrayName="other_items">
+  
+            <ng-container *ngFor="let control of itemOthersForm.controls.other_items['controls'];let i = index"
+              class="drag-item py-2" [formGroupName]="i">
+              <tr class="custom-field-input-wrap">
+                <td [ngClass]="{'error-border':control.controls.item?.touched && control.controls.item?.hasError('required')}">
+                  <material-dropdown [addable]="true"  class="quotation-dropdown-cf"
+                  [addNewOptions]="true"
+                  (addNewOption)="addNewAdditionalCharge($event,i)"
+                  [selectedOption]="initialValues?.item[i]">
+                  <select #customSelect formControlName="item" class="no-style select--modify"
+                    (change)="onMaterialSelected(control,i,$event);">
+                    <option *ngFor="let option of staticOptions.materialList" value="{{ option?.name.id }}">
+                      {{ option.name?.name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                </td>
+                <td>
+                  <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialValues.tax[i]" class="quotation-dropdown-cf" >
+                    <select #customSelect name="" class="no-style select--modify" formControlName="tax" (change)="onTaxChanges()">
+                      <option *ngFor="let option of taxOptions" value="{{ option.id }}">{{
+                        option.label }}</option>
+                    </select>
+                  </material-dropdown>
+                </td>
+                <td [ngClass]="{'error-border':control.controls.unit?.touched && control.controls.unit?.hasError('required')}">
+                  <material-dropdown class="quotation-dropdown-cf" [searchable]="true" [addable]="false" [addBlank]="true"
+                   [selectedOption]="initialValues.units[i]">
+                  <select #customSelect formControlName="unit"
+                  (change)="makeMandatory(control)" >
+                      <option *ngFor="let option of staticOptions.itemUnits"
+                          value="{{ option.id }}">
+                          {{ option.label }}
+                      </option>
+                  </select>
+                </material-dropdown>
+                </td>
+                <td [ngClass]="{'error-border':control.controls.quantity?.touched && control.controls.quantity?.hasError('min')}">
+                  <input threeDigitDecimalNumber type="text" class="error-box"  placeholder=""
+                  formControlName="quantity" (change)="onTaxChanges();makeMandatory(control)">
+                </td>
+                <td [ngClass]="{'error-border':control.controls.unit_cost?.touched && control.controls.unit_cost?.hasError('min')}">
+                  <input threeDigitDecimalNumber type="text" class="error-box" placeholder=""
+                  formControlName="unit_cost" (change)="onTaxChanges();makeMandatory(control)">
+                </td>
+                <td>
+                  <input threeDigitDecimalNumber type="text" class="error-box" readonly placeholder=""
+                  formControlName="total_amount">
+                </td>
+              </tr>
+              <tr>
+                <td class="drag-icon py-2"></td>
+               
+                  <td [attr.colspan]="5" class="py-2 pe-5">
+                  <div class="justify-content-end d-flex align-items-center">
+                    <div class="d-flex flex-wrap me-lg-5">
+                      <button class=" row-btn row-btn-copy " *ngIf="itemOthersForm.controls.other_items['controls'].length-1 ==i " matTooltip="clone" (click)="cloneItemOther(control,i)"><span class="material-icons">
+                    content_copy
+                    </span></button>
+                    <button class="  row-btn row-btn-delete " *ngIf="itemOthersForm.controls.other_items['controls'].length !=1 " (click)="removeOtherItem(i)"><span class="material-icons">
+                    close
+                    </span></button>
+                      <button class=" row-btn row-btn-add " *ngIf="i==itemOthersForm.controls.other_items['controls'].length - 1" (click)="addMoreOtherItem()"  ><span class="material-icons">
+                        add
+                        </span></button>
+                  
+                  
+                    </div>
+                    </div>
+                  </td>
+                
+                
+              </tr>
+  
+            </ng-container>
+  
+  
+  
+          </tbody>
+        </table>
+      </div>
+  
+    </div>
+  </form>
+ 

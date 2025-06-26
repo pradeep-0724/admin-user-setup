@@ -1,0 +1,17 @@
+
+<ng-container *ngIf="apiError">
+  <div class="alert alert-danger " style="text-align: center; font-size: larger;" role="alert">
+    {{apiError}}
+  </div>
+</ng-container>
+<div class="start-class">
+  <ng-container *ngIf="!apiError">
+    <p class="welcome">Welcome Onboard!!</p>
+    <p class="get-started">Let's get you started to TransportSimple</p>
+  </ng-container>
+  <ng-container *ngIf="apiError" >
+    <p class="welcome">Invalid Activation Key! Please double-check the key and try again.</p>
+    <p class="get-started">If you need assistance, you can contact our support team. Email:- support@transportsimple.com</p>
+  </ng-container>
+</div>
+

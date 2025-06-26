@@ -1,0 +1,175 @@
+<div [formGroup]="truckFormGroup" >
+     <div class="form-layout--pd">
+        <div class="row">
+            <div class="col-xl-3 col-lg-3 col-md-3 col-6">
+                <div class="input-wrap mb-0 error dropdownArrow  rounded-input-box"
+                    [ngClass]="addErrorClass(truckFormGroup.controls.route_code)">
+                    <label for="">Route</label>
+                    <app-tool-tip class="route-tool-tip-position" [totalSlides]="routeToolTip.content.length"
+                        position="right" [toolTipContent]="routeToolTip"></app-tool-tip>
+                    <material-dropdown [searchable]="true" [addable]="false"
+                        [selectedOption]="initialValues.route_code">
+                        <select #customSelect formControlName="route_code" class="no-style select--modify"
+                            (change)="routeSelected()">
+                            <option *ngFor="let option of routeCodeList" value="{{ option?.name }}">
+                                {{ option?.name }}
+                            </option>
+                        </select>
+                    </material-dropdown>
+                    <app-error [controlName]="truckFormGroup.controls.route_code"></app-error>
+                </div>
+            </div>
+        </div>
+     </div>
+    <app-multiple-destination2 [multipleDestinationForm]="truckFormGroup" [ismultipleDestinationFormValid]="ismultipleDestinationFormValid" [routeId]="routeId" [routeDestinations]="routeDestinations"
+    [customerId]="customerId"></app-multiple-destination2>
+
+    <div class="quotation-customFields">
+        <div class="gb-tab-wrapper">
+            <mat-tab-group mat-stretch-tabs="false" class="mat-group" animationDuration="0ms" mat-align-tabs="start">
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <span [ngClass]="{ taberror:!isFreightVaild }">Customer Freight</span>
+                </ng-template>
+                <app-quotation-add-edit-custom-column  [vehicleCatagory]="this.quotationForm.get('vehicle_category').value" [editData]="clientFreightData"  [isEdit]="isEdit"  [isShowRedirect]="true" [isShowRefresh]="true" (quotationFormControl)="quotationFormControl($event)"></app-quotation-add-edit-custom-column>
+                <app-add-edit-material-info-section [editDetails]="materialFreightEditDetails" [parentForm]="truckFormGroup"
+                [isSubFormValid]="isFormValidclientFright"></app-add-edit-material-info-section>
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                      <span [ngClass]="{ taberror:!isOtherChargesValid}">Additional Charges</span>
+                    </ng-template>
+                    <app-item-others-quotation     [customerId]="customerId" [editData]="otherChargesData" [isEdit]="isEdit"  [isShowRefresh]="true" (itemOthersFormValue)="itemOthersFormControl($event)"></app-item-others-quotation>
+                    </mat-tab>
+            </mat-tab-group>
+          </div>
+    </div>
+<div class="row">
+    <div class="col-lg-7 p-0">
+        <div class="fake-tab-bar">
+            <span>Signature</span>
+        </div>
+        <div class="row p-4 ps-5">
+            <div class="col-lg-5 ">
+                <div class="input-wrap clearfix">
+                    <div class="d-flex flex-wrap">
+                    <label for="" class=" me-2">Terms and condition</label>
+                    <app-tool-tip  [totalSlides]="T_AND_C_Tooltip.content.length"
+                        position="right" [toolTipContent]="T_AND_C_Tooltip"></app-tool-tip>
+                    </div>
+                    <div>
+                        <material-dropdown [addBlank]="true" [selectedOption]="initialValues.termsAndCondition">
+                            <select #customSelect class="no-style select--modify"
+                                formControlName="terms_and_condition">
+                                <option *ngFor="let option of tersmAndConditions " value="{{option.id}}">
+                                    {{option.name}}
+                                </option>
+                            </select>
+                        </material-dropdown>
+                    </div>
+                </div>
+            </div>
+
+            <!-- <div class="col-lg-5">
+                <div class="input-wrap clearfix">
+                    <label for="" class="">Customer Approval Status</label>
+                    <div>
+                        <material-dropdown [selectedOption]="initialValues.clientApprovalStatus">
+                            <select #customSelect class="no-style select--modify"
+                                formControlName="status">
+                                <option *ngFor="let option of quotationApprovalStatus "
+                                    value="{{option.value}}">
+                                    {{option.label}}
+                                </option>
+                            </select>
+                        </material-dropdown>
+                    </div>
+                </div>
+            </div> -->
+
+            <div class="col-lg-5">
+                <div class="input-wrap clearfix">
+                    <label for="" class="">Narration</label>
+                    <div>
+                        <input type="text" class="no-style input--bd" placeholder="Narration"
+                            formControlName="narration" value="">
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="input-wrap clearfix">
+                    <div class="d-flex flex-wrap">
+                    <label for="" class="me-2">Signature</label>
+                    <app-tool-tip  [totalSlides]="signatureToolTip.content.length"
+                        position="right" [toolTipContent]="signatureToolTip"></app-tool-tip>
+                        </div>
+                    <div>
+                        <material-dropdown [addBlank]="true" [selectedOption]="initialValues.signature">
+                            <select #customSelect class="no-style select--modify" formControlName="signature">
+                                <option *ngFor="let option of digitalSignature " value="{{option.id}}">
+                                    {{option.name}}
+                                </option>
+                            </select>
+                        </material-dropdown>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class=" col-lg-5 p-0 box-shadow-left">
+        <div class="fake-tab-bar">
+            <span>Balance</span>
+        </div>
+        <div>
+           
+            <div class="p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <p class=" fw-bold min-w-145px ">  Subtotal freight </p>
+                    <p class=" fw-bold"> {{ currency_type?.symbol}} {{
+                        quotationTotals.subtotal_freights|numberFormat }}</p>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <p class=" fw-bold min-w-145px "> Subtotal Additional Charges </p>
+                    <p class=" fw-bold"> {{ currency_type?.symbol}} {{
+                        quotationTotals.subtotal_others|numberFormat }}</p>
+                </div>
+                <ng-container  *ngFor="let percentageTotal of quotationTotals.taxes;">
+                    <div class=" mb-4 align-items-center d-flex justify-content-between"  *ngIf="percentageTotal.total && percentageTotal.taxAmount>0">
+                        <p class="fw-bold min-w-145px"> Include {{terminology.tax_type}} &#64; {{
+                            percentageTotal.value  }}% on
+                            <span>{{ percentageTotal.total| numberFormat }}</span>:
+                        </p>
+                        <p class="fw-bold"> {{ currency_type?.symbol}} {{ percentageTotal.taxAmount |numberFormat}} </p>
+                    </div> 
+                </ng-container>
+              
+
+
+                <div class=" mb-4 align-items-center d-flex justify-content-between">
+                    <div class="d-flex  ">
+                        <p class=" fw-bold min-w-145px "> Round Off </p>
+                        <mat-checkbox [disableRipple]="true" (change)="onRoundOffEvent($event)"
+                            formControlName="is_roundoff">
+                        </mat-checkbox>
+                    </div>
+                    <p class="fw-bold"> {{ currency_type?.symbol}} {{
+                        quotationTotals.roundOffAmount }} </p>
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-between px-4 py-3 border-top border-2">
+                <p class=" fw-bold min-w-145px fs-5 "> Total </p>
+                <p class=" fw-bold fs-5"> {{ currency_type?.symbol}} {{ quotationTotals.total|numberFormat
+                    }}</p>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
+</div>
+

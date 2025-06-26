@@ -1,0 +1,28 @@
+<div class="driver-wraper " [ngClass]="{'box-driver':boxDesign}" *ngIf="!isDriverAdd">
+    <ng-multiselect-dropdown  [formControl]="driverControl"  [placeholder]="driverControl.value?.length ? '&nbsp;' : 'Select Driver'"  [settings]="dropdownSettings" [data]="driverList">
+    </ng-multiselect-dropdown>
+    <div *ngIf="driverControl.value">
+      <p class="driver-name">{{ formattedDriverNames }}</p>    
+      <p *ngIf="driverControl.value?.length" class="driver-count">{{driverControl.value?.length}} Driver</p>
+    </div>
+</div> 
+
+<div class="driver-wraper-width" *ngIf="isDriverAdd" style="min-width: 200px;">
+ 
+  <ng-multiselect-dropdown *ngIf="isDriverDropopen" (onSelect)="dataSelected($event)" (onDeSelectAll)="dataSelected($event)" (onSelectAll)="allDriversSelected($event)" (onDeSelect)="dataSelected($event)"  [formControl]="driverControl" [placeholder]="' '"  [settings]="dropdownSettings" [data]="driverList">
+  </ng-multiselect-dropdown>
+
+  <div *ngIf="isDriverAdd">
+    <div class="d-flex flex-wrap align-items-center fw-semibold ps-2">
+      <ng-container *ngIf="driverControl.value" >
+        <p class="driver-name-list">{{ formattedDriverNames }}</p>
+      </ng-container>
+      <button class="material-add-btn ms-2"  (click)="addNewDriver()" >+</button><i class="bi bi-info-circle def-color ms-2 cursor-pointer" [matTooltip]="'You can assign multiple drivers for the job.'" matTooltipShowDelay="200" matTooltipClass="material-toltip-class" matTooltipPosition="above" ></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+

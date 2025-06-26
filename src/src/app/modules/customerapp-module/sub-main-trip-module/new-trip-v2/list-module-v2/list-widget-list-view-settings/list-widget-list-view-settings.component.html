@@ -1,0 +1,25 @@
+<div class="filter-dropdown-wrap  text-end desktop-filter" *ngIf="visible">
+    <div class="filter-dropdown show">
+        <div class="filter-dropdown__body">
+            <div class="filter-dropdown__menu">
+                <ul>
+
+                    <li cdkDropList class="drag-drop-list" (cdkDropListDropped)="drop($event)">
+                        <div class="drag-drop-list-box" *ngFor="let item of viewSettingsList"
+                            [cdkDragData]="viewSettingsList" cdkDrag>
+                            <mat-icon class="indicator-icon" class="me-2 drag-icon">drag_indicator</mat-icon>
+                            <input type="checkbox" class="me-3 " [disabled]="item?.is_disable" [(ngModel)]="item.is_active">
+                            <span>{{item?.name}}</span>
+                        </div>
+                        <p *ngIf="viewSettingsList.length==0">No Additional fields to display</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="filter-dropdown__actions">
+            <button class="btn btn--primary me-2 btn--sm" (click)="applySettings()">Apply</button>
+
+            <button class="reset-btn " (click)="cancel()"><i class="bi bi-x" style="font-size: 32px;"></i></button>
+        </div>
+    </div>
+</div>

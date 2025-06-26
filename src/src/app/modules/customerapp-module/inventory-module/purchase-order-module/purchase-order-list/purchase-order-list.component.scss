@@ -1,0 +1,111 @@
+.table-wrapper tbody td.link:focus,
+.table-wrapper tbody td.link:hover {
+  outline: none;
+  text-decoration: underline;
+}
+
+.table-wrapper tbody td.table-action .justify-content-center {
+margin-left: 0px;}
+
+.table-section--sm {
+  .more-actions__menu {
+    right: 0px;
+  }
+}
+
+.table-header--shrinked{
+  .mt-0-shrink{
+    margin-top: 0 !important;
+  }
+}
+
+.form-layout
+{
+  position: relative;
+}
+
+.table-wrapper-list .table-container {
+  width: 100%;
+  background: white !important;
+}
+
+
+  table{
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .table-wrapper-list {
+
+    overflow-y: scroll;
+    overflow-x: scroll;
+    height: 200px;
+    z-index: 1;
+  }
+
+
+
+  .table-wrapper-list th{
+    position: sticky;
+    top: 0;
+    z-index: 0;
+    background-color: white;
+}
+
+div#table-height{
+  @media only screen and (min-width: 993px){
+   height: 51vh;
+  }
+  @media only screen and (min-width: 1700px){
+    height: 56vh;
+   }
+  @media only screen and (min-width: 1900px){
+    height: 61vh;
+   }
+   @media only screen and (min-width: 2000px){
+    height: 63vh;
+   }
+   @media only screen and (min-width: 2300px){
+    height: 67vh;
+   }
+   @media only screen and (min-width: 2500px){
+    height: 75vh;
+   }
+}
+.table-page-no
+{
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  padding: 8px 2px;
+}
+
+.table-container{
+margin-bottom: 50px;
+}
+
+.viewActive{
+  border-left: 2px solid #595fab;
+  background-color: rgba(13,114,229,0.05) !important;
+  color: #595fab !important;
+  font-weight: 700;
+  border-top: 1px solid transparent;
+}
+:host ::ng-deep.ngx-pagination .current
+{
+  background: #595fab !important;
+  border-radius: 2px;
+}
+.modal {
+  position: fixed;
+    top: 50%;
+    transform: translate(0,-50%);
+    left: 0;
+    z-index: 1050;
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    outline: 0;
+}
+

@@ -1,0 +1,155 @@
+<div class="modal fade" [ngClass]="{'show':vehicleAddPopup.status}" id="exampleModal" tabindex="-1" role="dialog"
+aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal-dialog modal--xls" role="document">
+    <div class="modal-content">
+      <button class="close-icon" (click)="cancelButtonClick()"><mat-icon>highlight_off</mat-icon></button>
+      <div class="info-msg m-1" *ngIf="!canCreateVehicle">
+        <p class="message-cont">Please Note: Maximum Vehicle Limit({{totalActiveVehicleCreated}}) reached for the tenant, Please delete any unused  vehicle or 
+          contact the team to increase the Limit“ - The Inactive here is the actual inactive vehicle that are not deleted.</p>
+      </div>
+        <form [formGroup]="newVehicleForm" class="margin-30">
+          <div class="form-layout form-layout--pd" *ngIf="apiError">
+            <div class="alert-msg">
+              <span class="icon-wrap"></span>
+              <p class="message-cont">{{ apiError }}</p>
+            </div>
+           </div>
+          <div class="row mg-top-20">
+
+            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
+              <div class="input-wrap error clearfix" [ngClass]="addErrorClass(newVehicleForm.controls.reg_number)">
+                <label for="" class="input--required" >Vehicle Number</label>
+                <input appUpperCase type="text" class="no-style input--bd" placeholder="AAAA0000" maxlength="14" value="" formControlName="reg_number">
+                <app-error [controlName]="newVehicleForm.controls.reg_number"></app-error>
+              </div>
+            </div>
+
+
+            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
+              <div class="input-wrap error clearfix" [ngClass]="addErrorClass(newVehicleForm.controls.vehicle_type)">
+                <label for="" class="input--required">Vehicle Type</label>
+                <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialDetails.vehicle">
+                  <select #customSelect formControlName="vehicle_type" class="no-style select--modify" (change)="onVehicleTypeChange()"  >
+                    <option *ngFor="let option of vehicleType" value="{{ option?.id }}">
+                      {{ option?.vehicleType }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="newVehicleForm.controls.vehicle_type"></app-error>
+              </div>
+            </div>
+
+            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
+              <div class="input-wrap error clearfix"  [ngClass]="addErrorClass(newVehicleForm.controls.make)">
+                <label for=""  *ngIf="newVehicleForm.get('vehicle_type').value=='own_vehicle'" class="input--required">Make</label>
+                <label for=""  *ngIf="newVehicleForm.get('vehicle_type').value!='own_vehicle'" class="input">Make</label>
+                <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth" [selectedOption]="initialDetails.vehicleMake" [addBlank]="true"
+                  [postApiUrl]="vehicleMakeUrl"
+                  [params]="vehicleMakeParam"
+                  (postApiResponse)="getNewVehicleMake($event)"
+                  (addValueToList)="addNewVehicleMake($event)">
+                          <select #customSelect formControlName="make" class="no-style select--modify"
+                          (change)="onMakeSelected($event)">
+                              <option *ngFor="let option of vehicleMake" value="{{ option.id }}">
+                                  {{ option.make_name }}
+                              </option>
+                          </select>
+                  </material-dropdown>
+                <app-error [controlName]="newVehicleForm.controls.make"></app-error>
+              </div>
+            </div>
+
+            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
+              <div class="input-wrap error clearfix"  [ngClass]="addErrorClass(newVehicleForm.controls.model)">
+                <label for=""  *ngIf="newVehicleForm.get('vehicle_type').value=='own_vehicle'" class="input--required">Model</label>
+                <label for="" *ngIf="newVehicleForm.get('vehicle_type').value!='own_vehicle'" class="input">Model</label>
+                <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth" [addBlank]="true"
+                                        [postApiUrl]="vehicleModelUrl"
+                                        [params]="vehicleModelParam"
+                                        (postApiResponse)="getNewVehicleModel($event)"
+                                        (addValueToList)="addNewVehicleModel($event)"
+                                        [selectedOption]="initialDetails.vehicleModel">
+                                                <select #customSelect formControlName="model" class="no-style select--modify">
+                                                    <option *ngFor="let option of vehicleModel" value="{{ option.id }}">
+                                                        {{ option.model_name }}
+                                                    </option>
+                                                </select>
+                                        </material-dropdown>
+                <app-error [controlName]="newVehicleForm.controls.model"></app-error>
+              </div>
+            </div>
+
+            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6" *ngIf="!vehicleTypeFlag">
+              <div class="input-wrap clearfix">
+                <label for="" class="input">Assign Driver</label>
+                <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialDetails.vehicleDriver"  *ngIf="newVehicleForm.get('vehicle_type').value!='market_vehicle'">
+                  <select #customSelect formControlName="driver" class="no-style select--modify">
+                    <option *ngFor="let option of driverListCompany" value="{{ option.id }}">
+                      {{ option.first_name }} {{ option.last_name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="newVehicleForm.controls.driver"></app-error>
+              </div>
+            </div>
+  
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="vehicleTypeFlag">
+              <div class="input-wrap">
+                <label for="">Assign Driver</label>
+                <input type="text" class="no-style input--bd"  placeholder="Driver name"
+                formControlName="market_driver" >
+              </div>
+            </div>
+  
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="vehicleTypeFlag">
+              <div class="input-wrap">
+              <label for="">Driver Number </label>
+  
+              <div class="row ">
+                <div class="col-4 ">
+                  <div class="width-country-code custom-margin me-0">
+  
+                        <material-dropdown class="dropDownWidth" [selectedOption]="initialValues.mobile_country_code">
+                            <select #customSelect formControlName="mobile_country_code" class="no-style select--modify">
+                          <option *ngFor="let phone_code of countryPhoneCode" [value]="phone_code">
+                            {{phone_code}}
+                          </option>
+                        </select>
+                       </material-dropdown>
+                      </div>
+                    </div>
+  
+                    <div class="px-0 number-grow col-8 px-0">
+                      <div class="ms-3">
+  
+                    <div class="w-auto px-0 number-grow">
+                        <div class="error input-wrap" [ngClass]="addErrorClass(newVehicleForm.controls.mobile)">
+  
+                        <input type="text" class="no-style input--bd"  placeholder="9999999999"
+                             formControlName="mobile" >
+                        <app-error [controlName]="newVehicleForm.controls.mobile"></app-error>
+  
+                    </div>
+                    </div>
+                  </div>
+  
+            </div>
+            </div>
+            </div>
+            </div>
+
+          </div>
+        </form>
+      <div class="row mx-0 justify-content-between">
+        <div class="col-6">
+          <button class="btn btn- btn--primary wd-105 cancel-button" (click)="cancelButtonClick()" >Cancel</button>
+        </div>
+
+        <div class="col-6">
+          <button class="btn btn- btn--primary wd-105 save-button text-capitalize ms-auto" (click)="onOkButtonClick()" type="submit">Save</button>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+<div *ngIf="vehicleAddPopup.status" class="modal-backdrop fade show"></div>

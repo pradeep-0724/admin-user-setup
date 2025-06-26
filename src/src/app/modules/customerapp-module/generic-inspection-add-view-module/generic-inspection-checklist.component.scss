@@ -1,0 +1,69 @@
+
+@import "../../../../assets/styles/helpers/variable";
+
+.mh-450px{
+
+  min-height: 500px;
+  overflow: auto;
+}
+
+
+.upload-menu-wrapper .upload-menu__item.active{
+  position: static;
+}
+
+.input-wrap label,
+.check-label {
+    color: #676A6E;
+    font-weight: 600;
+}
+
+.bottom-btn-wrap {
+    background-color: #eaeaea;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+  .form-layout__card {
+    &.active {
+      .form-body {
+        display: block;
+      }
+    }
+  }
+
+  .form-body {
+    display: none;
+    margin-bottom: 15px;
+
+    &.show {
+      display: block;
+    }
+  }
+
+  .completed {
+    width: 20px;
+    height: 20px;
+    border: none;
+    background-color: #2BB741;
+
+}
+
+.iscompletedbtn {
+    width: 20px;
+    height: 20px;
+    border: 2px solid $text-color;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+
+    .bi {
+        color: $layout-bg;
+        -webkit-text-stroke: 0.5px;
+    }
+}
+.attech-img-wrap{
+  border-bottom: 1.5px dashed $border-color;
+}

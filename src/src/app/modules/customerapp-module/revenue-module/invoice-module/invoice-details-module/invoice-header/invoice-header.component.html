@@ -1,0 +1,63 @@
+
+
+    <div class="d-flex justify-content-between align-items-center py-2 px-3">
+  
+      <div class="d-flex align-items-center">
+        <button (click)="historyBack()" class="gb-back-btn"><i
+            class="bi bi-chevron-left"></i></button>
+        <span class="fw-semibold primary-brand-text ms-2 fs-6">{{invoiceDetail['head']?.invoice_no}}</span>
+              <div class="header-chip header-chip-green ms-3" >
+                Total Invoice: {{ currency_type?.symbol}} {{invoiceDetail['head']?.invoice_amount | numberFormat}}
+                
+              </div>
+              <div class="header-chip header-chip-grey ms-2" >
+                Status: {{invoiceDetail['head']?.status}}
+              </div>
+              <div *ngIf="invoiceDetail['head']?.status=='Partially Paid'" class="header-chip header-chip-sky-blue ms-2" >
+                Balance Amount: {{ currency_type?.symbol}} {{invoiceDetail['head']?.balance| numberFormat}}
+              </div>
+      </div>
+  
+      <div class="d-flex align-items-center" >  
+        <button class="gb-btn gb-btn-icon gb-btn-blue ms-2"(click)="openPdf()" >
+            <span class="material-icons">  remove_red_eye  </span>View PDF</button>  
+          <button class="gb-edit-btn-secondary ms-2" (click)="editRequest()">
+              <span class="material-icons"> create </span>Edit Request</button> 
+              <ng-container *ngIf="invoiceDetail['head']?.status !='Paid'" >   
+          <button class="gb-edit-btn-secondary ms-2" [routerLink]="[preFixUrl+'/income/invoice/edit/',invoiceId]" *ngxPermissionsOnly="invoicePermission[1]" >
+            <span class="material-icons"> create </span>Edit</button>
+          </ng-container> 
+         
+      </div>
+    </div>
+ 
+  
+    <div >
+      <div class=" row mx-0   px-4 py-3  details shadow-inset-top def-color">
+        <p class="col-lg-4 col-md-6"><b>Customer: </b><a class="custom-link" [routerLink]="[preFixUrl+'/onboarding/party/details/client/',invoiceDetail['info']?.customer['id']]"  target="_blank"  >{{invoiceDetail['info']?.customer['name']}}</a></p>
+        <p class="col-lg-4 col-md-6 "><b>Invoice Date: </b>{{invoiceDetail['info']?.invoice_date}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Due Date: </b>{{invoiceDetail['info']?.due_date}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Employee In Charge: </b>{{invoiceDetail['info']?.employee}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Terms: </b>{{invoiceDetail['info']?.terms}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Reference No.: </b>{{invoiceDetail['info']?.reference_no}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Bank: </b>{{invoiceDetail['info']?.bank}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Point of Contact (Name): </b>{{invoiceDetail['info']?.contact_person_name}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Point of Contact (Mobile): </b>{{invoiceDetail['info']?.country_code}} {{invoiceDetail['info']?.contact_person_no}}</p>
+        <!-- <p class="col-lg-4 col-md-6 "><b>Reverse Charge: </b>{{invoiceDetail['info']?.reverse_charge}}</p> -->
+        <p class="col-lg-4 col-md-6 "><b>Billing Address:</b>{{getAddressIntext(invoiceDetail['info']?.billing_address)}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Shipping Address:</b>{{getAddressIntext(invoiceDetail['info']?.shipping_address)}}</p>
+        <ng-container *ngIf="invoiceDetail['info']['customfields'].length">
+          <p class="col-lg-4 col-md-6 " *ngFor="let item of invoiceDetail['info']['customfields']"><b>{{item?.label}}:</b>
+            <span *ngIf="item.type =='boolean'">{{item.value}}</span>
+            <span *ngIf="item.type !='boolean'">{{item.value ? item.value : '-'}}</span>
+          </p>
+        </ng-container>
+        
+        
+  
+      </div>
+  
+      
+    </div>
+  
+ 

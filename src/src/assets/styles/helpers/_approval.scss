@@ -1,0 +1,276 @@
+@import "../../styles/helpers/variable";
+.approval-offcanvas-header{
+    background-color: #F6F6F6;
+    border-bottom: 1px solid #CCCCCC;
+    .close-btn {
+      font-size: 16px;
+     -webkit-text-stroke: 1px ;
+     color: #676a6e;
+  
+  
+    }
+  }
+  .approval-offcanvas-body{
+    height: calc(100vh - 50px );
+    overflow: auto;
+  }
+
+  .approver-stepper {
+    max-width: 400px;
+    margin: 10px;
+
+    .step {
+        display: flex;
+
+
+        .stepper-line-wrap {
+            position: relative;
+            &::before{
+
+                content: '';
+                border: 0.5px solid #ACB5BD;
+                display: flex;
+                height:calc(100% - 30px);
+                position: absolute;
+                top: 30px;
+                left: calc(50% - 0.5px )
+
+
+            }
+            
+
+            
+
+            .circle-name {
+                text-transform: capitalize;
+                width: 30px;
+                height: 30px;
+                
+                font-size: 14px;
+                border-radius: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-weight: 500;
+
+                &.submitter{
+                    background-color: #4cacfe;
+                    border: 1.5px solid #4cacfe;
+                    color: #fff;
+    
+                }
+
+                
+                
+                &.rejected{
+                    background-color: transparent;
+                border: 1.5px solid $error-txt;
+                color: $error-txt
+
+                }
+                &.approved{
+                    background-color: $green;
+                border: 1.5px solid $green;
+                color: #fff
+
+                }
+                &.edit-requested{
+                    background-color: transparent;
+                    color: $gray-600;
+                    border: 1.5px solid $gray-600;
+
+                }
+                &.need_approval{
+                    background-color: transparent;
+                    color: $green;
+                    border: 1.5px solid $green;
+                }
+                
+            }
+            
+        }
+
+        .stepper-content {
+            min-height: 150px;
+            height: 100%;
+        padding: 15px;
+        padding-top: 0px;
+        flex-grow: 1;
+           
+            .email{
+                color: #9F9F9F;
+                font-size: 13px;
+                margin-bottom: 6px;
+
+            }
+            .name{
+                color: #4E515C;
+                font-size: 16px;
+                font-weight: 600;
+                margin-bottom: 10px;
+            }
+            .status{
+               
+
+                margin-bottom: 10px;
+                font-size: 13px;
+            }
+            .remark{
+                background-color: #F3F3F3;
+                border-radius: 3px;
+                color: $text-color;
+                padding: 12px;
+                line-height: normal;
+                min-height: 70px;
+                margin-bottom: 30px;
+            }
+            .seperator{
+                height: 40px;
+               
+                width: 90%;
+                margin: auto;
+                position: relative;
+                margin-top: 15px;
+                margin-bottom: 15px;
+
+                &::before{
+                    content: ""
+                    ;
+                    display: block;
+                    width: 100%;
+                    position: absolute;
+                    top: calc(50% - 0.5px);
+
+                    left: 0px;
+                    border: 0.5px solid #ACB5BD;
+            
+                }
+                &::after{
+                    content: 'Resend for approval';
+                    display: flex;
+                    padding: 0px 15px;
+                    justify-content: center;
+                    align-items: center;
+                    height: 40px;
+                    position: absolute;
+                    top: 0px;
+                    white-space: nowrap;
+
+                    left: 50%;
+                    transform: translateX(-50%);
+
+                   background-color: #fff;
+
+                }
+            }
+            .edit-req-wrap{
+                position: relative;
+                
+                .edit-delete-btn{
+                    position: absolute;
+                    top: 4px;
+                    right: 6px;
+                    opacity: 0;
+                    padding: 8px 6px 6px 6px;
+                    border-radius: 3px;
+                    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+                    background-color: #fff;
+                    display: flex;
+                    flex-direction: column;
+                    z-index: 2;
+                    .material-icons{
+            
+                        cursor: pointer;
+                    }
+                }
+            
+                &:hover{
+                    .edit-delete-btn{
+                        opacity: 1;
+                    }
+                    
+                }
+            }
+            .edit-textarea-remark{
+                width: 100%;
+                padding: 7px;
+            }
+            .cancel-update-btn{
+                display: flex;
+                align-items: center;
+                button{
+                    font-size: 12px;
+                }
+                
+            
+            }
+        }
+
+    }
+    
+
+}
+.approver-stepper .step:last-child{
+    .stepper-line-wrap::before{
+        display: none;
+    }
+}
+
+
+.approvel-view{
+    color: $text-color;
+    p{
+        line-height: normal;
+    }
+    .status-icon-wrap{
+        max-width: 50px;
+    }
+    .approve-status-icon img{
+
+        width: 35px;
+        
+
+    }
+    .approval-details{
+        .header{
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+    }
+    .first-letter{
+        width: 25px;
+        height: 25px;
+        color: white;
+        border-radius: 100%;
+        display: flex;
+        text-transform: capitalize;
+        justify-content: center;
+        align-items: center;
+        margin-right: 14px;
+        font-weight: 500;
+    
+        &.blue{
+            background-color: $sky-blue;
+
+        }
+        &.green{
+            background-color: $green;
+        }
+    }
+    .btn-group-1{
+        .f-b{
+          border-radius: 3px 0px 0px 3px ;
+        }
+        .s-b{
+          border-radius: 0px 3px 3px 0px ;
+         
+          min-width: 35px
+      
+        }
+      }
+      .approve-status-icon-wrap{
+        max-width: 45px;
+        padding: 0px !important;
+        
+      }
+}

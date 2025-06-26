@@ -1,0 +1,98 @@
+<div class="modal fade" [ngClass]="{'show':popUpRenewDocuments.show}" id="exampleModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal--xls " role="document">
+    <div class="modal-content ">
+      <div class="gb-popup-header">
+        Renew {{popUpRenewDocuments?.data?.name}}
+      </div>
+      <div class="p-4">
+      <form [formGroup]="renewDocuments" >
+        <div class="alert-msg" *ngIf="apiError">
+          <span class="icon-wrap"></span>
+          <p class="message-cont">{{ apiError }}</p>
+        </div>
+       
+        <div class="row justify-content mx-0">
+          <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6" *ngIf="popUpRenewDocuments?.data?.vehicle_number">
+            <div class="input-wrap error ">
+              <label for="" class="input">Vehicle Number</label>
+              <p class="vehicle_number">{{popUpRenewDocuments?.data?.vehicle_number}}</p>
+            </div>
+          </div>
+          <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+            <div class="input-wrap error " [ngClass]="addErrorClass(renewDocuments.controls.number)">
+              <label for="" class="input">{{popUpRenewDocuments?.data?.name}} Number</label>
+              <input  type="text" class="no-style input--bd" placeholder="123456" value="" appUpperCase formControlName="number" (keyup)="onDocumentNumberChange()">
+              <app-error [controlName]="renewDocuments.controls.number"></app-error>
+            </div>
+          </div>
+          <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6"  *ngIf="isSubAsset">
+            <div class="input-wrap error error--type-1" [ngClass]="addErrorClass(renewDocuments.controls.issue_date)">
+              <label for="" class="input"> {{popUpRenewDocuments?.data?.name}} Issue Date</label>
+              <mat-form-field class="width--100">
+                <input matInput placeholder="DD/MM/YYYY" [matDatepicker]="issue_date" (focus)="issue_date.open()"
+                  formControlName="issue_date">
+                <mat-datepicker-toggle matSuffix [for]="issue_date">
+                </mat-datepicker-toggle>
+                <mat-datepicker #issue_date startView="multi-year"></mat-datepicker>
+              </mat-form-field>
+              <app-error [controlName]="renewDocuments.controls.issue_date">
+              </app-error>
+            </div>
+          </div>
+          <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+            <div class="input-wrap error error--type-1" [ngClass]="addErrorClass(renewDocuments.controls.expiry_date)">
+              <label for="" [ngClass]="{'input--required':isExpiryMandatory&& renewDocuments.controls.number.value}"> {{popUpRenewDocuments?.data?.name}} Expiry Date</label>
+              <mat-form-field class="width--100">
+                <input matInput placeholder="DD/MM/YYYY" [matDatepicker]="expiry_date" (focus)="expiry_date.open()"
+                  formControlName="expiry_date">
+                <mat-datepicker-toggle matSuffix [for]="expiry_date">
+                </mat-datepicker-toggle>
+                <mat-datepicker #expiry_date startView="multi-year"></mat-datepicker>
+              </mat-form-field>
+              <app-error [controlName]="renewDocuments.controls.expiry_date">
+              </app-error>
+            </div>
+          </div>
+          <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6" *ngIf="isSubAsset"> 
+            <div class="input-wrap error"
+                [ngClass]="addErrorClass(renewDocuments.controls.vendor)">
+                <label for="" class="input">Certificate Issued By</label>
+                <material-dropdown [searchable]="true" [addable]="false"
+                    class="dropDownWidth">
+                    <select #customSelect formControlName="vendor"
+                        class="no-style select--modify">
+                        <option *ngFor="let vendor of vendorList"
+                            value="{{ vendor.id }}">
+                            {{ vendor.party_display_name }}</option>
+                    </select>
+                </material-dropdown>
+                <app-error
+                    [controlName]="renewDocuments.controls.vendor"></app-error>
+            </div>
+        </div>
+          <div class="col-sm-12 row mx-0 mt-4">
+            <file-uploader class="width-98" (onFileUploaded)="fileUploader($event)"
+              (onFileDeleted)="fileDeleted($event)" [multiple]="true"
+              [accept]="'capture=camera, image/jpeg,image/x-jpg,image/png, application/pdf'" [showFileName]="false"
+              [uploaderId]="'vehicle-doc'" [patchFileUrls]="patchFileUrls">
+            </file-uploader>
+          </div>
+        </div>
+
+      </form>
+      <div class="d-flex justify-content-between align-items-center" >
+
+
+        <button class="btn btn-sm w-auto" (click)="cancelButtonClick()" type="submit">Cancel</button>
+
+
+
+        <button class="btn  btn--primary w-auto" (click)="onOkButtonClick()" type="submit">Save</button>
+
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="popUpRenewDocuments.show" class="modal-backdrop fade show"></div>

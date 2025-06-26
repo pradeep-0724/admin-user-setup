@@ -1,0 +1,13 @@
+<div class="charge-popup def-color">
+    <div class="gb-popup-header">
+        Void Job
+    </div>
+
+    <p class=" text-center my-5 mx-4">Revenue for this job will be set to  ({{ currency_type?.symbol}}) 0, and Expenses will not be impacted. Are you sure you want to Void the job?</p>
+
+    <div class="d-flex justify-content-between px-3 pb-3 ">
+        <button class="btn btn--sm" (click)="close(false)">No</button>
+        <button class="btn  btn--primary btn--sm " (click)="close(true)">Yes</button>
+    </div>
+
+</div>

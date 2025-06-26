@@ -1,0 +1,499 @@
+<div class="calc-height">
+  <app-list-widget [isFilter]="true" [isSettings]="true" [isDateRangeText]="true" [isDateRange]="false"
+    [isExport]="true" [isDropDown]="true" [isSwitch]="true" [isAddButton]="true" [tabSelectionList]="tabSelectionList"
+    [settingsUrl]="settingsUrl" [isExport]="true" [isDateDropDown]="true" (listWidgetData)="listWidgetData($event)"
+    (settingsApplied)="settingsApplied($event)" [buttonData]="buttonData" [filterUrl]="filterUrl"
+    (viewChange)="viewChange($event)" (exportList)="exportList($event)">
+    <button class="gb-video-play me-2" id="custom-button-left" (click)="openGothrough()">
+      <i class="bi bi-play-circle-fill"></i>
+    </button>
+  </app-list-widget>
+  <!-- <app-list-trip-v2-uassigned-vehicles-popup></app-list-trip-v2-uassigned-vehicles-popup> -->
+
+  <div class="container-fluid layout-bg">
+    <div class="row px-3 py-3 shadow-inset-top">
+      <div class="col-12">
+        <span class="live-status-toggle " (click)="isLiveStatusOpen = !isLiveStatusOpen"> <span>
+            <i class="bi bi-caret-right-fill " *ngIf="!isLiveStatusOpen"></i>
+            <i class="bi bi-caret-down-fill" *ngIf="isLiveStatusOpen"></i>
+          </span> <span class="ms-3">Today's Job Status</span></span>
+      </div>
+    </div>
+    <div class="row px-3 def-color live-status-wrap" *ngIf="isLiveStatusOpen">
+      <div class="col-lg col-md-4 col-6 " (click)="scheduledTrips()">
+        <div class="trip-status-card yellow-card">
+          <span class="truck-icon"><i class="bi bi-truck"></i></span>
+          <div>
+            <p class="fs-4 fw-semibold trips-amount">{{newTripStat?.scheduled_trips}}</p>
+            <p class="fs-12px mt-2">Scheduled Job</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg col-md-4 col-6 " (click)="ongoingTrips()">
+        <div class="trip-status-card blue-card">
+          <span class="truck-icon"><i class="bi bi-truck"></i></span>
+          <div>
+            <p class="fs-4 fw-semibold trips-amount">{{newTripStat?.ongoing_trips}}</p>
+            <p class="fs-12px mt-2">Ongoing Job</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg col-md-4 col-6 " (click)="ongoingOwnVehicleTrips()">
+        <div class="trip-status-card green-card">
+          <span class="truck-icon"><i class="bi bi-truck"></i></span>
+          <div>
+            <p class="fs-4 fw-semibold trips-amount">{{newTripStat?.on_trip_vehicles}}</p>
+            <p class="fs-12px mt-2">On Job Vehicles</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg col-md-4 col-6  " (click)="openUnassignedVehicleList()" type="button"
+        data-bs-toggle="offcanvas" data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">
+        <div class="trip-status-card blue-card">
+          <span class="truck-icon"><i class="bi bi-truck"></i></span>
+          <div>
+            <p class="fs-4 fw-semibold trips-amount">{{newTripStat?.unassigned_own_vehicles}}</p>
+            <p class="fs-12px mt-2">Unassigned Today</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg col-md-4 col-6 " (click)="scheduledOwnVehicle()">
+        <div class="trip-status-card yellow-card">
+          <span class="truck-icon"><i class="bi bi-truck"></i></span>
+          <div>
+            <p class="fs-4 fw-semibold trips-amount">{{newTripStat?.scheduled_own_vehicles}}</p>
+            <p class="fs-12px mt-2">Scheduled Owned Vehicles</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-go-through [goThroughDetais]="goThroughDetais"></app-go-through>
+
+
+<div *ngIf="isNormalList" id="normal-list" class="custom-table-container p-0 def-color trip-normal-list ws-nowrap"
+  (scroll)="onScroll($event)">
+  <table [ngClass]="{'h-100':newTripList.length==0}">
+
+    <thead>
+      <tr>
+
+        <ng-container *ngFor="let heading of tripHeader">
+          <th [ngClass]="{'text-center':heading=='Live Tracker'}"> {{heading}} </th>
+        </ng-container>
+        <th class="icon-box"></th>
+      </tr>
+    </thead>
+    <tbody *ngIf="newTripList.length == 0">
+      <tr class="border-0">
+        <td class="bg-white" colspan="30">
+          <div class="no-list-data-wrap">
+            <figure>
+              <img src="assets/img/no-content.png" alt="">
+            </figure>
+            <h5 class="mt-3 primary-brand-text">No data found!</h5>
+          </div>
+        </td>
+      </tr>
+
+    </tbody>
+
+    <tbody>
+
+
+
+      <tr *ngFor="let trip of newTripList; trackBy: trackById ;">
+
+        <ng-container *ngFor="let item of trip['extras'];let i =index">
+          <!-- vehicle No -->
+          <ng-container *ngIf="item?.name=='Vehicle No'">
+            <ng-container *ngIf="trip.is_market ==null">
+              <td> - </td>
+            </ng-container>
+            <ng-container *ngIf="trip.is_market!=null">
+              <ng-container *ngIf="trip.is_market">
+                <td>
+                  <a class="custom-link" target="_blank"
+                  [routerLink]="[prefixUrl+'/onboarding/vehicle/market/details/',item?.value?.id]"> {{item?.value?.reg_no}}
+                </a>
+                </td>
+              </ng-container>
+              <ng-container *ngIf="!trip.is_market">
+                <td>
+                  <a class="custom-link" target="_blank"
+                    [routerLink]="[prefixUrl+'/onboarding/vehicle/own/details/',item?.value?.id]"> {{item?.value?.reg_no}}
+                  </a>
+                </td>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+          <!-- Client -->
+          <ng-container *ngIf="item?.name=='Customer'" >
+            <td class="td-2l"><div class="text-2l"><a class="custom-link " target="_blank"
+                [routerLink]="[prefixUrl+'/onboarding/party/details/client/',item?.value?.id]">{{item?.value?.name}}</a></div>
+            </td>
+          </ng-container>
+          <!-- Status -->
+          <ng-container *ngIf="item?.name=='Status'">
+            <td *ngIf="item?.status_int == 0 || item?.status_int == 4" [style.color]="'#FFB900'">{{item?.value}}</td>
+            <td *ngIf="item?.status_int == 1"  [style.color]="'#4CACFE'">{{item?.value}}</td>
+            <td *ngIf="item?.status_int == 2"  [style.color]="'#2BB741'">{{item?.value}}</td>
+            <td *ngIf="item?.status_int == 3 || item?.status_int == 5"  [style.color]="'#dc3545'">{{item?.value}}</td>
+          </ng-container>
+          <!-- Trip Id -->
+          <ng-container *ngIf="item?.name=='Job ID'">
+            <td class="ws-nowrap"><a class="custom-link" [routerLink]="[prefixUrl+'/trip/new-trip/details/'+item?.value?.id]"
+                [queryParams]="{fromlist: 'trip'}">{{item?.value?.name}}</a>
+          </ng-container>
+          <!-- invoice -->
+          <ng-container *ngIf="item?.name=='Invoice No'">
+            <td class="ws-nowrap">
+              <ng-container *ngFor="let invoice of item?.value">
+                <a class="custom-link" target="_blank"
+                [routerLink]="[prefixUrl+'/income/invoice/view/',invoice?.id]">{{invoice?.no?invoice?.no:'-'}}</a>
+                <span *ngIf="item?.value.length>1">,</span>
+              </ng-container>
+              <ng-container *ngIf="item?.value.length==0">
+                 -
+              </ng-container>
+            </td>
+          </ng-container>
+          <!-- vehicle provider -->
+          <ng-container *ngIf="item?.name== 'Vehicle Provider'">
+            <td class="ws-nowrap td-2l">
+              <ng-container *ngIf="item?.value?.id">
+                <a class="custom-link two-line-text-ellipses" target="_blank" 
+                  [routerLink]="[prefixUrl+'/onboarding/party/details/vendor/',item?.value?.id]">{{item?.value?.name}}</a>
+              </ng-container>
+              <ng-container *ngIf="!item?.value?.id">
+                -
+              </ng-container>
+            </td>
+          </ng-container>
+          <!-- Sales order -->
+          <ng-container *ngIf="item?.name== 'Sales Order No'">
+            <td class="ws-nowrap">
+              <ng-container *ngIf="item?.value?.id">
+                <a class="custom-link" target="_blank" 
+                [routerLink]="[prefixUrl+'/trip/work-order/details/',item?.value?.id]">{{item?.value?.no ? item?.value?.no:'-'}}</a>
+              </ng-container>
+              <ng-container *ngIf="!item?.value?.id">
+                -
+              </ng-container>
+            </td>
+          </ng-container>
+          <!-- Operator -->
+          <ng-container *ngIf="item?.name=='Operator'">
+            <td *ngIf="isString(item?.value)">
+              {{ item?.value ? item?.value : '-' }}
+            </td>
+          
+            <td *ngIf="isArray(item?.value) && item?.value?.length==0">-</td>
+            <td *ngIf="isArray(item?.value) && item?.value.length>0" class="td-2l">
+              <div class="text-2l">
+              <ng-container *ngFor="let emp of item?.value; let last = last">
+                
+                <a class="py-0 custom-link" target="_blank" [routerLink]="[prefixUrl+'/onboarding/employee/view/',emp.id]"> {{ emp?.name ? emp?.name : '-'}} <span *ngIf="!last">,</span>
+                </a>
+              
+              </ng-container>
+            </div>
+            </td>
+          </ng-container>
+          <!-- Others -->
+
+          <ng-container
+            *ngIf="item?.name!='Vehicle No' && item?.name!='Operator' && item?.name!='Customer' && item?.name!='Invoice No'&&  item?.name!='Status'  && item?.name!='Job ID' && item?.name!='Live Tracker' && item?.name != 'Vehicle Provider' && item?.name !='Sales Order No'">
+            <td [ngClass]="{'ws-nowrap': item?.name?.includes('Date'),'line-height-normal':item.name=='Operator'}"> {{item?.value ?item?.value:'-'}} </td>
+          </ng-container>
+          <!-- Live Tracker -->
+
+          <ng-container *ngIf="item?.name=='Live Tracker'">
+            <td class="text-center icon-box">
+              <img *ngIf="trip?.map_icon?.show && trip?.map_icon?.clickable"
+              (click)="openLiveTracking(trip?.id, true)" class="cursor-pointer" alt=""
+              [src]="googleMaps" />
+              <span *ngIf="trip?.map_icon?.show && trip?.map_icon?.non_clickable">
+                <app-tool-tip class="point-type" [totalSlides]="GrayMapIconTooltip.content.length" position="left"
+                  [customIcon]="mapGrayIcon" [toolTipContent]="GrayMapIconTooltip">
+                </app-tool-tip>
+              </span>
+              <span *ngIf="trip?.map_icon?.show && trip?.map_icon?.red">
+                <app-tool-tip class="point-type" [totalSlides]="RedMapIconTooltip.content.length" position="left"
+                  [customIcon]="mapRedIcon" [toolTipContent]="RedMapIconTooltip">
+                </app-tool-tip>
+              </span>
+            </td>
+
+          </ng-container>
+
+
+        </ng-container>
+
+        <td *ngxPermissionsOnly="trip[2]" class="icon-box">
+          <div class="d-flex justify-content-center align-items-center ">
+            <span  matTooltip="Can not delete this job as it has associated expenses."[matTooltipShowDelay]="50"
+            [matTooltipDisabled]="trip.is_deleteable" matTooltipClass="material-toltip-class">
+            <button (click)="deleteTrip(trip)" [disabled]="!trip.is_deleteable" class=" del-btn"><i
+                class="material-icons" [ngClass]="{'text-danger':trip.is_deleteable,'text-secondary': !trip.is_deleteable}">delete</i></button>
+              </span>
+          </div>
+        </td>
+
+
+
+
+
+
+
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div *ngIf="!isNormalList" id="extended-list" class=" p-0 def-color trip-extended-list overflow-auto shadow-inset-top"
+  (scroll)="onScrollExtended($event)">
+  <div class="h-100 " *ngIf="newTripList?.length == 0">
+    <div class="no-list-data-wrap">
+      <figure>
+        <img src="assets/img/no-content.png" alt="">
+      </figure>
+      <h5 class="mt-3 primary-brand-text">No data found!</h5>
+    </div>
+  </div>
+
+  <div *ngFor="let trip of newTripList; trackBy: trackById"
+    class=" py-4 px-5 justify-content-space-between flex-wrap expanded-trip">
+
+
+    <div class="row mt-2">
+      <div class="col-11 line-height-normal">
+        <div class="row ">
+          <ng-container *ngFor="let item of trip['extras'];let i =index">
+            <!-- Operator -->
+            <ng-container *ngIf="item?.name== 'Operator'">
+              <div class="col-lg-3 col-6  mb-4">
+                <span class="field-name">{{item?.name}} :&nbsp;&nbsp; </span>
+                <span  *ngIf="isString(item?.value)" class="fw-semibold">{{item?.value ? item?.value : '-'}}</span>
+                <span *ngIf="isArray(item?.value) && item?.value?.length==0" class="fw-semibold">-</span>
+                
+                <ng-container *ngIf="isArray(item?.value) && item?.value.length>0">
+                  <span *ngFor="let emp of item?.value; let last = last">
+                    <a class="py-0 custom-link fw-semibold " target="_blank" [routerLink]="[prefixUrl+'/onboarding/employee/view/',emp.id]"> {{ emp?.name ? emp?.name : '-'}} <span *ngIf="!last">,</span>
+                    </a>
+                  </span>
+                </ng-container>
+              
+              </div>
+            </ng-container>
+            <ng-container
+              *ngIf="item?.name!='Vehicle No' && item?.name!='Customer' && item?.name!='Invoice No' &&  item?.name!='Status'  && item?.name!='Job ID' && item?.name!='Live Tracker' && item?.name !='Vehicle Provider' && item?.name !='Sales Order No' && item?.name !='Operator'">
+              <div class="col-lg-3 col-6  mb-4 ">
+                <span class="field-name">{{item?.name}} :&nbsp;&nbsp; </span>
+                <span class="field-value">{{item?.value?item?.value:'-'}}</span>
+              </div>
+            </ng-container>
+
+            <!-- vehicle No -->
+            <ng-container *ngIf="item?.name=='Vehicle No'">
+              <ng-container *ngIf="trip.is_market ==null">
+                <div class="col-lg-3 col-6  mb-4">
+                  <span class="field-name">{{item?.name}}:&nbsp;&nbsp; </span>
+                  <span class="field-value"> - </span>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="trip.is_market!=null">
+                <ng-container *ngIf="trip.is_market">
+                  <div class="col-lg-3 col-6  mb-4">
+                    <span class="field-name">{{item?.name}}:&nbsp;&nbsp; </span>
+                    <span class="field-value"><a class="custom-link" target="_blank"
+                        [routerLink]="[prefixUrl+'/onboarding/vehicle/details',item?.value?.id]">
+                        {{item?.value?.reg_no}} </a></span>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="!trip.is_market">
+                  <div class="col-lg-3 col-6  mb-4">
+                    <span class="field-name">{{item?.name}} :&nbsp;&nbsp; </span>
+                    <span class="field-value"><a class="custom-link" target="_blank"
+                        [routerLink]="[prefixUrl+'/onboarding/vehicle/details',item?.value?.id]">
+                        {{item?.value?.reg_no }} </a></span>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="item?.name== 'Vehicle Provider'">
+              <div class="col-lg-3 col-6  mb-4">
+                <span class="field-name">{{item?.name}} :&nbsp;&nbsp; </span>
+                <span class="field-value">
+                  <ng-container *ngIf="item?.value?.id">
+                    <a class="link" target="_blank"
+                    [routerLink]="[prefixUrl+'/onboarding/party/details/vendor/',item?.value?.id]">{{item?.value?.name}}</a>
+                  </ng-container>
+                  <ng-container *ngIf="!item?.value?.id">
+                    -
+                  </ng-container>
+                  
+                 </span>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="item?.name== 'Sales Order No'">
+              <div class="col-lg-3 col-6  mb-4">
+                <span class="field-name">{{item?.name}} :&nbsp;&nbsp; </span>
+                <span class="field-value">
+                  <ng-container *ngIf="item?.value?.id">
+                    <a class="link" target="_blank"
+                    [routerLink]="[prefixUrl+'/trip/work-order/details/',item?.value?.id]">{{item?.value?.no}}</a>
+                  </ng-container>
+                  <ng-container *ngIf="!item?.value?.id">
+                    -
+                  </ng-container>
+                   
+                 </span>
+              </div>
+            </ng-container>
+
+              <!-- Status -->
+              <ng-container *ngIf="item?.name=='Status'">
+                <div class="col-lg-3 col-6  mb-4">
+                  <span class="field-name">{{item?.name}}:&nbsp;&nbsp; </span>
+                  <span class="field-value" *ngIf="item?.status_int == 0 || item?.status_int == 4" [style.color]="'#FFB900'">{{item.value}}</span>
+                  <span class="field-value" *ngIf="item?.status_int == 1"  [style.color]="'#4CACFE'">{{item.value}}</span>
+                  <span class="field-value" *ngIf="item?.status_int == 2"  [style.color]="'#2BB741'">{{item.value}}</span>
+                  <span class="field-value" *ngIf="item?.status_int == 3 || item?.status_int == 5"  [style.color]="'#dc3545'">{{item.value}}</span>
+                </div>
+              </ng-container>
+
+            <!-- Trip Id -->
+            <ng-container *ngIf="item?.name=='Job ID'">
+              <div class="col-lg-3 col-6  mb-4">
+                <span class="field-name">{{item?.name}}:&nbsp;&nbsp; </span>
+                <span class="field-value"><a class="link"
+                    [routerLink]="[prefixUrl+'/trip/new-trip/details/'+item?.value?.id]"
+                    [queryParams]="{fromlist: 'trip'}">{{item?.value?.name}}</a></span>
+              </div>
+            </ng-container>
+
+            <ng-container  *ngIf="item?.name=='Invoice No'">
+              <div class="col-lg-3 col-6  mb-4">
+                <span class="field-name">{{item?.name}} :&nbsp;&nbsp; </span>
+                <ng-container *ngFor="let invoice of item?.value" >
+                  <span class="field-value"><a class="custom-link" target="_blank"
+                    [routerLink]="[prefixUrl+'/income/invoice/view/',invoice?.id]">
+                      {{invoice?.no?invoice.no:'-'}} </a></span>
+                </ng-container>
+                <ng-container *ngIf="item?.value.length==0">
+                  -
+                </ng-container>
+             
+              </div>
+            </ng-container>
+
+            <!-- Client -->
+            <ng-container *ngIf="item?.name=='Customer'">
+              <div class="col-lg-3 col-6  mb-4">
+                <span class="field-name">{{item?.name}}:&nbsp;&nbsp; </span>
+                <span class="field-value"><a class="custom-link" target="_blank"
+                    [routerLink]="[prefixUrl+'/onboarding/party/details/client/',item?.value?.id]">{{item?.value?.name}}</a></span>
+              </div>
+            </ng-container>
+
+          </ng-container>
+        </div>
+
+        <ng-container *ngIf="trip?.is_market ==null">
+          <div class="row">
+            <div class="col-12">
+              <div class="row justify-content-between">
+                <app-trip-v2-status [statusDetails]="trip|officeStatus" statusType="office"
+                  style="zoom:0%;"></app-trip-v2-status>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="trip?.is_market!=null">
+          <ng-container *ngIf="trip?.is_market">
+            <div class="row">
+              <div class="col-12">
+                <div class="row justify-content-between">
+                  <app-trip-v2-status [statusDetails]="trip|officeStatus" statusType="office"
+                    style="zoom:0%;"></app-trip-v2-status>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="!trip?.is_market">
+            <div class="row">
+
+              <ng-container *ngIf="trip.is_driver_trip">
+                <div class="col-12">
+                  <div class="row justify-content-between">
+                    <div class="col-lg-6 col-12 mb-3 mb-lg-0">
+                      <app-trip-v2-status statusType="office" style="zoom:0%;"
+                        [statusDetails]="trip|officeStatus"></app-trip-v2-status>
+                    </div>
+                    <div class="col-lg-6 col-12">
+                      <app-trip-v2-status statusType="driver" style="zoom:0%;"
+                        [statusDetails]="trip|driverStatus"></app-trip-v2-status>
+                    </div>
+                  </div>
+                </div>
+
+              </ng-container>
+              <ng-container *ngIf="!trip.is_driver_trip">
+                <div class="col-12">
+                  <div class="row justify-content-between">
+                    <app-trip-v2-status [statusDetails]="trip|officeStatus" statusType="office"
+                      style="zoom:0%;"></app-trip-v2-status>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </ng-container>
+
+        </ng-container>
+
+
+
+      </div>
+
+      <div class="col-1  d-flex flex-column align-items-center ">
+        <div class="mb-5 " *ngxPermissionsOnly="trip[2]">
+          <span  matTooltip="Can not delete this job as it has associated expenses."[matTooltipShowDelay]="50"
+            [matTooltipDisabled]="trip.is_deleteable" matTooltipClass="material-toltip-class">
+            <button (click)="deleteTrip(trip)" [disabled]="!trip.is_deleteable" class=" del-btn"><i
+                class="material-icons  fs-4" [ngClass]="{'text-danger':trip.is_deleteable,'text-secondary': !trip.is_deleteable}">delete</i></button>
+              </span>
+          
+        </div>
+        <div class="g-map-icon">
+
+          <img *ngIf="trip?.map_icon?.show && trip?.map_icon?.clickable"
+            (click)="openLiveTracking(trip?.id, true)" class="cursor-pointer" alt=""
+            [src]="googleMaps" />
+
+          <span *ngIf="trip?.map_icon?.show && trip?.map_icon?.non_clickable">
+            <app-tool-tip class="point-type" [totalSlides]="GrayMapIconTooltip.content.length" position="left"
+              [customIcon]="mapGrayIcon" [toolTipContent]="GrayMapIconTooltip">
+            </app-tool-tip>
+          </span>
+
+          <span *ngIf="trip?.map_icon?.show && trip?.map_icon?.red">
+            <app-tool-tip class="point-type" [totalSlides]="RedMapIconTooltip.content.length" position="left"
+              [customIcon]="mapRedIcon" [toolTipContent]="RedMapIconTooltip">
+            </app-tool-tip>
+          </span>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+
+
+<app-list-trip-v2-uassigned-vehicles-popup [show]="unassigned_veh_sidebar"></app-list-trip-v2-uassigned-vehicles-popup>
+
+<alert-popup [inputData]="tripDeleteConfirmationPopup" (outputData)="confirmButton($event)"></alert-popup>

@@ -1,0 +1,17 @@
+<div>
+  <p class="a-o-i">Enter verification code</p>
+  <p class="mb-2 mt-2 inactive-whatsapp text-center"> {{errorMessage}}</p>
+  <div>
+    <ng-otp-input (onInputChange)="onOtpChange($event)" *ngIf="showOtpComponent" [config]="config"></ng-otp-input>
+  </div>
+</div>
+
+
+<div>
+  <button *ngIf="countDown>=20 && resentOTPcount <=2" class="btn btn-primary float-end" (click)="resentOTP()"> Resent OTP </button>
+
+
+ <p *ngIf="countDown!=20" class="float-end">
+  {{countDown}}  sec
+ </p>
+</div>

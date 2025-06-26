@@ -1,0 +1,46 @@
+<div class="bg-white rounded-3 def-color overflow-hidden">
+    <div class="py-3 px-4 popup-header ">
+        <p class="fw-semibold primary-brand-text">{{isEdit?'Update':'Add'}} {{initialDetails?.heading}}</p>
+    </div>
+    <div>
+        <form [formGroup]="editDocumentForm">
+              <div *ngIf="isEdit && !isDuplicateDocInAllVech" class="alert alert-primary" role="alert">
+                Please note:  This {{initialDetails?.label}} changes will be done to all Assets
+            </div>
+              <div class="alert alert-primary" role="alert" *ngIf="!isEdit && isDuplicateDocInAllVech && (editDocumentForm.controls['all_asset'].value||  editDocumentForm.controls['type_asset'].value)">
+                Please note: {{editDocumentForm.controls['name'].value}} already exists in one of the Assets, We will proceed to assign it to the remaining Assets.
+              </div>
+              <div class="alert alert-danger" role="alert" *ngIf="isEdit && isDuplicateDocInAllVech">
+                Please note: {{editDocumentForm.controls['name'].value}} already exists is one of the Assets, Please give another name.
+              </div>
+            <div class="row px-4 pt-4">
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-lg-7">
+                            <div class="input-wrap error" [ngClass]="addErrorClass(editDocumentForm.get('name'))">
+                                <label for="" class="input--required">
+                                    {{initialDetails?.label}} Name</label>
+                                <input  type="text" class="no-style input--bd" placeholder="AA00-1122"
+                                    value="" formControlName="name" (keyup)="documentName()">
+                                <app-error [controlName]="editDocumentForm.controls['name']">
+                                </app-error>
+                            </div>
+                        </div>
+                        <ng-container  *ngIf="!isEdit">
+                            <div class="input-wrap" *ngIf="initialDetails?.isExpiry">
+                                <input style="display: inline-block;width:14px;" class="me-2" type="checkbox" formControlName="is_expiry_mandatory" > <span>{{initialDetails?.expiryLabel}}</span>
+                            </div>
+                            <div class="input-wrap">
+                                <input style="display: inline-block;width:14px;" class="me-2" type="checkbox" formControlName="all_asset" > <span>Add this to all own Assets categories</span>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-space-between pt-0 px-3 py-4 ">
+                <button class="btn w-auto " type="button" (click)="cancel()">Cancel</button>
+                <button class="btn btn--primary w-auto" type="submit" (click)="save(editDocumentForm)">{{isEdit?'Update':'Save'}}</button>
+            </div>
+        </form>
+    </div>
+</div>

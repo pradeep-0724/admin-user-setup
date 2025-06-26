@@ -1,0 +1,21 @@
+.col-20 {
+    max-width: 20% !important;
+}
+
+.disabled-input{
+    pointer-events: none !important;
+}
+
+.alert-msg {
+    margin-bottom: 20px;}
+.input-wrap{
+    &.error{
+        .add-hsn{
+            border: 1px solid #eb1e4a;
+            &::placeholder{
+                color: #eb1e4a;
+            }
+        }
+    }
+}
+

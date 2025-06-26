@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53 (72520) - https://sketchapp.com -->
+    <title>Group 7</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon/sub-nav/active/bank" transform="translate(-1.000000, -1.000000)">
+            <g id="Group-7" transform="translate(1.800000, 1.200000)">
+                <polygon id="Fill-1" fill="#DEDEF9" points="4.6332 5.400216 10.26 2.441016 15.8868 5.400216"></polygon>
+                <polygon id="Fill-2" fill="#595FAB" points="2.7 17.28 4.86 17.28 4.86 9.72 2.7 9.72"></polygon>
+                <polygon id="Fill-3" fill="#595FAB" points="9.18 17.28 11.34 17.28 11.34 9.72 9.18 9.72"></polygon>
+                <polygon id="Fill-4" fill="#595FAB" points="0 21.6 20.52 21.6 20.52 19.44 0 19.44"></polygon>
+                <polygon id="Fill-5" fill="#595FAB" points="15.66 17.28 17.82 17.28 17.82 9.72 15.66 9.72"></polygon>
+                <path d="M10.260432,0.000216 L0.000432,5.400216 L0.000432,7.560216 L20.519352,7.560216 L20.519352,5.400216 L10.260432,0.000216 Z M10.260432,2.441016 L15.886152,5.400216 L4.633632,5.400216 L10.260432,2.441016 Z" id="Fill-6" fill="#595FAB"></path>
+            </g>
+        </g>
+    </g>
+</svg>

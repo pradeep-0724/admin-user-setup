@@ -1,0 +1,66 @@
+.okButton {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.screen-center {
+  position: absolute;
+    margin: auto;
+    top: 0;
+    right: 0;
+    left: 0;
+}
+
+.close-icon{
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  color: #000;
+ }
+ .small-tag{
+
+  color: #53b1f1;
+  font-size: 10px;
+}
+.readonlyStyles input:read-only {
+  background: rgba(13,114,229,0.05);
+  opacity: 0.9;
+}
+@media only screen and (min-width: 900px) {
+  .screen-center {
+    height: 300px;
+  }
+}
+
+.alertMsg {
+  padding: 10px;
+  line-height: 1.2rem;
+}
+
+#date-month-col{
+padding: 0px;
+}
+
+.save-button,
+ .cancel-button{
+
+
+  padding: 7px;
+  margin: 7px;
+ }
+
+ :host ::ng-deep{
+   .date_time_class{
+  .input--bd{
+    border-bottom: 1px solid rgba(90,107,123,0.5);
+    padding-bottom: 0;
+    height: 31px;
+
+  }}
+ }
+
+ .showInvalid{
+  border: 1px solid red !important;
+
+}

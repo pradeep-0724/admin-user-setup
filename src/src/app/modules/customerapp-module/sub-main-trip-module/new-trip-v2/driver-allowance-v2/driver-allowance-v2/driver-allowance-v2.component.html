@@ -1,0 +1,163 @@
+<div class="form-layout__card formResponsiveTable tabIndexActive">
+  <div action="" [formGroup]="selfDriverForm">
+    <div class="mg-bottom-30 driver-allowance-section">
+      <div
+        class="table-wrapper table--bd table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow">
+        <table class="table-container" formArrayName="self_driver">
+          <thead>
+            <tr class="desktop_th">
+              <th>Name</th>
+              <th>Commission ({{ currency_type?.symbol}})</th>
+              <th>Payment Mode</th>
+              <th>Employee Name</th>
+              <th>Month</th>
+              <th>Reason</th>
+              <th>Transaction Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody *ngFor="
+              let item of selfDriverForm['controls'].self_driver['controls'];
+              let i = index
+            " [formGroupName]="i">
+            <tr class="mobile-flex">
+              <td class="max-wd-120 tabIndexActiveFields driver-name-td">
+                <h5 class="th_h5_mobile">Name</h5>
+                <div>
+                  <material-dropdown [searchable]="true" [addable]="false" [addBlank]="false"
+                    [addErrorClass]="addErrorClass(item.controls.employee)"
+                    [selectedOption]="initialDetails?.driverName[i]">
+                    <select #customSelect formControlName="employee" class="no-style select--modify"
+                      (change)="onemployeeChange(item,i)">
+                      <option *ngFor="let option of employeeList" value="{{ option?.id }}">
+                        {{ option?.first_name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                  <span class="driver-occupation">{{
+                    item.controls.designation.value
+                    }}</span>
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <h5 class="th_h5_mobile">Allowance</h5>
+                <div class="tabIndexActive">
+                  <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456"
+                    value="" (change)="addRemoveValidatorsFortheForm(item,i)" [ngClass]="{
+                      showInvalid:
+                        item.controls.paid.invalid && item.controls.paid.touched
+                    }" formControlName="paid" />
+                </div>
+              </td>
+              <td class="max-wd-120 tabIndexActiveFields">
+                <h5 class="th_h5_mobile">Payment Mode</h5>
+                <div class="max-wd-120">
+                  <material-dropdown [searchable]="true" [addable]="false"
+                    [addErrorClass]="addErrorClass(item.controls.account)"
+                    [selectedOption]="initialDetails?.driverAccount[i]">
+                    <select #customSelect formControlName="account" class="no-style select--modify" (change)="
+                        onDriverHelperPaymentModeSelected(
+                          $event.target.value,
+                          i
+                        )
+                      ">
+                      <option value="monthly">Monthly</option>
+                      <option value="paid_by_driver" *ngIf="isPaidByDriver">
+                        Paid By Employee
+                      </option>
+                      <option *ngFor="let option of accountList" value="{{ option?.id }}">
+                        {{ option?.name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </td>
+
+              <td>
+                <div class="max-wd-120 tabIndexActiveFields driver-name-td" >
+                  <h5 class="th_h5_mobile">EMPLOYEE NAME</h5>
+                  <div  [ngClass]="{ disabled : item.controls.account.value != 'paid_by_driver'}">
+                    <material-dropdown [searchable]="true" [addable]="false" [addBlank]="false"
+                    [addErrorClass]="addErrorClass(item.controls.paid_employee)"
+                    [selectedOption]="initialDetails?.paidEmployee[i]">
+                    <select #customSelect formControlName="paid_employee" class="no-style select--modify" (change)="paidEmployeeSelected(item)">
+                      <option *ngFor="let option of employeeList" value="{{ option?.id }}">
+                        {{ option?.first_name }} {{ option?.last_name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                  </div>
+                </div>
+                <span class="driver-occupation">{{
+                  item.controls.paid_designation.value
+                  }}</span>
+              </td>
+
+              <td class="max-wd-120 tabIndexActiveFields">
+                <h5 class="th_h5_mobile">Month</h5>
+                <div class="select-wrap" [ngClass]="{
+                    disabled: !initialDetails.isMonthlyPaymentModeSelected[i]
+                  }">
+                  <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialDetails?.month[i]"
+                    [addErrorClass]="addErrorClass(item.controls.month)"
+                    [disabled]="!initialDetails.isMonthlyPaymentModeSelected[i]">
+                    <select #customSelect formControlName="month" class="no-style select--modify">
+                      <option *ngFor="let option of monthsDropdownValues" value="{{ option?.id }}">
+                        {{ option?.name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </td>
+              <td class="max-wd-120 tabIndexActiveFields">
+                <h5 class="th_h5_mobile">Reason </h5>
+                <div class="max-wd-120">
+                  <material-dropdown [searchable]="true" [addable]="true"
+                  [postApiUrl]="manufacturerApi"
+                  [params]="manufacturerParams"
+                  (postApiResponse)="getNewManufacturer($event, i)"
+                  (addValueToList)="addNewManufacturer($event)"
+                    [addErrorClass]="addErrorClass(item.controls.reason)"
+                    [selectedOption]="initialDetails?.reason[i]">
+                    <select #customSelect formControlName="reason" class="no-style select--modify" >
+                      <option *ngFor="let option of staticOptions.tyreManufacturer" value="{{ option?.id }}">
+                        {{ option?.label }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </td>
+
+              <td class="table-datepicker max-wd-140 max-wd-120 tabIndexActiveFields">
+                <h5 class="th_h5_mobile">Transaction Date</h5>
+                <mat-form-field>
+                  <input matInput [matDatepicker]="transactionDate" (focus)="transactionDate.open()"
+                    formControlName="transaction_date" placeholder="DD/MM/YYYY"
+                    [disabled]="initialDetails.isMonthlyPaymentModeSelected[i]" />
+                  <mat-datepicker-toggle matSuffix [for]="transactionDate">
+                  </mat-datepicker-toggle>
+                  <mat-datepicker #transactionDate></mat-datepicker>
+                </mat-form-field>
+              </td>
+              <td class="tabIndexActive">
+                <button class="material-icons delete p-0" *ngIf="
+                    selfDriverForm['controls'].self_driver['controls'].length >
+                    1
+                  " (click)="removeItem(i)">
+                  add_circle_outline
+                </button>
+                <button class="material-icons add p-0" (click)="addMoreItem()" *ngIf="
+                    i ===
+                    selfDriverForm['controls'].self_driver['controls'].length -
+                      1
+                  ">
+                  add_circle_outline
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,330 @@
+
+<div class=" layout-bg">
+  <div class="row g-0 calc-height">
+    <div class="d-flex col-12 mx-0 align-items-start   py-3 px-3 ps-4 justify-content-between">
+
+      <h1 class="heading ">{{this.jobCardId?'Edit':'Add'}} Maintenance</h1>
+
+      <!-- <button class="gb-video-play text-end ms-3" (click)="openGothrough()">
+        <i class="bi bi-play-circle-fill"></i>
+      </button> -->
+    </div>
+ 
+  </div>
+  <form [formGroup]="maintenanceForm">
+    <div class="row shadow-inset-top-lg mx-0 wrap ">
+      <div class="col-lg-5 px-0">
+        <div class="layout-bg shadow-inset-top-lg h-100">
+
+          <div class=" px-4 py-3 pt-4">
+            <div class="alert alert-warning" *ngIf="maintenanceForm.controls.error_message.value">
+              {{maintenanceForm.controls.error_message.value}}
+            </div>
+            <div class="alert alert-warning" *ngIf="maintenanceForm.controls.error_message_hour.value">
+              {{maintenanceForm.controls.error_message_hour.value}}
+            </div>
+            <div class="row">
+
+              <div class="col-sm-6">
+                <div class="input-wrap clearfix error" [ngClass]="addErrorClass(maintenanceForm.controls.start_date)">
+                  <label for="" class="input">Scheduled Date</label>
+                  <mat-form-field>
+                    <input matInput [matDatepicker]="start_date" (focus)="start_date.open()"
+                      formControlName="start_date" placeholder="DD/MM/YYYY" (dateChange)="onDueInChange()">
+                    <mat-datepicker-toggle matSuffix [for]="start_date"></mat-datepicker-toggle>
+                    <mat-datepicker #start_date></mat-datepicker>
+                  </mat-form-field>
+                  <app-error [controlName]="maintenanceForm.controls.start_date"></app-error>
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <div class="input-wrap error" [ngClass]="addErrorClass(maintenanceForm.controls.due_in)">
+                  <label for="" class="position-relative">Due In</label>
+                  <material-dropdown [searchable]="true" class="dropDownWidth" [selectedOption]="initialValues.dueIn"
+                    [addErrorClass]="addErrorClass(maintenanceForm.controls.due_in)">
+                    <select #customSelect formControlName="due_in" class="no-style select--modify"
+                      (change)="onDueInChange()">
+                      <option *ngFor="let dueIn of dueInList" value="{{ dueIn.value }}">
+                        {{ dueIn?.label }}</option>
+                    </select>
+                  </material-dropdown>
+                  <app-error [controlName]="maintenanceForm.controls.due_in"></app-error>
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <div class="input-wrap clearfix error" [ngClass]="addErrorClass(maintenanceForm.controls.end_date)">
+                  <label for="" class="input"
+                    [ngClass]="{'input--required':(maintenanceForm.controls.due_in.value ==-1 || maintenanceForm.controls.due_in.value =='-1')}">Completion
+                    Date </label>
+                  <mat-form-field>
+                    <input matInput [matDatepicker]="end_date" (focus)="end_date.open()" formControlName="end_date"
+                      placeholder="DD/MM/YYYY" (dateChange)="onChangeCompletionDate()">
+                    <mat-datepicker-toggle matSuffix [for]="end_date"></mat-datepicker-toggle>
+                    <mat-datepicker #end_date></mat-datepicker>
+                  </mat-form-field>
+                  <app-error [controlName]="maintenanceForm.controls.end_date"></app-error>
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <div class="input-wrap error" [ngClass]="addErrorClass(maintenanceForm.controls.vehicle)"
+                  [class.disabled]="jobcardStatus>1">
+                  <label for="" class="input--required   position-relative">Vehicle/Asset No</label>
+                  <material-dropdown [searchable]="true" class="dropDownWidth" [selectedOption]="initialValues.vehicle"
+                    [addErrorClass]="addErrorClass(maintenanceForm.controls.vehicle)">
+                    <select #customSelect formControlName="vehicle" class="no-style select--modify"
+                      (change)="onVehicleOrDateChange()">
+                      <option *ngFor="let vehicle of vehicleList" value="{{ vehicle.id }}">
+                        {{ vehicle?.reg_number }}</option>
+                    </select>
+                  </material-dropdown>
+                  <app-error [controlName]="maintenanceForm.controls.vehicle"></app-error>
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <div class="input-wrap error" [ngClass]="addErrorClass(maintenanceForm.controls.priority)">
+                  <label for="" class="input position-relative">Priority</label>
+                  <mat-form-field>
+                    <mat-select formControlName="priority" class="priority"
+                      [ngClass]="'priority-'+maintenanceForm.controls.priority.value">
+                      <mat-option value="0">
+                        <img src="/assets/img/icons/priority-Highest.png" class="priority-icon"
+                          alt="" />Highest</mat-option>
+                      <mat-option value="1">
+                        <img src="/assets/img/icons/priority-High.png" class="priority-icon" alt="" />High</mat-option>
+                      <mat-option value="2"><img src="/assets/img/icons/priority-Medium.png" class="priority-icon"
+                          alt="" />Medium</mat-option>
+                      <mat-option value="3"><img src="/assets/img/icons/priority-Low.png" class="priority-icon"
+                          alt="" />Low</mat-option>
+                      <mat-option value="4"><img src="/assets/img/icons/priority-Lowest.png" class="priority-icon"
+                          alt="" />Lowest</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <div class="input-wrap error" [ngClass]="addErrorClass(maintenanceForm.controls.employee_incharge)">
+                  <label for="" class="input position-relative">Employee In Charge</label>
+                  <material-dropdown [searchable]="true" class="dropDownWidth" [selectedOption]="initialValues.employee"
+                    [addErrorClass]="addErrorClass(maintenanceForm.controls.employee_incharge)">
+                    <select #customSelect formControlName="employee_incharge" class="no-style select--modify"
+                      (change)="handleEmployeeChange()">
+                      <option *ngFor="let employee of employeeList" value="{{ employee.id }}">
+                        {{ employee?.emp_name_id }}</option>
+                    </select>
+                  </material-dropdown>
+                  <app-error [controlName]="maintenanceForm.controls.employee_incharge"></app-error>
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <div class="input-wrap clearfix error" [ngClass]="addErrorClass(maintenanceForm.controls.job_card_no)">
+                  <label for="" class="input--required">Job Card No.</label>
+                  <input type="text" class="no-style input--bd" placeholder="123456" value="" readonly
+                    formControlName="job_card_no">
+                  <app-error [controlName]="maintenanceForm.controls.job_card_no"></app-error>
+                </div>
+              </div>
+
+              <ng-container *ngIf="jobcardStatus>1">
+                <div class="col-sm-6">
+                  <div class="input-wrap clearfix error"
+                    [ngClass]="addErrorClass(maintenanceForm.controls.actual_start_date)">
+                    <label for="" class="input">Start Date </label>
+                    <mat-form-field>
+                      <input matInput [matDatepicker]="actual_start_date" (focus)="actual_start_date.open()"
+                        formControlName="actual_start_date" placeholder="DD/MM/YYYY"
+                        (dateChange)="onVehicleOrDateChange()">
+                      <mat-datepicker-toggle matSuffix [for]="actual_start_date"></mat-datepicker-toggle>
+                      <mat-datepicker #actual_start_date></mat-datepicker>
+                    </mat-form-field>
+                    <app-error [controlName]="maintenanceForm.controls.actual_start_date"></app-error>
+                  </div>
+                </div>
+                <ng-container *ngIf="jobcardStatus>2">
+                  <div class="col-sm-6">
+                    <div class="input-wrap clearfix error"
+                      [ngClass]="addErrorClass(maintenanceForm.controls.actual_end_date)">
+                      <label for="" class="input">Completed Date</label>
+                      <mat-form-field>
+                        <input matInput [matDatepicker]="actual_end_date"
+                          [min]="maintenanceForm.controls.actual_start_date.value" (focus)="actual_end_date.open()"
+                          formControlName="actual_end_date" placeholder="DD/MM/YYYY">
+                        <mat-datepicker-toggle matSuffix [for]="actual_end_date"></mat-datepicker-toggle>
+                        <mat-datepicker #actual_end_date></mat-datepicker>
+                      </mat-form-field>
+                      <app-error [controlName]="maintenanceForm.controls.actual_end_date"></app-error>
+                    </div>
+                  </div>
+                </ng-container>
+                <div class="col-sm-6">
+                  <div class="input-wrap clearfix error" [ngClass]="addErrorClass(maintenanceForm.controls.kms)">
+                    <label for="" class="input">Odometer KMS</label>
+                    <input type="text" class="no-style input--bd" positiveDigitNumber placeholder="123456" value=""
+                      formControlName="kms" (change)="onKmsChange()">
+                    <app-error [controlName]="maintenanceForm.controls.kms"></app-error>
+                  </div>
+                </div>
+
+                <div class="col-sm-6" formGroupName="hour_min">
+                  <div class="input-wrap clearfix error"
+                    [ngClass]="addErrorClass(maintenanceForm.controls.hour_min['controls'].hour)">
+                    <label for="" class="input">Odometer Hours</label>
+                    <input positiveDigitNumber type="text" class="no-style input--bd" placeholder="Hours" value=""
+                      formControlName="hour" (change)="onHourChange()">
+                    <app-error [controlName]="maintenanceForm.controls.hour_min['controls'].hour"
+                      class="w-100 desktop-position"></app-error>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7 px-0 layout-bg shadow-inset-top-lg def-color border-start" *ngIf="!jobCardId">
+          <div class="p-3  border-bottom calc-height">
+            <p class="fw-semibold def-color  mb-2">Services</p>
+            <p class="def-color fs-12px"> You can select services in advance for vehicle maintenance. </p>
+          </div>
+
+          <div class="row mx-0 border-bottom calc-height">
+            <div class="col-6 border-end px-0">
+              <div class="d-flex  custom-fake-tab ">
+                <button (click)="selectedTab=1 " class="tab" matRipple [ngClass]="{'active-tab':selectedTab==1}" style="pointer-events: none;">Service
+                  List</button>
+                <!-- <button (click)="selectedTab=2" class="tab" matRipple [ngClass]="{'active-tab':selectedTab==2}">Services
+                  Group</button> -->
+              </div>
+              
+            </div>
+          </div>
+          <div class="row mx-0 border-bottom calc-height">
+            <div class="col-6 border-end">
+              <div class=" position-relative-search ">
+                <input [(ngModel)]="search" [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="searchValueChanged($event)" placeholder="Search" class="search-filter border-0 ps-3 "><span
+                  class="search-icon"><i class="bi bi-search"></i></span>
+              </div>
+            </div>
+            <div class="col-6 fw-semibold  ">
+              <p class="vertical-align-center   fw-semibold h-100 d-flex align-items-center">Selected Services</p>
+            </div>
+          </div>
+
+          <div class="row mx-0 " >
+            <div class="col-6 border-end px-0" >
+              <div  *ngIf="selectedTab==1" class="custom-table-container" id="service-wrap">
+                <table >
+                  <tbody>
+                    <tr>
+                      <td colspan="5" style="padding: 11px 25px 11px 25px;">
+                        <button (click)="addNewService=!addNewService" *ngIf="!addNewService"
+                          class="fw-semibold def-color" >+
+                          &nbsp;Create Service </button>
+
+                        <ng-container *ngIf="addNewService">
+                          <div class=" input-wrap  mb-0">
+
+                            <p style="color: red;" *ngIf="apiError">{{apiError}}</p>
+                            <div >
+
+                              <input type="text" class="input--bd no-style  px-0 w-75 " [(ngModel)]="newServiceName"
+                                placeholder=" Service Name"  [ngModelOptions]="{ standalone: true }">
+                                <div  class="cancel-update-btn  mt-1"><button  class="def-color fs-12px" (click)="addNewService=false;newServiceName=''">Cancel</button><span  class="mx-2">|</span><button  class="green-text fs-12px" (click)="addNewServiceType()">Save</button></div>
+                            </div>
+                          </div>
+
+                        </ng-container>
+
+                      </td>
+                    </tr>
+                    <tr *ngFor="let data of serviceList ">
+                      <td>{{data?.service_name}}</td>
+                      <td><button (click)="serviceSelected(data)"><span
+                            class="material-icons add fs-5 verticle-align-middle green-text">add_circle_outline</span></button></td>
+                    </tr>
+                  </tbody>
+                  <tbody *ngIf="serviceList?.length == 0">
+                    <tr class="border-0">
+                      <td class="bg-white" colspan="30">
+                        <div class="no-list-data-wrap">
+                          <figure>
+                            <img src="assets/img/no-content.png" alt="" />
+                          </figure>
+                          <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+            </div>
+
+            <div class="col-6 px-0">
+              
+              <div class="custom-table-container" id="selected-services">
+                <div class=" fw-semibold  ">
+                  <div class=" position-relative-search ">
+                    <input [(ngModel)]="searchForSelectedServices" [ngModelOptions]="{ standalone: true }"
+                    (ngModelChange)="searchValueChangedForSelectedServices($event)" placeholder="Search" class="search-filter border-0 ps-3 "><span
+                      class="search-icon"><i class="bi bi-search"></i></span>
+                  </div>
+                </div>
+                    <div *ngIf="!initialValues?.serviceType.length" class="h-100 primary-brand-text fw-semibold text-center d-flex align-items-center justify-content-center p-4">
+                      <span class="material-icons verticle-align-middle me-2">
+                        handyman
+                        </span>
+                        <span class="fs-6">No Service Added !!</span>
+                    </div>
+                    <table *ngIf="initialValues?.serviceType.length">
+                      <tbody >
+                        <ng-container >
+                          <tr 
+                            *ngFor="let item of initialValues?.serviceType; let i = index;" class="new-item">
+                            <td>
+                              {{initialValues?.serviceType[i]?.label}}
+                            
+                            </td>
+                            <td>
+                              <button (click)="removeService(i)">
+                              <span class="material-icons verticle-align-middle error-text fs-5" >highlight_off</span>
+                            </button>
+                            </td>
+                          </tr>
+                        </ng-container>
+                      </tbody>
+                    </table>
+                  </div>
+             
+            </div>
+          </div>
+
+
+         
+       
+      </div>
+    </div>
+  </form>
+  <div class="row">
+    <div class="footer-bg calc-height p-2 px-4 custom-footer-bg d-flex justify-content-end">
+
+      <button *ngIf="jobCardId" type="button" class="btn  btn--sm me-2"
+        [routerLink]="preFixUrl+'/expense/maintenance/view/'+jobCardId">Cancel</button>
+      <button *ngIf="!jobCardId" type="button" class="btn  btn--sm me-2"
+        [routerLink]="preFixUrl+'/expense/maintenance/list'">Cancel</button>
+      <button type="button" class="btn btn--primary btn--sm"
+        (click)="saveMaintenance()">{{jobCardId?'Update':'Create'}}</button>
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<app-go-through [goThroughDetais]="goThroughDetais"></app-go-through>

@@ -1,0 +1,43 @@
+  <div class="parent-row">
+    <div class="flex-box">
+        <div class="name">
+            <span *ngIf="response.accounts?.length>0" class="mg-right-7">
+                <a class="plus-icon-sm" *ngIf="!response.show" (click)="response.show = !response.show"></a>
+                <a class="minus-icon-sm" *ngIf="response.show" (click)="response.show = !response.show;"></a>
+            </span>
+            <span *ngIf="response.accounts?.length==0" class="mg-left-22"></span>
+            <span [ngClass]="{'fw-600':response.show}">{{response.name}}</span></div>
+        <div *ngIf="!response.show" class="debit"><span class="rupee-symbol rupee-symbol--sm"></span> {{ currency_type?.symbol}}  {{fixedTo3Decimal(response?.debit_sub_total)}}</div>
+        <div *ngIf="!response.show" class="credit"><span class="rupee-symbol rupee-symbol--sm"></span> {{ currency_type?.symbol}}  {{fixedTo3Decimal(response?.credit_sub_total)}}</div>
+        <div *ngIf="response.show" class="debit"><span class="rupee-symbol rupee-symbol--sm"></span> {{ currency_type?.symbol}}  {{fixedTo3Decimal(response?.amount?.debit)}}</div>
+        <div *ngIf="response.show" class="credit"><span class="rupee-symbol rupee-symbol--sm"></span> {{ currency_type?.symbol}}  {{fixedTo3Decimal(response?.amount?.credit)}}</div>
+    </div>
+    <div class="nested-items" *ngIf="response.show">
+        <div *ngFor="let res of response | keyvalue; index as value; let i = index">
+          <div *ngIf="isArray(res)">
+            <div *ngFor="let item of res.value">
+              <app-tree [response]="item"></app-tree>
+            </div>
+            <div class="flex-box mg-left-5">
+              <div class="total fw-600">
+                Total for {{response.name}}
+              </div>
+              <div class="debit"><span class="rupee-symbol rupee-symbol--sm"></span>
+                {{ currency_type?.symbol}}  {{fixedTo3Decimal(response?.debit_sub_total)}} </div>
+              <div class="credit"><span class="rupee-symbol rupee-symbol--sm"></span>
+                {{ currency_type?.symbol}}  {{fixedTo3Decimal(response?.credit_sub_total)}}</div>
+            </div>
+            <!-- <div class="flex-box mg-left-5">
+              <div class="name">
+                {{response.name}}
+              </div>
+              <div *ngIf="response?.credit_sub_total>0" class="debit"><span
+                  class="rupee-symbol rupee-symbol--sm"></span> {{response?.credit_sub_total}}</div>
+              <div *ngIf="response?.debit_sub_total>0" class="credit"><span
+                  class="rupee-symbol rupee-symbol--sm"></span> {{response?.debit_sub_total}}</div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+  </div>
+

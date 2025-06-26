@@ -1,0 +1,76 @@
+<div class="create-multiple-trip">
+    <div class="popup-header ">
+      <h6>Schedule Multiple Jobs</h6>
+    </div>
+    <div class="popup-body"  [formGroup]="multiTripForm">
+        <div class="container-fluid">
+          <div *ngIf="isShowWarning">
+            <div class="alert alert-warning" role="alert" *ngIf="data?.workorderUnitStatus?.utilized_units==0" >
+              You have SO created for {{data?.workorderUnitStatus?.total_units}} {{data?.workorderUnitStatus?.total_units==1?'Job':'Jobs'}}. Are you sure you want to schedule new Jobs?
+            </div>
+            <div class="alert alert-warning" role="alert" *ngIf="data?.workorderUnitStatus?.utilized_units>0" >
+               You have SO created for {{data?.workorderUnitStatus?.total_units}} {{data?.workorderUnitStatus?.total_units==1?'Job':'Jobs'}}  . {{data?.workorderUnitStatus?.utilized_units}} {{data?.workorderUnitStatus?.utilized_units==1?'job':'jobs'}} have been created.  Are you sure you want to schedule new Jobs?
+            </div>
+          </div>
+          
+        
+
+          <div class="row">
+              <div class="addable-row-table overflow-visible p-0">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>No. Of Jobs</th>
+                      <th>Schedule Date</th>
+                    </tr>
+                  </thead>
+                  <tbody formArrayName="multiple_job">
+                    <ng-container  *ngFor="let control of  multiTripForm.controls['multiple_job']['controls'];let i = index " [formGroupName]="i">
+                      <tr>
+                        <td>
+                          <div  class="input-wrap  input-box error mb-2"  [ngClass]="addErrorClass(multiTripForm.get('multiple_job').controls[i].get('num_trips'))">
+                            <input positiveDigitNumber type="text" name="trip" class="no-style input--bd error-box" formControlName="num_trips" (keyup)="checkJobs()">
+                            <app-error [controlName]="multiTripForm.get('multiple_job').controls[i].get('num_trips')"></app-error>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="custom-box-input-wrap">
+                            <mat-form-field>
+                                <input matInput [matDatepicker]="date" 
+                                    (focus)="date.open()" formControlName="date"
+                                    placeholder="DD/MM/YYYY" readonly>
+                                <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                                <mat-datepicker #date></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        </td>
+                        <td class="rc-row-btn-wrap border-start-0 border-end-0">
+                          <div class="d-flex justify-content-end">      
+                              <button (click)="removeTrip(i)"
+                                  *ngIf="this.multiTripForm.controls['multiple_job']['controls'].length !== 1"
+                                  class="  row-btn row-btn-delete "><span class="material-icons">
+                                      close
+                                  </span>
+                              </button>
+                              <button (click)="addMoreMultiTripRow()" *ngIf="this.multiTripForm.controls['multiple_job']['controls'].length-1 ==i "
+                                  class=" row-btn row-btn-add "><span class="material-icons">
+                                      add
+                                  </span>
+                              </button>
+                          </div>
+      
+      
+                      </td>
+                      </tr>
+                    </ng-container>
+                  </tbody>
+                </table>
+              </div>
+            <div class="d-flex justify-content-space-between m-1 ">
+              <button class="btn w-auto " (click)="cancel()">Cancel</button>
+              <button class="btn btn--primary w-auto" (click)="save()">Create</button>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>

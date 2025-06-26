@@ -1,0 +1,47 @@
+
+
+<div *ngIf="!isShowOnlyUpload"  class="upload-proof-wrap d-flex flex-column justify-content-between"  (drop)="dropHandler($event)" (dragover)="dragOverHandler($event)">
+    <div class="file-warning">
+        <p>Drag or Drop your Receipts</p>
+        <p>The maximum file size allowed is 5MB</p>
+        <p *ngIf="image_error" class="image_error">{{image_error}}</p>
+    </div>
+    <div class="file-input-wrap">
+
+        <div class="file-input-with-upload">
+
+        <i class="bi bi-upload upload-icon"></i>
+        <input type="file" class="file-input border" id="browse-{{uploaderId}}" accept="{{accept}}" (change)="readFile($event)"
+        multiple={{multiple}}>
+    </div>
+    </div>
+
+
+</div>
+
+<div *ngIf="isShowOnlyUpload">
+    <div class="file-input-wrap position-relative">
+        <i class="bi bi-upload upload-icon "></i>
+        <input  type="file" class="file-input  border" id="browse-{{uploaderId}}" accept="{{accept}}" (change)="readFile($event)"
+        multiple={{multiple}}>
+        <p *ngIf="image_error" class="image_error">{{image_error}}</p>
+    </div>
+</div>
+
+
+<!-- <div class="browse-file">
+
+    <div class="browse-file__content ms-4" (drop)="dropHandler($event)" (dragover)="dragOverHandler($event)">
+        <span class="fw-bold">
+            Drag Files here or
+
+            <input #fileInput type="file" id="browse-{{uploaderId}}" accept="{{accept}}" (change)=readFile($event)
+                multiple={{multiple}}>
+            <label for="browse-{{uploaderId}}" class="browse-file__link">Browse</label>
+            <span class="border-anim"></span>
+        </span>
+        <p class="info">We currently support JPG, PNG, PDF make sure your
+            file size is no
+            more than 2mb.</p>
+    </div>
+</div> -->

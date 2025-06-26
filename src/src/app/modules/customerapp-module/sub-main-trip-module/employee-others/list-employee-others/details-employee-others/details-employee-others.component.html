@@ -1,0 +1,189 @@
+<div class="right-section__header pd-20-30 mb-0" *ngIf="expenseData">
+  <h1 class="heading">Employee Other Details</h1>
+  <div class="header-actions mt-0 ms-auto">
+    <button class="btn--action" *ngxPermissionsOnly="employeeExpensePermission[1]" [routerLink]="[preFixUrl+'/trip/employee-others/edit', expenseData?.id]">
+      <i class="material-icons">edit</i>
+    </button>
+    <button class="btn--action  ms-2" (click)="openDetails()" *ngIf="routeToDetail"><i class="material-icons">close</i></button>
+  </div>
+</div>
+
+<div class="invoice-list-view">
+  <div class="form-layout w-100" id="content" #content *ngIf="expenseData">
+    <div class="table-wrapper table--nobg">
+        <table class="table-container bill">
+            <thead>
+                <tr class="py-1">
+                    <th colspan="3" class="text-uppercase text-center bill__title">Employee <span
+                            class="title_to_change">Others</span></th>
+                </tr>
+            </thead>
+            <tbody>
+          <tr>
+
+            <td>
+              <div class="bill-info-wrap">
+              <span class="bill-info-label">Date: </span>
+              <span class="bill-info-value">{{changeDatetoNormalFormat(expenseData?.date)}}</span>
+              </div>
+
+              <div class="bill-info-wrap">
+              <span class="bill-info-label">Payment Mode: </span>
+              <span class="bill-info-value">{{expenseData?.payment_mode?.name}}</span>
+              </div>
+            </td>
+
+
+            <td class="text-center">
+              <div class="bill-info-wrap">
+              <span class="bill-info-label">Transaction Date: </span>
+              <span class="bill-info-value">{{changeDatetoNormalFormat(expenseData?.transaction_date ) }}</span>
+              </div>
+
+              <div class="bill-info-wrap">
+              <span class="bill-info-label">Employee Name:</span>
+              <span class="bill-info-value">{{expenseData?.employee?.display_name?expenseData?.employee?.display_name : '-' }}</span>
+              </div>
+            </td>
+
+
+            <td class=" text-end">
+              <div class="bill-info-wrap">
+              <span class="bill-info-label">Reference Number: </span>
+              <span class="bill-info-value">{{expenseData?.reference_no  ?  expenseData?.reference_no  : '-' }}</span>
+              </div>
+            </td>
+          </tr>
+
+
+
+  <tr  class="py-1">
+    <th colspan="3" class="text-uppercase text-center bill__title"> Other Details </th>
+  </tr>
+
+  <tr class="border-top-0">
+    <td colspan="3">
+        <div class="table-wrapper table--nobg table--bd">
+            <table class="table-container">
+                <thead>
+                     <tr>
+                        <th>Employee Name</th>
+                        <th>Expense Type</th>
+                        <th>Amount ({{ currency_type?.symbol}})</th>
+                        <th> Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of expenseData?.employees; let i=index;">
+                      <td>
+                        {{data?.employee?.display_name}}
+                      </td>
+                      <td>
+                        {{data?.expense_type?.name}}
+                      </td>
+                      <td>
+                        {{data?.amount| numberFormat}}
+                      </td>
+                      <td>
+                        {{data?.description}}
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </td>
+</tr>
+
+<tr class="border-top-0">
+  <td colspan="3" class="pb-0">
+      <div class="table-wrapper table--nobg">
+          <table class="table-container">
+              <tbody>
+                  <tr class="border-top-0 align-top">
+                      <td width=50% class="p-0">
+                          <div class="table-wrapper table--nobg">
+                              <table class="table-container">
+                                  <tbody>
+
+                                      <tr class="border-top-0">
+                                          <td colspan="2" class="pt-0"></td>
+                                          <td colspan="2" class="pt-0 bd-bottom"></td>
+                                      </tr>
+                                      <tr class="border-top-0">
+                                          <td width=25%></td>
+                                          <td width=25%></td>
+                                          <td width=25% class=" text-end bill-item">
+                                              Subtotal:
+                                          </td>
+                                          <td width=25%
+                                              class="rupee-symbol rupee-symbol--sm px-0  text-end bill-value">
+                                              {{ currency_type?.symbol}} {{expenseData?.subtotal | numberFormat}}
+                                          </td>
+                                      </tr>
+                                      <tr class="border-top-0">
+                                          <td width=25%></td>
+                                          <td width=25%></td>
+                                          <td width=25% class=" text-end p-0">
+                                              {{expenseData?.adjustment_account?.name}}
+                                          </td>
+                                          <td width=25%
+                                              class="rupee-symbol rupee-symbol--sm p-0  text-end">
+                                              {{ currency_type?.symbol}} {{expenseData?.adjustment_amount | numberFormat}}
+                                          </td>
+                                      </tr>
+
+                                      <tr class="border-top-0">
+                                          <td colspan="4" class="pt-0"></td>
+                                      </tr>
+
+
+                                      <tr class="border-top-0">
+                                          <td colspan="4" class="pt-0"></td>
+                                      </tr>
+                                      <tr class="border-top-0">
+                                              <td width=25%></td>
+                                              <td width=25%></td>
+                                              <td width=25% class=" text-end bill-item p-0">
+                                                  Total:
+                                              </td>
+                                              <td width=25%
+                                                  class="rupee-symbol rupee-symbol--sm bill-value p-0  text-end">
+                                                  {{ currency_type?.symbol}} {{expenseData?.total | numberFormat}}
+                                              </td>
+                                      </tr>
+
+                                  </tbody>
+                              </table>
+                          </div>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+  </td>
+</tr>
+
+<tr *ngIf="expenseData?.comments || expenseData?.reminder"   class="py-1">
+  <th colspan="3" class="text-uppercase text-center bill__title">REMARKS
+
+</tr>
+<tr class="border-top-0">
+  <td *ngIf="expenseData?.comments" class="w-50 consignment-pd-50">
+      <div>
+          <span class="fw-bold">Comment:</span>{{expenseData?.comments ? expenseData?.comments : '-'}}
+
+      </div>
+  </td>
+  <td *ngIf="expenseData?.reminder" class=" text-end w-50 consignment-pd-50">
+      <div>
+          <span class="fw-bold">Remainder Date: </span>{{expenseData?.reminder ? expenseData?.reminder: "-" }}
+
+      </div>
+  </td>
+</tr>
+
+</tbody>
+        </table>
+    </div>
+  </div>
+</div>

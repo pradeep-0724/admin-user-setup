@@ -1,0 +1,30 @@
+<div class="bg-white rounded-3">
+    <form [formGroup]="addnewDocumentPopUpForm">
+        <div>
+            <div class=" pd-20">
+                <div class="input-wrap error"
+                    [ngClass]="addErrorClass(addnewDocumentPopUpForm.controls['doc_name'])">
+                    <label for="" class="input--required">Document Title</label>
+                    <input  type="text" class="no-style input--bd" formControlName="doc_name"
+                        placeholder="Document Title">
+                    <app-error [controlName]="addnewDocumentPopUpForm.controls['doc_name']"></app-error>
+                </div>
+                <div>
+                    <label class="check-box d-inline-block">
+                      <input type="checkbox" formControlName="to_all"  class="w-auto d-inline-block"
+                         >
+                      <span class="check-mark"></span>
+                      <span class="label-text check-label"> Add this document type to all the vehicles</span>
+                    </label>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end px-3 pb-3">
+                <button type="button" class="btn w-auto py-2 me-3" data-dismiss="modal"
+                    (click)="closePopUp()">Close</button>
+                <button class="btn btn--primary w-auto py-2" type="button"
+                    (click)="submitAddMoreDocument()">Save
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

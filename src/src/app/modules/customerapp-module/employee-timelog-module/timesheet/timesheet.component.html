@@ -1,0 +1,138 @@
+
+<div class="right-section__header mb-1 totalbody">
+    <div class="row tabIndexActive justify-content-between flex-grow-1">
+      <div class="col-md-4">
+        <div class="table-header__left time-sheet-header-left">
+
+            <a [routerLink]="[preFixUrl+'/emp-timelog']"><span class="material-icons">
+              arrow_back_ios </span> </a>
+            <span  >{{employeeName}}</span>
+
+
+
+        </div>
+      </div>
+      <div class="col-md-8 col-12 respomsive-justify-center">
+        <div class="table-header__right time-sheet-calender">
+
+          <div class="wd-220">
+            <span class="date-text mx-2" *ngIf="dropdownValue==='last_7_days'">{{formattedDate}}</span>
+            <input type="text" *ngIf="dropdownValue==='custom'" class="form-control date-range" [ngModelOptions]="{ standalone: true }" bsDaterangepicker
+              [(ngModel)]="selectedRange" (ngModelChange)="filterBalanceSheet($event)"  [bsConfig]="{
+                  rangeInputFormat: 'DD MMM YYYY',
+                  showWeekNumbers: false}" />
+          </div>
+          <div class="select-wrap w-auto date-select">
+
+            <select  [(ngModel)]="dropdownValue" name="filters" class=" bg- light no-style select--modify" (change)="dataRange(dropdownValue)">
+              <option  value="last_7_days" selected  id="filters">Last 7 Days</option>
+              <option  value="this_month"  id="filters">This Month</option>
+              <option  value="last_month"  id="filters">Last Month</option>
+              <option  value="custom"  id="filters">Custom</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<div class="row time-sheet-block mx-0">
+    <div class="col-8 px-0 bg-white">
+      <div class="">
+       <div class="row timesheet-block mx-0 justify-content-between align-items-center">
+        <h4 class="heading time-sheet-header-left col-6">TimeSheet</h4>
+        <div class="col-6 text-end">
+       <button class="btn ms-auto w-auto py-2 bg-light no-style select--modify" *ngIf="activeDate!=currentDate" (click)="todayData()"><span class="material-icons d-inline-block align-middle pe-2">today</span> Today</button>
+        </div>
+       </div>
+       <div class="table-stick">
+        <div class="row mx-0 sticky-dates">
+          <div class="px-0">
+
+           <table class="table align-middle m-0 table-dates">
+            <thead></thead>
+            <tbody>
+
+
+              <tr>
+                <td *ngIf="navigationStartDate!=prevNavigationDate" class="previous"><button  (click)="previousRecords()" ></button></td>
+                <td *ngFor="let date of displayItems" class="date-styles" [ngClass]="{'active-date': activeDate===date.date}"><button (click)="particulardayLog(date.date)"> <span>{{date.day_of_week}}</span><span>{{date.day_of_month}}</span>
+                  <span>{{date.total_hours.hours}} : {{date.total_hours.mins}} hrs</span>
+                </button></td>
+                <td *ngIf="navigationEndDate!=nextNavigationDate" class="next"><button (click)="nextRecords()" ></button></td>
+        </tr>
+            </tbody>
+           </table>
+
+          </div>
+
+        </div>
+
+        <div class="table-body added-data-table">
+        <table class="table table-details">
+          <thead></thead>
+          <tbody class="border-primary">
+            <tr *ngIf="dayTimelog.length == 0">
+              <td colspan="10" class="white">
+                  <div class="no-content-wrapper justify-content-start">
+                      <figure class="no-content-pic">
+                          <img src="assets/img/no-content.png" alt="">
+                      </figure>
+                      <div class="no-content-txt">
+                          <h5 class="heading">No data found!</h5>
+                      </div>
+                  </div>
+              </td>
+          </tr>
+            <tr *ngFor="let data of dayTimelog">
+              <td class="in-out" [ngClass]="{'green': data.type.toLowerCase()==='in'}"><span>{{data.type}}</span></td>
+              <td class="time"><span>{{data.time}}</span></td>
+              <td *ngIf="data.type==='OUT'" class="outTime"><span>( {{data.total_hours.hour}}:{{data.total_hours.min}}hrs )</span></td>
+              <td *ngIf="data.type==='IN'"><span></span></td>
+              <td class="odometer">Odometer : {{ data.odometer_reading ? data.odometer_reading : '-' }}</td>
+              <td class="map"><span class="material-icons" (click)="mapsButton(data.address)"> location_on </span></td>
+              <ng-container *ngIf="data.documents.length>0">
+
+                <td *ngFor="let doc of data.documents" class="image"><a href={{doc.presigned_url}} target="new"><img src={{doc.presigned_url}} alt="Image" style="max-width: 40px;max-height: 40px"></a></td>
+              </ng-container>
+
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+    </div>
+  </div>
+    <div class="col-4 border-left text-center time-sheet-right ps-1 pe-0">
+      <div class="bg-white h-100">
+
+        <h4 class="heading time-sheet-header-left text-start">Employee Total Timing</h4>
+        <p class="m-2 text py-4">Employee time {{displayRangeWeek}}</p>
+        <h4 class="total-time">Total Time <span>{{totalTimelog}}</span></h4>
+
+
+        <h4 class="total-time  py-5 pb-0">Average Daily Time <span>{{averageTime}}</span></h4>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" [ngClass]="{'show':showMap.show}" id="exampleModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content tabIndexActive">
+      <button class="close-icon material-icons" (click)="close()">highlight_off</button>
+      <div class="modal-body text-center pd-20">
+        <google-map height="400px" width="100%" [zoom]="zoom" [center]="center">
+          <map-marker *ngFor="let markerPosition of markerPositions" [position]="markerPosition"
+            [options]="markerOptions"></map-marker>
+        </google-map>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="showMap.show" class="modal-backdrop fade show"></div>
+

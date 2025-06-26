@@ -1,0 +1,37 @@
+<!-- <button  (click)="show=true">{{selectedOpt}}<span class="material-icons">
+  chevron_right
+  </span></button> -->
+<div class="position-relative">
+
+  <button class="change-duration-btn def-color " [ngClass]="{'open':show}" (click)="show=!show">
+    <span class="material-icons me-2 calender-icon">
+      calendar_month
+      </span>
+    <span *ngIf="dateRangeAndType?.startDate && dateRangeAndType?.endDate; else elseBlock">{{dateRangeAndType?.startDate|date:'d MMM, y'}} - {{dateRangeAndType?.endDate|date:'d MMM, y'}}</span> 
+    <ng-template #elseBlock>Select a Date Range</ng-template>
+  </button>
+
+  <div class="popup" [ngStyle]="{'display':show?'block':'none'}">
+    <div class="d-flex ">
+
+      <div *ngIf="openCustomCalanderSlide" class="calender-widget">
+        <mat-calendar [selected]="selectedDateRange" (yearSelected)="yearSelected($event)" (monthSelected)="monthSelected($event)"  (viewChanged)="viewChanged($event)"  (selectedChange)="rangeChanged($event)"></mat-calendar>
+      </div>
+      <div class="date-options">
+        <button (click)="getSelectedDateRangeAndType(0,'7 Days','days')">7 Days</button>
+        <button (click)="getSelectedDateRangeAndType(1,'This Week','week')">This Week</button>
+        <button (click)="getSelectedDateRangeAndType(2,'This Month','month')">This Month</button>
+        <button (click)="getSelectedDateRangeAndType(3,'This Quarter','quarter')">This Quarter</button>
+        <button (click)="getSelectedDateRangeAndType(4,'This Year','year')">This Year</button>
+        <button (click)="getSelectedDateRangeAndType(5,'Yesterday','day')">Yesterday</button>
+        <button (click)="getSelectedDateRangeAndType(6,'Last Week','week')">Last Week</button>
+        <button (click)="getSelectedDateRangeAndType(7,'Last Month','month')">Last Month</button>
+        <button (click)="getSelectedDateRangeAndType(8,'Last Quarter','quarter')">Last Quarter</button>
+        <button (click)="getSelectedDateRangeAndType(9,'Last Year','year')">Last Year</button>
+        <button (click)="getSelectedDateRangeAndType(10,'This financial year','year')">This Financial Year</button>
+        <button (click)="openCustomCalander()">Custom</button>
+      </div>
+
+    </div>
+  </div>
+</div>

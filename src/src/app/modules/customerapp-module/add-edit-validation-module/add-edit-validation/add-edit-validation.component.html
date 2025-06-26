@@ -1,0 +1,94 @@
+<div class="driver-allowance-popup">
+    <div class="popup-header ">
+      <h6 class="d-inline">Add Validation</h6>
+      <span>&nbsp;</span>
+    </div>
+    <div class="popup-body px-3 py-4 ">
+      <div class="alert alert-danger" role="alert" *ngIf="apiError">
+       {{apiError}}
+      </div>
+      <form [formGroup]="validationForm">
+        <div class="container-fluid  ">
+          <div class=" d-flex gap-3 flex-wrap justify-content-center">
+  
+            <div class="input-wrap input-box error ">
+              <label for="validation" class="input--required">Validation</label>
+              <material-dropdown [searchable]="true" [addErrorClass]="addErrorClass(validationForm.controls.validation)" [selectedOption]="initialValues.validation">
+                <select #customSelect formControlName="validation" class="no-style select--modify" (change)="onChangeValidation()">
+                  <option *ngFor="let option of validationList" value="{{ option?.validation?.key }}">
+                    {{ option?.validation?.label }}
+                  </option>
+                </select>
+              </material-dropdown>
+            </div>
+            <div class="input-wrap input-box error" [ngClass]="{'disable':!validationForm.controls.validation.value}">
+              <label for="condition" class="input--required">Condition</label>
+              <material-dropdown [searchable]="true"  [addErrorClass]="addErrorClass(validationForm.controls.condition)" [selectedOption]="initialValues.condition" [disabled]="!validationForm.controls.validation.value">
+                <select #customSelect formControlName="condition" class="no-style select--modify">
+                  <option *ngFor="let option of conditionList" value="{{ option?.key }}">
+                    {{ option?.label }}
+                  </option>
+                </select>
+              </material-dropdown>
+            </div>
+            <ng-container *ngIf="valueType=='enabled'" >
+              <div class="input-wrap input-box error " [ngClass]="{'disable':!validationForm.controls.validation.value}">
+                <label for="value" class="input--required">Value</label>
+                <material-dropdown [addErrorClass]="addErrorClass(validationForm.controls.value)" [selectedOption]="initialValues.value" [searchable]="true" [disabled]="!validationForm.controls.validation.value">
+                  <select #customSelect formControlName="value" class="no-style select--modify">
+                    <option *ngFor="let option of optionsList" value="{{ option}}">
+                      {{ option }}
+                    </option>
+                  </select>
+                </material-dropdown>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="valueType=='disabled'" >
+              <div class="input-wrap input-box  error" [ngClass]="{'disable':true}">
+                <label for="value" class="input">Value</label>
+                <material-dropdown [addErrorClass]="addErrorClass(validationForm.controls.value)" [selectedOption]="initialValues.value" [searchable]="true" [disabled]="true">
+                  <select #customSelect formControlName="value" class="no-style select--modify">
+                    <option *ngFor="let option of []" value="{{ option?.key}}">
+                      {{ option?.label }}
+                    </option>
+                  </select>
+                </material-dropdown>
+              </div>
+            </ng-container>
+      
+
+            <div class="input-wrap input-box error " [ngClass]="{'disable':!validationForm.controls.validation.value}">
+              <label for="action" class="input--required">Action</label>
+              <material-dropdown [addErrorClass]="addErrorClass(validationForm.controls.action)" [selectedOption]="initialValues.action" [searchable]="true" [disabled]="!validationForm.controls.validation.value">
+                <select #customSelect formControlName="action" class="no-style select--modify">
+                  <option *ngFor="let option of actionList" value="{{ option?.key }}">
+                    {{ option?.label }}
+                  </option>
+                </select>
+              </material-dropdown>
+            </div>
+
+          </div>
+
+          <div [ngClass]="{'disable':!validationForm.controls.validation.value}">
+            <p class="def-color fw-semibold mb-2 input--required" >Alert Message</p>
+            <p class="def-color mb-4">An alert message will be displayed and the transaction will not be created when it matches this condition.</p>
+            <div class="input-wrap input-box error" [ngClass]="addErrorClass(validationForm.controls.message)">
+              <textarea [maxlength]="255" [disabled]="!validationForm.controls.validation.value" class="error-box w-50 p-2"  placeholder="Enter your alert messege" formControlName="message" rows="4" cols="1000">
+              </textarea>
+            </div>
+           
+          </div>
+  
+          <div class="d-flex justify-content-space-between  ">
+            <button class="btn w-auto " (click)="close()">Cancel</button>
+            <button class="btn btn--primary w-auto" (click)="save()">Save</button>
+          </div>
+  
+        </div>
+      </form>
+  
+    </div>
+  
+  </div>

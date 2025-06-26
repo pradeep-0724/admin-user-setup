@@ -1,0 +1,83 @@
+
+<div class="calc-height">
+    <app-list-widget [isFilter]="true" [isDateRangeText]="true" [isDateRange]="false" [isDateDropDown]="true" [isDropDown]="true"
+      [filterUrl]="filterUrl" [subtractDays]="30" [end_date]="end_date"
+      [tabSelectionList]="tabSelectionList" (listWidgetData)="listWidgetData($event)">
+    </app-list-widget>
+  </div>
+
+    <div class="row mx-0">
+  
+      <div class="custom-table-container  bg-white  fuel-list-wrap  p-0"
+        (scroll)="onScroll($event)" id="cp-table">
+        <table [ngClass]="{'h-100':paymentData.length==0}">
+  
+          <thead >
+            <tr>
+              <th>CHEQUE DATE</th>
+              <th>CHEQUE NO.</th>
+              <th>CUSTOMER</th>
+              <th>PAYMENT DATE</th>
+              <th>PAYMENT NO.</th>
+              <th>CHEQUE AMOUNT ({{ currency_type?.symbol}})</th>
+              <th>BANK ACCOUNT</th>
+              <th>STATUS</th>
+              <th>CLEARANCE DATE Date</th>
+              <th class="icon-box"></th>
+            </tr>
+          </thead>
+          <tbody *ngIf="paymentData.length == 0">
+            <tr class="border-0">
+              <td class="bg-white" colspan="30">
+                <div class="no-list-data-wrap">
+                  <figure>
+                    <img src="assets/img/no-content.png" alt="">
+                  </figure>
+                  <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                </div>
+              </td>
+            </tr>
+  
+          </tbody>
+  
+          <tbody>
+            <tr *ngFor="let data of paymentData" [ngClass]="{'activated-row':selectedId==data.id}">
+  
+                <td>{{ dateChange(data.cheque_date) }}</td>
+                <td>{{ data.cheque_no }}</td>
+                <td class="td-2l"> <div class="text-2l"><a target="_blank" class="custom-link" [routerLink]="[prefixUrl+'/onboarding/party/details/client/'+data.party_id]">{{ data.party }}</a></div></td>
+                <td>{{ dateChange(data.payment_date) }}</td>
+                <td>{{ data.payment_no }}</td>
+                <td>{{ data.amount_paid| numberFormat}}</td>
+                <td>{{ data.account?.label ? data?.account?.label:'-'}}</td>
+                <td>{{ data.cheque_status?data.cheque_status?.label:'-'}}</td>
+                <td>{{ data?.clearance_date? dateChange(data?.clearance_date) :'-'}}</td>
+                <td class="icon-box  tabIndexActive">
+                  <div class="d-flex justify-content-center align-items-center">
+                    <div class="position-relative">
+                      <i class="material-icons more-icon" (click)="optionsList(data.id)"
+                        *ngxPermissionsOnly="[invoiceSettlementPermissions[1],invoiceSettlementPermissions[2]]">more_vert</i>
+                      <ul class="more-actions__menu table-popup" [ngClass]="{show: showOptions === data.id}">
+                        <li class="more-actions__item" *ngxPermissionsOnly="invoiceSettlementPermissions[1]"
+                        [routerLink]="[prefixUrl+'/income/payments/invoice/edit/', data.payment_settlement]"><i
+                            class="material-icons">edit</i>Edit</li>
+                            <ng-container *ngIf="checkStatusId(data.cheque_status.id)">
+                              <li *ngxPermissionsOnly="invoiceSettlementPermissions[2]" class="more-actions__item"
+                                (click)="popupFunction(data.id, i)">Change Status</li>
+                            </ng-container>
+                      </ul>
+                    </div>
+                  </div>
+  
+                </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  
+    
+    </div>
+
+  
+<app-update-cheque-status [inputData]="chequeinputData" (outputData)="checqueEvent($event)"></app-update-cheque-status>
+  

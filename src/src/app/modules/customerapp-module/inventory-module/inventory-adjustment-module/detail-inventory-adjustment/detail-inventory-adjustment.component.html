@@ -1,0 +1,129 @@
+<div class="right-section__header pd-20-30 mb-0" *ngIf="inventoryData">
+    <h1 class="heading">INVENTORY DETAILS</h1>
+    <div class="header-actions">
+        <button class="btn--action" [routerLink]="[prefixUrl+'/inventory/edit/inventory-adjustment/', inventoryData.id]">
+            <i class="material-icons">edit</i>
+        </button>
+    </div>
+  </div>
+
+  <div class="invoice-list-view">
+    <div class="form-layout w-100" id="content" #content *ngIf="inventoryData">
+      <div class="table-wrapper table--nobg">
+          <table class="table-container bill">
+              <thead>
+                  <tr class="py-1">
+                      <th colspan="3" class="text-uppercase text-center bill__title">ONBOARDING <span
+                              class="title_to_change">SPARES STOCK</span></th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                <tr>
+                  <td >
+                      <div class="bill-info-wrap">
+                          <span class="bill-info-label">Stock Date: </span>
+                          <span class="bill-info-value">{{ dateChange (inventoryData?.stock_date) }}</span>
+                      </div>
+                  </td>
+
+                  <td class="text-center">
+                    <div class="bill-info-wrap">
+                        <span class="bill-info-label">Reason: </span>
+                        <span class="bill-info-value">{{inventoryData?.reason ? inventoryData?.reason  : '-'}} </span>
+                    </div>
+                </td>
+                  <td class=" text-end">
+                      <div class="bill-info-wrap">
+                          <span class="bill-info-label">Employee Name: </span>
+                          <span class="bill-info-value">{{inventoryData?.employee ? inventoryData?.employee  : '-'}} </span>
+                      </div>
+                  </td>
+              </tr>
+
+
+            <tr  class="py-1">
+              <th *ngIf="inventoryData.hasOwnProperty('spares')" colspan="3" class="text-uppercase text-center bill__title">SPARES DETAIL </th>
+              <th *ngIf="inventoryData.hasOwnProperty('tyres')" colspan="3" class="text-uppercase text-center bill__title">TYRES DETAIL </th>
+
+            </tr>
+
+
+    <tr *ngIf="inventoryData.hasOwnProperty('tyres')"  class="border-top-0">
+      <td colspan="3">
+          <div  class="table-wrapper table--nobg table--bd">
+              <table class="table-container">
+                  <thead>
+                      <tr>
+                        <th>ACTION</th>
+                          <th>TYRE DETAIL</th>
+                          <th>TYRE UNIQUE NO.</th>
+                          <th >TOTAL ({{ currency_type?.symbol}})</th>
+                          <th class=" text-end" *ngIf="isDescriptionEmpty">DESCRIPTION</th>
+
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngFor="let data of inventoryData.tyres; let i=index;">
+                        <td > {{data?.is_add ? 'Add' : 'Remove'}}</td>
+                       <td> {{ data?.tyre_detail}}</td>
+                       <td> {{ data?.unique_no}}</td>
+                       <td class="rupee-symbol rupee-symbol--sm"> {{ data?.total}}</td>
+                       <td  class=" text-end" *ngIf="isDescriptionEmpty"> {{ data?.note}}</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+      </td>
+  </tr>
+
+
+  <tr *ngIf="inventoryData.hasOwnProperty('spares')" class="border-top-0">
+    <td colspan="3">
+        <div  class="table-wrapper table--nobg table--bd">
+            <table class="table-container">
+                <thead>
+                    <tr>
+                        <th>ITEM NAME</th>
+                        <th>QUANTITY AVAILABLE</th>
+                        <th>NEW QUANTITY</th>
+                        <th>ADJUSTMENT</th>
+                        <th>RATE ({{ currency_type?.symbol}})</th>
+                        <th class=" text-end">TOTAL ({{ currency_type?.symbol}})</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of inventoryData.spares; let i=index;">
+                     <td>
+                        {{ data?.item}}
+                     </td>
+                     <td> {{ data?.quantity_available}}</td>
+                     <td> {{ data?.new_quantity}}</td>
+                     <td class="rupee-symbol rupee-symbol--sm"> {{ data?.adjustment}}</td>
+                     <td> {{ data?.rate}}</td>
+                     <td class=" text-end"> {{ data?.total}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </td>
+</tr>
+
+  <tr *ngIf="inventoryData?.comments"   class="py-1">
+    <th colspan="3" class="text-uppercase  bill__title">REMARKS
+
+  </tr>
+  <tr class="border-top-0">
+    <td *ngIf="inventoryData?.comments" class="w-50 consignment-pd-50">
+        <div>
+            <span class="fw-bold">Comments:</span>  {{inventoryData?.comments ? inventoryData?.comments : '-'}}<br>
+
+        </div>
+    </td>
+  </tr>
+
+              </tbody>
+          </table>
+      </div>
+    </div>
+  </div>

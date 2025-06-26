@@ -1,0 +1,466 @@
+<div class="add-screen-wrap d-flex flex-column">
+
+  <div class="right-section__header align-items-center justify-content-between">
+    <h1 class="heading col-10 ps-3">{{workOrderId?'Edit':'Add'}} Sales Order</h1>
+    <button class="gb-video-play float-right" (click)="openGothrough()">
+      <i class="bi bi-play-circle-fill"></i>
+    </button>
+  </div>
+  <app-add-trip-v2-documents-expiry [locations]="locations"
+    [documentExpiryData]="documentExpiryData"></app-add-trip-v2-documents-expiry>
+  <div class="position-relative mx">
+    <form [formGroup]="addWorkOrder">
+      <div>
+        <div class="alert-msg" *ngIf="apiError">
+          <span class="icon-wrap"></span>
+          <p class="message-cont">{{ apiError }}</p>
+        </div>
+
+        <div class="def-color p-4 shadow-inset-top-bottom"   *ngIf="vehicleCategiriesObj.hasMultipleCategories" [ngClass]="{'disable':workOrderId!=''}">
+          <div class=" veh-category-wrap">
+            <div class="veh-category" (click)="vehicleCatagoryChange('1')"
+              [class.active]="addWorkOrder.get('vehicle_category').value =='1'" *ngIf="vehicleCategiriesObj.categories.includes(1)">
+              <img src="../../../../../../../../assets/img/icons/crane-truck.svg" alt="truck image">
+
+              <p class="text-center mt-2">Crane</p>
+            </div>
+            <div class="veh-category" (click)="vehicleCatagoryChange('2')"
+              [class.active]="addWorkOrder.get('vehicle_category').value =='2'" *ngIf="vehicleCategiriesObj.categories.includes(2)">
+              <img src="../../../../../../../../assets/img/icons/awp.svg" alt="truck image">
+
+              <p class="text-center mt-2">AWP</p>
+            </div>
+
+            <div class="veh-category" (click)="vehicleCatagoryChange('0')"
+            [class.active]="addWorkOrder.get('vehicle_category').value =='0'" *ngIf="vehicleCategiriesObj.categories.includes(0)||vehicleCategiriesObj.categories.includes(3)">
+            <img class="cargo" src="../../../../../../../../assets/img/icons/loose-cargo-black.png" alt="truck image">
+
+            <p class="text-center mt-2"> Loose Cargo</p>
+          </div>
+
+          <div class="veh-category" (click)="vehicleCatagoryChange('4')"
+          [class.active]="addWorkOrder.get('vehicle_category').value =='4'" *ngIf="vehicleCategiriesObj.categories.includes(0)||vehicleCategiriesObj.categories.includes(3)">
+          <img class="container" src="../../../../../../../../assets/img/icons/container-black.png" alt="truck image">
+           <p class="text-center mt-2">Container</p>
+           </div>
+          </div>
+        </div>
+
+        <ng-container *ngIf="isCatagorySelected">
+          <div [ngClass]="{'shadow-inset-top-bottom':!vehicleCategiriesObj.hasMultipleCategories}">
+            <div class="p-4 pb-0">
+              <div class="alert alert-danger" role="alert" *ngIf="this.isPartyApproverRequired&&!this.isPartyApproverAvailable && this.isApprovalConfigured && addWorkOrder.controls.customer.value">
+                <ng-container *ngIf="!isLinkedClicked" >
+                  <p>Party Approver not found. Please add a Party Approver for the approval mechanism to run smoothly</p>
+                  <p   class="pt-2">You can add party approver by clicking<a
+                    class="cursor-pointer text-primary" (click)="linkClicked()" target="_blank" [routerLink]="[preFixUrl+'/onboarding/party/edit/'+addWorkOrder.controls.customer.value]"> Here</a> </p>
+                </ng-container>
+                  <p  *ngIf="isLinkedClicked" class="pt-2">If party approver added refresh by clicking <span
+                    class="cursor-pointer text-primary" (click)="getpartyDetails(addWorkOrder.controls.customer.value)"> Here</span> </p>
+              </div>
+              <div class="row tabIndexActiveFields mx-0">
+                <div class="col-xl-3 col-lg-3 col-md-3 col-6" [ngClass]="{'disable': workOrderId!=''}">
+                  <div class="input-wrap error dropdownArrow" [ngClass]="addErrorClass(addWorkOrder.controls.customer)">
+                    <label for="" class="input--required">Customer </label>
+                    <material-dropdown [searchable]="true" [addable]="true" [disabled]="workOrderId!=''"
+                      [selectedOption]="initialDetails.customer" [party]="true" [maxLength]="255"
+                      (addPartyPopup)="openAddPartyModal($event, 'client')"
+                      (addValueToList)="addValueToPartyPopup($event, billingParty)" [params]="partyNamePopup">
+                      <select #customSelect formControlName="customer" class="no-style select--modify"
+                        (change)="onvendorSelected()">
+                        <option *ngFor="let option of partyList" value="{{ option?.id }}">
+                          {{ option?.party_display_name }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                    <span *ngIf="gstin" class="font-small-blue">
+                      {{ terminology.tax_no_type }}: {{ gstin }}
+                    </span>
+                    <app-error [controlName]="addWorkOrder.controls.customer"></app-error>
+                  </div>
+                </div>
+
+                <div class="col-xl-3 col-lg-3 col-md-3 col-6">
+                  <div class="input-wrap error dropdownArrow"
+                    [ngClass]="addErrorClass(addWorkOrder.controls.workorder_no)">
+                    <label for="" class="input--required ">Sales Order No.</label>
+                    <div class="input--bd">{{ addWorkOrder.controls.workorder_no.value }}</div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-md-4 col-6 input-wrap error"
+                  [ngClass]="addErrorClass(addWorkOrder.controls.workorder_date)">
+                  <label class="input--wrap input--required" for="">Sales Order Date</label>
+                  <mat-form-field>
+                    <input matInput [matDatepicker]="workOrderDate" formControlName="workorder_date"
+                      placeholder="DD/MM/YYYY" (focus)="workOrderDate.open()" readonly>
+                    <mat-datepicker-toggle matSuffix [for]="workOrderDate"></mat-datepicker-toggle>
+                    <mat-datepicker #workOrderDate></mat-datepicker>
+                  </mat-form-field>
+                  <app-error [controlName]="addWorkOrder.controls.workorder_date"></app-error>
+                </div>
+
+                <div class="col-xl-3 col-md-4 col-sm-6 input-wrap error"
+                  *ngIf="addWorkOrder.get('vehicle_category').value !='4'"
+                  [ngClass]="addErrorClass(addWorkOrder.controls.workstart_date)">
+                  <label class="input--wrap input--required" for="">Sales Order Start Date</label>
+                  <mat-form-field>
+                    <input matInput [matDatepicker]="workStartDate" formControlName="workstart_date"
+                      placeholder="DD/MM/YYYY" (focus)="workStartDate.open()"
+                      (dateChange)="setWorkEndDate();getDocsExpiryLIst()" readonly>
+                    <mat-datepicker-toggle matSuffix [for]="workStartDate"></mat-datepicker-toggle>
+                    <mat-datepicker #workStartDate></mat-datepicker>
+                  </mat-form-field>
+                  <app-error class="removePositionDate"
+                    [controlName]="addWorkOrder.controls.workstart_date"></app-error>
+                </div>
+                <div class="col-xl-3 col-md-4 col-sm-6 input-wrap error"
+                  *ngIf="addWorkOrder.get('vehicle_category').value !='4'"
+                  [ngClass]="addErrorClass(addWorkOrder.controls.expected_tenure)">
+                  <label for="" class="input--required">Sales Order Expected Tenure</label>
+                  <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                    [selectedOption]="initialDetails.expectedTenure">
+                    <select #customSelect formControlName="expected_tenure" class="no-style select--modify"
+                      (change)="setWorkEndDate()">
+                      <option *ngFor="let tenure of expectedTenures" value="{{ tenure.id }}">
+                        {{ tenure.label }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                  <app-error class="removePosition" [controlName]="addWorkOrder.controls.expected_tenure"></app-error>
+
+                </div>
+
+                <div class="col-xl-3 col-md-4 col-sm-6 input-wrap error"
+                  *ngIf="addWorkOrder.get('vehicle_category').value !='4'"
+                  [ngClass]="addErrorClass(addWorkOrder.controls.workend_date)">
+                  <label class="input--wrap input--required" for="">Sales Order End Date</label>
+                  <mat-form-field>
+                    <input matInput [matDatepicker]="workEndDate" [min]="addWorkOrder.controls.workstart_date.value"
+                      formControlName="workend_date" placeholder="DD/MM/YYYY" (focus)="workEndDate.open()"
+                      (dateChange)="onWorkEndDateChange()" readonly>
+                    <mat-datepicker-toggle matSuffix [for]="workEndDate"></mat-datepicker-toggle>
+                    <mat-datepicker #workEndDate></mat-datepicker>
+                  </mat-form-field>
+                  <app-error class="removePositionDate" [controlName]="addWorkOrder.controls.workend_date"></app-error>
+                </div>
+                <div class="col-xl-3 col-md-4 col-sm-6 input-wrap error"
+                  [ngClass]="addErrorClass(addWorkOrder.controls.quotation)">
+                  <label for="">Quotation No.</label>
+                  <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                    [selectedOption]="initialDetails.quotation">
+                    <select #customSelect formControlName="quotation" class="no-style select--modify"
+                      (change)="quotationSelected($event.target.value)">
+                      <option *ngFor="let quotation of quotationsList" value="{{ quotation.id }}">
+                        {{ quotation.quotation_no }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                  <app-error class="removePosition" [controlName]="addWorkOrder.controls.quotation"></app-error>
+
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="input-wrap">
+                    <label for="">Employee In Charge</label>
+                    <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [addBlank]="true"
+                      [selectedOption]="initialDetails.employee_in_charge">
+                      <select #customSelect formControlName="employee_in_charge" class="no-style select--modify"
+                        (change)="handleEmployeeChange()">
+                        <option *ngFor="let employee of employeeList" value="{{ employee.id }}">
+                          {{ employee.emp_name_id }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                    <app-error [controlName]="addWorkOrder.controls.employee_in_charge"></app-error>
+
+
+                  </div>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-3 col-6">
+                  <div class="input-wrap error " [ngClass]="addErrorClass(addWorkOrder.controls.enquiry_no)">
+                    <label for="" class="input">Reference No.</label>
+                    <input formControlName="enquiry_no" type="text" class="no-style input--bd" placeholder="" value="">
+                  </div>
+                </div>
+                <div class="col-xl-3 col-md-4 col-sm-6 input-wrap error"
+                  *ngIf="addWorkOrder.get('vehicle_category').value =='1' || addWorkOrder.get('vehicle_category').value =='2'"
+                  [ngClass]="addErrorClass(addWorkOrder.controls.site_inspection_no)">
+                  <label for="">Site Inspection No.</label>
+                  <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                    [selectedOption]="initialDetails.site_inspection_no">
+                    <select #customSelect formControlName="site_inspection_no" class="no-style select--modify"
+                      (change)="siteInspectionSelected($event.target.value)">
+                      <option *ngFor="let option of siteInspectionList" value="{{ option.id }}">
+                        {{ option.site_inspection_no }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                  <app-error class="removePosition"
+                    [controlName]="addWorkOrder.controls.site_inspection_no"></app-error>
+
+                </div>
+
+                <div class="col-xl-3 col-lg-3  col-md-3 col-6" [ngClass]="{'disable' : !isToMAndSoWEditable}"
+                  *ngIf="addWorkOrder.get('vehicle_category').value =='0' || addWorkOrder.get('vehicle_category').value =='4'">
+                  <div class="input-wrap clearfix" [ngClass]="addErrorClass(addWorkOrder.controls.type_of_movement)">
+                    <label for="" class="input--required">Type Of Movement</label>
+                    <div>
+                      <material-dropdown [selectedOption]="initialDetails.typeOfMovement"  [disabled]="!isToMAndSoWEditable">
+                        <select #customSelect class="no-style select--modify" formControlName="type_of_movement"
+                          (change)="movementTypeChanged()">
+                          <option *ngFor="let type of movementTypes" value="{{ type.value }}">
+                            {{ type.label }} </option>
+                        </select>
+                      </material-dropdown>
+                      <app-error [controlName]="addWorkOrder.controls.type_of_movement"></app-error>
+                    </div>
+                  </div>
+                </div>
+                <ng-container *ngIf="addWorkOrder.get('type_of_movement').value =='1'">
+                  <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                    <div class="input-wrap clearfix">
+                      <label for="">DO No</label>
+                      <input type="text" class="no-style input--bd" formControlName="no" placeholder="123456" value="">
+                    </div>
+                  </div>
+                  <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(addWorkOrder.controls.date)">
+                      <label for="">DO Date</label>
+                      <mat-form-field>
+                        <input matInput readonly [matDatepicker]="date" formControlName="date" (focus)="date.open()"
+                          placeholder="DD/MM/YYYY">
+                        <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                        <mat-datepicker #date></mat-datepicker>
+                      </mat-form-field>
+                      <app-error [controlName]="addWorkOrder.controls.date"></app-error>
+                    </div>
+                  </div>
+                  <ng-container *ngIf="addWorkOrder.get('vehicle_category').value =='4'">
+                    <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                      <div class="input-wrap error"
+                        [ngClass]="addErrorClass(addWorkOrder.controls.movement_expiry_cutoff_date)">
+                        <label for="">DO Expiry Date</label>
+                        <mat-form-field>
+                          <input matInput readonly [matDatepicker]="movement_expiry_cutoff_date"
+                            formControlName="movement_expiry_cutoff_date" (focus)="movement_expiry_cutoff_date.open()"
+                            placeholder="DD/MM/YYYY">
+                          <mat-datepicker-toggle matSuffix [for]="movement_expiry_cutoff_date"></mat-datepicker-toggle>
+                          <mat-datepicker #movement_expiry_cutoff_date></mat-datepicker>
+                        </mat-form-field>
+                        <app-error [controlName]="addWorkOrder.controls.movement_expiry_cutoff_date"></app-error>
+                      </div>
+                    </div>
+                  </ng-container>
+
+
+                  <ng-container *ngIf="addWorkOrder.get('vehicle_category').value =='0'">
+
+                    <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                      <div class="input-wrap clearfix">
+                        <label for="" class="">Is Inspection Required</label>
+                        <div>
+                          <material-dropdown [selectedOption]="initialDetails.inspectionRequired">
+                            <select #customSelect class="no-style select--modify"
+                              formControlName="is_inspection_required"
+                              (change)="inspectionRequiredSelected($event.target.value)">
+                              <option *ngFor="let type of inspectionRequired" value="{{ type.value }}">
+                                {{ type.label }} </option>
+                            </select>
+                          </material-dropdown>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3  col-md-3 col-6"    [ngClass]="{'disable':addWorkOrder.get('is_inspection_required').value=='0'}">
+                      <div class="input-wrap clearfix"
+                        [ngClass]="addErrorClass(addWorkOrder.controls.inspection_type)"   [ngClass]="{'disable':addWorkOrder.get('is_inspection_required').value=='0'}">
+                        <label for="" class="input--required mb-1">Type Of Inspection </label>
+                        <app-inspection-type [inspectionTypeControl]="addWorkOrder.controls.inspection_type"></app-inspection-type>
+                      </div>
+                    </div>
+
+
+
+                  </ng-container>
+                </ng-container>
+
+                <ng-container *ngIf="addWorkOrder.get('type_of_movement').value =='2'">
+                  <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                    <div class="input-wrap clearfix">
+                      <label for="">Booking No</label>
+                      <input type="text" class="no-style input--bd" formControlName="no" placeholder="123456" value="">
+                    </div>
+                  </div>
+                  <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(addWorkOrder.controls.date)">
+                      <label for="">Booking Date</label>
+                      <mat-form-field>
+                        <input matInput readonly [matDatepicker]="date" formControlName="date" (focus)="date.open()"
+                          placeholder="DD/MM/YYYY">
+                        <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                        <mat-datepicker #date></mat-datepicker>
+                      </mat-form-field>
+                      <app-error [controlName]="addWorkOrder.controls.date"></app-error>
+                    </div>
+                  </div>
+                  <ng-container *ngIf="addWorkOrder.get('vehicle_category').value =='4'">
+                    <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                      <div class="input-wrap error"
+                        [ngClass]="addErrorClass(addWorkOrder.controls.movement_expiry_cutoff_date)">
+                        <label for="">Cut off Date</label>
+                        <mat-form-field>
+                          <input matInput readonly [matDatepicker]="movement_expiry_cutoff_date"
+                            formControlName="movement_expiry_cutoff_date" (focus)="movement_expiry_cutoff_date.open()"
+                            placeholder="DD/MM/YYYY">
+                          <mat-datepicker-toggle matSuffix [for]="movement_expiry_cutoff_date"></mat-datepicker-toggle>
+                          <mat-datepicker #movement_expiry_cutoff_date></mat-datepicker>
+                        </mat-form-field>
+                        <app-error [controlName]="addWorkOrder.controls.movement_expiry_cutoff_date"></app-error>
+                      </div>
+                    </div>
+                  </ng-container>
+                 
+                  <ng-container *ngIf="addWorkOrder.get('vehicle_category').value =='0'">
+                    <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                      <div class="input-wrap clearfix">
+                        <label for="" class="">Is Inspection Required</label>
+                        <div>
+                          <material-dropdown [selectedOption]="initialDetails.inspectionRequired">
+                            <select #customSelect class="no-style select--modify"
+                              formControlName="is_inspection_required"
+                              (change)="inspectionRequiredSelected($event.target.value)">
+                              <option *ngFor="let type of inspectionRequired" value="{{ type.value }}">
+                                {{ type.label }} </option>
+                            </select>
+                          </material-dropdown>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3  col-md-3 col-6"   [ngClass]="{'disable':addWorkOrder.get('is_inspection_required').value=='0'}">
+                      <div class="input-wrap clearfix"
+                        [ngClass]="addErrorClass(addWorkOrder.controls.inspection_type)">
+                        <label for="" class="input--required">Type Of Inspection </label>
+                        <app-inspection-type [inspectionTypeControl]="addWorkOrder.controls.inspection_type"></app-inspection-type>
+                      </div>
+                    </div>
+
+                  </ng-container>
+
+
+                </ng-container>
+                <ng-container *ngIf="addWorkOrder.get('vehicle_category').value =='4'">
+                  <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                    <div class="input-wrap clearfix error" [ngClass]="addErrorClass(addWorkOrder.controls.no_of_containers)">
+                      <label for="">No. Of Containers </label>
+                      <input positiveDigitNumber type="text" class="no-style input--bd"
+                        formControlName="no_of_containers" placeholder="123456" value="">
+                        <p class="containor-error" *ngIf="addWorkOrder.controls.no_of_containers.touched && addWorkOrder.controls.no_of_containers.invalid">Cannot reduce below  {{workOrderDetails['container']['min_no']}} as jobs have been scheduled for them.</p>
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-container
+                  *ngIf="(addWorkOrder.get('type_of_movement').value =='2' || addWorkOrder.get('type_of_movement').value =='1') && addWorkOrder.get('vehicle_category').value =='4'">
+                  <div class="col-xl-3 col-lg-3  col-md-3 col-6"  [ngClass]="{'disable' : !isToMAndSoWEditable}">
+                    <div class="input-wrap clearfix" [ngClass]="addErrorClass(addWorkOrder.controls.movement_sow)">
+                      <label for="" class="input--required">Scope Of Work</label>
+                      <div>
+                        <material-dropdown [selectedOption]="initialDetails.sow" [disabled]="!isToMAndSoWEditable">
+                          <select #customSelect class="no-style select--modify" formControlName="movement_sow"
+                            (change)="scopeOfWork()">
+                            <option *ngFor="let type of sowList" value="{{ type.value }}">
+                              {{ type.label }} </option>
+                          </select>
+                        </material-dropdown>
+                        <app-error [controlName]="addWorkOrder.get('movement_sow')"></app-error>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+                <div class=" col-xl-3 col-lg-3  col-md-3 col-6">
+                  <div class="input-wrap dropdownArrow">
+                      <label for="">Customer POC</label>
+                      <material-dropdown [addable]="true" [selectedOption]="initialDetails.poc"
+                      [postApiUrl]="pocURL" [params]="pocParam"
+                      (postApiResponse)="getAddedPoC($event)"
+                      (addValueToList)="addNewPoC($event)">
+                          <select #customSelect class="no-style select--modify"
+                              formControlName="poc">
+                              <option *ngFor="let option of pointOfContactsList" value="{{option.id}}">{{option.display_name}}
+                              </option>
+                          </select>
+                      </material-dropdown>
+                  </div>
+              </div>
+
+              </div>
+            </div>
+            <ng-container *ngIf="!isCustomerChanged">
+              <app-work-order-template-others [workOrderForm]="addWorkOrder" [quotationDetails]="quotationDetails"
+                [workOrderDetails]="workOrderDetails" [isFormValid]="isFormValid"
+                [contactPersonList]="contactPersonList"
+                *ngIf="addWorkOrder.get('vehicle_category').value =='0'"></app-work-order-template-others>
+              <app-work-order-template-crane (locationSelectedEmitter)="locationSelected($event)"
+                (selectedvehicleAndJobDate)="selectedvehicleAndJobDate($event)"  (isCustomerRateCardExisted)="customerRateCardExisted($event)"
+                (rateCardQuotationPreviousValues)="rateCardQuotationPreviousValues($event)"
+                [iseditQuotationPresent]="iseditQuotationPresent" [quotationDetails]="quotationDetails"
+                [startDate]="addWorkOrder.get('workstart_date').value"
+                [endDate]="addWorkOrder.get('workend_date').value" [workOrderDetails]="workOrderDetails"
+                [contactPersonList]="contactPersonList" *ngIf="addWorkOrder.get('vehicle_category').value =='1'"
+                [isFormValid]="isFormValid" [formType]="'crane'"
+                [workOrderForm]="addWorkOrder"></app-work-order-template-crane>
+              <app-work-order-template-crane   (locationSelectedEmitter)="locationSelected($event)"
+                (selectedvehicleAndJobDate)="selectedvehicleAndJobDate($event)"  (isCustomerRateCardExisted)="customerRateCardExisted($event)"
+                (rateCardQuotationPreviousValues)="rateCardQuotationPreviousValues($event)"
+                [iseditQuotationPresent]="iseditQuotationPresent" [quotationDetails]="quotationDetails"
+                [startDate]="addWorkOrder.get('workstart_date').value"
+                [endDate]="addWorkOrder.get('workend_date').value" [workOrderDetails]="workOrderDetails"
+                [contactPersonList]="contactPersonList" *ngIf="addWorkOrder.get('vehicle_category').value =='2'"
+                [isFormValid]="isFormValid" [formType]="'awp'"
+                [workOrderForm]="addWorkOrder"></app-work-order-template-crane>
+              <app-work-order-template-container *ngIf="addWorkOrder.get('vehicle_category').value =='4'"
+                [workOrderForm]="addWorkOrder" [quotationDetails]="quotationDetails" (commonRateCardValuesEmitter)="commonRateCardValuesEmitter($event)"
+                [contactPersonList]="contactPersonList" [workOrderDetails]="workOrderDetails"
+                [isFormValid]="isFormValid"></app-work-order-template-container>
+
+            </ng-container>
+          </div>
+        </ng-container>
+
+      </div>
+    </form>
+
+
+
+
+
+  </div>
+  <div class=" flex-grow-1 d-flex justify-content-center align-items-center flex-column" *ngIf="!isCatagorySelected">
+    <i class="bi bi-truck select-veh-truck"></i>
+    <p class="select-veh-text text-center line-height-normal ">Please select a vehicle category to proceed</p>
+  </div>
+
+</div>
+<div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end">
+
+  <button class="btn me-2 btn--sm" type="button" [routerLink]="[preFixUrl+'/trip/work-order/list']">Cancel</button>
+  <div class="d-flex align-items-center btn-group-1">
+    <button class="btn btn--primary btn--sm border-end f-b"
+      (click)="saveWorkOrder('save_and_submit','Validation Failed',false)"> {{workOrderId?'Update':'Save'}} </button>
+    <button mat-button class="btn btn--primary w-auto s-b" [matMenuTriggerFor]="menu" *ngIf="isApprovalConfigured"><i
+        class="material-icons">arrow_drop_down</i></button>
+    <mat-menu #menu="matMenu">
+      <button class="more-actions__item  w-100 text-start" type="button"
+        (click)="saveWorkOrder('save_and_submit','Validation Failed',false)">Save and Submit</button>
+      <button class="more-actions__item w-100 text-start mb-2" type="button" *ngIf="isApprovalConfigured"
+        (click)="saveWorkOrder('send_for_approval','Send Approval',true)">Send for Approval</button>
+
+    </mat-menu>
+
+  </div>
+
+</div>
+
+<app-add-party-popup *ngIf="showAddPartyPopup.status" [popDetail]="showAddPartyPopup" [isVendor]="vendor"
+  (closeModal)="closePartyPopup()" (partyAdded)="addPartyToOption($event)"></app-add-party-popup>
+
+
+<app-go-through [goThroughDetais]="goThroughDetais"></app-go-through>
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>

@@ -1,0 +1,126 @@
+<div [ngClass]="{disabled: !showModal}" class="add-item mg-top-30" *ngIf="!inlineAdd && challanList.length>0">
+  <span class="" [ngClass]="{'add-item__note': !challanErrorMessage, 'add-item__error': challanErrorMessage}"
+    data-toggle="modal" data-target="#exampleModal" (click)="toggleChallanModal()">
+    <i class="material-icons add-icon align-middle">add_circle_outline</i>
+    <span class="align-middle mg-left-5" *ngIf="!challanErrorMessage">Add Fuel Challan</span>
+    <span class="align-middle mg-left-5" *ngIf="challanErrorMessage">{{challanErrorMessage}}</span>
+  </span>
+</div>
+
+<a class="" data-toggle="modal" data-target="#exampleModal" *ngIf="inlineAdd && challanList.length>0" (click)="mapSelectedChallans();">
+  <span *ngIf="!this.challanList.length > 0" class="align-middle img-loder">
+    <img src="../assets/img/loder3.gif" alt="">
+  </span>
+  <span class="material-icons add-icon align-middle">add_circle_outline</span>
+  <span class="link-1 align-middle"> Manage Challans</span>
+</a>
+<div class="modal fade" [ngClass]="{show: showModal}" id="exampleModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel1" aria-hidden="true">
+  <div class="modal-dialog modal--wd-lg" role="document">
+    <div class="modal-content">
+      <div class="d-flex justify-content-between def-color border-bottom px-4 align-items-center py-3">
+        <h6  id="exampleModalLabel1" class="fs-5">Add Fuel Challan</h6>
+        <div class="d-flex justify-content-end flex-wrap align-items-center">
+
+          <div class="search-options mx-0 me-2">
+            <input type="text" class="no-style search-bar input-search" placeholder="Search" (keyup)="searchitem()"
+              [(ngModel)]="search" [ngModelOptions]="{standalone: true}">
+
+          </div>
+          <app-date-drop-down (dateSelectedEmitter)="dateSelectedEmitter($event)"></app-date-drop-down>
+          <ng-container >
+            <button class="btn--action mg-left-10 hide_onClick" [ngClass]="{'filterOpen':showFilter }" (click)="showFilter = !showFilter">
+              <span  *ngIf="isFilterApplied && !showFilter" class="material-icons filterBullet">
+                fiber_manual_record
+                </span>
+                <img *ngIf="!isFilterApplied && !showFilter" src="assets/img/filter-icon.svg" alt="">
+                <img *ngIf="isFilterApplied && !showFilter" src="assets/img/filter_icon_2.svg" alt="">
+                <img *ngIf="showFilter" src="assets/img/filter-icon-svg-3.svg" alt="">
+            </button>
+            <app-filter [config]="options" [data]="allData" [visible]="showFilter" (onApplied)="filterApplied($event)"
+              (onClear)="filterApplied($event)">
+            </app-filter>
+          </ng-container>
+        
+        </div>
+      </div>
+      <div class="modal-body pd-20">
+        <form [formGroup]="challanListForm">
+          <div class="">
+            <div
+              class="table-wrapper table-wrapper--type1 table-wrapper--type2 table--bd table--nobg table-wrapper--scroll">
+              <table class="table-container">
+                <thead>
+                  <tr>
+                    <th width=5%>
+                      <label for="check-all" class="check-box" *ngIf="isAdd">
+                        <input type="checkbox" id="check-all" formControlName="selectedAll"
+                          (change)="selectAllChalan()">
+                        <span class="check-mark"></span>
+                      </label>
+                    </th>
+                    <th width=15%>Date</th>
+                    <th width=15%>Vehicle No.</th>
+                    <th width=10%>Fuel Quantity</th>
+                    <th width=15%>Fuel Rate  ({{ currency_type?.symbol}})</th>
+                    <th width=15%>Total  ({{ currency_type?.symbol}})</th>
+                    <th width=15%>Document No.</th>
+                  </tr>
+                </thead>
+                <tbody formArrayName="challans">
+                  <tr *ngIf="challanList.length == 0">
+                    <td colspan="10" style="background-color: #fff">
+                      <div class="no-content-wrapper h-auto">
+                        <figure class="no-content-pic mb-4">
+                          <img src="assets/img/no-content.png" alt="">
+                        </figure>
+                        <div class="no-content-txt">
+                          <h5 class="heading fs-5">No data found!</h5>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngFor="let challan of challanList; let i = index;" [formGroupName]="i">
+                    <td class="table-checkbox">
+                      <label for="check-check-vech{{ i }}" class="check-box">
+                        <input type="checkbox" id="check-check-vech{{ i }}" formControlName="selectedChallan"
+                          value="{{ challan.id }}" (change)="onChallanSelected($event)">
+                        <span class="check-mark"></span>
+                      </label>
+                    </td>
+                    <td>
+                      {{ challan.challan_date |formateDate }}
+                    </td>
+                    <td>
+                      {{ challan?.vehicle?.reg_number }}
+                    </td>
+                    <td>
+                      {{ challan.quantity}}
+                    </td>
+                    <td>
+                      {{ challan.unit_cost}}
+                    </td>
+                    <td>
+                      {{ challan.total }}
+                    </td>
+                   
+                    <td>
+                      {{ challan.document_no || '-'}}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer no-border">
+        <button type="button" class="btn" data-dismiss="modal" (click)="close()">Close</button>
+        <button type="button" class="btn btn--primary" (click)="selectChallans()" *ngIf="!inlineAdd">Add</button>
+        <button type="button" class="btn btn--primary" (click)="manageChallan ()" *ngIf="inlineAdd">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="showModal" class="modal-backdrop fade show"></div>

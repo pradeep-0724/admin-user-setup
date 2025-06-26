@@ -1,0 +1,98 @@
+<div >
+    <div >
+      <app-table-widget
+        [isSearch]="true"
+        [tableTitle]="'Loose Cargo Jobs'"
+        [isSettings]="true"
+        [isExpanded]="true" 
+        [settingsUrl]="'revenue/workorder/cargo/setting/'"
+        (searchedData)="searchJobList($event)" 
+        (settingAppliedEmitter)="settingsApplied($event)">
+    </app-table-widget>
+      <div >
+       
+
+        <div class="custom-table-container job-class" (scroll)="onScrollJob($event)">
+          <table>
+            <thead>
+              <tr>
+                <ng-container *ngFor="let header of jobHeaderList">
+                <!-- <th *ngIf="header == 'Rental charge' ||  header == 'Total Amount' || header == 'Extra hours'">{{header}} ({{ currency_type?.symbol}})</th> -->
+                <th *ngIf="true">{{header}}</th>
+              </ng-container>
+              </tr>
+            </thead>
+            <tbody *ngIf="jobList.length==0">
+              <tr class="border-0">
+                <td colspan="30" class="bg-white">
+                  <div class="no-list-data-wrap">
+                    <figure>
+                      <img src="assets/img/no-content.png" alt="" />
+                    </figure>
+                    <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tbody>
+                <tr *ngFor="let job of jobList">
+                  <ng-container *ngFor="let jobObj of job?.extra_values" >
+                    <ng-container *ngIf="jobObj?.id!='vehicle' && jobObj?.id!='job_id' 
+                                        && jobObj?.id!='status'
+                                        && jobObj?.id!='vp' && jobObj?.id!='lpo_no'" >
+                      <td class="ws-nowrap">{{jobObj?.value}}</td>
+                     </ng-container>
+
+                     <ng-container *ngIf="jobObj?.id == 'status'">
+                      <td class="ws-nowrap" *ngIf="job?.status_int == 0 || job?.status_int == 4" [style.color]="'#FFB900'">{{jobObj?.value}}</td>
+                      <td class="ws-nowrap" *ngIf="job?.status_int == 1"  [style.color]="'#4CACFE'">{{jobObj?.value}}</td>
+                      <td class="ws-nowrap" *ngIf="job?.status_int == 2"  [style.color]="'#2BB741'">{{jobObj?.value}}</td>
+                      <td class="ws-nowrap" *ngIf="job?.status_int == 3 || job?.status_int == 5"  [style.color]="'#dc3545'">{{jobObj?.value}}</td>
+                    </ng-container>
+
+                     <td *ngIf="jobObj?.id == 'vp'" ><a *ngIf="isNotEmpty(jobObj?.value)" class="custom-link" 
+                      [routerLink]="[prefix+'/onboarding/party/details/vendor/',jobObj?.value?.id]"  target="_blank">{{jobObj?.value?.name}}</a> 
+                      <span *ngIf="!isNotEmpty(jobObj?.value)">-</span></td>
+    
+                    <td  *ngIf="jobObj?.id == 'lpo_no'">
+                      <a  *ngIf="isNotEmpty(jobObj?.value)" class=" custom-link"  
+                      [routerLink]="[prefix+'/trip/local-purchase-order/view',jobObj?.value?.id]" target="_blank" > {{jobObj?.value?.name}} </a>
+                      <span *ngIf="!isNotEmpty(jobObj?.value)">-</span>
+                    </td>
+    
+
+                     <ng-container *ngIf="jobObj?.id=='vehicle'" >
+                      <ng-container *ngIf="jobObj?.value['reg_no']">
+                        <td class="ws-nowrap">
+                          <a class="custom-link" target="_blank" *ngIf="jobObj?.value['is_market']"
+                        [routerLink]="[prefix+'/onboarding/vehicle/market/details/',jobObj?.value?.id]">{{jobObj?.value?.reg_no}}</a>
+                        <a class="custom-link" target="_blank" *ngIf="!jobObj?.value['is_market']"
+                        [routerLink]="[prefix+'/onboarding/vehicle/own/details/',jobObj?.value?.id]">{{jobObj?.value?.reg_no}}</a>
+                        </td>
+                      </ng-container>
+                      <ng-container *ngIf="!jobObj?.value['reg_no']">
+                        <td class="ws-nowrap">-</td>
+                      </ng-container>
+                    
+                     </ng-container>
+                     
+
+                      <ng-container *ngIf="jobObj?.id =='job_id'" >
+                      <td class="ws-nowrap"><a class="custom-link" target="_blank"
+                        [routerLink]="[prefix+'/trip/new-trip/details/',jobObj?.value?.id]">{{jobObj?.value?.job_id}}</a></td>
+                     
+                     </ng-container> 
+
+
+                  </ng-container> 
+
+
+                </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+   
+  </div>
+ 

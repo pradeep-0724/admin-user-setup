@@ -1,0 +1,14 @@
+
+<div>
+    <app-party-vehicle-provider-header [partInfoDetails]="partInfoDetails"></app-party-vehicle-provider-header>
+</div>
+    <div class="custom-fake-tab custom-fake-tab-sticky calc-height">
+        <p (click)="selectedTab=1 "matRipple class="tab" [ngClass]="{'active-tab':selectedTab==1}">Party Info.</p>
+        <p (click)="selectedTab=2"matRipple class="tab" [ngClass]="{'active-tab':selectedTab==2}">Transactions</p>
+        <p (click)="selectedTab=3"matRipple class="tab" [ngClass]="{'active-tab':selectedTab==3}">Trip Summary</p>
+    </div>
+    <div class=" shadow-inset-top tab-content ">
+        <app-vehicle-provider-info [partInfoDetails]="partInfoDetails" [partyId]="partyId" *ngIf="selectedTab==1"></app-vehicle-provider-info>
+        <app-party-vehicle-provider-transactions [partyId]="partyId" *ngIf="selectedTab==2"></app-party-vehicle-provider-transactions>
+        <app-party-vehicle-provider-trip-summary [partyId]="partyId" *ngIf="selectedTab==3"></app-party-vehicle-provider-trip-summary>
+    </div>

@@ -1,0 +1,32 @@
+<form class="mt-4" *ngIf="activate_advance">
+  <h4>Advances Received</h4>
+  <div class="row mt-4 ml-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong>Cash Advance: </strong> </span>
+      <label for="Cash_Advance" class="d-inline-block checkbox-15"><input type="checkbox" id="Cash_Advance"  [(ngModel)]="transporterTripAdvance.cash_rc_op" (change)="transporterTripAdvance.cash_rc_view=transporterTripAdvance.cash_rc_op" name="cashactive"> <span class="h6"> Active </span><div class="d-inline" [class.disabled]="!transporterTripAdvance.cash_rc_op">
+        <label for="Cash_Advance_pdf" class="d-inline-block checkbox-15 ml-3"><input type="checkbox" id="Cash_Advance_pdf" [(ngModel)]="transporterTripAdvance.cash_rc_view" [readOnly]="!transporterTripAdvance.cash_rc_op" name="cashshowpdf"> <span class="h6">Show PDF</span></label>
+      </div></label>
+    </div>
+    
+  </div>
+  <h4 class="mt-4">Advances paid</h4>
+  <div class="row mt-4 ml-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong>Fuel Advance: </strong> </span>
+      <label for="Fuel_Advance" class="d-inline-block checkbox-15"><input type="checkbox" id="Fuel_Advance"  [(ngModel)]="transporterTripAdvance.fuel_op" (change)="transporterTripAdvance.fuel_view=transporterTripAdvance.fuel_op" name="fuelactive"> <span class="h6"> Active </span><div class="d-inline" [class.disabled]="!transporterTripAdvance.fuel_op">
+        <label for="Fuel_Advance_pdf" class="d-inline-block checkbox-15 ml-3"><input type="checkbox" id="Fuel_Advance_pdf"  [(ngModel)]="transporterTripAdvance.fuel_view" [readOnly]="!transporterTripAdvance.fuel_op" name="fuelshowpdf"> <span class="h6">Show PDF</span></label>
+      </div></label>
+    </div>
+    
+  </div>
+   <div class="row mt-4 ml-2">
+    <div class="col-12">
+      <span class="max-width-150 my-2"><strong>Cash Advance: </strong> </span>
+      <label for="Cash_Advance_paid" class="d-inline-block checkbox-15"><input type="checkbox" id="Cash_Advance_paid"  [(ngModel)]="transporterTripAdvance.cash_ad_op" (change)="transporterTripAdvance.cash_ad_view=transporterTripAdvance.cash_ad_op" name="cashactiveadd"> <span class="h6"> Active </span><div class="d-inline" [class.disabled]="!transporterTripAdvance.cash_ad_op">
+        <label for="Cash_Advance_paid_pdf" class="d-inline-block checkbox-15 ml-3"><input type="checkbox" id="Cash_Advance_paid_pdf" [(ngModel)]="transporterTripAdvance.cash_ad_view" [readOnly]="!transporterTripAdvance.cash_ad_op" name="cashshowpdfadd"> <span class="h6">Show PDF</span></label>
+      </div></label>
+    </div>
+    
+  </div>
+</form>
+<button type="button"  *ngIf="activate_advance" class="btn btn-primary mt-4" (click)="updateAdvances()">Update Advances</button>

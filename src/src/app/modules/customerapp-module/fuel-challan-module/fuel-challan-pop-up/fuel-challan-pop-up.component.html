@@ -1,0 +1,147 @@
+<div class="modal fade" [ngClass]="{'show':inputData.show}" id="exampleModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-body text-center pd-20 py-3">
+        <form [formGroup]="fuelChallanForm" *ngIf="fuelChallanForm">
+          <div class="alert-msg" *ngIf="apiError">
+            <span class="icon-wrap"></span>
+            <p class="message-cont">{{ apiError }}</p>
+          </div>
+
+          <div class="error-msg-list  text-start py-2 " *ngIf="globalFormErrorList.length > 0">
+            <p class="message-head">{{ errorHeaderMessage }}</p>
+            <span class="icon-wrap"></span>
+            <ul *ngFor="let error of globalFormErrorList">
+              <li class="message-cont">{{ error }}</li>
+            </ul>
+          </div>
+          <div>
+            <div class="row  text-start mt-2">
+              <div class="col-lg-3 col-sm-6 pb-2" [ngClass]="{'disabled': isBilledAny || fuelChallanForm.controls.has_trip.value}">
+                <div class="input-wrap error mb-0" [ngClass]="addErrorClass(fuelChallanForm.controls.vendor)">
+                  <label for="" class="input--required">Vendor Name</label>
+                  <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialValues.vendor_name">
+                    <select #customSelect formControlName="vendor" class="no-style select--modify">
+                      <option *ngFor="let option of partyListVendor" value="{{ option?.id }}">
+                        {{ option?.party_display_name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                  <app-error [controlName]="fuelChallanForm.controls.vendor"></app-error>
+                </div>
+              </div>
+
+              <div class="col-lg-3 col-sm-6" [ngClass]="{'disabled': isBilledAny}">
+                <div class="input-wrap error mb-0" [ngClass]="addErrorClass(fuelChallanForm.controls.date)">
+                  <label for="" class="input--required">Date</label>
+                  <mat-form-field>
+                    <input matInput [matDatepicker]="date_field" (focus)="date_field.open()" formControlName="date"
+                      placeholder="DD/MM/YYYY">
+                    <mat-datepicker-toggle matSuffix [for]="date_field"></mat-datepicker-toggle>
+                    <mat-datepicker #date_field></mat-datepicker>
+                  </mat-form-field>
+                  <app-error [controlName]="fuelChallanForm.controls.date"></app-error>
+                </div>
+              </div>
+
+
+            </div>
+
+
+            <div class="">
+              <div
+                class="table-wrapper table-wrapper--type1 table-wrapper--type2  table--bd table--nobg dropDownOverflow"
+                id="table-wrapper">
+                <table class="table-container">
+                  <thead>
+                    <tr>
+                      <th width=15%>Vehicle No.</th>
+                      <th width=10%>Fuel Quantity</th>
+                      <th width=9%>Fuel Cost</th>
+                      <th width=10%>Total ({{ currency_type?.symbol}})</th>
+                      <!-- <th width=10%>Date </th> -->
+                      <th width=10%>Document No.</th>
+                      <th width=8%></th>
+                    </tr>
+                  </thead>
+                  <tbody formArrayName="fuel_challans_meta">
+                    <tr
+                      *ngFor="let vehicleItem of fuelChallanForm.controls.fuel_challans_meta['controls']; let i = index;"
+                      [formGroupName]="i">
+
+
+                      <td [ngClass]="{'disabled':vehicleItem.controls.status.value=='1' || fuelChallanForm.controls.has_trip.value}">
+                        <div>
+                          <material-dropdown [searchable]="true" [addable]="false"
+                            [addErrorClass]="addErrorClass(vehicleItem.controls.vehicle)"
+                            [selectedOption]="initialValues.vehicle[i]">
+                            <select #customSelect formControlName="vehicle" class="no-style select--modify">
+                              <option *ngFor="let option of vehicleList" value="{{ option?.id }}">
+                                {{ option?.reg_number }}
+                              </option>
+                            </select>
+                          </material-dropdown>
+                        </div>
+                      </td>
+
+                      <td [ngClass]="{'disabled':vehicleItem.controls.status.value=='1'}">
+                        <input
+                          [ngClass]="{'showInvalid':vehicleItem.controls.fuel_quntity.invalid&&vehicleItem.controls.fuel_quntity.touched }"
+                          positiveThreeDigitDecimalNumber type="text" placeholder="Eg.: 1234567"
+                          formControlName="fuel_quntity" (keyup)="populateFuelRate(vehicleItem)">
+                      </td>
+
+                      <td [ngClass]="{'disabled':vehicleItem.controls.status.value=='1'}">
+                        <input
+                          [ngClass]="{'showInvalid':vehicleItem.controls.fuel_cost.invalid&&vehicleItem.controls.fuel_cost.touched }"
+                          positiveThreeDigitDecimalNumber type="text" placeholder="1000" formControlName="fuel_cost"
+                          (keyup)="calculateTotal(vehicleItem)">
+                      </td>
+
+                      <td [ngClass]="{'disabled':vehicleItem.controls.status.value=='1'}">
+                        <div class="input-wrap disabled">
+                          <input type="number" placeholder="1000" formControlName="total" [attr.disabled]="true">
+                        </div>
+                      </td>
+                      <!-- <td [ngClass]="{'disabled':vehicleItem.controls.status.value=='1'}"
+                        class="table-datepicker max-wd-140">
+                        <mat-form-field>
+                          <input matInput [matDatepicker]="transactionDate3" (focus)="transactionDate3.open()"
+                            formControlName="date" placeholder="DD/MM/YYYY">
+                          <mat-datepicker-toggle matSuffix [for]="transactionDate3">
+                          </mat-datepicker-toggle>
+                          <mat-datepicker #transactionDate3></mat-datepicker>
+                        </mat-form-field>
+                      </td> -->
+
+                      <td [ngClass]="{'disabled':vehicleItem.controls.status.value=='1'}">
+                        <input type="text" placeholder="1000" formControlName="document">
+                      </td>
+
+
+
+                      <td class="text-center" *ngIf="!fuelChallanForm.controls.has_trip.value">
+                        <span [ngClass]="{'disabled':vehicleItem.controls.status.value=='1'}"
+                          class="material-icons delete" (click)="removeVehicleDetail(i)"
+                          *ngIf="fuelChallanForm.controls.fuel_challans_meta['controls'].length !== 1">add_circle_outline</span>
+                        <span class="material-icons add" (click)="addMoreFuelDetails([])">add_circle_outline</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </form>
+        <div class="modal-footer no-border">
+          <button class="btn btn- btn--primary wd-105 mg-right-5" (click)="cancelButtonClick()"
+            type="submit">Cancel</button>
+          <button class="btn btn- btn--primary wd-105 mg-left-5" (click)="onOkButtonClick()" type="submit">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="inputData.show" class="modal-backdrop fade show"></div>

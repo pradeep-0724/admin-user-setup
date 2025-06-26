@@ -1,0 +1,54 @@
+<div class="rounded-3 overflow-hidden">
+    <div class="bg-white">
+        <ng-container *ngIf="isDelete">
+            <div class="p-4 d-flex flex-column justify-content-center">
+            <span class="material-icons popup-warning m-auto">warning</span>
+            <p class="my-3 warn-text text-center">Are you sure you want to delete this Certificate?</p>
+            <div class="alert alert-warning text-center">
+                <p>This certificate will be deleted from all the Employees</p>
+            </div>
+            <div class="d-flex justify-content-space-between pt-2 ">
+                <button type="button" class="btn w-auto" data-dismiss="modal"
+                    type="reset" (click)="close()">Cancel</button>
+                <button class="btn btn--primary w-auto" type="button"  (click)="deleteDoc()">Confirm</button>
+            </div>
+        </div>
+        </ng-container>
+        <form [formGroup]="addMoreForm" class="p-0" *ngIf="!isDelete">
+                <div class="py-3 px-4 popup-header p-0">
+                    <p class="fw-semibold p-1 primary-brand-text">{{isEditDoc?'Update':'Add'}} Certificate</p>
+                </div>
+                <div class="alert alert-primary">
+                    <span class="icon-wrap"></span>
+                    <p *ngIf="isEditDoc">This certificate changes will be done to all Employees</p>
+                    <p *ngIf="!isEditDoc">This certificate will be added to all Employees</p>
+                </div><br>
+
+            <div class="px-4">
+                <div class="input-wrap tabIndexActiveFields error w-75"
+                    [ngClass]="addErrorClass(addMoreForm.get('field_title'))">
+                    <label for="" class="input--required">Document Title</label>
+                    <input type="text" class="no-style input--bd" formControlName="field_title"
+                        placeholder="Document Title">
+                    <app-error [controlName]="addMoreForm.get('field_title')">
+                    </app-error>
+                    <p class="error-reg">{{certificateErrMsg}}</p>
+                </div>
+
+                <ng-container  *ngIf="!isEdit">
+                    <div class="input-wrap">
+                        <input style="display: inline-block;width:14px;" class="me-2" type="checkbox" formControlName="is_expiry_mandatory" > <span>Make Certificate Expiry Date Mandatory</span>
+                    </div>
+                </ng-container>
+
+            </div>
+            <div class="d-flex justify-content-space-between pt-0 px-4 py-4 ">
+                <button type="button" class="btn w-auto" data-dismiss="modal"
+                    type="reset" (click)="close()">Close</button>
+                <button class="btn btn--primary w-auto" type="submit" *ngIf="!isEditDoc" (click)="saveForm(addMoreForm,false)">Save </button>
+                <button class="btn btn--primary w-auto" type="submit" *ngIf="isEditDoc"  (click)="saveForm(addMoreForm,true)">Update</button>
+
+            </div>
+        </form>
+    </div>
+</div>

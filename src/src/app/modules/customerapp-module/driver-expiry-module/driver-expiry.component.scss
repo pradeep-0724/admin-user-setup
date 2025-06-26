@@ -1,0 +1,15 @@
+@import "../../../../assets/styles/helpers/variable";
+
+.box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 500;
+    border-radius: 4px;
+    min-height: 40px;
+&--yellow{
+    border: 1px solid #FFA43D ;
+    color: #FFA43D;
+}
+}
+

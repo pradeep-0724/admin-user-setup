@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53 (72520) - https://sketchapp.com -->
+    <title>Dashboard active</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon/main-nav/active/dashboard" transform="translate(-1.000000, -1.000000)">
+            <g id="Dashboard-active">
+                <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+                <g id="Group-14" transform="translate(1.200000, 1.200000)">
+                    <g id="Group-9" transform="translate(2.400000, 2.400000)" fill="#D8DCEF">
+                        <polygon id="Fill-1" points="11.244 17.6148 18.0072 17.6148 18.0072 8.2548 11.244 8.2548"></polygon>
+                        <polygon id="Fill-3" points="0 7.2 4.8 7.2 4.8 0 0 0"></polygon>
+                        <polygon id="Fill-5" points="0 16.8 4.8 16.8 4.8 14.4 0 14.4"></polygon>
+                        <polygon id="Fill-7" points="12 2.4 16.8 2.4 16.8 0 12 0"></polygon>
+                    </g>
+                    <path d="M0,12 L9.6,12 L9.6,0 L0,0 L0,12 Z M2.4,9.6 L7.2012,9.6 L7.2012,2.4 L2.4,2.4 L2.4,9.6 Z" id="Fill-10" fill="#595FAB"></path>
+                    <path d="M12,21.6 L21.6,21.6 L21.6,9.6 L12,9.6 L12,21.6 Z M14.4,19.2 L19.2012,19.2 L19.2012,12 L14.4,12 L14.4,19.2 Z" id="Fill-11" fill="#595FAB"></path>
+                    <path d="M12,7.2 L21.6,7.2 L21.6,0 L12,0 L12,7.2 Z M14.4,4.8 L19.2012,4.8 L19.2012,2.4 L14.4,2.4 L14.4,4.8 Z" id="Fill-12" fill="#595FAB"></path>
+                    <path d="M0,21.6 L9.6,21.6 L9.6,14.4 L0,14.4 L0,21.6 Z M2.4,19.2 L7.2012,19.2 L7.2012,16.8 L2.4,16.8 L2.4,19.2 Z" id="Fill-13" fill="#595FAB"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

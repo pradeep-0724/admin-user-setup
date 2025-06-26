@@ -1,0 +1,41 @@
+<div class="rounded-3 custom-shadow-md">
+<app-table-widget tableTitle="" class="border-bottom"  [isDateRange]="true" [selectedDateRangeType]="10" [isShowDateRangeText]="true"
+(dateRangeEmitter)="dateRange($event)" >
+            <div id="custom-button">
+              <button [matMenuTriggerFor]="download" class="jndjsnd">
+                <span class="material-icons" style="font-size: 20px;color: #979696;">
+                  download
+                </span>
+              </button>
+            </div>
+            <div id="custom-right-btn">
+              <div class="jndjsnd">
+              <mat-form-field appearance="none" style="margin-top: 8px;">
+                <mat-select [(ngModel)]="soaType" panelClass="custom-panel"
+                    (selectionChange)="optionSelect()">
+                    <mat-option value="all">
+                      All Entries
+                    </mat-option>
+                    <mat-option value="outstanding">
+                      Outstanding
+                    </mat-option>
+                </mat-select>
+            </mat-form-field> 
+          </div>
+            </div>
+</app-table-widget>
+
+<pdf-viewer [src]="pdfSrc" [render-text]="true" [stick-to-page]="true" [autoresize]="true" [original-size]="false"
+[show-all]="true">
+</pdf-viewer>
+</div>
+
+
+<mat-menu #download="matMenu">
+  <button mat-menu-item (click)="downloadPdf()">
+    Export the SOA as a PDF
+  </button>
+  <button mat-menu-item (click)="downLodExcel()">
+    Export the SOA as a Excel 
+  </button>
+</mat-menu>

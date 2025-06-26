@@ -1,0 +1,453 @@
+<div class="modal fade px-2" [ngClass]="{'show':addServices?.show&& !isServiceListOpen}" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog screen-center modal--xls" style="max-width: 900px;" role="document">
+    <div class="modal-content p-3">
+
+      <!-- service main popup -->
+
+      <ng-container >
+        <div class="tabIndexActive top-header row mx-0 justify-content-between pt-2">
+          <h1 class="heading col-9">{{isServiceEdit?'Edit':'Add'}} Services</h1>
+        <button class="close-icon material-icons w-auto ms-auto text-end py-0" (click)="onClickCancel()"> highlight_off </button></div>
+        <div *ngIf="!initialValues.errorMessage.isTotalGreaterThenZero" class="alert-msg ">
+
+          <span class="message-cont">Total should be greater then Zero</span>
+        </div>
+        <form class="px-0" [formGroup]="addServiceForm">
+          <div class="row mx-0">
+            <div class="row mx-0 tabIndexActive add-buttons row mx-0 ps-3">
+              <button class="w-auto btn-parrot-green ms-0 px-4 rounded-3" *ngxPermissionsOnly="maintenancePermission[0]" (click)="openAddService()">Add Service</button>
+              <button class="w-auto btn-parrot-green px-4 rounded-3" *ngxPermissionsOnly="maintenancePermission[0]" (click)="addTyreChange()">Add Tyre change</button>
+              <!-- <button class="w-auto btn btn--primary">Add Tire Rotation</button> -->
+           </div>
+           </div>
+
+         <div *ngIf="initialValues.errorMessage.position">
+          <div class="alert-msg">
+              <span class="icon-wrap"></span>
+              <p class="message-cont">Please Note: No information about the Vehicle Tyre Position is available to display,
+                  Please add Tyre Master Information About the Vehicle Make and Model</p>
+          </div>
+            <br>
+         </div>
+
+          <div class="row mx-0 mb-3 align-items-center" *ngIf="addServiceForm['controls'].services['controls'].length>0||addServiceForm['controls'].tyre_change['controls'].length>0">
+
+            <div class="w-auto my-3" [ngClass]="{'hiddenContent':!isTax}" >
+              <div class="input-wrap clearfix d-inline-flex align-items-end  mb-0 removeBorder">
+                <label for="" class="input">Tax</label>
+                <material-dropdown [searchable]="true" class="dropDownWidth" [selectedOption]="initialValues.tax">
+                  <select #customSelect formControlName="tax" class="no-style select--modify" (change)="onCalculationChange();taxValueChange()">
+                      <option *ngFor="let status of taxOptions" value="{{ status.id }}">
+                          {{ status.label}}</option>
+                  </select>
+              </material-dropdown>
+              </div>
+            </div>
+              <div class="w-auto my-3" [ngClass]="{'hiddenContent':!isTax}">
+                <div>
+                  <label class="check-box d-inline-block">
+                    <input type="checkbox" formControlName="is_tax_included" (change)="onCalculationChange()">
+                    <span class="check-mark"></span>
+                    <span class="label-text">Item rates are tax inclusive</span>
+                </label>
+                </div>
+              </div>
+
+
+          </div>
+
+
+
+        <ng-container *ngIf="addServiceForm['controls'].services['controls'].length>0" >
+          <!-- services  -->
+             <h5 class="heading-right-line m-3">Services</h5>
+          <div class="mg-bottom-30 mx-3">
+            <div class="box-shadow table-wrapper table--bd table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow">
+              <table class="table-container" formArrayName="services">
+                <thead>
+                  <tr class="desktop_th">
+                    <th>Service Name</th>
+                    <th>Spare Cost ({{currency_type.symbol}})</th>
+                    <th>Labour Amount ({{currency_type.symbol}})</th>
+                    <th>Total Amount ({{currency_type.symbol}})</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody *ngFor="let item of addServiceForm['controls'].services['controls']; let i = index;"
+                [formGroupName]="i">
+                  <tr class="mobile-flex">
+                    <td class="max-wd-120 ">
+                      <h5 class="th_h5_mobile">Service Name</h5>
+                      <div>
+                        <input type="text" readonly value="{{initialValues.serviceType[i].label}}"/>
+                      </div>
+                    </td>
+                    <td class="max-wd-120">
+                      <h5 class="th_h5_mobile">Service Amount ({{currency_type.symbol}})</h5>
+                      <div>
+                      <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456" (change)="serviceTotalCalculation(item)"  value=""  [ngClass]="{'uniqueNumbererror':item.controls.service_amount.invalid&&item.controls.service_amount.touched}"  formControlName="service_amount">
+                      </div>
+                    </td>
+                    <td class="max-wd-120">
+                      <h5 class="th_h5_mobile">Labour Amount ({{currency_type.symbol}})</h5>
+                      <div>
+                        <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" (change)="serviceTotalCalculation(item)" placeholder="123456" value=""   [ngClass]="{'uniqueNumbererror':item.controls.labour_amount.invalid&&item.controls.labour_amount.touched}"  formControlName="labour_amount">
+                      </div>
+                    </td>
+                    <td class="max-wd-120">
+                      <h5 class="th_h5_mobile">Total Amount ({{currency_type.symbol}})</h5>
+                      <div>
+                        <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456"  [ngClass]="{'uniqueNumbererror':item.controls.total_amount.invalid&&item.controls.total_amount.touched}" value="" formControlName="total_amount"  readonly>
+                      </div>
+                    </td>
+
+                  <td>
+                    <span class="material-icons delete" (click)="removeService(i)">add_circle_outline</span>
+                </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+
+
+
+
+        </ng-container>
+
+
+
+        <ng-container *ngIf="addServiceForm['controls'].tyre_change['controls'].length>0" >
+          <!-- Tyre Change  -->
+             <h5 class="heading-right-line m-3">Tyre Change</h5>
+             <div class="form-body">
+              <div class="alert alert-primary" role="alert" *ngIf="!isVehiclePosition">
+                Please Note: No information about the Vehicle Tyre Position is available to display, Please add Tyre Master Information for the Vehicle Make and Model
+              </div>
+
+              <div *ngIf="initialValues.errorMessage.unique_no">
+                  <div class="alert-msg">
+                      <span class="icon-wrap"></span>
+                      <p class="message-cont">Unique number already exists</p>
+                  </div>
+                  <br>
+              </div>
+              <div *ngIf="initialValues.errorMessage.position_no">
+                  <div class="alert-msg">
+                      <span class="icon-wrap"></span>
+                      <p class="message-cont">Vehicle Position already used</p>
+                  </div>
+                  <br>
+              </div>
+              <div class="mg-bottom-30 mx-3 box-shadow table-wrapper table--bd table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow">
+
+                  <table class="table-container formResponsiveTable" formArrayName="tyre_change">
+                      <thead>
+                          <tr class="desktop_th">
+                            <th>Make</th>
+                            <th>Model</th>
+                            <th >Unique Number</th>
+                            <th>Total ({{currency_type.symbol}})</th>
+                            <th *ngIf="isVehiclePosition">Position</th>
+                            <th ></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                      <ng-container *ngFor="let tyreChange of addServiceForm.controls['tyre_change']['controls']; let i = index;"[formGroupName]="i" >
+                          <tr class="mobile-flex ">
+                              <td  class="max-wd-120 mobile-width-3">
+                                  <h5 class="th_h5_mobile">Make</h5>
+                                  <div class="select-wrap">
+                                  <material-dropdown [searchable]="true" [addable]="true"
+                                  [postApiUrl]="manufacturerApi" [params]="vehicleMakeParam"  [selectedOption]="initialValues.make[i]"
+                                  [addErrorClass]="addErrorClass(tyreChange.controls.manufacturer)"
+                                  (postApiResponse)="getNewVehicleMake($event,i,tyreChange)" (addValueToList)="addNewVehicleMake($event)">
+                                          <select #customSelect formControlName="manufacturer" class="no-style select--modify"
+                                          (change)="onMakeChange(tyreChange, i)">
+                                          <option *ngFor="let make of tyreManufacturer" value="{{make.id}}">
+                                              {{ make.label}}
+                                          </option>
+                                          </select>
+                                      </material-dropdown>
+                                  </div>
+                              </td>
+                              <td  class="max-wd-120  mobile-width-3">
+                                  <div class="select-wrap join-field">
+                                      <material-dropdown [searchable]="true" [addable]="true"
+                                      [params]="modelParams"
+                                      [postApiUrl]="modelApi[i]"
+                                      [selectedOption]="initialValues.model[i]"
+                                      [addErrorClass]="addErrorClass(tyreChange.controls.tyre_model)"
+                                      (postApiResponse)="getNewModel($event,i, tyreChange)"
+                                      (addValueToList)="addNewModel($event)">
+                                          <select #customSelect formControlName="tyre_model" class="no-style select--modify">
+                                              <option *ngFor="let model of modelList[i] " value="{{model.id}}">
+                                                  {{ model.name}}
+                                              </option>
+                                          </select>
+                                      </material-dropdown>
+                                  </div>
+                              </td>
+                              <!-- unique_no -->
+
+                              <td  class="max-wd-120 ">
+                                  <h5 class="th_h5_mobile">Unique Number</h5>
+                                  <div class="input-wrap" [ngClass]="addErrorClass(tyreChange.controls.changed_unique_no)">
+                                      <input type="text" placeholder="1000" formControlName="changed_unique_no" class="error-box" (focusout)="changeUniqueNo(tyreChange)">
+                                  </div>
+                              </td>
+                              <!-- unique_no -->
+                                  <!-- total -->
+                              <td  class="max-wd-120 ">
+                                  <h5 class="th_h5_mobile input-wrap">Total ({{currency_type.symbol}})</h5>
+                                  <input type="text" positiveThreeDigitDecimalNumber [ngClass]="{'uniqueNumbererror':tyreChange.controls.total.invalid&&tyreChange.controls.total.touched}" placeholder="1000"  formControlName="total" (change)="onCalculationChange()">
+                              </td>
+                                 <!-- position -->
+                                 <td  class="max-wd-120 " *ngIf="isVehiclePosition">
+                                  <h5 class="th_h5_mobile">Position</h5>
+                                  <div>
+                                      <div class="select-wrap">
+                                          <material-dropdown  [searchable]="true"  [addErrorClass]="addErrorClass(tyreChange.controls.position)" [addable]="false" [selectedOption]="initialValues.position[i]"  class="dropDownWidth">
+                                              <select #customSelect formControlName="position" class="no-style select--modify" (change)="onTyreSelect(tyreChange)">
+                                                  <option *ngFor="let option of initialValues.vehicleTyrePositions" value="{{option.id}}" >
+                                                      {{option?.tyre_position?.label}}
+                                                  </option>
+                                              </select>
+                                          </material-dropdown>
+                                      </div>
+                                  </div>
+                              </td>
+                                  <!-- position -->
+                              <td>
+                                <span class="material-icons delete" (click)="removeTyreChange(i)">add_circle_outline</span>
+                            </td>
+                          </tr>
+                          <tr *ngIf="false">
+                            <td class="pt-0"></td>
+                            <td class="pt-0"></td>
+                            <td class="pt-0"></td>
+                            <td class="pt-0"></td>
+                            <td class="pt-0">
+                              <div class="input-wrap">
+                                <p  class="unique-number"><span (click)="tyreChange.controls.present_unique_no_edit.value=!tyreChange.controls.present_unique_no_edit.value" >Tyre No : </span>
+                                   <span *ngIf="!tyreChange.controls.present_unique_no_edit.value" >{{tyreChange.controls.present_unique_no.value}}</span>
+                                <span> <input *ngIf="(tyreChange.controls.present_unique_no_edit.value) || (tyreChange.controls.present_unique_no.hasError('required') && tyreChange.controls.present_unique_no.touched)" type="text"
+                                  [ngClass]="{'vechclePositionerror':tyreChange.controls.present_unique_no_status.value == true || (tyreChange.controls.present_unique_no.hasError('required') && tyreChange.controls.present_unique_no.touched)}"
+                                      formControlName="present_unique_no"
+                                       (focusout)="changeOldUniqueNo(tyreChange);
+                                       tyreChange.controls.present_unique_no_edit.value=!tyreChange.controls.present_unique_no_edit.value"
+                                      > </span></p>
+                            </div>
+                            </td>
+                            <td class="pt-0"></td>
+                            <td class="pt-0"></td>
+                          </tr>
+                          </ng-container>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+
+
+
+
+
+        </ng-container>
+
+        <div class="row mx-3">
+          <div class="col-md-7 ps-0 row mx-0">
+              <ng-container *ngIf="isTotalGreaterThenZero" >
+            <!-- payment section  -->
+                <!-- payment types -->
+                <mat-radio-group class="d-inline-flex mb-3 " formControlName="payment_type" (change)="onChangePaymentOptions()">
+                <mat-radio-button class="me-4"  *ngFor="let paymentOption of paymentTypes"  [value]="paymentOption.id">
+                {{paymentOption.label}}
+                </mat-radio-button>
+                </mat-radio-group>
+
+                <div class="col-md-4  col-sm-6">
+                  <div class="input-wrap clearfix error mb-3" [ngClass]="addErrorClass(addServiceForm.controls.vendor)">
+                    <label for="" class="input" [ngClass]="{'input--required':addServiceForm.controls.payment_type.value=='2'||addServiceForm.controls.payment_type.value==2}">Vendor Name</label>
+                    <material-dropdown [searchable]="true"
+                                       [addable]="true"
+                                       class="dropDownWidth"
+                                       [addErrorClass]="addErrorClass(addServiceForm.controls.vendor)"
+                                       [selectedOption]="initialValues.vendor"
+                                       [party]="true" (addPartyPopup)="openAddPartyModal($event)"
+                                       (addValueToList)="addValueToPartyPopup($event)"
+                                       [params]="partyNamePopup">
+                                 <select #customSelect formControlName="vendor" class="no-style select--modify" (change)="vendorSelected($event.target.value)">
+                                    <option *ngFor="let vendor of vendorList" value="{{ vendor.id }}">
+                                          {{ vendor.party_display_name }}</option>
+                        </select>
+                    </material-dropdown>
+                    <app-error [controlName]="addServiceForm.controls.vendor"></app-error>
+    
+                  </div>
+                </div>
+
+                <div class="col-md-4 col-sm-6" *ngIf="addServiceForm.controls.payment_type.value<=2">
+                  <div class="input-wrap clearfix ">
+                    <label for="" class="input">Bill Number</label>
+                    <input  type="text" class="no-style input--bd"  placeholder="123456" value=""  formControlName="bill_number">
+                  </div>
+                </div>
+              <ng-container *ngIf="addServiceForm.controls.payment_type.value==1" >
+                <!-- paid  -->
+
+                  <div class="col-md-4 col-sm-6">
+                    <div class="input-wrap error" [ngClass]="addErrorClass(addServiceForm.controls.payment_mode)" >
+                        <label for="" class="input--required   position-relative">Payment Mode</label>
+                        <material-dropdown [searchable]="true"   [selectedOption]="initialValues.paymentMode" [addErrorClass]="addErrorClass(addServiceForm.controls.payment_mode)" class="dropDownWidth">
+                            <select #customSelect formControlName="payment_mode" class="no-style select--modify" (change)="paymentModeChanged()">
+                              <option value="paid_By_Driver">Paid By Employee</option>
+                                <option *ngFor="let option of paymentModeList" value="{{ option.id }}">
+                                    {{ option.name}}</option>
+                            </select>
+                        </material-dropdown>
+                        <app-error [controlName]="addServiceForm.controls.payment_mode"></app-error>
+                        </div>
+                  </div>
+                  <div class="col-md-4 col-sm-6"  *ngIf="is_driver_paid" >
+                    <div class="input-wrap" >
+                        <div class="input-wrap error"
+                            [ngClass]="addErrorClass(addServiceForm.controls.paid_employee)">
+                            <label for="" class="input--required">Paid By</label>
+                            <material-dropdown [searchable]="true" [selectedOption]="initialValues.paid_employee"  [addable]="false" class="dropDownWidth">
+                                <select #customSelect formControlName="paid_employee" class="no-style select--modify" >
+                                    <option *ngFor="let account of activeEmpList" value="{{ account.id }}">
+                                        {{ account.display_name }}</option>
+                                </select>
+                              </material-dropdown>
+                            <app-error [controlName]="addServiceForm.controls.paid_employee"></app-error>
+                        </div>
+                    </div>
+                </div>
+
+
+              </ng-container>
+
+
+              <ng-container *ngIf="addServiceForm.controls.payment_type.value<=2">
+              <div class="col-md-4 col-sm-6">
+                <div class="input-wrap clearfix error"  [ngClass]="addErrorClass(addServiceForm.controls.bill_date)">
+                    <label for="" class="input--required">Bill Date</label>
+                    <mat-form-field>
+                        <input matInput [matDatepicker]="bill_date" (focus)="bill_date.open()" formControlName="bill_date"
+                            placeholder="DD/MM/YYYY">
+                        <mat-datepicker-toggle matSuffix [for]="bill_date"></mat-datepicker-toggle>
+                        <mat-datepicker #bill_date></mat-datepicker>
+                    </mat-form-field>
+                    <app-error [controlName]="addServiceForm.controls.bill_date"></app-error>
+                </div>
+              </div>
+            </ng-container>
+
+              <ng-container *ngIf="addServiceForm.controls.payment_type.value==2" >
+              <!-- credit -->
+
+              <div class="col-md-4 col-sm-6">
+                <div class="input-wrap clearfix error"  [ngClass]="addErrorClass(addServiceForm.controls.due_date)">
+                    <label for="" class="input--required">Due Date</label>
+                    <mat-form-field>
+                        <input matInput [matDatepicker]="due_date" (focus)="due_date.open()" formControlName="due_date"
+                            placeholder="DD/MM/YYYY">
+                        <mat-datepicker-toggle matSuffix [for]="due_date"></mat-datepicker-toggle>
+                        <mat-datepicker #due_date></mat-datepicker>
+                    </mat-form-field>
+                    <app-error [controlName]="addServiceForm.controls.due_date"></app-error>
+                </div>
+              </div>
+
+              </ng-container>
+
+              <ng-container >
+              <!-- Bill Later -->
+
+              </ng-container>
+
+            </ng-container>
+
+            <div class="col-12" *ngIf="addServiceForm['controls'].services['controls'].length>0||addServiceForm['controls'].tyre_change['controls'].length>0">
+              <label class="mb-3 h6">Note</label>
+              <textarea placeholder="Add notes or Additional Details" formControlName="notes" class="d-inline-flex w-100 rounded-2 p-3 border" cols="90%" rows="10"></textarea>
+            </div>
+          </div>
+
+          <div class="col-md-5" *ngIf="addServiceForm['controls'].services['controls'].length>0||addServiceForm['controls'].tyre_change['controls'].length>0">
+            <ng-container >
+          <!-- claculation part -->
+
+                    <div class="row mx-0 justify-content-between align-items-center py-2">
+                       <p class="ps-0 w-auto">Spare Cost</p><p  class="pe-0 w-auto">{{currency_type.symbol}} {{ addServiceForm.controls.service_total.value }}</p>
+                    </div>
+
+                    <div class="row mx-0 justify-content-between align-items-center py-2">
+                      <p class="ps-0 w-auto">Labour Total </p><p  class="pe-0 w-auto">{{currency_type.symbol}} {{ addServiceForm.controls.labour_total.value }}</p>
+                    </div>
+
+                    <div class="row mx-0 justify-content-between align-items-center py-2">
+                      <p class="ps-0 w-auto">Tyre Change Total </p><p  class="pe-0 w-auto">{{currency_type.symbol}} {{ addServiceForm.controls.tyre_change_total.value }}</p>
+                    </div>
+
+                    <div class="row mx-0 justify-content-between align-items-center py-2">
+                      <p class="ps-0 w-auto">SubTotal </p><p  class="pe-0 w-auto">{{currency_type.symbol}} {{ addServiceForm.controls.subtotal.value }}</p>
+                    </div>
+
+                    <div class="row mx-0 justify-content-between align-items-center py-2">
+                      <p class="ps-0 w-auto">Adjustment </p>
+                      <p  class="pe-0 col-5 "><input  type="text" positiveThreeDigitDecimalNumber (change)="onCalculationChange()"  class="border p-2 rounded-2"  placeholder="123456" value=""  formControlName="adjustment_before_tax"></p>
+                    </div>
+
+                    <div class="row mx-0 justify-content-between align-items-center" [ngClass]="{'hiddenContent':!isTax}"
+                              *ngFor="let percentageTotal of    addServiceTotal.taxes;">
+                        <ng-container *ngIf="percentageTotal.total">
+                        <p class="ps-0 w-auto py-2"> Include {{terminology.tax_type}} @{{ percentageTotal.value }}% on  {{ percentageTotal.total }}
+                        </p>
+                        <p class="pe-0 w-auto py-2">{{currency_type.symbol}} {{ percentageTotal.taxAmount }}</p>
+                      </ng-container>
+                    </div>
+
+                    <div class="row mx-0 justify-content-between align-items-center py-2" [ngClass]="{'hiddenContent':!isTax}">
+                      <p class="ps-0 w-auto">Adjustment </p>
+                      <p class="pe-0 col-5"><input  type="text" positiveThreeDigitDecimalNumber  placeholder="123456" value="" (change)="onCalculationChange()" formControlName="adjustment_after_tax" class="border p-2 rounded-2"></p>
+                    </div>
+
+                    <div class="row mx-0 justify-content-between align-items-center py-2">
+                      <p class="ps-0 w-auto">
+                        <mat-checkbox [disableRipple]="true" (change)="onRoundOffEvent($event)"
+                          formControlName="is_roundoff">Round Off</mat-checkbox>
+                      </p>
+                      <p class="pe-0 w-auto"> {{currency_type.symbol}} {{ addServiceForm.controls.roundoff_amount.value }}</p>
+                    </div>
+
+
+              <div class="row mx-0 justify-content-between align-items-center py-2 border-top-ccc size-3">
+                <h5 class="ps-0 w-auto">Total</h5>  <h5 class="pe-0 w-auto"> {{currency_type.symbol}} {{ addServiceForm.controls.total_amount.value }}</h5>
+              </div>
+            </ng-container>
+            </div>
+         </div>
+        </form>
+
+         <div class="row mx-0 tabIndexActive justify-content-end px-3 mt-5">
+          <button class="btn btn-primary  me-3" (click)="onClickCancel()">Cancel</button>
+          <button class="btn btn-primary btn--primary " (click)="saveMaintenance()">Save</button>
+         </div>
+
+      </ng-container>
+
+  </div>
+</div>
+</div>
+<div *ngIf="addServices?.show&& !isServiceListOpen" class="modal-backdrop fade show"></div>
+
+<app-services-list [isServiceListOpen]="isServiceListOpen" *ngIf="isServiceListOpen" (serviceDetails)="serviceDetails($event)"></app-services-list>
+
+
+<!-- Popup for adding party details -->
+<!-- <app-add-party-popup [popDetail]="showAddPartyPopup" (closeModal)="closePartyPopup()"
+(partyAdded)="addPartyToOption($event)" [isVendor]="true"></app-add-party-popup> -->
+
+

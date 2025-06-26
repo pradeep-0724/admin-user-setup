@@ -1,0 +1,128 @@
+
+<div class="modal fade" [ngClass]="{'show': editNewTripCustomFieldData.show}" id="exampleModal" tabindex="-1" role="dialog"
+aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal-dialog   modal--xls" role="document">
+    <div class="modal-content">
+      <button class="close-icon" (click)="cancelButtonClick()"><mat-icon>highlight_off</mat-icon></button>
+      <form [formGroup]="customFieldForm" style="margin: 10px;">
+
+        <!-- Custom Field Section Starts -->
+        <div>
+          <div class="row" formArrayName="other_details">
+            <ng-container
+              *ngFor="let customfield of customFieldForm['controls']['other_details']['controls']; let iiii = index;"
+              [formGroupName]="iiii">
+
+            <!-- datetime field -->
+          <div class="col-xl-4 col-lg-4 col-md-4" *ngIf="customfield.controls.field_type.value =='datetime'">
+            <div class="input-wrap error" [ngClass]="addErrorClass(customfield.controls.value)"
+            [class.disabled]="customfield.controls.disabled.value">
+              <label for="" class="input--required"
+                *ngIf="customfield.controls.mandatory.value">{{customfield.controls.field_label.value}}</label>
+              <label for="" class="input"
+                *ngIf="!customfield.controls.mandatory.value">{{customfield.controls.field_label.value}}</label>
+                <mat-form-field>
+                  <input matInput [ngxMatDatetimePicker]="picker" formControlName="value"
+                  [disabled]="customfield.controls.disabled.value" [attr.tabindex]="customfield.controls.disabled.value ? -1 : 0"
+                  (dateChange)="onDateTimeChange(customfield)">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <ngx-mat-datetime-picker #picker [showSpinners]="true" [showSeconds]="false"
+                    [stepHour]="1" [stepMinute]="1" [touchUi]="false"
+                    [color]="'primary'" [enableMeridian]="true"
+                    [disabled]="customfield.controls.disabled.value">
+                  </ngx-mat-datetime-picker>
+                </mat-form-field>
+              <app-error [controlName]="customfield.controls.value"></app-error>
+            </div>
+          </div>
+
+              <!-- text field -->
+              <div class="col-xl-4 col-lg-4 col-md-4" *ngIf="customfield.controls.field_type.value =='string'">
+                <div class="input-wrap error" [ngClass]="addErrorClass(customfield.controls.value)"
+                     [class.disabled]="customfield.controls.disabled.value">
+                  <label for="" class="input--required"
+                    *ngIf="customfield.controls.mandatory.value">{{customfield.controls.field_label.value}}</label>
+                  <label for="" class="input"
+                    *ngIf="!customfield.controls.mandatory.value">{{customfield.controls.field_label.value}}</label>
+                  <input type="text" class="no-style input--bd" placeholder="" value="" formControlName="value"
+                  [readonly]="customfield.controls.disabled.value ? -1 : 0">
+                  <app-error [controlName]="customfield.controls.value"></app-error>
+                </div>
+              </div>
+
+              <!-- date field -->
+              <div class="col-xl-4 col-lg-4 col-md-4" *ngIf="customfield.controls.field_type.value =='date'">
+                <div class="input-wrap error" [ngClass]="addErrorClass(customfield.controls.value)"
+                [class.disabled]="customfield.controls.disabled.value">
+                  <label for="" class="input--required"
+                    *ngIf="customfield.controls.mandatory.value">{{customfield.controls.field_label.value}}</label>
+                  <label for="" class="input"
+                    *ngIf="!customfield.controls.mandatory.value">{{customfield.controls.field_label.value}}</label>
+                    <mat-form-field>
+                      <input matInput [matDatepicker]="customDateField"
+                      (focus)="customDateField.open()" [disabled]="customfield.controls.disabled.value"
+                      formControlName="value" placeholder="DD/MM/YYYY"
+                      [attr.tabindex]="customfield.controls.disabled.value ? -1 : 0" >
+                      <mat-datepicker-toggle matSuffix [for]="customDateField"></mat-datepicker-toggle>
+                      <mat-datepicker #customDateField ></mat-datepicker>
+                    </mat-form-field>
+                  <app-error [controlName]="customfield.controls.value"></app-error>
+                </div>
+              </div>
+
+              <!-- check box -->
+              <div class="col-xl-4 col-lg-4 col-md-4 row align-items-center mx-0 d-inline-flex" *ngIf="customfield.controls.field_type.value =='checkbox'">
+                <div class="input-wrap error m-0 w-100" [ngClass]="addErrorClass(customfield.controls.value)"
+                [class.disabled]="customfield.controls.disabled.value">
+                  <label for="" class="input--required w-auto d-inline"
+                    *ngIf="customfield.controls.mandatory.value">{{customfield.controls.field_label.value}}</label>
+                  <label for="" class="input  w-auto d-inline "
+                    *ngIf="!customfield.controls.mandatory.value">{{customfield.controls.field_label.value}}</label>
+                  <input type="checkbox" class=" w-auto d-inline "   placeholder="" value="" formControlName="value"
+                  [disabled]="customfield.controls.disabled.value">
+                  <app-error [controlName]="customfield.controls.value"></app-error>
+                </div>
+              </div>
+
+              <!-- drop down -->
+              <div class="col-xl-4 col-lg-4 col-md-4" *ngIf="customfield.controls.field_type.value =='select_option'">
+                <div class="input-wrap error" [ngClass]="addErrorClass(customfield.controls.value)"
+                  [class.disabled]="customfield.controls.disabled.value">
+                  <label for="" class="input--required"
+                    *ngIf="customfield.controls.mandatory.value">{{customfield.controls.field_label.value}}</label>
+                  <label for="" class="input"
+                    *ngIf="!customfield.controls.mandatory.value">{{customfield.controls.field_label.value}}</label>
+                  <material-dropdown [searchable]="false" [addable]="false" class="dropDownW"
+                    [selectedOption]="customfield?.controls?.selected_option?.value"
+                    [addErrorClass]="customfield.controls.value"
+                    [disabled]="customfield.controls.disabled.value">
+                    <select #customSelect formControlName="value" class="no-style select--modify ">
+                      <option *ngFor=" let option of customfield.controls.option_list.value" value="{{ option }}">
+                        {{ option }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                  <app-error [controlName]="customfield.controls.value"></app-error>
+                </div>
+              </div>
+
+            </ng-container>
+          </div>
+        </div>
+        <!-- Custom Field Section Ends -->
+
+      </form>
+
+      <div class="row justify-content-between">
+        <div class="col-5">
+          <button class="btn btn- btn--primary wd-105 cancel-button" (click)="cancelButtonClick()" type="submit">Cancel</button>
+        </div>
+        <div class="col-5">
+          <button class="btn btn- btn--primary  save-button wd-105 ms-auto" (click)="onOkButtonClick()" type="submit">Save</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+</div>
+<div *ngIf=" editNewTripCustomFieldData.show" class="modal-backdrop fade show"></div>

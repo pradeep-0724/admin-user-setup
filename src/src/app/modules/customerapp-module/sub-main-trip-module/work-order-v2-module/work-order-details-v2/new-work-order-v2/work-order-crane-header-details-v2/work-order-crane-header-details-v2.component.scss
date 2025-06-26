@@ -1,0 +1,171 @@
+@import "../../../../../../../../assets/styles/helpers/variable";
+
+.right-section__header {
+    padding: 6px 20px;
+}
+
+b {
+    margin-right: 8px;
+}
+
+p {
+    color: $text-color;
+}
+
+
+.play-button {
+    border: 2px solid #4CACFE;
+    padding: 0 15px;
+    color: #4CACFE;
+    border-radius: 2px;
+    transition: all 400ms ease-in-out;
+
+    .bi-play-circle-fill {
+        margin-right: 10px;
+        font-size: 15px;
+    }
+
+    &:hover {
+        background-color: #4CACFE;
+        color: white;
+        transform: scale(1.03);
+
+    }
+}
+
+.trip-id {
+    margin-right: 14px;
+    color: $primary-brand-color;
+    font-weight: 600;
+    font-size: 15px;
+
+    button {
+        box-sizing: border-box;
+        padding: 7px;
+        border-radius: 7px;
+        border: 1px dotted transparent;
+        margin-right: 10px;
+
+        &:hover {
+            border-color: gainsboro;
+        }
+
+        .bi-chevron-left {
+            -webkit-text-stroke: 1px;
+            color: black;
+            font-size: 15px;
+        }
+    }
+}
+
+.trip-id+p {
+
+    padding-left: 14px;
+    font-weight: 600;
+    color: $green;
+    border-left: 2px solid gainsboro;
+    font-size: 15px;
+
+}
+
+.details {
+    background-color: $layout-bg;
+
+
+    p {
+
+        padding: 11px 4px;
+        color: #676A6E;
+    }
+
+}
+
+.edit-btn {
+    border: 2px solid #ACB5BD;
+    padding: 10px 15px;
+    color: #676A6E;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-right: 20px;
+    transition: all 400ms ease-in-out;
+
+    &:hover {
+
+        transform: scale(1.04);
+
+    }
+
+    .bi-pencil-fill {
+        margin-right: 10px;
+
+    }
+}
+.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.shadow-circle {
+    width: 50px;
+    height: 50px;
+
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .bi {
+        font-size: 25px;
+    }
+
+}
+
+.green-shadow {
+    box-shadow: 0px 0px 8px #64B164A6;
+
+    .bi {
+        color: #64B164
+    }
+
+    &:hover {
+        box-shadow: 0px 0px 20px rgba(100, 177, 100, 1.6509803922);
+
+    }
+}
+
+.red-shadow {
+    box-shadow: 0px 0px 8px #FF0000A6;
+    color: #FF0000;
+
+    &:hover {
+        box-shadow: 0px 0px 20px #FF0000A6;
+
+    }
+
+
+    &::after {
+        content: "";
+        display: block;
+        position: absolute;
+        height: 100%;
+        width: 1.5px;
+        border-radius: 10px;
+        background-color: #B9B9B9;
+        right: 0;
+
+    }
+
+    &::before {
+        content: "";
+        display: block;
+        position: absolute;
+        height: 100%;
+        width: 1.5px;
+        border-radius: 10px;
+        background-color: #B9B9B9;
+        left: 0;
+
+    }
+}

@@ -1,0 +1,109 @@
+<div class="right-section__header">
+    <h1 class="heading col-8">Purchase Order List</h1>
+    <div class="col-4  text-end d-flex align-items-center justify-content-end tabIndexActive">
+        <button class="add-button btn--rounded mx-2" *ngxPermissionsOnly="[purchasePer[0]]" [routerLink]="[prefixUrl+'/inventory/purchase-order/add']"
+         routerLinkActive="router-link-active">Add Purchase Order</button>
+    </div>
+</div>
+<app-list-widget
+[isDetailsEnable]="true"
+[isSearchEnable]="true"
+[isShowingEnable]="true"
+[isFilterEnable]="true"
+(filteredDataEmitter)="filteredData($event)"
+(searchValueEmitter)="searchFilter($event)"
+(showItemByEmitter)="filterListBy($event)"
+(openDetailsEmitter)="openListDetailsData($event)"
+[openListDetails]="openListDetails"
+[apiError]="apiError"
+[isMobile]="isMobile"
+[filterOptions]="options"
+[filterDataList]="allData">
+  <div id="tableList">
+
+    <div class="table-wrapper-list" [ngClass]="{'table-wrapper-init':!routeToDetail , 'table-wrapper-auto':routeToDetail}" id="table-height">
+      <table class="table-container">
+          <thead>
+              <tr>
+                  <th>PO Date</th>
+                  <th>PO No.</th>
+                  <th>Vendor Name</th>
+                  <th>Approval  User</th>
+                  <th>Expected Delivery Date </th>
+                  <th>Amount ({{ currency_type?.symbol}})</th>
+                  <th>Status</th>
+                  <th></th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr *ngIf="(sortedData |purchaseOrderPipe:search)?.length == 0">
+                  <td colspan="10" style="background-color: #fff">
+                      <div class="no-content-wrapper">
+                          <figure class="no-content-pic">
+                              <img src="assets/img/no-content.png" alt="">
+                          </figure>
+                          <div class="no-content-txt">
+                              <h5 class="heading">No data found!</h5>
+                          </div>
+                      </div>
+                  </td>
+              </tr>
+              <tr
+                  *ngFor="let data of sortedData |purchaseOrderPipe:search|paginate: { itemsPerPage: filter_by, currentPage: p }; let i = index;" [ngClass]="{'viewActive':(data.id==selectedId)&&routeToDetail }">
+                  <td>{{ data.po_date }}</td>
+                  <td class="link" (click)="routeToDetailById(data.id)">{{ data.po_number}}</td>
+                  <td><a target="_blank" class="link" [routerLink]="[prefixUrl+'/onboarding/party/details/vendor/'+data.vendor_id]">{{ data.vendor}}</a></td>
+                  <td>{{ data.approval_user}}</td>
+                  <td>{{ data.expected_delivery_date}}</td>
+                  <td class="rupee-symbol rupee-symbol--sm">{{ data.total}}</td>
+                  <td class="rupee-symbol rupee-symbol--sm">{{ data.status.label}}</td>
+                  <td class="table-action">
+                       <div *ngxPermissionsOnly="[purchasePer[1],purchasePer[2]]">
+                         <i class="material-icons more-icon"  *ngIf="checkShowDots(data)" (click)="optionsList($event, 'list_'+data.id)">more_vert</i>
+                       </div>
+                      <ul class="more-actions__menu table-popup" [ngClass]="{show: showOptions === 'list_'+data.id}">
+                           <div *ngxPermissionsOnly="[purchasePer[1]]">
+                             <li class="more-actions__item" *ngIf="checkEditDelete(data)"
+                                 [routerLink]="[prefixUrl+'/inventory/purchase-order/edit/', data.id]" ><i
+                                     class="material-icons">edit</i>Edit</li>
+                           </div>
+                           <div *ngxPermissionsOnly="[purchasePer[2]]">
+                             <li  class="more-actions__item"  *ngIf="checkEditDelete(data)" (click)="popupFunction(data.id, i)"><i
+                                     class="material-icons">delete</i>Delete</li>
+                           </div>
+                           <ng-container *ngxPermissionsOnly="[purchasePer[1]]" >
+                            <li  class="more-actions__item"  *ngIf="data.status.index==1" (click)="changeStatus(data.id)">Change status</li>
+                            <li *ngIf="checkBillConvert(data)"  class="more-actions__item" (click)="changeStatus(data.id)" [routerLink]="[prefixUrl+'/inventory/add/inventory-new/convert-to-bill']" [queryParams]="{ poNumber: data.id }">Convert to Bill</li>
+                           </ng-container>
+
+                      </ul>
+
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+  </div>
+
+
+
+  <div class="table-page-no">
+      <pagination-controls previousLabel='' nextLabel="" directionLinks="true" class=" my-pagination"
+          (pageChange)="p = $event" (pageBoundsCorrection)="p=$event">
+      </pagination-controls>
+  </div>
+  </div>
+
+  <div id="listWebDetails">
+    <app-purchase-order-details *ngIf="routeToDetail && !isMobile" [purchaseOrderId]="purchaseOrderId"></app-purchase-order-details>
+  </div>
+  <div id="listMobileDetails">
+    <app-purchase-order-details *ngIf="routeToDetail && isMobile"  [purchaseOrderId]="purchaseOrderId"></app-purchase-order-details>
+  </div>
+</app-list-widget>
+
+
+
+
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>
+<app-change-status-purchase-order [allDataPurchase]="allDataPurchase" (resultOut)="resultOut($event)"></app-change-status-purchase-order>
+

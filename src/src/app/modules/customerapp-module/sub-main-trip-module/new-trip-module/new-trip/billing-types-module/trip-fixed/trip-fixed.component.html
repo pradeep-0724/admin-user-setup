@@ -1,0 +1,63 @@
+<div class="row tabIndexActiveFields">
+  <div class="col-md-9">
+    <div *ngIf="!showUnloading" class="form-layout__card ">
+      <div action=""  [formGroup]="fixedForm">
+          <div class="mg-bottom-30">
+            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 padding_left_0">
+              <div class="input-wrap clearfix error" [ngClass]="addErrorClass(fixedForm.controls.freight_amount)">
+                <label for="" class="input">Freight Amount</label>
+                <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456" value="" formControlName="freight_amount" (change)="calculateFreightAmount()">
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div *ngIf="showUnloading" class="form-layout__card tabIndexActive" [formGroup]="fixedForm">
+  <div  action="" class="form-body show">
+
+      <div class="table-wrapper table--bd table--nobg table-wrapper--type1 table-wrapper--type2 tcol-6 dropDownOverflow">
+        <table class="table-container">
+          <thead>
+            <tr class="desktop_th">
+              <th>Fixed Amount</th>
+              <th>Adjustment</th>
+              <th>Net Receivable</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="mobile-flex">
+              <td class="max-wd-120  ps-2">
+                <h5 class="th_h5_mobile">Fixed Amount</h5>
+                <div>
+                  <input positiveThreeDigitDecimalNumber type="text"  [ngClass]="{'showInvalid':fixedForm.controls.freight_amount.invalid&&fixedForm.controls.freight_amount.touched}" class="no-style input--bd" placeholder="123456" (change)="calculateFreightAmount()" value="" formControlName="freight_amount">
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <h5 class="th_h5_mobile">Adjustment</h5>
+                <div>
+                  <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" placeholder="123456" (change)="calculateFreightAmount()" value="" formControlName="adjustment_amount">
+                </div>
+              </td>
+              <td class="max-wd-120">
+                <h5 class="th_h5_mobile">Net Receivable</h5>
+                <div>
+                  <input type="text" class="no-style input--bd" placeholder="123456" value="" formControlName="net_receivable" readonly>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <!-- <div class="col-md-6"></div> -->
+        <div class="my-2  text-end col-12">
+          <p><strong>Freight Amount: </strong> <span class="h6">{{fixedForm.controls.freight_amount.value}}</span>  | <strong>Total Freight: </strong> <span class="h6">{{fixedForm.controls.freight_amount.value}}</span> </p>
+        </div>
+      </div>
+  </div>
+</div>

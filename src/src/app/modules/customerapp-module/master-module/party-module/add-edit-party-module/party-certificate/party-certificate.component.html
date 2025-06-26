@@ -1,0 +1,127 @@
+<div *ngIf="documentList.length==0" class="no-doc-wrap py-5">
+    <img src="assets/img/no-document.png" alt="" class="mb-2">
+    <p class="mb-3 no-doc-text">No certificates added!</p>
+    <button class="btn btn--primary rounded-pill px-5 w-auto" (click)="AddCertificate()">+ Add Certificate</button>
+
+</div>
+<form [formGroup]="partyForm" *ngIf="documentList.length>0">
+    <div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-3 col-lg-3 p-0">
+            <aside class="upload-menu-wrapper h-450px ">
+               
+                    
+                    <button class="gb-document-add  primary-brand-text border-bottom" matRipple type="button"
+                    (click)="AddCertificate()">
+                    <i class="material-icons material-icons--al-top me-2 primary-brand-text">add</i>
+                    Add Certificate</button>
+              
+                <nav class="upload-menu border-bottom-0">
+                    <ul>
+                        <li class="upload-menu__item d-flex justify-content-between align-items-center"
+                            *ngFor="let document of documentList; let i = index;"
+                            [ngClass]="{'active': i==activeDoc,  'error':partyForm.controls.certificates.controls[i].invalid && partyForm.controls.certificates.controls[i].touched }"
+                            (click)="changeDocument(i)">
+                            <a class="flex-grow-1" [id]="'party-certificate-id'+document.name">{{ document.name }}</a>
+                        <div>
+                            <button class="gb-btn-hover" (click)="editCertificate(document.name,i)">
+                                <span class="no-style px-2">
+                                    <i class="material-icons def-color ">edit</i>
+                                </span>
+                            </button>
+                            <button class="gb-btn-hover">
+                                <span class="no-style px-2" (click)="deleteDocuments(document.name,i)">
+                                    <i class="material-icons text-danger ">delete</i>
+                                </span>
+                            </button>
+                        </div>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+        </div>
+
+        <div class="col-lg-9 h-450px" formArrayName="certificates">
+            <div  *ngFor="let document of documentList; let i = index;" [formGroupName]="i"
+                [ngClass]="{'active': i==activeDoc}">
+                <div class="form-layout__card" [ngClass]="{'active': i==activeDoc}">
+                    <div class="form-body">
+
+                        <div class="px-3 py-4">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class=" col-lg-4 col-md-6">
+                                            <div class="input-wrap error"
+                                                [ngClass]="addErrorClass(partyForm.controls.certificates.controls[i].controls.number)">
+                                                <label for="" class="input">{{document.name}}
+                                                    No.</label>
+                                                <input  type="text" class="no-style input--bd" placeholder="AA00-1122"
+                                                    value="" formControlName="number" appUpperCase  (change)="onChangeNumber(partyForm.controls.certificates.controls[i])">
+                                                <app-error
+                                                    [controlName]="partyForm.controls.certificates.controls[i].controls.number">
+                                                </app-error>
+                                            </div>
+                                        </div>
+                                        <div class=" col-lg-4 col-md-6">
+                                            <div class="input-wrap error error--type-1"
+                                                [ngClass]="addErrorClass(partyForm.controls.certificates.controls[i].controls.issue_date)">
+                                                <label for="">Issue Date</label>
+                                                <mat-form-field class="width--100">
+                                                    <input matInput  placeholder="DD/MM/YYYY"
+                                                        [matDatepicker]="issue_date" (focus)="issue_date.open()"
+                                                        formControlName="issue_date">
+                                                    <mat-datepicker-toggle matSuffix [for]="issue_date">
+                                                    </mat-datepicker-toggle>
+                                                    <mat-datepicker #issue_date startView="multi-year"></mat-datepicker>
+                                                </mat-form-field>
+                                                <app-error
+                                                    [controlName]="partyForm.controls.certificates.controls[i].controls.expiry_date">
+                                                </app-error>
+                                            </div>
+                                        </div>
+                                        <div class=" col-lg-4 col-md-6">
+                                            <div class="input-wrap error error--type-1"
+                                                [ngClass]="addErrorClass(partyForm.controls.certificates.controls[i].controls.expiry_date)">
+                                                <label for="" [ngClass]="{'input--required':partyForm.controls.certificates.controls[i].controls.is_expiry_mandatory.value && partyForm.controls.certificates.controls[i].controls.number.value}">Expiry Date</label>
+                                                <mat-form-field class="width--100">
+                                                    <input matInput [min]="partyForm.controls.certificates.controls[i].controls.issue_date.value" placeholder="DD/MM/YYYY"
+                                                        [matDatepicker]="expiry_date" (focus)="expiry_date.open()"
+                                                        formControlName="expiry_date">
+                                                    <mat-datepicker-toggle matSuffix [for]="expiry_date">
+                                                    </mat-datepicker-toggle>
+                                                    <mat-datepicker #expiry_date startView="multi-year"></mat-datepicker>
+                                                </mat-form-field>
+                                                <app-error
+                                                    [controlName]="partyForm.controls.certificates.controls[i].controls.expiry_date">
+                                                </app-error>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-4 pt-4 border-top">
+                                        
+                                            <file-uploader-v2 (onFileUploaded)="fileUploader($event,i)" [uploaderId]="'vech-assets-document-'+i"
+                                            [isShowOnlyUpload]="false"></file-uploader-v2>
+                                     
+                                        <div  *ngFor="let document of partyForm.controls.certificates.controls[i].controls.files.value">
+                                            <app-file-delete-view [showInlineEdit]="false" [fileData]="document" 
+                                            (fileDeleted)="fileDeleted($event,i)"></app-file-delete-view>
+                                        </div>
+                                      
+                                    </div>
+                                </div>
+                             
+                                
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+    </div>
+    </div>
+</form>

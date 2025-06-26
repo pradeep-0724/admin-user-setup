@@ -1,0 +1,548 @@
+<div class="add-screen-wrap d-flex flex-column">
+
+  <div class="right-section__header align-items-center justify-content-between">
+    <h1 class="heading col-10 ps-3">{{tripId?'Edit':'Add'}} Job</h1>
+  </div>
+  <app-add-trip-v2-documents-expiry  [scheduledJobsForSelectedVehicleList]="scheduledJobsForSelectedVehicleList" [locations]="locations"
+    [documentExpiryData]="documentExpiryData"></app-add-trip-v2-documents-expiry>
+  <div class="position-relative mx add-trip-v2-wrap">
+    <form [formGroup]="addTrip">
+      <div>
+        <div class="alert-msg" *ngIf="apiError">
+          <span class="icon-wrap"></span>
+          <p class="message-cont">{{ apiError }}</p>
+        </div>
+
+        <div class="def-color p-4 shadow-inset-top-bottom" *ngIf="vehicleCategiriesObj.hasMultipleCategories">
+          <div class="veh-category-wrap" [ngClass]="{'disable':tripId!=''}">
+
+            <div class="veh-category" (click)="vehicleCatagoryChange('1')"
+              [class.active]="addTrip.get('vehicle_category').value =='1'"
+              *ngIf="vehicleCategiriesObj.categories.includes(1)">
+              <img src="../../../../../../../../assets/img/icons/crane-truck.svg" alt="truck image">
+
+              <p class="text-center mt-2">Crane</p>
+            </div>
+            <div class="veh-category" (click)="vehicleCatagoryChange('2')"
+              [class.active]="addTrip.get('vehicle_category').value =='2'"
+              *ngIf="vehicleCategiriesObj.categories.includes(2)">
+              <img src="../../../../../../../../assets/img/icons/awp.svg" alt="truck image">
+
+              <p class="text-center mt-2">AWP</p>
+            </div>
+
+            <div class="veh-category" (click)="vehicleCatagoryChange('0')"
+            [class.active]="addTrip.get('vehicle_category').value =='0'"
+            *ngIf="vehicleCategiriesObj.categories.includes(3)||vehicleCategiriesObj.categories.includes(0)">
+            <img class="cargo" src="../../../../../../../assets/img/icons/loose-cargo-black.png" alt="truck image">
+            <p class="text-center mt-2">Loose Cargo</p>
+            </div>
+
+            <div class="veh-category" (click)="vehicleCatagoryChange('4')"
+            [class.active]="addTrip.get('vehicle_category').value =='4'"
+            *ngIf="vehicleCategiriesObj.categories.includes(3)||vehicleCategiriesObj.categories.includes(0)">
+            <img class="container"  src="../../../../../../../assets/img/icons/container-black.png" alt="truck image">
+            <p class="text-center mt-2">Container</p>
+            </div>
+            <div class="veh-category" (click)="vehicleCatagoryChange('10')"
+            [class.active]="addTrip.get('vehicle_category').value =='10'"
+            *ngIf="vehicleCategiriesObj.categories.includes(3)||vehicleCategiriesObj.categories.includes(0)">
+            <img src="../../../../../../../assets/img/icons/no-money.png" alt="truck image">
+            <p class="text-center mt-2">Internal Job</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 pb-0" *ngIf="isCatagorySelected"
+          [ngClass]="{'shadow-inset-top-bottom':!vehicleCategiriesObj.hasMultipleCategories}">
+          <div class="alert alert-danger" role="alert" *ngIf="this.isPartyApproverRequired&&!this.isPartyApproverAvailable && this.isApprovalConfigured && addTrip.controls.customer.value">
+            <ng-container *ngIf="!isLinkedClicked" >
+              <p>Party Approver not found. Please add a Party Approver for the approval mechanism to run smoothly</p>
+              <p  class="pt-2">You can add party approver by clicking<a
+                class="cursor-pointer text-primary" target="_blank" (click)="linkClicked()" [routerLink]="[preFixUrl+'/onboarding/party/edit/'+addTrip.controls.customer.value]"> Here</a> </p>
+            </ng-container>
+              <p *ngIf="isLinkedClicked" class="pt-2">If party approver added refresh by clicking <span
+                class="cursor-pointer text-primary"  (click)="initialDetailsOnClientSelected()"> Here</span> </p>
+          </div>
+          <div class="row mx-0">
+
+            <div class="col-xl-3 col-lg-3 col-md-3 col-6" [ngClass]="{'disable':tripId!=''}">
+              <div class="input-wrap error dropdownArrow" [ngClass]="addErrorClass(addTrip.controls.customer)">
+                <label for="" [ngClass]="{'input--required':addTrip.get('vehicle_category').value !='10'}">Customer </label>
+                <material-dropdown [searchable]="true" [addable]="true" [disabled]="tripId!=''"
+                  [selectedOption]="initialDetails.customer" [party]="true" [maxLength]="255"
+                  (addPartyPopup)="openAddPartyModal($event, 'client')"
+                  (addValueToList)="addValueToPartyPopup($event, billingParty)" [params]="partyNamePopup">
+                  <select #customSelect formControlName="customer" class="no-style select--modify"
+                    (change)="onvendorSelected()">
+                    <option *ngFor="let option of partyList" value="{{ option?.id }}">
+                      {{ option?.party_display_name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="addTrip.controls.customer"></app-error>
+              </div>
+            </div>
+
+            <div class=" col-lg-3 col-md-3  mb-0 input-wrap"
+              [ngClass]="{'disable':!isFieldEditable||addTrip.get('vehicle_category').value =='4' || (addTrip.get('vehicle_category').value =='10' || !addTrip.get('customer').value)}">
+              <label [ngClass]="{'input--required':addTrip.get('vehicle_category').value !='4'}">Job From </label>
+              <div class=" combo-input-wrap" formGroupName="job_from">
+
+                <div class="combo-input sm-input"
+                  [ngClass]="{'invalid-input':addTrip.get('job_from.type').invalid &&addTrip.get('job_from.type').touched }">
+                  <material-dropdown [searchable]="true" [disabled]="!isFieldEditable || addTrip.get('vehicle_category').value =='4' || addTrip.get('vehicle_category').value =='10' || !addTrip.get('customer').value"
+                    [selectedOption]="initialDetails.jobfrom">
+                    <select #customSelect formControlName="type" class="no-style select--modify"
+                      (change)="jobfromChange()">
+                      <option *ngFor="let option of jobFromList" [value]="option?.value">
+                        {{ option?.label }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+
+                <div class="seperator"></div>
+
+
+                <div class="combo-input"
+                  [ngClass]="{'disable':addTrip.get('job_from.type').value==2,'invalid-input':addTrip.get('job_from.id').invalid &&addTrip.get('job_from.id').touched }">
+                  <material-dropdown [searchable]="true" [disabled]="!isFieldEditable || addTrip.get('job_from.type').value==2 || addTrip.get('vehicle_category').value =='4'"
+                    [selectedOption]="initialDetails.jobfromValue" >
+                    <select #customSelect formControlName="id" class="no-style select--modify"
+                      (change)="jobformValueChange()">
+                      <option *ngFor="let option of quotationListOrsalesOrderList" [value]="option?.id">
+                        {{ option?.number }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                  <app-error [controlName]="addTrip.get('job_from.id')"></app-error>
+                </div>
+
+
+              </div>
+
+            </div>
+
+            <div class="col-xl-3 col-lg-3 col-6">
+              <div class="input-wrap clearfix error" [ngClass]="addErrorClass(addTrip.controls.lr_no)">
+                <label for="" class="input">Reference No.</label>
+                <input type="text" class="no-style input--bd" placeholder="123456" value="" formControlName="lr_no" />
+                <app-error [controlName]="addTrip.controls.lr_no"></app-error>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-3 col-6">
+              <div class="input-wrap clearfix">
+                <label for="" class="">Job No.</label>
+                <app-tool-tip class="tool-tip-position trip-no" [totalSlides]="tripToolTip.content.length"
+                  position="left" [toolTipContent]="tripToolTip"></app-tool-tip>
+                <input type="text" class="no-style input--bd" placeholder="123456" readonly value=""
+                  formControlName="trip_id" />
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-3  col-md-3 col-6"
+              *ngIf="addTrip.get('vehicle_category').value =='0' || addTrip.get('vehicle_category').value =='4'"
+              [ngClass]="{'disable': addTrip.get('job_from').value?.id || disableTypeOfMovementAndSow}">
+              <div class="input-wrap clearfix" [ngClass]="addErrorClass(addTrip.controls.type_of_movement)">
+                <label for="" class="input--required">Type Of Movement</label>
+                <div>
+                  <material-dropdown [selectedOption]="initialDetails.typeOfMovement" [disabled]="addTrip.get('job_from').value?.id || disableTypeOfMovementAndSow">
+                    <select #customSelect class="no-style select--modify" formControlName="type_of_movement"
+                      (change)="movementTypeChanged()">
+                      <option *ngFor="let type of movementTypes" value="{{ type.value }}">
+                        {{ type.label }} </option>
+                    </select>
+                  </material-dropdown>
+                  <app-error [controlName]="addTrip.controls.type_of_movement"></app-error>
+                </div>
+              </div>
+            </div>
+
+            <ng-container *ngIf="addTrip.get('vehicle_category').value =='4'">
+              <div class="col-xl-3 col-lg-3  col-md-3 col-6"
+                *ngIf="addTrip.get('type_of_movement').value =='1'||addTrip.get('type_of_movement').value =='2'"
+                [ngClass]="{'disable': addTrip.get('job_from').value?.id || disableTypeOfMovementAndSow}">
+                <div class="input-wrap error clearfix" [ngClass]="addErrorClass(addTrip.controls.movement_sow)">
+                  <label for="" class="input--required">Scope Of Work</label>
+                  <div>
+                    <material-dropdown [selectedOption]="initialDetails.sow" [disabled]="addTrip.get('job_from').value?.id || disableTypeOfMovementAndSow">
+                      <select #customSelect class="no-style select--modify" formControlName="movement_sow">
+                        <option *ngFor="let type of sowList" value="{{ type.value }}">
+                          {{ type.label }} </option>
+                      </select>
+                    </material-dropdown>
+                    <app-error [controlName]="addTrip.get('movement_sow')"></app-error>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-3 col-md-6 mb-3">
+                <div class="input-wrap clearfix" [ngClass]="addErrorClass(addTrip.controls.job_type)">
+                  <label for="" class="input">Container Handling</label>
+                  <div>
+                    <material-dropdown [selectedOption]="initialDetails.jobType">
+                      <select #customSelect class="no-style select--modify" formControlName="job_type">
+                        <option *ngFor="let option of containerJobType" [value]="option?.id">
+                          {{ option?.label }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                    <app-error [controlName]="addTrip.get('job_type')"></app-error>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+
+
+            <ng-container *ngIf="addTrip.get('vehicle_category').value =='0'">
+              <ng-container *ngIf="addTrip.get('type_of_movement').value =='1'">
+                <div class="col-xl-3 col-lg-3  col-md-3 col-6"
+                  [ngClass]="{'disable': addTrip.get('job_from').value?.id}">
+                  <div class="input-wrap clearfix">
+                    <label for="">DO No.</label>
+                    <input type="text" class="no-style input--bd" [readOnly]="addTrip.get('job_from').value?.id" formControlName="no" placeholder="123456" value="">
+                  </div>
+                </div>
+                <div class="col-xl-3 col-lg-3  col-md-3 col-6"
+                  [ngClass]="{'disable':addTrip.get('job_from').value?.type==1 && addTrip.get('job_from').value?.id}">
+                  <div class="input-wrap error" [ngClass]="addErrorClass(addTrip.controls.date)">
+                    <label for="">DO Date</label>
+                    <mat-form-field>
+                      <input matInput readonly [matDatepicker]="date" formControlName="date" (focus)="date.open()"
+                        placeholder="DD/MM/YYYY">
+                      <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                      <mat-datepicker #date></mat-datepicker>
+                    </mat-form-field>
+                    <app-error [controlName]="addTrip.controls.date"></app-error>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                  <div class="input-wrap clearfix">
+                    <label for="" class="">Is Inspection Required</label>
+                    <div>
+                      <material-dropdown [selectedOption]="initialDetails.inspectionRequired">
+                        <select #customSelect class="no-style select--modify" formControlName="is_inspection_required"
+                          (change)="inspectionRequiredSelected($event.target.value)">
+                          <option *ngFor="let type of inspectionRequired" value="{{ type.value }}">
+                            {{ type.label }} </option>
+                        </select>
+                      </material-dropdown>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-lg-3  col-md-3 col-6"     [ngClass]="{'disable':addTrip.get('is_inspection_required').value=='0'}">
+                  <div class="input-wrap clearfix" [ngClass]="addErrorClass(addTrip.controls.inspection_type)">
+                    <label for="" class="input--required">Type Of Inspection </label>
+                    <app-inspection-type [inspectionTypeControl]="addTrip.controls.inspection_type"></app-inspection-type>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="addTrip.get('type_of_movement').value =='2'">
+                <div class="col-xl-3 col-lg-3  col-md-3 col-6"
+                  [ngClass]="{'disable': addTrip.get('job_from').value?.id}">
+                  <div class="input-wrap clearfix">
+                    <label for="">Booking No.</label>
+                    <input type="text" class="no-style input--bd" [readOnly]="addTrip.get('job_from').value?.id" formControlName="no" placeholder="123456" value="">
+                  </div>
+                </div>
+                <div class="col-xl-3 col-lg-3  col-md-3 col-6"
+                  [ngClass]="{'disable':addTrip.get('job_from').value?.type==1 && addTrip.get('job_from').value?.id}">
+                  <div class="input-wrap error" [ngClass]="addErrorClass(addTrip.controls.date)">
+                    <label for="">Booking Date</label>
+                    <mat-form-field>
+                      <input matInput readonly [matDatepicker]="date" formControlName="date" (focus)="date.open()"
+                        placeholder="DD/MM/YYYY">
+                      <mat-datepicker-toggle matSuffix [for]="date"></mat-datepicker-toggle>
+                      <mat-datepicker #date></mat-datepicker>
+                    </mat-form-field>
+                    <app-error [controlName]="addTrip.controls.date"></app-error>
+                  </div>
+                </div>
+                <!-- <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                <div class="input-wrap clearfix">
+                  <label for="">No. Of Containers </label>
+                  <input positiveThreeDigitDecimalNumber type="text" class="no-style input--bd" formControlName="no_of_containers"
+                    placeholder="123456" value="">
+                </div>
+              </div> -->
+                <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                  <div class="input-wrap clearfix">
+                    <label for="" class="">Is Inspection Required</label>
+                    <div>
+                      <material-dropdown [selectedOption]="initialDetails.inspectionRequired">
+                        <select #customSelect class="no-style select--modify" formControlName="is_inspection_required"
+                          (change)="inspectionRequiredSelected($event.target.value)">
+                          <option *ngFor="let type of inspectionRequired" value="{{ type.value }}">
+                            {{ type.label }} </option>
+                        </select>
+                      </material-dropdown>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-lg-3  col-md-3 col-6"      [ngClass]="{'disable':addTrip.get('is_inspection_required').value=='0'}">
+                  <div class="input-wrap clearfix" [ngClass]="addErrorClass(addTrip.controls.inspection_type)">
+                    <label for="" class="input--required">Type Of Inspection </label>
+                    <app-inspection-type [inspectionTypeControl]="addTrip.controls.inspection_type"></app-inspection-type>
+                  </div>
+                </div>
+              </ng-container>
+
+            </ng-container>
+
+          </div>
+          <div class="row def-color mx-0 mb-3">
+            <div class="col-lg-12">
+              <p class="fw-semibold  fs-6"> Vehicle Info.</p>
+              <hr>
+            </div>
+          </div>
+
+          <div class="row mx-0">
+
+            <div class="col-xl-3 col-lg-3 col-6" [ngClass]="{'disable':!isFieldEditable}"
+            *ngIf="addTrip.get('vehicle_category').value !='0' && addTrip.get('vehicle_category').value !='4' && addTrip.get('vehicle_category').value !='10'">
+              <div class="input-wrap error" [ngClass]="addErrorClass(addTrip.controls.specification)">
+                <label for="" class="input--required"
+                  [ngClass]="{'input--required':addTrip.controls.vehicle_category.value!='0'}">Specification</label>
+                <material-dropdown [searchable]="true" [disabled]="!isFieldEditable"
+                  [selectedOption]="initialDetails.specification">
+                  <select #customSelect formControlName="specification" class="no-style select--modify"
+                    (change)="getVehicleList();onSpecificationChange()">
+                    <option *ngFor="let option of vechileSpecifications" value="{{ option?.id }}">
+                      {{ option?.specification }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="addTrip.controls.specification"></app-error>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-3 col-md-3 col-6" [ngClass]="{'disable':!isFieldEditable}">
+              <div class="input-wrap error dropdownArrow" [ngClass]="addErrorClass(addTrip.controls.c_vehicle)">
+                <label for="" class="input">Vehicle Number</label>
+                <material-dropdown [searchable]="true" [disabled]="!isFieldEditable"
+                  [addItemText]="'+ Add Market Vehicle'" [isUpperCaseAllowed]="true" [addable]="addTrip.get('vehicle_category').value !=10" [party]="true"
+                  [selectedOption]="initialDetails.vehicle" (addPartyPopup)="openAddVehicle($event)"
+                  (addValueToList)="addValueToVehiclePopUp($event)" [params]="vehicleNamePopup" [maxLength]="14">
+                  <select #customSelect formControlName="c_vehicle" class="no-style select--modify"
+                    (change)="onVehicleChange()">
+                    <option *ngFor="let option of vehicleList" value="{{ option?.id }}">
+                      {{ option?.reg_number }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="addTrip.controls.c_vehicle"></app-error>
+                <div class="side-by-side">
+                  <p class="font-small-blue" *ngIf="vehicleType">&nbsp;{{vehicleType}}</p>
+                  <p class="font-small-blue" *ngIf="vehicleSpecFor3and4">&nbsp;{{vehicleSpecFor3and4}}</p>
+                </div>
+
+              </div>
+            </div>
+            <ng-container
+              *ngIf="addTrip.get('vehicle_category').value =='0' || addTrip.get('vehicle_category').value =='4' || addTrip.get('vehicle_category').value =='10'">
+              <div class="col-xl-3 col-lg-3 col-md-3 col-6" [ngClass]="{'disable':isTransporterTrip}">
+                <div class="input-wrap error dropdownArrow" [ngClass]="addErrorClass(addTrip.controls.asset_1)">
+                  <label for="">Asset No.1 </label>
+                  <material-dropdown [searchable]="true" [addable]="false" [selectedOption]="initialDetails.assetOne"
+                    [addBlank]="false">
+                    <select #customSelect formControlName="asset_1" class="no-style select--modify"
+                      (change)="assetOneSelected()">
+                      <ng-container *ngFor="let option of assetData">
+                        <option
+                          *ngIf="addTrip.get('asset_2').value !== option?.id && addTrip.get('asset_3').value !== option?.id"
+                          value="{{ option?.id }}">
+                          {{ option?.display_no }}
+                        </option>
+                      </ng-container>
+                    </select>
+                  </material-dropdown>
+                  <app-error [controlName]="addTrip.controls.asset_1"></app-error>
+                  <p class="font-small-blue" *ngIf="asset1Specification">&nbsp;{{asset1Specification}}</p>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-3 col-md-3 col-6" [ngClass]="{'disable':isTransporterTrip}">
+                <div class="input-wrap error dropdownArrow" [ngClass]="addErrorClass(addTrip.controls.asset_2)">
+                  <label for="">Asset No.2 </label>
+                  <material-dropdown [searchable]="true" [addable]="false" [addBlank]="false"
+                    [selectedOption]="initialDetails.assetTwo">
+                    <select #customSelect formControlName="asset_2" class="no-style select--modify"
+                      (change)="assetTwoSelected()">
+                      <ng-container *ngFor="let option of assetData">
+                        <option
+                          *ngIf="addTrip.get('asset_1').value !== option?.id && addTrip.get('asset_3').value !== option?.id"
+                          value="{{ option?.id }}">
+                          {{ option?.display_no }}
+                        </option>
+                      </ng-container>
+                    </select>
+                  </material-dropdown>
+                  <app-error [controlName]="addTrip.controls.asset_2"></app-error>
+                  <p class="font-small-blue" *ngIf="asset2Specification">&nbsp;{{asset2Specification}}</p>
+
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-3 col-md-3 col-6" [ngClass]="{'disable':isTransporterTrip}">
+                <div class="input-wrap error dropdownArrow" [ngClass]="addErrorClass(addTrip.controls.asset_3)">
+                  <label for="">Asset No.3 </label>
+                  <material-dropdown [searchable]="true" [addable]="false" [addBlank]="false"
+                    [selectedOption]="initialDetails.assetThree">
+                    <select #customSelect formControlName="asset_3" class="no-style select--modify"
+                      (change)="assetThreeSelected()">
+                      <ng-container *ngFor="let option of assetData">
+                        <option
+                          *ngIf="addTrip.get('asset_1').value !== option?.id && addTrip.get('asset_2').value !== option?.id"
+                          value="{{ option?.id }}">
+                          {{ option?.display_no }}
+                        </option>
+                      </ng-container>
+                    </select>
+                  </material-dropdown>
+                  <app-error [controlName]="addTrip.controls.asset_3"></app-error>
+                  <p class="font-small-blue" *ngIf="asset3Specification">&nbsp;{{asset3Specification}}</p>
+
+                </div>
+              </div>
+            </ng-container>
+
+            <div class="col-xl-3 col-lg-3 col-6" *ngIf="isTransporterTrip" [ngClass]="{'disable':!isFieldEditable}">
+              <div class="input-wrap error" [ngClass]="addErrorClass(addTrip.controls.vehicle_provider)">
+                <label for="" class="input--required">Vehicle Provider</label>
+                <material-dropdown [searchable]="true" [disabled]="!isFieldEditable"
+                  [selectedOption]="initialDetails.vehicle_provider" [addable]="true" [addBlank]="true" [maxLength]="46"
+                  [status]="true" [party]="true" (addPartyPopup)="openAddPartyModal($event, 'vendor')"
+                  (addValueToList)="addValueToPartyPopup($event, vehicleprovider)" [params]="partyNamePopup">
+                  <select #customSelect formControlName="vehicle_provider" class="no-style select--modify"
+                    (change)="onVehicleProviderSelection()">
+                    <option *ngFor="let option of partyListVendor" value="{{ option?.id }}">
+                      {{ option?.party_display_name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="addTrip.controls.vehicle_provider"></app-error>
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-6" *ngIf="isTransporterTrip" [ngClass]="{'disable':!isFieldEditable}">
+              <div class="input-wrap error" [ngClass]="addErrorClass(addTrip.controls.lpo)">
+                <label for="" class="input">LPO</label>
+                <material-dropdown [searchable]="true" [disabled]="!isFieldEditable"
+                  [selectedOption]="initialDetails.lpo" [addBlank]="true">
+                  <select #customSelect formControlName="lpo" class="no-style select--modify">
+                    <option *ngFor="let option of lpoList" value="{{ option?.id }}">
+                      {{ option?.name }}
+                    </option>
+                  </select>
+                </material-dropdown>
+                <app-error [controlName]="addTrip.controls.lpo"></app-error>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-3 col-md-3 col-6" *ngIf="!isTransporterTrip"
+              [ngClass]="{'disabled':!addTrip.controls.c_vehicle.value}">
+              <div class="input-wrap">
+                <label for="">Operator</label>
+                <app-multi-driver-select (selectedDriverList)="selectedDriverList($event)" [driverList]="driverList"
+                  [driverControl]="addTrip.controls.driver"
+                  (driverId)="prefillDriverSelf($event)"></app-multi-driver-select>
+              </div>
+            </div>
+            <div *ngIf="isTransporterTrip" class="col-xl-3 col-lg-3 col-md-3 col-6">
+              <div class="input-wrap">
+                <label for="" class="input">Operator</label>
+                <input type="text" class="no-style input--bd" formControlName="driver">
+              </div>
+            </div>
+            <div class=" col-xl-3 col-lg-3  col-md-3 col-6">
+              <div class="input-wrap dropdownArrow">
+                  <label for="">Customer POC</label>
+                  <material-dropdown [addable]="true" [selectedOption]="initialDetails.poc"
+                  [postApiUrl]="pocURL" [params]="pocParam"
+                  (postApiResponse)="getAddedPoC($event)"
+                  (addValueToList)="addNewPoC($event)">
+                      <select #customSelect class="no-style select--modify"
+                          formControlName="poc">
+                          <option *ngFor="let option of pointOfContactsList " value="{{option.id}}">{{option.display_name}}
+                          </option>
+                      </select>
+                  </material-dropdown>
+              </div>
+          </div>
+
+          </div>
+
+
+        </div>
+        <ng-container *ngIf="!isCustomerChanged">
+          <app-add-job-template-container (locationSelectedEmitter)="locationSelected($event)" (commonRateCardValuesEmitter)="commonRateCardValuesEmitter($event)"
+            (selectedJobStartDate)="selectedJobStartDate($event)" [routeCodeBdp]="routeCodeBdp" [driverId]="driverId"
+            [tripDetails]="tripDetails" [quotationDetails]="quotationDetails" [workOrderDetails]="workOrderDetails"
+            [contactPersonList]="contactPersonList" *ngIf="addTrip.get('vehicle_category').value =='4'"
+            [isFormValid]="isFormValid" [parentForm]="addTrip"></app-add-job-template-container>
+          <app-add-job-template-trailer-loose-cargo (locationSelectedEmitter)="locationSelected($event)"
+            (selectedJobStartDate)="selectedJobStartDate($event)" [routeCodeBdp]="routeCodeBdp" [driverId]="driverId"
+            [tripDetails]="tripDetails" [quotationDetails]="quotationDetails" [workOrderDetails]="workOrderDetails"
+            [contactPersonList]="contactPersonList" *ngIf="addTrip.get('vehicle_category').value =='3'"
+            [isFormValid]="isFormValid" [parentForm]="addTrip"></app-add-job-template-trailer-loose-cargo>
+          <app-add-job-template-others (locationSelectedEmitter)="locationSelected($event)"
+            (selectedJobStartDate)="selectedJobStartDate($event)" [routeCodeBdp]="routeCodeBdp" [driverId]="driverId"
+            [tripDetails]="tripDetails" [quotationDetails]="quotationDetails" [workOrderDetails]="workOrderDetails"
+            [contactPersonList]="contactPersonList" *ngIf="addTrip.get('vehicle_category').value =='0' || addTrip.get('vehicle_category').value =='10'"
+            [formType]="addTrip.get('vehicle_category').value =='0' ? 'others':'internal_job'"
+            [isFormValid]="isFormValid" [parentForm]="addTrip" ></app-add-job-template-others>
+          <app-add-job-template-crane [isMarketVehicleSelected]="isMarketVehicleSelected"   (isCustomerRateCardExisted)="customerRateCardExisted($event)"
+            (locationSelectedEmitter)="locationSelected($event)" (selectedJobStartDate)="selectedJobStartDate($event)"
+            [specificationChange]="specificationChange"
+            (rateCardQuotationPreviousValues)="rateCardQuotationPreviousValues($event)"
+            [prevRentalCharge]="prevRentalCharge" [driverId]="driverId" [tripDetails]="tripDetails"
+            [quotationDetails]="quotationDetails" [workOrderDetails]="workOrderDetails" [isFormValid]="isFormValid"
+            [contactPersonList]="contactPersonList" *ngIf="addTrip.get('vehicle_category').value =='2'"
+            [formType]="'awp'" [parentForm]="addTrip"></app-add-job-template-crane>
+          <app-add-job-template-crane  [isMarketVehicleSelected]="isMarketVehicleSelected"   (isCustomerRateCardExisted)="customerRateCardExisted($event)"
+            (locationSelectedEmitter)="locationSelected($event)" (selectedJobStartDate)="selectedJobStartDate($event)"
+            [specificationChange]="specificationChange"
+            (rateCardQuotationPreviousValues)="rateCardQuotationPreviousValues($event)"
+            [prevRentalCharge]="prevRentalCharge" [driverId]="driverId" [tripDetails]="tripDetails"
+            [quotationDetails]="quotationDetails" [workOrderDetails]="workOrderDetails" [isFormValid]="isFormValid"
+            [contactPersonList]="contactPersonList" *ngIf="addTrip.get('vehicle_category').value =='1'"
+            [formType]="'crane'" [parentForm]="addTrip"></app-add-job-template-crane>
+        </ng-container>
+
+
+
+
+      </div>
+    </form>
+  </div>
+
+  <div class=" flex-grow-1 d-flex justify-content-center align-items-center flex-column" *ngIf="!isCatagorySelected">
+    <i class="bi bi-truck select-veh-truck"></i>
+    <p class="select-veh-text text-center line-height-normal ">Please select a vehicle category to proceed</p>
+  </div>
+</div>
+
+
+
+<div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end">
+
+  <button class="btn me-2 btn--sm" type="button" [routerLink]="[preFixUrl + '/trip/new-trip/list']">Cancel</button>
+  <div class="d-flex align-items-center btn-group-1">
+    <button class="btn btn--primary btn--sm border-end f-b"
+      (click)="saveTrip('save_and_submit','Validation Failed',false)"> {{tripId?'Update':'Create'}} Job </button>
+    <button mat-button class="btn btn--primary w-auto s-b" [matMenuTriggerFor]="menu" *ngIf="isApprovalConfigured"><i
+        class="material-icons">arrow_drop_down</i></button>
+    <mat-menu #menu="matMenu">
+      <button class="more-actions__item  w-100 text-start" type="button"
+        (click)="saveTrip('save_and_submit','Validation Failed',false)">Save and Submit</button>
+      <button class="more-actions__item w-100 text-start mb-2" type="button" *ngIf="isApprovalConfigured"
+        (click)="saveTrip('send_for_approval','Send Approval',true)">Send for Approval</button>
+
+    </mat-menu>
+
+  </div>
+
+</div>
+
+
+<app-add-party-popup vendorPartyType="2" *ngIf="showAddPartyPopup.status" [popDetail]="showAddPartyPopup"
+  [isVendor]="vendor" (closeModal)="closePartyPopup()" (partyAdded)="addPartyToOption($event)"></app-add-party-popup>

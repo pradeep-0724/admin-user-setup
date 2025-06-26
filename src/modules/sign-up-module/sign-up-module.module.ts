@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { SignUpModuleRoutingModule } from './sign-up-module-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ErrorModuleModule } from '../error-module/error-module.module';
+import { PdfSampleComponent } from '../pdf-sample/pdf-sample.component';
 
 
 @NgModule({
@@ -13,6 +14,7 @@ import { ErrorModuleModule } from '../error-module/error-module.module';
     ErrorModuleModule,
     ReactiveFormsModule,
     FormsModule,
+    PdfSampleComponent,
     SignUpModuleRoutingModule
   ]
 })

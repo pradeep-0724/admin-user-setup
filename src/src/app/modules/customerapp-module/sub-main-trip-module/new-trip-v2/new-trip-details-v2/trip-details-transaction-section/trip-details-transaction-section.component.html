@@ -1,0 +1,366 @@
+<div class="transaction-wrap" *ngIf="tripPartyTransactionData |async as partyTransaction">
+  <div class="p-4 px-5 border-bottom border-1">
+
+    <div class="d-flex mb-4 pt-3 justify-content-between align-items-center">
+      <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+
+        <div class="d-flex align-items-center">
+          <p class=" label primary-label me-3 fs-6">{{partyTransaction?.client?.name}} (Client)
+            <ng-container *ngIf="partyTransaction?.vehicle_category==0">
+              <span *ngIf="partyTransaction?.client?.invoice?.no">(Invoice No: <a class="custom-link" [routerLink]="[prefixUrl+'/income/invoice/view/'+partyTransaction?.client?.invoice?.id]" target="_blank">{{partyTransaction?.client?.invoice?.no}}</a>)</span>
+            </ng-container>
+            </p>
+          <ng-container>
+            <button class="me-2 create-btn" [disabled]="!partyTransaction?.can_create_invoice"
+            (click)="createInvoiceClick()"><i class="bi bi-plus-circle"></i>Create Invoice</button>
+          <!-- <button class="me-2 create-btn" [disabled]="!partyTransaction?.can_create_invoice || headerDetailsData.status ==4"
+            (click)="createPerformaInvoice()"><i class="bi bi-plus-circle"></i>Create Performa Invoice</button> -->
+          </ng-container>
+          <!-- <button class="pay-btn" disabled><i class="bi bi-wallet-fill"></i>Pay Advance</button> -->
+        </div>
+
+
+        <p class="label primary-label fs-6">{{partyTransaction?.client?.balance| numberFormat}} {{ currency_type?.symbol}}</p>
+
+      </div>
+      <div class="box-110px d-flex justify-content-between"></div>
+    </div>
+
+
+    <div class="d-flex mb-3 justify-content-between" *ngFor=" let freights of partyTransaction?.client?.freights ">
+      <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+
+        <p class=" label ">Client Freight  <ng-container *ngIf="partyTransaction?.vehicle_category==4">
+          <span *ngIf="partyTransaction?.client?.invoice?.no">(Invoice No: <a class="custom-link" [routerLink]="[prefixUrl+'/income/invoice/view/'+partyTransaction?.client?.invoice?.id]" target="_blank">{{partyTransaction?.client?.invoice?.no}}</a>)</span>
+        </ng-container></p>
+
+
+        <p class="label">{{freights?.freight_amount| numberFormat}} {{ currency_type?.symbol}}</p>
+
+      </div>
+      <div class="box-110px d-flex justify-content-between ">
+        <button class="edit-btn me-2" [disabled]="!freights?.is_editable_deletable  || headerDetailsData['approval_status']['status_screen_to_show'] ==='Completed'" *ngxPermissionsOnly="[trip[1]]"
+        [routerLink]="[prefixUrl+'/trip/new-trip/edit/',tripId]">
+          <i class="bi bi-pencil-fill"></i>Edit
+        </button>
+        <!-- <button  class="del-btn"><i class="material-icons  text-danger">delete</i></button> -->
+      </div>
+    </div>
+
+     <!--         Rental Charge -->
+
+     <div class="d-flex mb-3 justify-content-between" *ngIf="partyTransaction?.vehicle_category>=1 && partyTransaction?.vehicle_category<=2">
+      <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+        <p class=" label ">  Rental Charge</p>
+        <p class="label">{{ partyTransaction?.client?.rental_charge| numberFormat }} {{ currency_type?.symbol}}</p>
+      </div>
+      <div class="box-110px d-flex justify-content-between ">
+        <button class="edit-btn me-2" *ngxPermissionsOnly="[trip[1]]"  [disabled]="headerDetailsData['approval_status']['status_screen_to_show'] ==='Completed'"
+        [routerLink]="[prefixUrl+'/trip/new-trip/edit/',tripId]">
+          <i class="bi bi-pencil-fill"></i>Edit
+        </button>
+      </div>
+    </div>
+
+    <!-- Extra Hours Charge -->
+    <div class="d-flex mb-3 justify-content-between" *ngIf="partyTransaction?.vehicle_category>=1 && partyTransaction?.vehicle_category<=2 && partyTransaction?.client?.extra_hours_charge > 0">
+      <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+        <p class=" label ">  Extra {{billingUnitType}} </p>
+        <p class="label">{{ partyTransaction?.client?.extra_hours_charge| numberFormat }} {{ currency_type?.symbol}}</p>
+      </div>
+      <div class="box-110px d-flex justify-content-between ">
+        <button class="edit-btn me-2" *ngxPermissionsOnly="[trip[1]]"   [disabled]="headerDetailsData['approval_status']['status_screen_to_show'] ==='Completed'"
+        [routerLink]="[prefixUrl+'/trip/new-trip/edit/',tripId]">
+          <i class="bi bi-pencil-fill"></i>Edit
+        </button>
+      </div>
+    </div>
+
+
+    <div class="d-flex mb-3 justify-content-between"
+      *ngFor=" let charges_add of partyTransaction?.client?.charges_add ">
+      <!-- <p class="label"> {{charges_add?.party?.display_name}} </p> -->
+      <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+        <p class="label">{{charges_add?.type?.label}} 
+          <ng-container *ngIf="charges_add?.containers.length">
+            ( <span *ngFor="let container of charges_add?.containers;let last =last">{{container.name }}{{last ? ' ':', '}}</span> )
+          </ng-container>  
+          <span *ngIf="charges_add?.invoice"> (Invoice No: <a class="custom-link" target="_blank"
+          [routerLink]="[prefixUrl+'/income/invoice/view/',charges_add?.invoice?.id]">{{charges_add?.invoice?.number?charges_add?.invoice?.number:'-'}}</a>) </span>
+        </p>
+        <p class="label">{{charges_add?.amount_before_tax| numberFormat}} {{ currency_type?.symbol}}</p>
+      </div>
+
+      <div class="box-110px d-flex justify-content-between ">
+        <button class="edit-btn me-2" [disabled]="!charges_add.is_charge_editable_deletable"
+          (click)="openChargeDeductionClient(charges_add,'party_add_bill_charges')">
+          <i class="bi bi-pencil-fill"></i>Edit
+        </button>
+        <button class="del-btn me-2" (click)="viewUploadedDocument(charges_add?.documents,charges_add?.document_no)"  [disabled]="charges_add?.documents?.length == 0" [ngStyle]="{'color': charges_add?.documents.length > 0 ? '#15A4F6' : '#CCCCCC'}"
+          >
+          <span class="material-icons">
+           image
+           </span>
+         </button>
+        <button class="del-btn" [disabled]="!charges_add.is_deletable"
+          (click)="deleteItems(charges_add.id,'charges')"><i class="material-icons  text-danger">delete</i></button>
+      </div>
+    </div>
+
+    <div class="d-flex mb-3 justify-content-between"
+      *ngFor="let charges_reduce of partyTransaction?.client?.charges_reduce ">
+      <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+        <p class=" label ">{{charges_reduce?.type?.label}} 
+          <ng-container *ngIf="charges_reduce?.containers.length">
+            ( <span *ngFor="let container of charges_reduce?.containers;let last =last">{{container.name }}{{last ? ' ':', '}}</span> )
+          </ng-container>  
+          <span *ngIf="charges_reduce?.invoice">(Invoice No: <a class="custom-link" target="_blank"
+          [routerLink]="[prefixUrl+'/income/invoice/view/',charges_reduce?.invoice?.id]">{{charges_reduce?.invoice?.number?charges_reduce?.invoice?.number:'-'}}</a>)</span> 
+        </p>
+        <p class="label">- {{charges_reduce?.amount_before_tax| numberFormat}} {{ currency_type?.symbol}}</p>
+      </div>
+      <div class="box-110px d-flex justify-content-between ">
+        <button class="edit-btn me-2" [disabled]="!charges_reduce?.is_charge_editable_deletable"
+          (click)="openChargeDeductionClient(charges_reduce,'party_reduce_bill_charges')">
+          <i class="bi bi-pencil-fill"></i>Edit
+        </button>
+        <button class="del-btn me-2" (click)="viewUploadedDocument(charges_reduce?.documents,charges_reduce?.document_no)"  [disabled]="charges_reduce?.documents?.length == 0" [ngStyle]="{'color': charges_reduce?.documents.length > 0 ? '#15A4F6' : '#CCCCCC'}"
+          >
+          <span class="material-icons">
+           image
+           </span>
+         </button>
+        <button class="del-btn" [disabled]="!charges_reduce?.is_deletable"
+          (click)="deleteItems(charges_reduce.id,'charges')"><i class="material-icons  text-danger">delete</i></button>
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="p-4 px-5 border-bottom border-1" *ngIf="partyTransaction?.vendor?.name">
+
+    <div class="d-flex mb-4 pt-3 justify-content-between align-items-center">
+      <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+
+
+        <p class=" label primary-label ">{{partyTransaction?.vendor?.name}} (Vendor)
+          <ng-container>
+            <button class="me-2 ms-3 create-btn" [disabled]="!partyTransaction?.can_create_vp"
+            (click)="createVehiclePaymentClick()"><i class="bi bi-plus-circle"></i>Create Vehicle Provider</button>
+          </ng-container>
+      
+        </p>
+
+
+        <p class="label primary-label ">{{partyTransaction?.vendor?.balance| numberFormat}} {{ currency_type?.symbol}}</p>
+
+      </div>
+      <div class="box-110px d-flex justify-content-between"></div>
+    </div>
+
+    <div class="d-flex mb-3 justify-content-between" *ngFor=" let freights of partyTransaction?.vendor?.freights ">
+      <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+
+        <p class=" label ">Vehicle Freight </p>
+        <p class="label">{{freights?.freight_amount| numberFormat}} {{ currency_type?.symbol}}</p>
+
+      </div>
+      <div class="box-110px d-flex justify-content-between ">
+        <button class="edit-btn me-2" [disabled]="!freights?.is_editable_deletable || headerDetailsData['approval_status']['status_screen_to_show'] ==='Completed'"
+        *ngxPermissionsOnly="[trip[1]]"
+        [routerLink]="[prefixUrl+'/trip/new-trip/edit/',tripId]">
+          <i class="bi bi-pencil-fill"></i>Edit
+        </button>
+        <!-- <button  class="del-btn"><i class="material-icons  text-danger">delete</i></button> -->
+      </div>
+    </div>
+    <div class="d-flex mb-3 justify-content-between" *ngIf="partyTransaction?.vehicle_category>=1 && partyTransaction?.vehicle_category <=2">
+      <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+        <p class=" label "> Market Rental Charge</p>
+        <p class="label">{{ partyTransaction?.vendor?.market_rental_charge | numberFormat}} {{ currency_type?.symbol}}</p>
+      </div>
+      <div class="box-110px d-flex justify-content-between ">
+        <button class="edit-btn me-2" *ngxPermissionsOnly="[trip[1]]"  [disabled]=" headerDetailsData['approval_status']['status_screen_to_show'] ==='Completed'"
+        [routerLink]="[prefixUrl+'/trip/new-trip/edit/',tripId]">
+          <i class="bi bi-pencil-fill"></i>Edit
+        </button>
+      </div>
+    </div>
+
+    <!-- Extra Hours Charge -->
+    <div class="d-flex mb-3 justify-content-between" *ngIf="partyTransaction?.vehicle_category>=1 && partyTransaction?.vendor?.market_extra_hours_charge > 0">
+      <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+        <p class=" label ">  Extra {{billingUnitType}} </p>
+        <p class="label">{{ partyTransaction?.vendor?.market_extra_hours_charge| numberFormat }} {{ currency_type?.symbol}}</p>
+      </div>
+      <div class="box-110px d-flex justify-content-between ">
+        <button class="edit-btn me-2" *ngxPermissionsOnly="[trip[1]]"   [disabled]=" headerDetailsData['approval_status']['status_screen_to_show'] ==='Completed'"
+        [routerLink]="[prefixUrl+'/trip/new-trip/edit/',tripId]">
+          <i class="bi bi-pencil-fill"></i>Edit
+        </button>
+      </div>
+    </div>
+
+    <div class="d-flex mb-3 justify-content-between" *ngFor="let charges_add of partyTransaction?.vendor?.charges_add ">
+      <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+
+        <p class=" label ">{{charges_add?.type?.label}} 
+          <ng-container *ngIf="charges_add?.containers.length">
+            ( <span *ngFor="let container of charges_add?.containers;let last =last">{{container.name }}{{last ? ' ':', '}}</span> )
+          </ng-container>  
+        </p>
+
+        <p class="label">{{charges_add?.amount_before_tax| numberFormat}} {{ currency_type?.symbol}}</p>
+
+      </div>
+      <div class="box-110px d-flex justify-content-between ">
+        <button class="edit-btn me-2" [disabled]="!charges_add?.is_editable"
+          (click)="openChargeDeductionVendor(charges_add,'vp_add_bill_charges')">
+          <i class="bi bi-pencil-fill"></i>Edit
+        </button>
+        <button class="del-btn me-2" (click)="viewUploadedDocument(charges_add?.documents,charges_add?.document_no)"  [disabled]="charges_add?.documents?.length == 0" [ngStyle]="{'color': charges_add?.documents.length > 0 ? '#15A4F6' : '#CCCCCC'}"
+          >
+          <span class="material-icons">
+           image
+           </span>
+         </button>
+        <button class="del-btn" [disabled]="!charges_add?.is_deletable"
+          (click)="deleteItems(charges_add.id,'charges')"><i class="material-icons  text-danger">delete</i></button>
+      </div>
+    </div>
+
+    <div class="d-flex mb-3 justify-content-between"
+      *ngFor="let charges_reduce of partyTransaction?.vendor?.charges_reduce ">
+      <!-- <p class=" label ">{{charges_reduce?.party?.display_name}} </p> -->
+      <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+
+        <p class=" label ">{{charges_reduce?.type?.label}}
+          <ng-container *ngIf="charges_reduce?.containers.length">
+            ( <span *ngFor="let container of charges_reduce?.containers;let last =last">{{container.name }}{{last ? ' ': ', ' }}</span> )
+          </ng-container>  
+         </p>
+
+
+        <p class="label">- {{charges_reduce?.amount_before_tax| numberFormat}} {{ currency_type?.symbol}}</p>
+
+      </div>
+      <div class="box-110px d-flex justify-content-between ">
+        <button class="edit-btn me-2" [disabled]="!charges_reduce?.is_editable"
+          (click)="openChargeDeductionVendor(charges_reduce,'vp_reduce_bill_charges')">
+          <i class="bi bi-pencil-fill"></i>Edit
+        </button>
+        <button class="del-btn me-2" (click)="viewUploadedDocument(charges_reduce?.documents,charges_reduce?.document_no)"  [disabled]="charges_reduce?.documents?.length == 0" [ngStyle]="{'color': charges_reduce?.documents.length > 0 ? '#15A4F6' : '#CCCCCC'}"
+          >
+          <span class="material-icons">
+           image
+           </span>
+         </button>
+        
+        <button class="del-btn" [disabled]="!charges_reduce?.is_deletable"
+          (click)="deleteItems(charges_reduce.id,'charges')"><i class="material-icons  text-danger">delete</i></button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="p-4 px-5  border-1"
+    [ngClass]="{'border-bottom':partyTransaction?.others?.fuels.length!=0 || partyTransaction?.others?.party_charges_add.length!=0 || partyTransaction?.others?.vp_charges_reduce!=0}">
+    <div *ngFor="let fuel of partyTransaction?.others?.fuels">
+      <div class="d-flex mb-4 pt-3 justify-content-between align-items-center">
+        <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+          <p class=" label primary-label ">{{fuel?.name}} (Vendor)
+          </p>
+          <p class="label primary-label ">{{fuel?.total| numberFormat}} {{ currency_type?.symbol}}</p>
+
+        </div>
+        <div class="box-110px d-flex justify-content-between"></div>
+      </div>
+      <div class="d-flex mb-3 justify-content-between" *ngFor="let bill of fuel?.fuel">
+
+          <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+            <p class=" label ">Fuel Bill</p>
+            <p class="label">{{bill?.amount| numberFormat}} {{ currency_type?.symbol}}</p>
+          </div>
+
+          <div class="box-110px d-flex justify-content-between ">
+            <button class="edit-btn me-2" [disabled]="!bill?.is_editable_deletable" (click)="openFuelExpense(bill)">
+              <i class="bi bi-pencil-fill"></i>Edit
+            </button>
+            <button class="del-btn" [disabled]="!bill?.is_editable_deletable"
+              (click)="deleteItems(bill.id,'self_fuels')"><i class="material-icons  text-danger">delete</i></button>
+          </div>
+      </div>
+    </div>
+
+    <div *ngFor="let party_charges_add of partyTransaction?.others?.party_charges_add ">
+      <div class="d-flex mb-4 pt-3 justify-content-between align-items-center">
+        <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+          <p class=" label primary-label ">{{party_charges_add?.name}} (Vendor)
+          </p>
+          <p class="label primary-label ">{{party_charges_add?.total| numberFormat}} {{ currency_type?.symbol}}</p>
+
+        </div>
+        <div class="box-110px d-flex justify-content-between"></div>
+      </div>
+      <div class="d-flex mb-3 justify-content-between" *ngFor="let charge of party_charges_add?.charges">
+        <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+          <p class=" label ">{{charge?.type?.label}} </p>
+          <p class="label">{{charge?.expense_amount_before_tax| numberFormat}} {{ currency_type?.symbol}}</p>
+        </div>
+
+        <div class="box-110px d-flex justify-content-between ">
+          <button class="edit-btn me-2" [disabled]="!charge?.is_expense_editable_deletable"
+            (click)="openChargeDeductionClient(charge,'party_add_bill_charges')">
+            <i class="bi bi-pencil-fill"></i>Edit
+          </button>
+          <button class="del-btn me-2" (click)="viewUploadedDocument(charge?.documents,charge?.document_no)"  [disabled]="charge?.documents?.length == 0" [ngStyle]="{'color': charge?.documents?.length > 0 ? '#15A4F6' : '#CCCCCC'}"
+            >
+            <span class="material-icons">
+             image
+             </span>
+           </button>
+          <button class="del-btn" [disabled]="!charge?.is_expense_editable_deletable"
+            (click)="deleteItems(charge.id,'charge_expense')"><i class="material-icons  text-danger">delete</i></button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngFor="let vp_charges_reduce of partyTransaction?.others?.vp_charges_reduce ">
+      <div class="d-flex mb-4 pt-3 justify-content-between align-items-center">
+        <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+          <p class=" label primary-label ">{{vp_charges_reduce?.name}} (Vendor)
+          </p>
+          <p class="label primary-label ">{{vp_charges_reduce?.total| numberFormat}} {{ currency_type?.symbol}}</p>
+
+        </div>
+        <div class="box-110px d-flex justify-content-between"></div>
+      </div>
+      <ng-container *ngFor="let charge of  vp_charges_reduce?.charges">
+        <div class="d-flex mb-3 justify-content-between">
+          <div class="flex-grow-1  pe-5 d-flex justify-content-between align-items-center">
+            <p class=" label ">{{charge?.type?.label}} </p>
+            <p class="label">{{charge?.expense_amount_before_tax| numberFormat}} {{ currency_type?.symbol}}</p>
+
+          </div>
+          <div class="box-110px d-flex justify-content-between ">
+            <button class="edit-btn me-2" [disabled]="!charge?.is_expense_editable_deletable"
+              (click)="openChargeDeductionVendor(charge,'vp_reduce_bill_charges')">
+              <i class="bi bi-pencil-fill"></i>Edit
+            </button>
+            <button class="del-btn me-2" (click)="viewUploadedDocument(charge?.documents,charge?.document_no)"  [disabled]="charge?.documents?.length == 0" [ngStyle]="{'color': charge?.documents?.length > 0 ? '#15A4F6' : '#CCCCCC'}"
+              >
+              <span class="material-icons">
+               image
+               </span>
+             </button>
+            <button class="del-btn" [disabled]="!charge?.is_expense_editable_deletable"
+              (click)="deleteItems(charge.id,'charge_expense')"><i
+                class="material-icons  text-danger">delete</i></button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+</div>

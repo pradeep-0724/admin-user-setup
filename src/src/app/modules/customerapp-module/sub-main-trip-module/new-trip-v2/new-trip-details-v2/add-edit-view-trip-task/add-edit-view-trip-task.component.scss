@@ -1,0 +1,88 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+
+.left--section {
+    .input-wrap label {
+        font-size: 13px;
+        font-weight: 600;
+        color: $text-color;
+    }
+
+    .input-wrap .input--bd {
+        padding: 8px;
+        border: 1px solid #bcc7d1;
+        border-radius: 6px;
+        color: $text-color;
+    }
+}
+
+
+.trip-task-date-wrap {
+    padding: 3px;
+    border: 1px solid #bcc7d1;
+    border-radius: 6px;
+    color: $text-color;
+}
+
+
+
+.upload-document-section {
+    h6 {
+        font-size: 14px;
+        font-weight: 600;
+        color: $text-color;
+    }
+
+   
+}
+
+.error{
+    .trip-task-date-wrap,.input--bd {
+        border: 1px solid red !important;
+    }
+
+    
+}
+
+
+.iscompletedbtn {
+    width: 20px;
+    height: 20px;
+    border: 2px solid $text-color;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+
+    .bi {
+        color: $layout-bg;
+        -webkit-text-stroke: 0.5px;
+    }
+}
+
+.completed {
+    width: 20px;
+    height: 20px;
+
+    border: none;
+
+
+    background-color: #2BB741;
+
+}
+
+
+
+:host::ng-deep .trip-task-date-wrap {
+
+    .mat-form-field-underline{
+      display: none;
+    }
+
+    .mat-datepicker-input {
+        padding-left: 10px;
+    }
+
+
+}

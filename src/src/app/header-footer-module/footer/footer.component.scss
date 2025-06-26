@@ -1,0 +1,50 @@
+@import "../../../assets/styles/helpers/footer-sticky.scss";
+
+.footer{
+   p{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}
+.copyright{
+  text-transform: uppercase;
+}
+
+/*
+ 
+@media screen and (orientation: portrait) and (max-width: 767px) {
+    .footerDashboard {
+        transform: rotate(-90deg);
+        transform-origin: left top;
+        width: 100vh;
+        height: 100vw;
+        overflow-x: hidden;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: unset;
+        bottom: unset;
+        padding: 30px 05px;
+   }
+   
+ 
+ }
+ @media (max-width: 767px) {
+   .footerDashboard {
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    width: 100vh;
+    height: 100vw;
+    overflow-x: hidden;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: unset;
+    bottom: unset;
+    padding: 30px 05px;
+  }
+  
+ 
+ }
+*/

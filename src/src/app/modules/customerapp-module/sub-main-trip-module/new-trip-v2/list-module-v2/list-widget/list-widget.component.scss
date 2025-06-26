@@ -1,0 +1,227 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+
+
+
+.right-section__header {
+    padding: 10px 20px;
+}
+
+.video-button {
+    button {
+        font-size: 30px;
+        color: #0583D7;
+    }
+
+}
+
+.filter {
+    span {
+        font-size: 30px;
+        color: #808080;
+        cursor: pointer;
+
+    }
+}
+
+.search-filter {
+
+    color: $text-color;
+    height: 35px;
+    border: 2px solid #ACB5BD !important;
+    border-radius: 35px;
+    padding: 7px;
+    padding-right: 32px;
+    transition: all 200ms ease;
+
+
+
+
+}
+
+.search-filter:focus {
+
+    border-color: $primary-brand-color !important;
+    background-color: white;
+    box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+
+
+}
+
+.search-filter:focus+.search-icon {
+    color: $primary-brand-color;
+}
+
+.search-icon {
+    position: absolute;
+    font-size: 16px;
+    right: 16px;
+    top: 9px;
+
+
+    -webkit-text-stroke: 1px;
+    color: #979696;
+}
+
+
+.settings-icon {
+    .mat-icon {
+        transform-origin: center center;
+        transition: all 500ms ease;
+
+    }
+}
+
+.mat-icon-animation {
+
+
+    .mat-icon {
+        color: $primary-brand-color !important;
+        transform: rotate(90deg);
+        // color: #595fab !important;
+
+    }
+}
+
+
+
+.export-button {
+    button {
+        border: 2px solid #ACB5BD;
+        color: $text-color;
+        border-radius: 6px;
+        height: 35px;
+        padding-left: 30px;
+        padding-right: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        position: relative;
+
+        &::before {
+            content: "";
+            width: 15px;
+            height: 15px;
+            display: inline-block;
+            position: absolute;
+            left: 10px;
+
+
+            background-image: url("../../../../../../../assets/img/icons/file-export.png");
+            background-size: cover;
+        }
+    }
+
+}
+
+
+.btn--action {
+    border: 0px;
+    font-weight: bold;
+}
+
+.add--button button {
+    width: auto;
+    padding: 10px 15px;
+    font-size: 14px;
+
+
+}
+
+
+img {
+    max-width: fit-content;
+    vertical-align: middle;
+    margin: auto;
+}
+
+.calendar {
+    width: 20px
+}
+
+::ng-deep .select-options {
+    margin-bottom: 0px;
+
+    .mat-select-value {
+        width: fit-content;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .mat-form-field-infix {
+        width: auto;
+        padding: 0px;
+    }
+
+    .mat-select-arrow-wrapper {
+        margin-left: 7px;
+        margin-right: 7px;
+        font-weight: bold;
+    }
+
+    .mat-select-value {
+        width: fit-content;
+
+        font-weight: 600;
+        color: $text-color;
+    }
+
+    mat-form-field .mat-form-field-wrapper {
+        padding-bottom: 0px !important;
+    }
+}
+
+
+::ng-deep {
+    .calendar .mat-datepicker-toggle {
+        margin-top: 1.5px;
+    }
+
+    .calendar .mat-date-range-input {
+        display: none;
+        width: 0%;
+    }
+
+    .calendar .cdk-program-focused {
+        background-color: white
+    }
+
+    .calendar .cdk-focused {
+        background-color: white
+    }
+
+    .calendar .mat-button-toggle-focus-overlay {
+        display: none;
+    }
+
+    .search-filter .mat-form-field-infix {
+        width: auto;
+    }
+}
+
+
+
+::ng-deep .widget-datepicker .mat-datepicker-toggle {
+    color: #979696;
+}
+
+::ng-deep .widget-datepicker .mat-datepicker-toggle-active {
+    color: $primary-brand-color;
+}
+
+
+
+.filterOpen ::after {
+    content: "";
+    top: 29px;
+    right: 5px;
+    position: absolute;
+    border: 11px solid transparent;
+    border-bottom: 16px solid #fff;
+    z-index: 2;
+
+}
+
+.filterOpen {
+    border: 1px solid #979696 !important;
+    border-radius: 3px;
+}

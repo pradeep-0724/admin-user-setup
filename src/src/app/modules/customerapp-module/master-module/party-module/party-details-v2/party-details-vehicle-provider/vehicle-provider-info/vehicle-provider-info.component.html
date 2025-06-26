@@ -1,0 +1,158 @@
+<div class="container-fluid">
+    <div class="row align-items-lg-stretch ">
+        <div class="col-lg-6 pe-lg-2 p-0 ">
+            <div class="  rounded-3 p-3 layout-bg def-color h-100 card-shadow">
+
+                <div class="d-flex justify-content-between align-items-center"><span class="fs-6 fw-bold">Details</span>
+                    <button class="gb-edit-btn" [routerLink]="[preFixUrl+'/onboarding/party/edit/'+partyId]"><i class="bi bi-pencil-fill"></i>
+                    </button>
+                </div>
+                <div
+                    class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px mt-3">
+                    <span class="fw-semibold">Company</span><span>{{partInfoDetails?.company_name}}</span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Email</span><span>{{partInfoDetails?.email_address ? partInfoDetails?.email_address:'-'}}</span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Phone</span><span>{{partInfoDetails?.mobile_country_code}} {{partInfoDetails?.mobile ? partInfoDetails?.mobile:'-'}}</span>
+                </div>
+                <div class=" d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Sales Person</span><span>
+                        {{partInfoDetails?.sales_person_name ? partInfoDetails?.sales_person_name:'-'}}</span>
+                </div>
+
+                <div class="py-4">
+                    <span class="fs-6 fw-bold">Address</span>
+
+                </div>
+
+                <div class="border-1 border-bottom d-flex justify-content-between  px-4 p-y-15px pt-0 mt-3">
+                    <span class="fw-semibold">Billing Address</span>
+                    <span class="address-text ">{{partInfoDetails?.address[0]?.address_line_1}}, {{partInfoDetails?.address[0]?.street}}<br /> {{partInfoDetails?.address[0]?.state}}<br />
+                        {{partInfoDetails?.address[0]?.country}}<br /> {{partInfoDetails?.address[0]?.pincode}}</span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between  px-4 p-y-15px">
+                    <span class="fw-semibold">Shipping Address</span>
+                    <span class="address-text ">{{partInfoDetails?.address[1]?.address_line_1}} ,{{partInfoDetails?.address[1]?.street}}<br /> {{partInfoDetails?.address[1]?.state}}<br />
+                        {{partInfoDetails?.address[1]?.country}}<br /> {{partInfoDetails?.address[1]?.pincode}}</span>
+                </div>
+                <ng-container *ngIf="isTax">
+                    <div class="py-4">
+                        <span class="fs-6 fw-bold">Tax</span>
+                    </div>
+                    <div
+                        class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px pt-0 mt-3">
+                        <span class="fw-semibold">{{isTds?'VAT':'GST'}} registration</span><span>{{partInfoDetails?.tax_details?.treatment?.label}}</span>
+                    </div>
+                    <div [ngClass]="{'border-bottom':isTds}" class=" d-flex justify-content-between align-items-center px-4 p-y-15px">
+                        <span class="fw-semibold">{{isTds?'TRN':'GSTIN'}}</span><span>{{partInfoDetails?.tax_details?.gstin ? partInfoDetails?.tax_details?.gstin:'-'}}</span>
+                    </div>
+                 </ng-container>
+                 <ng-container *ngIf="isTds">
+                    <div class="border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                        <span class="fw-semibold">Corporate Tax Registration
+                        </span><span>{{partInfoDetails?.tax_details?.crn_treatment ?
+                            partInfoDetails?.tax_details?.crn_treatment?.label:'-'}}</span>
+                    </div>
+                    <div class=" d-flex justify-content-between align-items-center px-4 p-y-15px">
+                        <span class="fw-semibold">CRN
+                        </span><span>{{partInfoDetails?.tax_details?.crn_no ?
+                            partInfoDetails?.tax_details?.crn_no:'-'}}</span>
+                    </div>
+                </ng-container>
+              
+            </div>
+        </div>
+        <div class="col-lg-6 ps-lg-2 p-0  mt-4 mt-lg-0 ">
+            <div class="rounded-3 p-3 h-100  layout-bg def-color card-shadow">
+                <div class="d-flex justify-content-between align-items-center"><span class="fs-6 fw-bold">Balance</span>
+                    <button class="gb-edit-btn" [routerLink]="[preFixUrl+'/onboarding/party/edit/'+partyId]"><i class="bi bi-pencil-fill"></i>
+                    </button>
+                </div>
+
+                <div
+                    class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px mt-3">
+                    <span class="fw-semibold">Opening Balance jytfdfgh</span><span>{{ currency_type?.symbol}} {{partInfoDetails?.opening_balance?.open_balance}}</span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Opening Date</span><span>{{partInfoDetails?.opening_balance?.open_balance_date}}</span>
+                </div>
+                <div class="py-4">
+                    <span class="fs-6 fw-bold">Billing</span>
+                </div>
+                <div
+                    class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px pt-0 mt-3">
+                    <span class="fw-semibold">Preferred Payment Method</span><span>{{partInfoDetails?.billing_payment_method ?partInfoDetails?.billing_payment_method:'-'}}</span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Terms</span><span>{{partInfoDetails?.terms}} <span *ngIf="partInfoDetails?.terms=='Custom'">( {{partInfoDetails?.terms_days}} Days )</span></span>
+                </div>
+                <div class="border-1 border-bottom d-flex justify-content-between align-items-center px-4 p-y-15px">
+                    <span class="fw-semibold">Note</span><span>{{partInfoDetails?.notes ?partInfoDetails?.notes:'-'}}</span>
+                </div>
+                <div class="py-4">
+                    <span class="fs-6 fw-bold">Attachments</span>
+                    <div class="row">
+                        <div class="col-md-6 mt-2" *ngFor="let document of partInfoDetails?.attachments">
+                            <app-file-delete-view [showDelete]="false" [fileData]="document" ></app-file-delete-view>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row rounded-3 mt-4  layout-bg def-color card-shadow mb-4 pb-3">
+        <app-table-widget [isEditButton]="true" tableTitle="CONTACT PERSON" (editButtonEvent)="editButton($event)"></app-table-widget>
+
+        <div class="col-12 p-0">
+            <div class="custom-table-container ">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>NAME</th>
+                            <th>CONTACT NUMBER</th>
+                            <th>EMAIL</th>
+                            <th class=" icon-box">DEFAULT CONTACT</th>
+                        </tr>
+                    </thead>
+
+                    <!-- do-data-component -->
+                    <tbody *ngIf="partyContactList.length==0">
+                        <tr class="border-0">
+                            <td class="bg-white" colspan="30">
+                                <div class="no-list-data-wrap">
+                                    <figure>
+                                        <img src="assets/img/no-content.png" alt="">
+                                    </figure>
+                                    <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                    <tbody>
+                        <!-- Rows -->
+                        <tr *ngFor="let contact of partyContactList">
+                            <td>{{contact?.display_name}}</td>
+                            <td>{{contact?.contact_no}}</td>
+                            <td>{{contact?.email_address}}</td>
+
+                            <td class=" icon-box">
+                                <div class="justify-content-center align-items-center d-flex">
+                                    <input type="radio" [checked]="contact.default" (change)="makeContactDefault(contact)" class="default-contect-btn" />
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+</div>

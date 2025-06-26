@@ -1,0 +1,105 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+
+
+
+.label {
+    font-weight: 600;
+    color: #676A6E;
+    font-size: 13px;
+    margin-right: 10px;
+}
+
+p {
+    color: $text-color;
+}
+
+.primary-label {
+    color: $primary-brand-color
+}
+
+.green-label {
+    color: #2BB741;
+}
+
+
+
+
+
+
+
+
+.trip-task-tab {
+
+
+    span {
+        height: 40px;
+        color: $text-color;
+        font-size: 13px;
+        border-bottom: 3.5px solid $primary-brand-color;
+        display: flex;
+        padding: 5px;
+        align-items: center;
+        width: 160px;
+        font-weight: 500;
+        margin-bottom: -1px;
+        cursor: pointer;
+
+    }
+}
+
+
+
+
+
+::ng-deep {
+    .summary-tabs {
+        margin-top: 20px;
+
+        .mat-tab-body-content {
+            overflow: hidden !important;
+        }
+
+
+
+        .mat-tab-labels {
+            background-color: $layout-bg;
+            opacity: 1 !important;
+            border-bottom: 2px solid $gray-400;
+        }
+
+
+
+        .mat-tab-label {
+            flex-basis: 0;
+            flex-grow: 0 !important;
+            margin-top: 3px;
+            opacity: 1 !important;
+            position: relative;
+            color: #676A6E;
+
+
+        }
+
+        .mat-tab-label::after {
+            display: none;
+        }
+
+        .mat-ink-bar {
+            display: block;
+            background-color: #595FAB !important;
+            height: 3px;
+        }
+
+        .mat-tab-header {
+            border-bottom: 0px !important;
+        }
+
+
+
+    }
+}
+
+.disabled{
+    opacity: 0.4;
+    pointer-events: none;
+}

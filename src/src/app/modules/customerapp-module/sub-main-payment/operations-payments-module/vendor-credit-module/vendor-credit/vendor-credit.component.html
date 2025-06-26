@@ -1,0 +1,535 @@
+<div class="right-section__header">
+    <h1 *ngIf="vendorCreditId" class="heading">Edit Vendor Credit</h1>
+    <h1 *ngIf="!vendorCreditId" class="heading">Add Vendor Credit</h1>
+    <button class="gb-video-play float-right"  (click)="openGothrough()">
+        <i class="bi bi-play-circle-fill"></i>
+    </button>
+</div>
+<form [formGroup]="editVendorCredit" class="shadow-inset-top-lg">
+    <div class="error-msg-list" *ngIf="globalFormErrorList.length > 0">
+        <p class="message-head">{{ errorHeaderMessage }}</p>
+        <span class="icon-wrap"></span>
+        <ul *ngFor="let error of globalFormErrorList">
+          <li class="message-cont">{{ error }}</li>
+        </ul>
+    </div>
+    <div class="form-layout form-layout--pd">
+        <div class="form-layout__card active">
+            <div class="form-body">
+                <div class="row tabIndexActiveFields">
+
+                    <div *ngIf="vendorCreditId" class="col-lg-3 col-sm-6">
+                        <div class="input-wrap disabled">
+                            <label for="" class="input--required position-relative">Vendor  <span class="blueTag" *ngIf="isTdsDecleration">TDS Declaration Received</span></label>
+                            <div class="input--bd">{{ initialValues.vendor.label }}</div>
+                            <span *ngIf="gstin" class="font-small-blue"> {{terminology.tax_no_type}}: {{gstin}} </span>
+
+                        </div>
+                    </div>
+
+                    <div *ngIf="!vendorCreditId" class="col-lg-3 col-sm-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(editVendorCredit.controls.vendor)">
+                            <label for="" class="input--required position-relative">Vendor  <span class="blueTag" *ngIf="isTdsDecleration">TDS Declaration Received</span></label>
+                            <material-dropdown [searchable]="true"
+                                               [addable]="false"
+                                               class="dropDownWidth"
+                                               [selectedOption]="initialValues.vendor"
+                                               [party]="true" (addPartyPopup)="openAddPartyModal($event)"
+                                               (addValueToList)="addValueToPartyPopup($event)"
+                                               [params]="partyNamePopup"
+                                               [maxLength]="255">
+                                <select #customSelect formControlName="vendor" class="no-style select--modify" (change)="onVendorSelected($event)">
+                                    <option *ngFor="let vendor of vendorList" value="{{ vendor.id }}">
+                                        {{ vendor.party_display_name }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <span *ngIf="gstin" class="font-small-blue"> {{terminology.tax_no_type}}: {{gstin}} </span>
+                            <app-error [controlName]="editVendorCredit.controls.vendor"></app-error>
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(editVendorCredit.controls.bill_number)">
+                            <label for="" class="input--required">Bill Number</label>
+                            <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="initialValues.billNumber">
+                                <select #customSelect formControlName="bill_number" class="no-style select--modify">
+                                    <option *ngFor="let option of billList" value="{{ option.id }}">
+                                        {{ option.bill_number }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <app-error [controlName]="editVendorCredit.controls.bill_number"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap error" [ngClass]="addErrorClass(editVendorCredit.controls.vendor_credit_number)">
+                            <label for="" class="input--required">Vendor Credit Number</label>
+                            <input type="text" class="no-style input--bd add-hsn" placeholder="Eg.: 987654321" value="" formControlName="vendor_credit_number">
+                            <!-- <span class="border-anim"></span> -->
+                            <app-error [controlName]="editVendorCredit.controls.vendor_credit_number"></app-error>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap">
+                            <label for="" class="input--required">Date</label>
+                            <mat-form-field>
+                                <input matInput [matDatepicker]="vendor_credit_date" (focus)="vendor_credit_date.open()" formControlName="vendor_credit_date"
+                                    placeholder="DD/MM/YYYY">
+                                <mat-datepicker-toggle matSuffix [for]="vendor_credit_date"></mat-datepicker-toggle>
+                                <mat-datepicker #vendor_credit_date></mat-datepicker>
+                            </mat-form-field>
+                            <span class="error-message">Error messge!</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap">
+                            <label for="">Order Number</label>
+                            <input type="text" class="no-style input--bd add-hsn" placeholder="Eg.: 987654321" value="" formControlName="order_number">
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="input-wrap">
+                            <label for="">Employee In Charge</label>
+                            <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                            [selectedOption]="initialValues.employee" [addBlank]="true">
+                                <select #customSelect formControlName="employee"(change)="handleEmployeeChange()" class="no-style select--modify">
+                                    <option *ngFor="let employee of employeeList" value="{{ employee.id }}">
+                                        {{ employee.emp_name_id }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                            <span class="error-message">Error messge!</span>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <app-header-input-field-box [ngClass]="{'hiddenContent':true}" [partyDetailsData]="partyTaxDetails" [editData]="editData" [taxFormValid]="taxFormValid" (headerTaxDetails)="headerTaxDetails($event)"></app-header-input-field-box>
+                <div class="form-layout__card mg-top-30 formResponsiveTable">
+                    <div class="">
+                        <div class="table-wrapper table-wrapper--type1 table-wrapper--type2  table--bd table--nobg dropDownOverflow">
+                            <table class="table-container item-table">
+                                <thead>
+                                    <tr class="desktop_th">
+                                        <th width=15%>Item</th>
+                                        <th width=15%>Account</th>
+                                        <th width=10%>Quantity</th>
+                                        <th width=10%>Unit</th>
+                                        <th width=10%>Rate ({{ currency_type?.symbol}})</th>
+                                        <th width=15% [ngClass]="{'hiddenContent':!isTax}">Amount ({{ currency_type?.symbol}})</th>
+                                        <th width=10% [ngClass]="{'hiddenContent':!isTax}">Tax ({{ currency_type?.symbol}})</th>
+                                        <th width=15%>Total ({{ currency_type?.symbol}})</th>
+                                        <th width=10%></th>
+                                    </tr>
+                                </thead>
+                                <tbody formArrayName="vendor_items">
+                                    <ng-container *ngFor="let vendorItem of editVendorCredit.controls.vendor_items['controls']; let i = index;" [formGroupName]="i">
+                                        <tr class="mobile-flex tabIndexActive">
+                                            <td>
+
+                                                <h5 class="th_h5_mobile">Item</h5>
+                                                <div>
+                                                    <material-dropdown [searchable]="true" [addable]="true" class="dropDownWidth" [addBlank]="false"
+                                                    [addErrorClass]="addErrorClass(vendorItem.controls.item)" [maxLength]="20"
+                                                    [selectedOption]="initialValues.items[i]" [addNewOptions]="true"
+                                                    (addNewOption)="addNewAdditionalCharge($event,i)">
+                                                    <select #customSelect formControlName="item" class="no-style select--modify" (change)="onItemSelected($event, vendorItem, i)">
+                                                        <option *ngFor="let option of materialList" value="{{ option?.id }}">
+                                                            {{ option?.name }}
+                                                        </option>
+                                                    </select>
+                                                  </material-dropdown>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <h5 class="th_h5_mobile"> Account  </h5>
+                                                <div>
+                                                    <material-dropdown [searchable]="true" [addable]="true" [selectedOption]="initialValues.accounts[i]"
+                                                    [chartOfAccount]="true" (addChartOfAccount)="openAddCoaModal($event, i)"
+                                                    [params]="coaParams" (addValueToList)="addParamsCoaItem($event)"
+                                                    [addErrorClass]="addErrorClass(vendorItem.controls.account)">
+                                                        <select #customSelect formControlName="account" class="no-style select--modify">
+                                                            <option *ngFor="let account of accountList" value="{{ account.id }}">
+                                                                {{ account.name }}
+                                                            </option>
+                                                        </select>
+                                                    </material-dropdown>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <h5 class="th_h5_mobile"> Quantity  </h5>
+                                                <div class="input-wrap" [ngClass]="addErrorClass(vendorItem.controls.quantity)">
+                                                    <input positiveThreeDigitDecimalNumber placeholder="1" class="error-box"
+                                                    formControlName="quantity"
+                                                    (change)="calculateItemOthersAmount(i)">
+
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <h5 class="th_h5_mobile">Unit</h5>
+                                                <div class="select-wrap">
+                                                    <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth"
+                                                    [selectedOption]="initialValues.units[i]" [addBlank]="true"  [addErrorClass]="addErrorClass(vendorItem.controls.units)">
+                                                        <select #customSelect formControlName="units" class="no-style select--modify">
+                                                            <option *ngFor="let option of staticOptions.itemUnits" value="{{ option.id }}">{{ option.label }}</option>
+                                                        </select>
+                                                    </material-dropdown>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <h5 class="th_h5_mobile"> Rate    ({{ currency_type?.symbol}})</h5>
+                                                <div  class="input-wrap" [ngClass]="addErrorClass(vendorItem.controls.rate)" >
+                                                    <input positiveThreeDigitDecimalNumber placeholder="1000" formControlName="rate" class="error-box" (change)="calculateItemOthersAmount(i)">
+
+                                                </div>
+                                            </td>
+                                            <td [ngClass]="{'hiddenContent':!isTax}">
+                                                <h5 class="th_h5_mobile" >  Amount  ({{ currency_type?.symbol}}) </h5>
+                                              <div class="input-wrap" [ngClass]="addErrorClass(vendorItem.controls.total_before_tax)">
+                                                <input positiveThreeDigitDecimalNumber type="text" readonly class="error-box" placeholder="1000" formControlName="total_before_tax" (change)="calculateItemOther(i)">
+                                              </div>
+                                          </td>
+                                          <td [ngClass]="{'hiddenContent':!isTax}">
+                                            <h5 class="th_h5_mobile"> Tax  </h5>
+                                              <div [ngClass]="{disable:disableTax || !companyRegistered}">
+                                                <div class="select-wrap"
+                                                    [ngClass]="addErrorClass(vendorItem.controls.tax)">
+                                                    <material-dropdown [searchable]="true" [addable]="false"
+                                                    [selectedOption]="initialValues.tax[i]" [disabled]="disableTax || !companyRegistered">
+                                                        <select #customSelect formControlName="tax" class="no-style select--modify"
+                                                                  (change)="onCalcuationsChanged()">
+                                                            <option *ngFor="let option of taxOptions" value="{{ option.id }}">
+                                                                    {{ option.label }}
+                                                            </option>
+                                                        </select>
+                                                    </material-dropdown>
+                                                </div>
+                                              </div>
+                                          </td>
+                                            <td class="input-wrap disabled">
+                                                <h5 class="th_h5_mobile"> Total  ({{ currency_type?.symbol}})  </h5>
+                                                <input positiveThreeDigitDecimalNumber type="text" placeholder="1000"
+                                                formControlName="amount" [attr.readOnly]="true">
+                                            </td>
+                                            <td class="text-center mobile-remove-add-position mobile-width-100 max-wd-120 align-middle tabIndexActive">
+                                                <button class="material-icons drop-down p-0" (click)="vendorItem.controls.additionalDetails.setValue(!vendorItem.controls.additionalDetails.value)"
+                                                    *ngIf="!vendorItem.controls.additionalDetails.value">arrow_drop_down</button>
+                                                <button class="material-icons drop-down p-0" (click)="vendorItem.controls.additionalDetails.setValue(!vendorItem.controls.additionalDetails.value)"
+                                                    *ngIf="vendorItem.controls.additionalDetails.value">arrow_drop_up</button>
+                                                 <button class="material-icons clear p-0" (click)="resetItem(vendorItem, i)">remove_circle_outline</button>
+                                                <button class="material-icons delete p-0" (click)="removeItems(i)" *ngIf="editVendorCredit.controls.vendor_items.length > 1">add_circle_outline</button>
+                                                <button class="material-icons add p-0" (click)="addMoreItem()" *ngIf="editVendorCredit.controls.vendor_items.length - 1 == i">add_circle_outline</button>
+                                                <button class="material-icons add p-0" (click)="cloneVendorItem(vendorItem)">file_copy</button>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-top-0 tabIndexActive" [ngClass]="{show: vendorItem.controls.additionalDetails.value}">
+                                          <td colspan="5" class="fs-12 pt-0">
+                                              <input type="text" placeholder="Description" formControlName="description">
+                                          </td>
+                                          <td colspan="2" [ngClass]="{'hiddenContent':!(isTax==true && isTds==false)}" class="pt-0">
+                                              <div class="custom-input d-flex align-items-center ms-3">
+                                                  <div class="custom-input__checkbox border-0 p-0 h-auto position-relative">CESS (%)</div>
+                                                  <input positiveThreeDigitDecimalNumber type="text" placeholder="CESS (%)" (change)="onCalcuationsCess()" class="custom-input__margin ms-1" formControlName="cess">
+                                              </div>
+                                          </td>
+                                          <!-- <td colspan="2"> -->
+                                              <!-- <a class="#" (click)="cloneVendorItem(vendorItem)">Clone</a> -->
+                                          <!-- </td> -->
+                                      </tr>
+                                    </ng-container>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-footer-actions mg-top-20 tabIndexActive">
+                            <button class="clear-item p-0" (click)="clearVendorItems()">Remove All</button>
+                        </div>
+                    </div>
+                </div>
+        <div class="gst-table-wrapper mg-top-30 tabIndexActive">
+
+                   <div class="gst-main">
+                      <div class="text-end fw-bold gst-left"> Subtotal: </div>
+                      <div class="px-0  text-end fw-bold gst-right"> {{ currency_type?.symbol}}  {{ vendorCreditTotals.subtotal }}</div>
+                    </div>
+
+                <div class="gst-main" *ngFor="let percentageTotal of vendorCreditTotals.taxes;" [ngClass]="{'hiddenContent':!isTax}">
+                  <ng-container *ngIf="percentageTotal.total">
+
+                        <div class="text-end gst-left"> Include {{terminology.tax_type}} &#64; {{ percentageTotal.value }}% on
+                          <span>{{ percentageTotal.total }}</span>:
+                        </div>
+                        <div class="px-0  text-end gst-right">{{ currency_type?.symbol}}  {{ percentageTotal.taxAmount }}</div>
+                  </ng-container>
+              </div>
+
+
+            <div class="gst-main" *ngFor="let percentageTotal of vendorCreditTotals.cess;" [ngClass]="{'hiddenContent':!(isTax==true && isTds==false) }">
+                <ng-container *ngIf="vendorCreditTotals.cess.length">
+                  <div class="text-end gst-left"> Include CESS &#64; {{ percentageTotal.cessPercent || 0}}% on
+                        <span>{{ percentageTotal.total }}</span>:
+                  </div>
+                  <div class="px-0  text-end gst-right">{{ currency_type?.symbol}} {{ percentageTotal.cessValue }}</div>
+                </ng-container>
+            </div>
+            <div class="gst-main" [ngClass]="{'hiddenContent':!isTax}">
+              <div class="gst-left text-end pt-0">
+                  <span>Discount after Tax </span>
+                  <div class="input" [ngClass]="addErrorClass(editVendorCredit.controls.discount_after_tax)"
+                        [class.disabled]="disableTax || !companyRegistered">
+                            <input positiveThreeDigitDecimalNumber  type="text" class="error-box" placeholder="0.00"
+                            formControlName="discount_after_tax"
+                            [attr.disabled]="disableTax || !companyRegistered ? '': null"
+                            (change)="onCalcuationsChanged()">
+                    </div>
+                    <div class="select-wrap dropdown">
+                      <select name=""
+                          class="no-style select--modify custom-select"
+                          formControlName="discount_after_tax_type"
+                          (change)="onCalcuationsChanged()">
+                          <option value="0">%</option>
+                          <option value="1">{{ currency_type?.symbol}}</option>
+                      </select>
+                    </div>
+
+                </div>
+                <div class="px-0 gst-right text-end">{{ currency_type?.symbol}} {{ vendorCreditTotals.discountAfterTaxTotal }}</div>
+              </div>
+              <div class="gst-main">
+                <div class="text-start pt-0 gst-left">
+
+                    <div class="dropdown select-wrap">
+                      <material-dropdown
+                      [selectedOption]="initialValues.adjustmentAccount">
+                      <select #customSelect formControlName="adjustment_account"
+                          class="no-style select--modify">
+                          <option *ngFor="let option of expenseAccountList"
+                              value="{{ option.id }}">{{ option.name }}
+                          </option>
+                      </select>
+                      </material-dropdown>
+                    </div>
+                    <div class="input" [ngClass]="addErrorClass(editVendorCredit.controls.adjustment)">
+                          <input twoDigitDecimalNumber  type="text" class="ms-auto error-box"
+                          placeholder="0.00"
+                          formControlName="adjustment"
+                          (change)="onCalcuationsChanged()">
+                    </div>
+                    <div class="select-wrap dropdown">
+                          <select name=""
+                              class="no-style select--modify custom-select"
+                              formControlName="adjustment_choice"
+                              (change)="onCalcuationsChanged()">
+                              <option value="0">%</option>
+                              <option value="1"> {{ currency_type?.symbol}}</option>
+                          </select>
+                    </div>
+                  </div>
+
+                  <div class="px-0  text-end gst-right"> {{ currency_type?.symbol}} {{ vendorCreditTotals.adjustmentAmount }}</div>
+              </div>
+              <div class="text-end gst-main">
+                <div class="text-end h5"> <strong> Total: </strong></div>
+                <div class="px-0 text-end ms-3 h5"><strong> {{ currency_type?.symbol}} {{ vendorCreditTotals.total }} </strong></div>
+              </div>
+       </div>
+
+                <!-- <div class="form-layout__card mg-top-30">
+                    <div class="table-wrapper table--nobg table-wrapper--mobile">
+                        <table class="table-container respinsiveTable">
+                            <tbody>
+                                <tr class="border-top-0 border-bottom-0">
+                                    <td class="p-0 disp-none"></td>
+                                    <td class="p-0">
+                                        <div class="table-wrapper table-wrapper--type1 table--nobg">
+                                            <table class="table-container mg-bottom-30">
+                                                <tbody>
+                                                    <tr class="border-top-0 mobileFlex">
+
+                                                        <td     class=" text-end bill-item">
+                                                            Subtotal:
+                                                        </td>
+                                                        <td     class="rupee-symbol rupee-symbol--sm px-0  text-end bill-value">
+                                                          {{ currency_type?.symbol}}  {{ vendorCreditTotals.subtotal }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="border-top-0 mobileFlex">
+                                                        <td     class=" text-end">
+                                                            <div class="gst">
+                                                                <span class="mobileBlock">Discount </span>
+                                                                <div class="input-wrap width-100" [ngClass]="addErrorClass(editVendorCredit.controls.discount)">
+                                                                    <input positiveThreeDigitDecimalNumber  type="text" class="mg-left-10 error-box" placeholder="0.00"
+                                                                    formControlName="discount"
+                                                                    (change)="onCalcuationsChanged()">
+                                                                </div>
+                                                                <div class="select-wrap d-inline-block">
+                                                                    <select name=""
+                                                                        class="no-style select--modify custom-select"
+                                                                        formControlName="discount_type"
+                                                                        (change)="onCalcuationsChanged()">
+                                                                        <option value="0">%</option>
+                                                                        <option value="1"> {{ currency_type?.symbol}} </option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td     class="rupee-symbol rupee-symbol--sm px-0  text-end">
+                                                          {{ currency_type?.symbol}}  {{ vendorCreditTotals.discountTotal }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="border-top-0 mobileFlex" *ngFor="let percentageTotal of vendorCreditTotals.taxes;" [ngClass]="{'hiddenContent':!isTax}">
+                                                      <ng-container *ngIf="percentageTotal.total">
+                                                          <td     class=" text-end">
+                                                            <span class="mobileBlock">Include GST @{{ percentageTotal.value }}% on </span>
+                                                              <span class="rupee-symbol rupee-symbol--sm">{{ percentageTotal.total }}</span>:
+                                                          </td>
+                                                          <td     class="rupee-symbol rupee-symbol--sm px-0  text-end">
+                                                            {{ currency_type?.symbol}}  {{ percentageTotal.taxAmount }}
+                                                          </td>
+                                                      </ng-container>
+                                                  </tr>
+                                                  <tr class="border-top-0 mobileFlex" *ngFor="let percentageTotal of vendorCreditTotals.cess;" [ngClass]="{'hiddenContent':!isTax}">
+                                                      <ng-container *ngIf="vendorCreditTotals.cess.length">
+                                                          <td     class=" text-end">
+                                                              Include CESS @{{ percentageTotal.cessPercent || 0}}% on
+                                                              <span
+                                                                  class="rupee-symbol rupee-symbol--sm">{{ percentageTotal.total }}</span>:
+                                                          </td>
+                                                          <td     class="rupee-symbol rupee-symbol--sm px-0  text-end">
+                                                            {{ currency_type?.symbol}} {{ percentageTotal.cessValue }}
+                                                          </td>
+                                                      </ng-container>
+                                                  </tr>
+                                                  <tr class="border-top-0 mobileFlex" [ngClass]="{'hiddenContent':!isTax}">
+                                                      <td     class=" text-end pt-0">
+                                                          <div class="gst">
+                                                            <span class="mobileBlock"> Discount after Tax </span>
+                                                              <div class="input-wrap width-100"
+                                                              [ngClass]="addErrorClass(editVendorCredit.controls.discount_after_tax)"
+                                                              [class.disabled]="disableTax || !companyRegistered">
+                                                                  <input positiveThreeDigitDecimalNumber  type="text" class="mg-left-10 error-box" placeholder="0.00"
+                                                                  formControlName="discount_after_tax"
+                                                                  [attr.disabled]="disableTax || !companyRegistered ? '': null"
+                                                                  (change)="onCalcuationsChanged()">
+                                                              </div>
+                                                              <div class="select-wrap d-inline-block">
+                                                                  <select name=""
+                                                                      class="no-style select--modify custom-select"
+                                                                      formControlName="discount_after_tax_type"
+                                                                      (change)="onCalcuationsChanged()">
+                                                                      <option value="0">%</option>
+                                                                      <option value="1">{{ currency_type?.symbol}}</option>
+                                                                  </select>
+                                                              </div>
+                                                          </div>
+                                                      </td>
+                                                      <td     class="rupee-symbol rupee-symbol--sm px-0  text-end">
+                                                        {{ currency_type?.symbol}} {{ vendorCreditTotals.discountAfterTaxTotal }}
+                                                      </td>
+                                                  </tr>
+                                                    <tr class="border-top-0 mobileFlex">
+                                                        <td width=100% class=" text-end pt-0">
+                                                            <div class="gst">
+                                                                <div id="other-option" class="mb-2">
+                                                                    <material-dropdown
+                                                                    [selectedOption]="initialValues.adjustmentAccount">
+                                                                    <select #customSelect formControlName="adjustment_account"
+                                                                        class="no-style select--modify">
+                                                                        <option *ngFor="let option of expenseAccountList"
+                                                                            value="{{ option.id }}">{{ option.name }}
+                                                                        </option>
+                                                                    </select>
+                                                                    </material-dropdown>
+                                                                    </div>
+                                                                    <div class="input-wrap width-100" [ngClass]="addErrorClass(editVendorCredit.controls.adjustment)">
+                                                                        <input twoDigitDecimalNumber  type="text" class="ms-auto error-box"
+                                                                        placeholder="0.00"
+                                                                        formControlName="adjustment"
+                                                                        (change)="onCalcuationsChanged()">
+                                                                    </div>
+                                                                    <div class="select-wrap d-inline-block">
+                                                                        <select name=""
+                                                                            class="no-style select--modify custom-select"
+                                                                            formControlName="adjustment_choice"
+                                                                            (change)="onCalcuationsChanged()">
+                                                                            <option value="0">%</option>
+                                                                            <option value="1"> {{ currency_type?.symbol}}</option>
+                                                                        </select>
+                                                                    </div>
+                                                            </div>
+                                                        </td>
+                                                        <td     class="rupee-symbol rupee-symbol--sm px-0  text-end">
+                                                          {{ currency_type?.symbol}} {{ vendorCreditTotals.adjustmentAmount }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="border-top-0">
+                                                        <td colspan="2" class="pt-0"></td>
+                                                    </tr>
+                                                    <tr class="mobileFlex">
+                                                        <td class=" text-end bill-total disp-w-50">
+                                                            Total:
+                                                        </td>
+                                                        <td     class="rupee-symbol px-0  text-end bill-total">
+                                                          {{ currency_type?.symbol}} {{ vendorCreditTotals.total }} </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div> -->
+                <div class="form-layout__card notes mg-top-15 tabIndexActiveFields">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="input-wrap mb-0 pb-3">
+                                <label for="" class="">Note</label>
+                                <input type="text" class="no-style input--bd" placeholder="Comments" value="" formControlName="comments">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="input-wrap mb-0 pb-3">
+                                <label for="" class="">Remarks (For Internal Use)</label>
+                                <input type="text" class="no-style input--bd" placeholder="Comments" value="" formControlName="remarks">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-layout__card mg-top-30">
+                    <file-uploader (onFileUploaded)="fileUploader($event)"
+                    (onFileDeleted)="fileDeleted($event)" [multiple]="true"
+                    [accept]="'capture=camera, image/jpeg,image/x-jpg,image/png, application/pdf'"
+                    [showFileName]="false" [patchFileUrls]="patchFileUrls">
+                    </file-uploader>
+                 </div>
+            </div>
+        </div>
+    </div>
+    
+
+</form>
+<div class="footer-bg p-2 px-4 custom-footer-bg d-flex justify-content-end" >
+        
+            <button class="btn btn--sm me-2" [routerLink]="[prefixUrl+'/payments/vendor_credit/list']"
+                routerLinkActive="active">Cancel</button>
+            <button *ngIf="vendorCreditId" class="btn btn--primary btn--sm" (click)="updateVendorCredit()">Update</button>
+            <button *ngIf="!vendorCreditId" class="btn btn--primary btn--sm" (click)="saveVendorCredit()">Save</button>
+
+        
+    </div>
+
+    <add-new-coa [popDetail]="showAddCoaPopup" (closeModal)="closeCoaPopup" (coaAdded)="addExpenseToOption($event)">
+    </add-new-coa>
+
+<!-- Popup for adding Vendor details -->
+<app-add-party-popup [popDetail]="showAddPartyPopup" (closeModal)="closePartyPopup()"
+(partyAdded)="addPartyToOption($event)" [isVendor]="true"></app-add-party-popup>
+
+
+<app-go-through  [goThroughDetais]="goThroughDetais"></app-go-through>

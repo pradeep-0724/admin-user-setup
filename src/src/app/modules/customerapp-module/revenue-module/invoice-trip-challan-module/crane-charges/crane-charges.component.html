@@ -1,0 +1,127 @@
+<div class="bg-white rounded-3">
+    <form [formGroup]="chargesListForm">
+
+      <div class="d-flex justify-content-between align-items-center px-4 py-2 mx-0 p-0 border-bottom"  >
+        <p  class="fs-6 def-color fw-semibold modal-title col-6" >Add Job Charges</p>
+        <div class="table-header__right col-md-4 col-6 justify-content-end px-0">
+          <div id="demo-2">
+            <input type="search" class="no-style search-bar input-search" placeholder="Search" (keyup)="searchitem()"
+           [(ngModel)]="search" [ngModelOptions]="{standalone: true}">
+  
+          </div>
+          <ng-container *ngIf="allData?.length">
+            <button class="btn--action mg-left-10 hide_onClick py-1" [ngClass]="{'filterOpen':showFilter }" (click)="showFilter = !showFilter">
+              <span  *ngIf="isFilterApplied && !showFilter" class="material-icons filterBullet">
+                fiber_manual_record
+                </span>
+                <img *ngIf="!isFilterApplied && !showFilter" src="assets/img/filter-icon.svg" alt="">
+                <img *ngIf="isFilterApplied && !showFilter" src="assets/img/filter_icon_2.svg" alt="">
+                <img *ngIf="showFilter" src="assets/img/filter-icon-svg-3.svg" alt="">
+            </button>
+            <app-filter [config]="options" [data]="allData" [visible]="showFilter" (onApplied)="filterApplied($event)"
+              (onClear)="filterApplied($event)">
+            </app-filter>
+          </ng-container>
+        </div>
+      </div>
+
+
+
+
+     
+      <div  class="charges-popup-body p-4 pb-2">
+        <div
+          class="table-wrapper table-wrapper--type1 table-wrapper--type2 table--bd table--nobg table-wrapper--scroll">
+          <table class="table-container">
+            <thead>
+              <tr>
+                <th width=5%>
+                  <label for="check-trip-all" class="check-box">
+                    <input type="checkbox" id="check-trip-all" formControlName="selectedAll"
+                      (change)="selectAllTimeSheet()">
+                    <span class="check-mark"></span>
+                  </label>
+                </th>
+                <th >SO No.</th>
+                <th >Job No</th>
+                <th >Job Date</th>
+                <th>Vehicle No</th>
+                <th>Job Charges</th>
+                <th *ngIf="showAdjustment">Adjustments ({{ currency_type?.symbol}})</th>
+                <th >Total Amount ({{ currency_type?.symbol}})</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody formArrayName="charges">
+              <tr *ngIf="chargesList.length == 0">
+                <td colspan="10" style="background-color: #fff">
+                  <div class="no-content-wrapper">
+                    <figure class="no-content-pic">
+                      <img src="assets/img/no-content.png" alt="">
+                    </figure>
+                    <div class="no-content-txt">
+                      <h5 class="heading">No data found!</h5>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngFor="let charge of chargesList ; let i = index;" [formGroupName]="i">
+                <td class="table-checkbox">
+                  <label for="check-charge-{{i}}" class="check-box">
+                    <input type="checkbox" id="check-charge-{{i}}" formControlName="selectedCharge" (change)="onSelectionCharge()"
+                      value="{{ charge.charge_id }}">
+                    <span class="check-mark"></span>
+                  </label>
+                </td>
+                <td>
+                  {{ charge.workorder_no ? charge.workorder_no : '-' }}
+                </td>
+                <td>
+                  {{ charge.trip_id }}
+                </td>
+                <td>
+                  {{ charge.date|formateDate }}
+                </td>
+                <td>
+                  {{ charge.vehicle_no }}
+                </td>
+                <td>
+                  {{ charge.name }}
+                </td>
+                <td  *ngIf="showAdjustment">{{charge?.amount_before_tax}}</td>
+                <td>
+                  {{ charge.amount }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-container *ngIf="showDocuments">
+          <p class="fs-6 border-bottom py-3 my-3 def-color fw-semibold" *ngIf="chargesListForm.controls.documents['controls'].length">Select Job Charges Documents <app-tool-tip class="" [totalSlides]="1"
+            position="right" [toolTipContent]="docToolTip"></app-tool-tip></p>
+          <div formArrayName="documents" class="d-flex gap-3 flex-wrap">
+            <div  *ngFor="let document of chargesListForm.controls.documents['controls']; let i = index;" [formGroupName]="i" >
+              <div class="table-checkbox d-flex align-items-center ">
+                <label for="check-trip-{{document.controls.document_name.value}}" class="check-box me-3">
+                  <input type="checkbox" id="check-trip-{{document.controls.document_name.value}}" formControlName="selected" >
+                  <span class="check-mark"></span>
+                </label>
+                <div>
+                  {{document.controls.document_name.value}}
+                </div>
+           
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <div class="d-flex justify-content-between px-4 pb-4 pt-2">
+        <button type="button" class="btn btn--sm" data-dismiss="modal" (click)=" close()">Close</button>
+        <button type="button" class="btn btn--primary btn--sm" (click)="selectedCharge()">{{selectedChargeList.length==0?'Add':'Update'}} </button>
+        </div>
+      
+
+    </form>
+  </div>
+  
+    

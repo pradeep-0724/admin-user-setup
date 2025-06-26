@@ -1,0 +1,121 @@
+@import "../../../../../../../assets/styles/helpers/variable";
+@import "../../../../../../../assets/styles/helpers/mixins";
+
+.error-reg {
+    color: #eb1e4a;
+    font-size: 12px;
+}
+
+.alert-msg {
+    margin-bottom: 20px;
+}
+
+.input-wrap label {
+    color: $text-color;
+    font-weight: 600;
+}
+
+
+
+.fake-tab-bar {
+    background-color: #eaeaea;
+    height: 51px;
+    padding-top: 2.5px;
+
+    span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        color: #676A6E;
+        background-color: #fefefe;
+        border-radius: 6px 6px 0 0;
+        height: 100%;
+        max-width: 180px;
+    }
+}
+
+.add-del-toggle {
+    color: #676A6E;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+// copied form market vehvile screeen
+
+.details-tab-vehicle {
+    min-height: 350px;
+    background-color: $layout-bg;
+}
+
+
+
+
+.veh-type{
+    box-shadow: 0px 0px 3px #00000029;
+  border: 1px solid #BBBBBB;
+  padding: 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  
+  transition: all 200ms ease-in-out ;
+  position: relative;
+  &.active{
+    border: 1px solid $primary-brand-color;
+    box-shadow: 0px 0px 3px $primary-brand-color;
+  }
+  .check-icon{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    cursor: pointer;
+    
+  }
+  // &:hover{
+  //   background-color: #f2f2f2cd;
+  //   transform: translateY(-3px);
+  // }
+    img{
+      display: block;
+    width: 55px;
+    height: 55px;
+    
+    margin: 0 auto;
+  
+    }
+    
+  }
+
+  .disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+:host::ng-deep{
+  .multi-dropdown{
+    .dropdown-list{
+      overflow: hidden;
+    }
+  }
+
+  .specification-multi-select-wrap .multiselect-dropdown .dropdown-btn{
+
+    border-top: 0px  !important;
+    border-left: 0px !important;
+    border-right: 0px !important;
+    border-bottom: 1px solid #adadad !important;
+    border-radius: 0px !important;
+    .selected-item {
+      background-color: $primary-brand-color !important;
+      border: 1px solid $primary-brand-color !important;
+    }
+    
+
+
+  }
+}
+
+.taberror {
+  color: red;
+  font-weight: normal;
+}

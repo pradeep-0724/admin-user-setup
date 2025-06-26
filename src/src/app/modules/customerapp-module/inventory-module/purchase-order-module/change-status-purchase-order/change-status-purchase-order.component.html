@@ -1,0 +1,30 @@
+<div class="modal fade" [ngClass]="{'show':show}" id="exampleModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal--sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center pd-20">
+              <form [formGroup]="changeStatusOrder">
+                <div class="row justify-content-center">
+                  <div class="col-xl-6 col-lg-6 col-sm-12">
+                    <div class="input-wrap mg-bottom-0">
+                        <label for="" class="text-start ">Purchase Status</label>
+                        <material-dropdown [searchable]="true" [addable]="false" class="dropDownWidth" [selectedOption]="initialDetails.status">
+                            <select #customSelect formControlName="po_status" class="no-style select--modify">
+                                <option *ngFor="let option of temppurchaseStatus" value="{{ option?.value }}">
+                                    {{ option?.label }}
+                                </option>
+                            </select>
+                        </material-dropdown>
+                    </div>
+                </div>
+                </div>
+              </form>
+              <div class="modal-footer no-border justify-content-center">
+                <button type="button" class="btn" data-dismiss="modal" (click)="close()">Close</button>
+                <button type="submit" class="btn btn--primary" (click)="save()">Save</button>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="show" class="modal-backdrop fade show"></div>

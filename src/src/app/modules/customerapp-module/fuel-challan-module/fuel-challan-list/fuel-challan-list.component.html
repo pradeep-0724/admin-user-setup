@@ -1,0 +1,119 @@
+
+  <div class="calc-height">
+    <app-list-widget listTitle="Fuel Challan List"
+    (listWidgetData)="listWidgetData($event)"
+    [filterUrl]="filterUrl"  [isFilter]="true" [isDateDropDown]="false">
+    <button class="btn  mx-2 w-auto btn--primary py-2" id="custom-button-right"  *ngxPermissionsOnly="fuelPermission[0]" (click)="addNew()" type="submit">+ Add Fuel Slips</button>
+    </app-list-widget>
+    <div class="alert-msg" *ngIf="apiError">
+      <span class="icon-wrap"></span>
+      <p class="message-cont">{{ apiError }}</p>
+    </div>
+  </div>
+    <div class="custom-table-container def-color table-wrapper-list" id="challan-list"   (scroll)="onScroll($event)">
+      <table [ngClass]="{'h-100':fuelChallanList.length==0}">
+  
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Vendor</th>
+              <th>Vehicle Number</th>
+              <th>Fuel Quantity</th>
+              <th>Fuel Cost ({{ currency_type?.symbol}})</th>
+              <th>Total ({{ currency_type?.symbol}})</th>
+              <th>Fuel Date</th>
+              <th>Document</th>
+              <th>Status</th>
+              <th class="icon-box"></th>
+              
+            </tr>
+          </thead>
+          <tbody *ngIf="fuelChallanList.length == 0">
+              <tr class="border-0">
+                  <td class="bg-white" colspan="30">
+                      <div class="no-list-data-wrap">
+                          <figure>
+                              <img src="assets/img/no-content.png" alt="">
+                          </figure>
+                          <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                      </div>
+                  </td>
+              </tr>
+  
+          </tbody>
+  
+          
+     
+          <tbody  *ngFor="let fuel of fuelChallanList; trackBy">
+            <tr class="align-text-bottom">
+              <td>{{changeDtaetoDDMMYYYY(fuel.date)}}</td>
+              <td><a target="_blank"  class="custom-link" [routerLink]="[prefixUrl+'/onboarding/party/details/vendor/'+fuel.vendor.id]">{{fuel.vendor.name}}</a></td>
+              <td class="removeBorder">
+            <tr *ngFor="let details of fuel.unpaidfuelchallan"  class="border-0">
+              <td class="p-0" *ngIf="details?.vehicle?.id && !details?.vehicle.is_market">
+                <a class="custom-link"  target="_blank" [routerLink]="[prefixUrl+'/onboarding/vehicle/own/details',details?.vehicle.id]" > {{details?.vehicle?.reg_number}} </a>
+               </td>
+               <td class="p-0" *ngIf="details?.vehicle.is_market || details?.vehicle.is_market==null ">{{details?.vehicle?.reg_no ? details?.vehicle?.reg_number : '-'}}</td>
+            </tr>
+            </td>
+            <td class="removeBorder">
+              <tr *ngFor="let details of fuel.unpaidfuelchallan" class="border-0">
+                <td class="p-0">{{details.fuel_quntity}}</td>
+              </tr>
+            </td>
+            <td class="removeBorder">
+              <tr *ngFor="let details of fuel.unpaidfuelchallan" class="border-0">
+                <td class="p-0">{{details.fuel_cost}}</td>
+              </tr>
+            </td>
+            <td class="removeBorder">
+              <tr *ngFor="let details of fuel.unpaidfuelchallan" class="border-0">
+                <td class="p-0">{{details.total}}</td>
+              </tr>
+            </td>
+            <td class="removeBorder">
+              <tr *ngFor="let details of fuel.unpaidfuelchallan" class="border-0">
+                <td class="p-0">{{changeDtaetoDDMMYYYY(details.date)}}</td>
+              </tr>
+            </td>
+            <td class="removeBorder">
+              <tr *ngFor="let details of fuel.unpaidfuelchallan" class="border-0">
+                <td class="p-0">{{details.document}}</td>
+              </tr>
+            </td>
+            <td class="removeBorder">
+              <tr *ngFor="let details of fuel.unpaidfuelchallan" class="border-0">
+                <td class="p-0">{{details?.status?.label}}</td>
+              </tr>
+            </td>
+
+            <td class="icon-box  tabIndexActive"  >
+              <div class="d-flex justify-content-center align-items-center" >
+                  <div class="position-relative"  *ngIf="hideEdit(fuel.unpaidfuelchallan)||hideDelete(fuel.unpaidfuelchallan)">
+                    <i class="material-icons more-icon" *ngxPermissionsOnly="[fuelPermission[1],fuelPermission[2]]" (click)="optionsList($event, 'list_'+fuel.id)">more_vert</i>
+              <ul class="more-actions__menu table-popup" [ngClass]="{show: showOptions === 'list_'+fuel.id}">
+                 <ng-container  *ngIf="hideEdit(fuel.unpaidfuelchallan)">
+                  <li class="more-actions__item" *ngxPermissionsOnly="fuelPermission[1]" (click)="editFuel(fuel)"><i class="material-icons">edit</i>Edit</li>
+                 </ng-container>
+                 <ng-container  *ngIf="hideDelete(fuel.unpaidfuelchallan)" >
+                  <li class="more-actions__item" *ngxPermissionsOnly="fuelPermission[2]" (click)="popupFunction(fuel.id, i)"><i
+                    class="material-icons">delete</i>Delete</li>
+                 </ng-container>
+
+         
+
+              </ul>
+                    
+                  </div>
+              </div>
+
+          </td>
+           
+            </tr>
+          </tbody>
+        </table>
+  </div>
+
+<alert-popup [inputData]="popupInputData" (outputData)="confirmButton($event)"></alert-popup>
+<app-fuel-challan-pop-up [inputData]="inputData" *ngIf="inputData.show" (dataFromPopUp)="dataFromPopUp($event)">
+</app-fuel-challan-pop-up>

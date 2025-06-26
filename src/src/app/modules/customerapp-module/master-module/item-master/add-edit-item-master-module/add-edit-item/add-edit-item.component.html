@@ -1,0 +1,223 @@
+<div class="add-screen-wrap def-color">
+    <form [formGroup]="itemMasterForm" *ngIf="itemMasterForm">
+        <div class="">
+            <h6 class="fs-5 px-4 py-3">{{itemId?'Edit':'Add'}} Item </h6>
+        </div>
+        <div class=" shadow-inset-top-lg ">
+            <div class="px-2 pt-2" *ngIf="apiError">
+                <div class="alert-msg">
+                    <span class="icon-wrap"></span>
+                    <p class="message-cont">{{ apiError }}</p>
+                </div>
+            </div>
+            <div class="px-2 pt-2" *ngIf="!isValidForm">
+                <div class="alert-msg">
+                    <span class="icon-wrap"></span>
+                    <p class="message-cont">Item should either be a Sales type or a Purchase type or both</p>
+                </div>
+            </div>
+            <div class="px-3 pt-4">
+                <div class="row mx-0">
+                    <div class="col-12 mb-3">
+
+                        <span class="fw-semibold me-3">Type : </span>
+
+                        <mat-radio-group formControlName="type">
+
+                            <mat-radio-button color="primary" [value]="1"
+                                class="fw-semibold me-4">Service</mat-radio-button>
+                            <mat-radio-button color="primary" [value]="0" class="fw-semibold ">Goods</mat-radio-button>
+                        </mat-radio-group>
+
+                    </div>
+                </div>
+                <div class="row mx-0">
+                    <div class="col-xl-3 col-lg-4 col-sm-6">
+                        <div class="input-wrap">
+                            <label for="" class="input">SKU</label>
+                            <input type="text" class="no-style input--bd" [maxlength]="20" placeholder="SKU"
+                                formControlName="sku" (change)="skuError=''">
+                        <span *ngIf="skuError" class="error-reg">{{skuError}}</span>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-4 col-sm-6">
+                        <div class="input-wrap error"  [ngClass]="addErrorClass(itemMasterForm.get('name'))">
+                            <label for="" class="input--required">Item Name</label>
+                            <input type="text" class="no-style input--bd" [maxlength]="50" placeholder="Item name"
+                                formControlName="name" (change)="nameError=''">
+                        <span *ngIf="nameError" class="error-reg">{{nameError}}</span>
+                        <app-error [controlName]="itemMasterForm.get('name')"></app-error>
+
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-4 col-sm-6">
+                        <div class="input-wrap">
+                            <label for="" class="input">Unit</label>
+                            <material-dropdown [searchable]="true" [selectedOption]="initialValues.unit" class="dropDownWidth">
+                                <select #customSelect formControlName="unit_of_measurement"
+                                    class="no-style select--modify">
+                                    <option *ngFor="let option of unitOptions" value="{{ option?.id }}">
+                                        {{ option?.label }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                        </div>
+                    </div>
+
+
+                    <div class="col-xl-3 col-lg-4 col-sm-6">
+                        <div class="input-wrap">
+                            <label for="" class="input">HSN</label>
+                            <input type="text" class="no-style input--bd" appUpperCase [maxlength]="20" placeholder="HSN"
+                                formControlName="hsn_code">
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-4 col-sm-6">
+                        <div class="input-wrap">
+                            <label for="" class="input">Tax</label>
+                            <material-dropdown [searchable]="true" [selectedOption]="initialValues.tax" class="dropDownWidth">
+                                <select #customSelect formControlName="tax" class="no-style select--modify">
+                                    <option *ngFor="let option of taxOptions" value="{{ option?.id }}">
+                                        {{ option?.label }}
+                                    </option>
+                                </select>
+                            </material-dropdown>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+                <div class="row mx-0" formGroupName="sales">
+                    <div class="col-12 mb-4">
+                        <div class="d-flex align-items-center">
+                            <mat-checkbox formControlName="sales" color="primary" class="fw-semibold " (change)="salesChange()">
+                                Sales
+                            </mat-checkbox>
+                            <hr class="w-100 ms-4">
+
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-4 col-sm-6" [ngClass]="{'disabled':!itemMasterForm.get('sales').get('sales').value}">
+                        <div class="">
+                            <div class="input-wrap error "  [ngClass]="addErrorClass(itemMasterForm.get('sales').get('rate'))">
+                                <label for="" class="input">Unit Cost ({{ currency_type?.symbol}})</label>
+                                <input type="text" class="no-style input--bd" positiveThreeDigitDecimalNumber
+                                    [maxlength]="20" placeholder="Unit Cost" formControlName="rate">
+                            <app-error [controlName]="itemMasterForm.get('sales').get('rate')"></app-error>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-4 col-12" [ngClass]="{'disabled':!itemMasterForm.get('sales').get('sales').value}">
+                        <div class="fw-semibold fs-12px">Please select the vehicle categories.
+                        </div>
+                        <div class=" my-3">
+                            <mat-checkbox color="primary" formControlName="select_all" (change)="checkAll()"><span class="fw-semibold">Select
+                                    All</span></mat-checkbox>
+
+
+                        </div>
+                        <div class="col-12 ">
+                            <div class="veh-category-wrap no-hover-effect">
+
+                            <div class="veh-category  " *ngIf="vehicleCategories.includes(1)">
+                                <mat-checkbox color="primary" formControlName="crane"  (change)="selectCategory()"></mat-checkbox>
+
+
+                                <img src="../../../../../../../assets/img/icons/crane-truck.svg" alt="truck image">
+                                <p class="text-center my-2 fw-semibold fs-12px"> Crane</p>
+
+                            </div>
+                            <div class="veh-category  "  *ngIf="vehicleCategories.includes(2)">
+                                <mat-checkbox color="primary" formControlName="awp"  (change)="selectCategory()"></mat-checkbox>
+
+
+                                <img src="../../../../../../../assets/img/icons/awp.svg" alt="truck image">
+                                <p class="text-center my-2 fw-semibold fs-12px"> AWP</p>
+
+                            </div>
+                            <div class="veh-category" *ngIf="vehicleCategories.includes(3)|| vehicleCategories.includes(0)">
+                                <mat-checkbox color="primary" formControlName="others"  (change)="selectCategory()"></mat-checkbox>
+
+
+                                <img class="cargo" src="../../../../../../../assets/img/icons/loose-cargo-black.png" alt="truck image">
+                                <p class="text-center my-2 fw-semibold fs-12px"> Loose Cargo</p>
+
+                            </div>
+                            <div class="veh-category" *ngIf="vehicleCategories.includes(3)|| vehicleCategories.includes(0)">
+                                <mat-checkbox color="primary" formControlName="container"  (change)="selectCategory()"></mat-checkbox>
+
+
+                                <img  class="container"  src="../../../../../../../assets/img/icons/container-black.png" alt="truck image">
+                                <p class="text-center my-2 fw-semibold fs-12px">Container</p>
+
+                            </div>
+                        </div>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+
+                <div formGroupName="purchase">
+                    <div class=" mb-4 row mx-0">
+                        <div class="d-flex col-12 align-items-center">
+                            <mat-checkbox formControlName="purchase" color="primary" class="fw-semibold " (change)="purchaseChange()">
+                                Purchase
+                            </mat-checkbox>
+                            <hr class="w-100 ms-4">
+                        </div>
+                    </div>
+                    <div class="row mx-0" [ngClass]="{'disabled':!itemMasterForm.get('purchase').get('purchase').value}">
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error" [ngClass]="addErrorClass(itemMasterForm.get('purchase').get('purchase_unit_cost'))">
+                                <label for="" class="input">Unit Cost ({{ currency_type?.symbol}})</label>
+                                <input type="text" class="no-style input--bd" positiveThreeDigitDecimalNumber
+                                    [maxlength]="20" placeholder="Unit Cost" formControlName="purchase_unit_cost">
+                                    <app-error [controlName]="itemMasterForm.get('purchase').get('purchase_unit_cost')"></app-error>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-4 col-sm-6">
+                            <div class="input-wrap error" [ngClass]="addErrorClass(itemMasterForm.get('purchase').get('account'))">
+                                <label for="" [ngClass]="{'input--required':itemMasterForm.get('purchase').get('purchase').value}" class="input">Expense Account</label>
+                                <material-dropdown [searchable]="true" [selectedOption]="initialValues.account" [addable]="true" class="dropDownWidth"
+                                    [chartOfAccount]="true" (addChartOfAccount)="openAddCoaModal($event)"
+                                    [params]="coaParams" (addValueToList)="addParamsCoaItem($event)">
+                                    <select #customSelect formControlName="account"
+                                        class="no-style select--modify">
+                                        <option *ngFor="let account of accountList" value="{{ account.id }}">
+                                            {{ account.name }}</option>
+                                    </select>
+                                </material-dropdown>
+                                <app-error [controlName]="itemMasterForm.get('purchase').get('account')"></app-error>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+
+
+        </div>
+    </form>
+
+</div>
+<div class="custom-footer-bg py-2 px-4 d-flex justify-content-end">
+
+    <button class="btn me-2 btn--sm" [routerLink]="prefixUrl+'/onboarding/item/list'">Cancel</button>
+    <button class="btn btn--primary btn--sm" type="button" (click)="saveItems()">{{itemId?'Update':'Save'}}</button>
+
+
+</div>
+
+<add-new-coa [popDetail]="showAddCoaPopup" [isExpenseType]="true" (closeModal)="closeCoaPopup"
+  (coaAdded)="addExpenseToOption($event)">
+</add-new-coa>

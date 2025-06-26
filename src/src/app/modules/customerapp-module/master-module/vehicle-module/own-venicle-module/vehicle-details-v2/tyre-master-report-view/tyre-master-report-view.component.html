@@ -1,0 +1,105 @@
+<div class="rounded-3 custom-shadow-md overflow-hidden " [ngClass]="{'d-none':isLoading}" >
+    <app-tyre-position-layout [isTyrePositionViewInfo]="true" [editTyreDetails]="editTyreDetails" [tyreMasterForm]="vehicleDetailsForm"></app-tyre-position-layout>
+</div>
+<div class="rounded-3 mt-4 custom-shadow-md " [ngClass]="{'d-none':isLoading}" >
+        <app-table-widget tableTitle="Tyre Change History"[selectedDateRangeType]='-1' [isFilter]="true" [isDateRange]="true" [isShowDateRangeText]="true"
+            (dateRangeEmitter)="dateRangeTyresHistory($event)" (filterDataEmitter)="filterDataTyresHistory($event)"
+            (searchedData)="searchedDataTyresHistory($event)" (fileExportEvent)="exportTable($event)" [filterUrl]="'operation/jobcard/tyre-change/history/filters/'+vehicleId+'/'"
+            [isSearch]="true" isExport="true">
+        </app-table-widget>
+     <div >
+            <div class="custom-table-container tyres-table" (scroll)="onScroll($event)">
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>
+                                Job No.
+                            </th>
+                            <th>
+                                Position
+                            </th>
+                            <th>
+                                Tyre No.
+                            </th>
+                            <th>
+                                Brand
+                            </th>
+                            <th>
+                                Model
+                            </th>
+                            <th>Date of Installation </th>
+                            <th>Permitted Date</th>
+                            <th>Thread Depth</th>
+                            <th>Tyre Amount ({{ currency_type?.symbol}})</th>
+                            <th>Labour Amount ({{ currency_type?.symbol}})</th>
+                            <th>Total Amount({{ currency_type?.symbol}})</th>
+                            <th>Tax Amount ({{ currency_type?.symbol}})</th>
+                            <th>Total ({{ currency_type?.symbol}})</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody *ngIf="TyresHistoryList.length==0">
+                        <tr class="border-0">
+                            <td class="bg-white" colspan="30">
+                                <div class="no-list-data-wrap">
+                                    <figure>
+                                        <img src="assets/img/no-content.png" alt="">
+                                    </figure>
+                                    <h5 class="mt-3 primary-brand-text">No data found!</h5>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                    <tbody>
+                        <tr *ngFor="let fuelIn of TyresHistoryList;let i=index">
+                            <td>
+                                <a class="custom-link" target="_blank" [routerLink]="[prefixUrl+'/expense/maintenance/view/'+fuelIn?.job_no?.id]">{{fuelIn?.job_no?.name}}</a>
+                            </td>
+                            <td>
+                               {{fuelIn?.position_name || '-'}}
+                            </td>
+                            <td>
+                                {{fuelIn?.tyre_number || '-'}}
+                            </td>
+                            <td>
+                                {{fuelIn?.brand || '-'}}
+                            </td>
+                            <td>
+                                {{fuelIn?.model || '-'}}
+                            </td>
+                            <td>
+                                {{fuelIn?.installation_date || '-'}}
+                            </td>
+                            <td>
+                                {{fuelIn?.permitted_date || '-'}}
+                            </td>
+                            <td>
+                                {{fuelIn?.thread_depth || '-'}}
+                            </td>
+                            <td>
+                                {{fuelIn?.tyre_amount}}
+                            </td>
+                            <td>
+                                {{fuelIn?.labour_amount}}
+                            </td>
+                            <td>
+                                {{fuelIn?.pre_total}}
+                            </td>
+                            <td>
+                                {{fuelIn?.tax_amount}}
+                            </td>
+                            <td>
+                                {{fuelIn?.total}}
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+</div>

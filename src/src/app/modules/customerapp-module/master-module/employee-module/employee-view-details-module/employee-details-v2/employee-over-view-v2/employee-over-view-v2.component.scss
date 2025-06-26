@@ -1,0 +1,24 @@
+@import "../../../../../../../../assets/styles/repeated/cost-card";
+.reminder-section{
+    min-height: 430px;
+    .reminder{
+        padding: 15px 25px ;
+        position: relative;
+        .reminder-name{
+            text-decoration: underline;
+            font-weight: 600;
+        }
+        &::after{
+            width: 85%;
+            display: block;
+            content: "";
+            border: 0.3px solid gainsboro;
+            position: absolute;
+            bottom: 0px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            
+        }
+    }
+}

@@ -1,0 +1,867 @@
+<div [formGroup]="tokenAndVgmForm" class="px-3 py-4 def-color">
+  <ng-container *ngIf="pullOutDetails?.token_date">
+    <div  class="d-flex align-items-center fw-semibold mb-2" *ngIf="showPullout"><mat-checkbox [disabled]="!pullOutDetails?.is_editable" color="primary" formControlName="pullout" (change)="onChangePullOut()">
+      Add Pullout</mat-checkbox><hr class="w-100 ms-4"></div>
+  </ng-container>
+  <ng-container *ngIf="!pullOutDetails?.token_date">
+    <div  class="d-flex align-items-center fw-semibold mb-2" *ngIf="showPullout"><mat-checkbox  color="primary" formControlName="pullout" (change)="onChangePullOut()">
+      Add Pullout</mat-checkbox><hr class="w-100 ms-4"></div>
+  </ng-container>
+ 
+  
+  <ng-container *ngIf="tokenAndVgmForm.get('pullout').value">
+    <div formGroupName="pulloutform">
+      <div  class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+        <p class="fs-6 fw-semibold">Pullout Token Details</p>
+        <div class="d-flex justify-content-end align-items-center flex-wrap gap-2">
+          <ng-container *ngIf="!this.tokenAndVgmForm.get('is_edit_pullout').value">
+          <!-- <button  class="gb-btn gb-btn-green ">Amend Token</button> -->
+          <button  class="gb-btn gb-btn-red " [disabled]="!pullOutDetails?.is_editable" (click)="cancelTokens('pullout')">Cancel Token</button>
+          <button class="gb-btn gb-btn-icon gb-btn-grey" [disabled]="!pullOutDetails?.is_editable"  (click)="editPullOut()"><span  class="material-icons"> create </span>Edit</button>
+        </ng-container>
+        <ng-container *ngIf="this.tokenAndVgmForm.get('is_edit_pullout').value">
+          <button class="btn  btn--sm w-auto" (click)="pulloutCancel()">Cancel</button>
+          <button class="btn btn--primary btn--sm w-auto" (click)="pullOutUpdate()">Update</button>
+        </ng-container>
+        </div>
+      </div>
+
+  <ng-container *ngIf="!this.tokenAndVgmForm.get('is_edit_pullout').value">
+      <div class="row mx-0 py-2 details">
+      <p class="col-lg-4 col-md-6 "><b>Token Number: </b>{{pullOutDetails?.token_no || '-'}}</p>
+      <p class="col-lg-4 col-md-6 "><b>Token Slot Date: </b>{{dateChange(pullOutDetails?.token_date)}}</p>
+      <p class="col-lg-4 col-md-6 "><b>Token Slot Timing: </b>{{pullOutDetails?.token_slot || '-'}}</p>
+      <p class="col-lg-4 col-md-6 "><b>Terminal: </b>{{pullOutDetails?.terminal?.label || '-'}}</p>
+      <p class="col-lg-4 col-md-6 "><b>Token Responsibility: </b>{{pullOutDetails?.token_responsibility=='0'?'Customer':'Company'}}</p>
+      <ng-container *ngIf="pullOutDetails?.token_responsibility=='1'">
+        <p class="col-lg-4 col-md-6 "><b>Token Amount: </b> {{pullOutDetails?.token_amount}}</p>
+        <ng-container *ngIf="pullOutDetails?.is_employee_paid" >
+          <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b>Paid By Employee</p>
+          <p class="col-lg-4 col-md-6 "><b>Employee: </b>{{pullOutDetails?.employee?.display_name || '-'}}</p>
+        </ng-container>
+        <ng-container *ngIf="!pullOutDetails?.is_employee_paid" >
+          <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b> {{pullOutDetails?.payment_mode?.name || '-'}}</p>
+        </ng-container>
+        <p class="col-lg-4 col-md-6 "><b>Include Token Charge in Invoice: </b>{{pullOutDetails?.include_in_invoice==0?'Yes':'No'}}</p>
+        <p class="col-lg-4 col-md-6 " *ngIf="pullOutDetails?.include_in_invoice==0"><b>Charge Amount: </b>{{pullOutDetails?.charge_amount}}</p>
+      </ng-container>
+      </div>
+      <p *ngIf="pullOutDetails?.documents?.length" class="px-2 fw-semibold ">Attachments</p>
+      <div class="col-12 d-flex flex-wrap gap-4 py-3 px-2">
+        <app-file-delete-view
+        [showInlineEdit]="false"
+        [fileData]="document"
+        [showDelete]="false"
+        *ngFor="let document of pullOutDetails.documents"
+        class="zo-85"
+      ></app-file-delete-view>
+      </div>
+      <ng-container *ngIf="pullOutHistory.length">
+        <p class="fs-6 fw-semibold">Pullout Token History</p>
+        <ng-container *ngFor="let history of pullOutHistory">
+          <div class="row mx-0 py-2 details">
+            <p class="col-lg-4 col-md-6 "><b>Reason: </b>{{history?.reason || '-'}}</p>
+            <p class="col-lg-4 col-md-6 "><b>Cancel Customer Charge Linked to Token: </b>{{history?.cancel_charge==0?'Yes':'No'}} </p>
+            <p class="col-lg-4 col-md-6 "><b>Token Number: </b>{{history?.token_no || '-'}}</p>
+            <p class="col-lg-4 col-md-6 "><b>Token Slot Date: </b>{{dateChange(history?.token_date)}} </p>
+            <p class="col-lg-4 col-md-6 "><b>Token Slot Timing: </b>{{history?.token_slot || '-'}}</p>
+            <p class="col-lg-4 col-md-6 "><b>Terminal: </b>{{history?.terminal || '-'}}</p>
+            <p class="col-lg-4 col-md-6 "><b>Token Responsibility: </b>{{history?.token_responsibility=='0'?'Customer':'Company'}}</p>
+            <ng-container *ngIf="history?.token_responsibility=='1'">
+              <p class="col-lg-4 col-md-6 "><b>Token Amount: </b> {{history?.token_amount}}</p>
+              <ng-container *ngIf="history?.is_employee_paid" >
+                <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b>Paid By Employee</p>
+                <p class="col-lg-4 col-md-6 "><b>Employee: </b>{{history?.employee || '-'}}</p>
+              </ng-container>
+              <ng-container *ngIf="!history?.is_employee_paid" >
+                <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b> {{history?.payment_mode}}</p>
+              </ng-container>
+              <p class="col-lg-4 col-md-6 "><b>Include Token Charge in Invoice: </b>{{history?.include_in_invoice==0?'yes':'No'}}</p>
+              <p class="col-lg-4 col-md-6 " *ngIf="history?.include_in_invoice==0"><b>Charge Amount: </b>{{pullOutDetails?.charge_amount}}</p>
+            </ng-container>
+          </div>
+        <p *ngIf="history?.documents?.length" class="px-2 fw-semibold ">Attachments</p>
+        <div class="col-12 d-flex flex-wrap gap-4 py-3 px-2">
+          <app-file-delete-view
+          [showInlineEdit]="false"
+          [showDelete]="false"
+          [fileData]="document"
+          *ngFor="let document of history?.documents"
+          class="zo-85"
+        ></app-file-delete-view>
+        </div>
+        </ng-container>
+      </ng-container>
+   
+  </ng-container>
+  <ng-container *ngIf="this.tokenAndVgmForm.get('is_edit_pullout').value">
+        <div class="row mx-0 pt-4" >
+           
+            <div class="col-lg-3 col-6" [ngClass]="{'disabled':tokenAndVgmForm.controls.pulloutform.get('reused_token').value}">
+              <div class="input-wrap ">
+                <label for="" class="input">Token Number</label>
+                <input
+                  type="text"
+                  class="no-style input--bd"
+                  placeholder="123456"
+                  value=""
+                  formControlName="token_no" (change)="onTokenChange(tokenAndVgmForm.controls.pulloutform,'pullout')"
+                />
+              </div>
+            </div>
+            <div class="col-lg-3 col-6" [ngClass]="{'disabled':tokenAndVgmForm.controls.pulloutform.get('reused_token').value}">
+              <div class="input-wrap mb-0">
+                <label for="" class="input">Token Slot Date</label>
+                <app-date-and-time-picker (dateTimeSelected)="dateTimeSelected(tokenAndVgmForm.controls.pulloutform,'pullout', $event)"
+                  [control]="tokenAndVgmForm.get('pulloutform').get('token_date')"
+                ></app-date-and-time-picker>
+              </div>
+            </div>
+      
+            <div class="col-lg-3 col-6" [ngClass]="{'disabled':tokenAndVgmForm.controls.pulloutform.get('reused_token').value}">
+              <div class="input-wrap">
+                <label for="">Token Slot Timing </label>
+                <material-dropdown [searchable]="true" [selectedOption]="initialValues.pullOutSlot">
+                  <select
+                    #customSelect
+                    formControlName="token_slot"
+                    class="no-style select--modify"
+                  >
+                    <option *ngFor="let option of timeSlots" value="{{ option?.value }}">
+                      {{ option?.label }}
+                    </option>
+                  </select>
+                </material-dropdown>
+              </div>
+            </div>
+      
+            <div class="col-lg-3 col-6" [ngClass]="{'disabled':tokenAndVgmForm.controls.pulloutform.get('reused_token').value}">
+              <div class="input-wrap">
+                <label for="">Terminal </label>
+                <material-dropdown [searchable]="true" [selectedOption]="initialValues.pullOutTerminal">
+                  <select
+                    #customSelect
+                    formControlName="terminal"
+                    class="no-style select--modify"
+                  >
+                    <option *ngFor="let option of terminalList" value="{{ option?.id }}">
+                      {{ option?.label }}
+                    </option>
+                  </select>
+                </material-dropdown>
+              </div>
+            </div>
+
+      
+            <div class="col-lg-3 col-6" [ngClass]="{'disabled':tokenAndVgmForm.controls.pulloutform.get('reused_token').value}">
+              <div class="input-wrap">
+                <label for="">Token Responsibility</label>
+                <material-dropdown [searchable]="true" [selectedOption]="initialValues.pullOutResponsibility">
+                  <select
+                    #customSelect
+                    formControlName="token_responsibility"
+                    class="no-style select--modify"
+                    (change)="onChangeTokenResponsibility(tokenAndVgmForm.controls.pulloutform,'pullout')"
+                  >
+                    <option *ngFor="let option of responsibilityList" value="{{ option?.value }}">
+                      {{ option?.label }}
+                    </option>
+                  </select>
+                </material-dropdown>
+              </div>
+            </div>
+            <ng-container *ngIf="this.tokenAndVgmForm.get('pulloutform.token_responsibility').value=='1'"> 
+              <div class="col-lg-3 col-6">
+                <div class="input-wrap">
+                  <label for="">Payment Mode</label>
+                  <material-dropdown [searchable]="true" [selectedOption]="initialValues.pullOutPaymentMode">
+                    <select
+                      #customSelect
+                      formControlName="payment_mode"
+                      class="no-style select--modify"  (change)="noChangePaymentMode(tokenAndVgmForm.controls.pulloutform,'pullout')" >
+                      <option value="paid_by_employee">
+                        Paid By Employee
+                      </option>
+                      <option *ngFor="let option of bankList" value="{{ option?.id }}">
+                        {{ option?.display_name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </div>
+              <ng-container *ngIf="this.tokenAndVgmForm.get('pulloutform.payment_mode').value=='paid_by_employee'" >
+                <div class="col-lg-3 col-6">
+                  <div class="input-wrap">
+                    <label for="">Employee Name </label>
+                    <material-dropdown [searchable]="true" [selectedOption]="initialValues.pullOutEmployee">
+                      <select
+                        #customSelect
+                        formControlName="employee"
+                        class="no-style select--modify" >
+                        <option *ngFor="let option of employeeList" value="{{ option?.id }}">
+                          {{ option?.first_name }} {{ option?.last_name }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+                </div>
+              </ng-container>
+             
+              <div class="col-lg-3 col-6">
+                <div class="input-wrap ">
+                  <label for="" class="input">Token Amount</label>
+                  <input
+                    type="text"
+                    positiveThreeDigitDecimalNumber
+                    class="no-style input--bd"
+                    placeholder="123456"
+                    value=""
+                    formControlName="token_amount"
+                    (change)="onChangeTokenAmount(tokenAndVgmForm.controls.pulloutform)"
+                  />
+                </div>
+              </div>
+              <div class="col-lg-3 col-6" [ngClass]="{'disabled':tokenAndVgmForm.controls.pulloutform.get('reused_token').value}">
+                <div class="input-wrap">
+                  <label for="">Include Token Charge in Invoice</label>
+                  <material-dropdown [searchable]="true" [selectedOption]="initialValues.pullOutIncludeInInvoice">
+                    <select
+                      #customSelect
+                      formControlName="include_in_invoice"
+                      class="no-style select--modify"
+                       (change)="onChangeTokenChargeInvoice(tokenAndVgmForm.controls.pulloutform)">
+                      <option *ngFor="let option of includeTokenChargeList" value="{{ option?.value }}">
+                        {{ option?.label }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </div>
+              <ng-container *ngIf="this.tokenAndVgmForm.get('pulloutform.include_in_invoice').value=='0'">
+                <div class="col-lg-3 col-6">
+                  <div class="input-wrap ">
+                    <label for="" class="input" >Charge Amount</label>
+                    <input
+                      positiveThreeDigitDecimalNumber
+                      type="text"
+                      class="no-style input--bd"
+                      placeholder="123456"
+                      value=""
+                      formControlName="charge_amount"
+                    />
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+          </div>
+          <p class="px-2 fw-semibold ">Attachments</p>
+          <div class="col-12 d-flex flex-wrap gap-4 py-3 px-2">
+            <file-uploader-v2
+              (onFileUploaded)="fileUploader(tokenAndVgmForm.controls.pulloutform,$event)"
+              fileName="Unknown Document"
+              [uploaderId]="'1234'"
+              [isShowOnlyUpload]="false"
+              class="zo-85"
+            ></file-uploader-v2>
+            <app-file-delete-view
+              [showInlineEdit]="true"
+              [fileData]="document"
+              *ngFor="let document of this.tokenAndVgmForm.get('pulloutform.documents').value"
+              (fileDeleted)="fileDeleted(tokenAndVgmForm.controls.pulloutform,$event)"
+              class="zo-85"
+            ></app-file-delete-view>
+          </div>
+  </ng-container>
+          
+    </div>
+  </ng-container>
+  <ng-container *ngIf="pullOutHistory.length">
+    <p class="fs-6 fw-semibold">Pullout Token History</p>
+    <ng-container *ngFor="let history of pullOutHistory">
+      <div class="row mx-0 py-2 details">
+        <p class="col-lg-4 col-md-6 "><b>Reason: </b>{{history?.reason || '-'}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Cancel Customer Charge Linked to Token: </b>{{history?.cancel_charge==0?'Yes':'No'}} </p>
+        <p class="col-lg-4 col-md-6 "><b>Token Number: </b>{{history?.token_no || '-'}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Token Date: </b>{{dateChange(history?.token_date)}} </p>
+        <p class="col-lg-4 col-md-6 "><b>Token Slot Timing: </b>{{history?.token_slot || '-'}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Terminal: </b>{{history?.terminal || '-'}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Token Responsibility: </b>{{history?.token_responsibility=='0'?'Customer':'Company'}}</p>
+        <ng-container *ngIf="history?.token_responsibility=='1'">
+          <p class="col-lg-4 col-md-6 "><b>Token Amount: </b> {{history?.token_amount}}</p>
+          <ng-container *ngIf="history?.is_employee_paid" >
+            <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b>Paid By Employee</p>
+            <p class="col-lg-4 col-md-6 "><b>Employee: </b>{{history?.employee || '-'}}</p>
+          </ng-container>
+          <ng-container *ngIf="!history?.is_employee_paid" >
+            <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b> {{history?.payment_mode}}</p>
+          </ng-container>
+          <p class="col-lg-4 col-md-6 "><b>Include Token Charge in Invoice: </b>{{history?.include_in_invoice==0?'Yes':'No'}}</p>
+          <p class="col-lg-4 col-md-6 " *ngIf="history?.include_in_invoice==0"><b>Charge Amount: </b>{{history?.charge_amount}}</p>
+        </ng-container>
+      </div>
+    <p *ngIf="history?.documents?.length" class="px-2 fw-semibold ">Attachments</p>
+    <div class="col-12 d-flex flex-wrap gap-4 py-3 px-2">
+      <app-file-delete-view
+      [showInlineEdit]="false"
+      [showDelete]="false"
+      [fileData]="document"
+      *ngFor="let document of history?.documents"
+      class="zo-85"
+    ></app-file-delete-view>
+    </div>
+    </ng-container>
+  </ng-container>
+
+
+<ng-container *ngIf="depositDetails?.token_date" >
+  <div  class="d-flex align-items-center fw-semibold mb-2" *ngIf="showDeposit"> <mat-checkbox [disabled]="!depositDetails?.is_editable" color="primary" formControlName="deposit" (change)="onDepositChange()">
+    Add Deposit</mat-checkbox><hr class="w-100 ms-4"></div>
+</ng-container>
+<ng-container *ngIf="!depositDetails?.token_date" >
+  <div  class="d-flex align-items-center fw-semibold mb-2" *ngIf="showDeposit"> <mat-checkbox  color="primary" formControlName="deposit" (change)="onDepositChange()">
+    Add Deposit</mat-checkbox><hr class="w-100 ms-4"></div>
+</ng-container>
+ 
+
+  <ng-container *ngIf="tokenAndVgmForm.get('deposit').value">
+    <div formGroupName="depositform">
+      <div  class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+        <p class="fs-6 fw-semibold">Deposit Token Details</p>
+        <div class="d-flex justify-content-end align-items-center flex-wrap gap-2">
+          <ng-container *ngIf="!this.tokenAndVgmForm.get('is_edit_deposit').value">
+          <!-- <button  class="gb-btn gb-btn-green ">Amend Token</button> -->
+          <button  class="gb-btn gb-btn-red " [disabled]="!depositDetails?.is_editable" (click)="cancelTokens('deposit')">Cancel Token</button>
+          <button class="gb-btn gb-btn-icon gb-btn-grey" [disabled]="!depositDetails?.is_editable" (click)="editDeposit()"><span  class="material-icons"> create </span>Edit</button>
+        </ng-container>
+        <ng-container *ngIf="this.tokenAndVgmForm.get('is_edit_deposit').value">
+          <button class="btn  btn--sm w-auto" (click)="depositCancel()">Cancel</button>
+          <button class="btn btn--primary btn--sm w-auto" (click)="depositUpdate()">Update</button>
+        </ng-container>
+        </div>
+      </div>
+
+      <ng-container *ngIf="!this.tokenAndVgmForm.get('is_edit_deposit').value">
+        <div class="row mx-0 py-2 details">
+          <p class="col-lg-4 col-md-6 "><b>Token Number: </b>{{depositDetails?.token_no || '-'}}</p>
+          <p class="col-lg-4 col-md-6 "><b>Token Slot Date: </b>{{dateChange(depositDetails?.token_date)}} </p>
+          <p class="col-lg-4 col-md-6 "><b>Token Slot Timing: </b>{{depositDetails?.token_slot || '-'}}</p>
+          <p class="col-lg-4 col-md-6 "><b>Terminal: </b>{{depositDetails?.terminal?.label || '-'}}</p>
+          <p class="col-lg-4 col-md-6 "><b>Token Responsibility: </b>{{depositDetails?.token_responsibility=='0'?'Customer':'Company'}}</p>
+          <ng-container *ngIf="depositDetails?.token_responsibility=='1'">
+            <p class="col-lg-4 col-md-6 "><b>Token Amount: </b> {{depositDetails?.token_amount}}</p>
+            <ng-container *ngIf="depositDetails?.is_employee_paid" >
+              <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b>Paid By Employee</p>
+              <p class="col-lg-4 col-md-6 "><b>Employee: </b>{{depositDetails?.employee?.display_name || '-'}}</p>
+            </ng-container>
+            <ng-container *ngIf="!depositDetails?.is_employee_paid" >
+              <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b> {{depositDetails?.payment_mode?.name || '-'}}</p>
+            </ng-container>
+            <p class="col-lg-4 col-md-6 "><b>Include Token Charge in Invoice: </b>{{depositDetails?.include_in_invoice==0?'Yes':'No'}}</p>
+            <p class="col-lg-4 col-md-6 " *ngIf="depositDetails?.include_in_invoice==0"><b>Charge Amount: </b>{{depositDetails?.charge_amount}}</p>
+          </ng-container>
+        </div>
+        <p class="px-2 fw-semibold " *ngIf="depositDetails?.documents?.length">Attachments</p>
+        <div class="col-12 d-flex flex-wrap gap-4 py-3 px-2">
+          <app-file-delete-view
+                  [showInlineEdit]="false"
+                  [fileData]="document"
+                  [showDelete]="false"
+                  *ngFor="let document of depositDetails?.documents"
+                  class="zo-85"
+          ></app-file-delete-view>
+        </div>
+        <ng-container *ngIf="depositHistory.length">
+          <p class="fs-6 fw-semibold">Deposit Token History</p>
+          <ng-container *ngFor="let history of depositHistory">
+            <div class="row mx-0 py-2 details" >
+              <p class="col-lg-4 col-md-6 "><b>Reason: </b>{{history?.reason || '-'}}</p>
+              <p class="col-lg-4 col-md-6 "><b>Cancel Customer Charge Linked to Token: </b>{{history?.cancel_charge==0?'Yes':'No'}} </p>
+              <p class="col-lg-4 col-md-6 "><b>Token Number: </b>{{history?.token_no || '-'}}</p>
+              <p class="col-lg-4 col-md-6 "><b>Token Slot Date: </b>{{dateChange(history?.token_date)}} </p>
+              <p class="col-lg-4 col-md-6 "><b>Token Slot Timing: </b>{{history?.token_slot || '-'}}</p>
+              <p class="col-lg-4 col-md-6 "><b>Terminal: </b>{{history?.terminal?.label || '-'}}</p>
+              <p class="col-lg-4 col-md-6 "><b>Token Responsibility: </b>{{history?.token_responsibility=='0'?'Customer':'Company'}}</p>
+              <ng-container *ngIf="history?.token_responsibility=='1'">
+                <p class="col-lg-4 col-md-6 "><b>Token Amount: </b> {{history?.token_amount }}</p>
+                <ng-container *ngIf="history?.is_employee_paid" >
+                  <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b>Paid By Employee</p>
+                  <p class="col-lg-4 col-md-6 "><b>Employee: </b>{{history?.employee?.display_name || '-'}}</p>
+                </ng-container>
+                <ng-container *ngIf="!history?.is_employee_paid" >
+                  <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b> {{history?.payment_mode?.name}}</p>
+                </ng-container>
+                <p class="col-lg-4 col-md-6 "><b>Include Token Charge in Invoice: </b>{{history?.include_in_invoice==0?'yes':'No'}}</p>
+                <p class="col-lg-4 col-md-6 " *ngIf="history?.include_in_invoice==0"><b>Charge Amount: </b>{{pullOutDetails?.charge_amount}}</p>
+              </ng-container>
+            </div>
+            <p class="px-2 fw-semibold " *ngIf="history?.documents?.length">Attachments</p>
+            <div class="col-12 d-flex flex-wrap gap-4 py-3 px-2">
+              <app-file-delete-view
+                      [showInlineEdit]="false"
+                      [fileData]="document"
+                      [showDelete]="false"
+                      *ngFor="let document of history?.documents"
+                      class="zo-85"
+              ></app-file-delete-view>
+            </div>
+          </ng-container>
+        
+
+        </ng-container>
+        
+      </ng-container>
+      <ng-container *ngIf="this.tokenAndVgmForm.get('is_edit_deposit').value">
+            <div class="row mx-0 pt-4" >
+              
+                <div class="col-lg-3 col-6" [ngClass]="{'disabled':tokenAndVgmForm.controls.depositform.get('reused_token').value}">
+                  <div class="input-wrap ">
+                    <label for="" class="input">Token Number</label>
+                    <input
+                      type="text"
+                      class="no-style input--bd"
+                      placeholder="123456"
+                      value=""
+                      formControlName="token_no"
+                      (change)="onTokenChange(tokenAndVgmForm.controls.depositform,'deposit')"
+                    />
+                  </div>
+                </div>
+                <div class="col-lg-3 col-6" [ngClass]="{'disabled':tokenAndVgmForm.controls.depositform.get('reused_token').value}">
+                  <div class="input-wrap mb-0">
+                    <label for="" class="input">Token Slot Date</label>
+                    <app-date-and-time-picker (dateTimeSelected)="dateTimeSelected(tokenAndVgmForm.controls.depositform,'deposit', $event)"
+                      [control]="tokenAndVgmForm.get('depositform.token_date')"
+                    ></app-date-and-time-picker>
+                  </div>
+                </div>
+          
+                <div class="col-lg-3 col-6" [ngClass]="{'disabled':tokenAndVgmForm.controls.depositform.get('reused_token').value}">
+                  <div class="input-wrap">
+                    <label for="">Token Slot Timing </label>
+                    <material-dropdown [searchable]="true" [selectedOption]="initialValues.depositSlot">
+                      <select
+                        #customSelect
+                        formControlName="token_slot"
+                        class="no-style select--modify"
+                      >
+                        <option *ngFor="let option of timeSlots" value="{{ option?.value }}">
+                          {{ option?.label }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+                </div>
+          
+                <div class="col-lg-3 col-6" [ngClass]="{'disabled':tokenAndVgmForm.controls.depositform.get('reused_token').value}">
+                  <div class="input-wrap">
+                    <label for="">Terminal </label>
+                    <material-dropdown [searchable]="true" [selectedOption]="initialValues.depositTerminal">
+                      <select
+                        #customSelect
+                        formControlName="terminal"
+                        class="no-style select--modify"
+                      >
+                        <option *ngFor="let option of terminalList" value="{{ option?.id }}">
+                          {{ option?.label }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+                </div>
+
+          
+                <div class="col-lg-3 col-6" [ngClass]="{'disabled':tokenAndVgmForm.controls.depositform.get('reused_token').value}">
+                  <div class="input-wrap">
+                    <label for="">Token Responsibility</label>
+                    <material-dropdown [searchable]="true" [selectedOption]="initialValues.depositResponsibility">
+                      <select
+                        #customSelect
+                        formControlName="token_responsibility"
+                        class="no-style select--modify"
+                        (change)="onChangeTokenResponsibility(tokenAndVgmForm.controls.depositform,'deposit')"
+                      >
+                        <option *ngFor="let option of responsibilityList" value="{{ option?.value }}">
+                          {{ option?.label }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+                </div>
+                <ng-container *ngIf="this.tokenAndVgmForm.get('depositform.token_responsibility').value=='1'"> 
+                  <div class="col-lg-3 col-6">
+                    <div class="input-wrap">
+                      <label for="">Payment Mode</label>
+                      <material-dropdown [searchable]="true" [selectedOption]="initialValues.depositPaymentMode">
+                        <select
+                          #customSelect
+                          formControlName="payment_mode"
+                          class="no-style select--modify"  (change)="noChangePaymentMode(tokenAndVgmForm.controls.depositform,'deposit')" >
+                          <option value="paid_by_employee">
+                            Paid By Employee
+                          </option>
+                          <option *ngFor="let option of bankList" value="{{ option?.id }}">
+                            {{ option?.display_name }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                    </div>
+                  </div>
+                  <ng-container *ngIf="this.tokenAndVgmForm.get('depositform.payment_mode').value=='paid_by_employee'" >
+                    <div class="col-lg-3 col-6">
+                      <div class="input-wrap">
+                        <label for="">Employee Name </label>
+                        <material-dropdown [searchable]="true" [selectedOption]="initialValues.depositEmployee">
+                          <select
+                            #customSelect
+                            formControlName="employee"
+                            class="no-style select--modify" >
+                            <option *ngFor="let option of employeeList" value="{{ option?.id }}">
+                              {{ option?.first_name }} {{ option?.last_name }}
+                            </option>
+                          </select>
+                        </material-dropdown>
+                      </div>
+                    </div>
+                  </ng-container>
+                
+                  <div class="col-lg-3 col-6">
+                    <div class="input-wrap ">
+                      <label for="" class="input">Token Amount</label>
+                      <input
+                        type="text"
+                        positiveThreeDigitDecimalNumber
+                        class="no-style input--bd"
+                        placeholder="123456"
+                        value=""
+                        formControlName="token_amount"
+                        (change)="onChangeTokenAmount(tokenAndVgmForm.controls.depositform)"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-lg-3 col-6"[ngClass]="{'disabled':tokenAndVgmForm.controls.depositform.get('reused_token').value}">
+                    <div class="input-wrap">
+                      <label for="">Include Token Charge in Invoice</label>
+                      <material-dropdown [searchable]="true" [selectedOption]="initialValues.depositIncludeInInvoice">
+                        <select
+                          #customSelect
+                          formControlName="include_in_invoice"
+                          class="no-style select--modify"
+                          (change)="onChangeTokenChargeInvoice(tokenAndVgmForm.controls.depositform)">
+                          <option *ngFor="let option of includeTokenChargeList" value="{{ option?.value }}">
+                            {{ option?.label }}
+                          </option>
+                        </select>
+                      </material-dropdown>
+                    </div>
+                  </div>
+                  <ng-container *ngIf="this.tokenAndVgmForm.get('depositform.include_in_invoice').value=='0'">
+                    <div class="col-lg-3 col-6">
+                      <div class="input-wrap ">
+                        <label for="" class="input" >Charge Amount</label>
+                        <input
+                          positiveThreeDigitDecimalNumber
+                          type="text"
+                          class="no-style input--bd"
+                          placeholder="123456"
+                          value=""
+                          formControlName="charge_amount"
+                        />
+                      </div>
+                    </div>
+                  </ng-container>
+                </ng-container>
+              </div>
+              <p class="px-2 fw-semibold ">Attachments</p>
+              <div class="col-12 d-flex flex-wrap gap-4 py-3 px-2">
+                <file-uploader-v2
+                  (onFileUploaded)="fileUploader(tokenAndVgmForm.controls.depositform,$event)"
+                  [uploaderId]="'1234'"
+                  fileName="Unknown Document"
+                  [isShowOnlyUpload]="false"
+                  class="zo-85"
+                ></file-uploader-v2>
+                <app-file-delete-view
+                  [showInlineEdit]="true"
+                  [fileData]="document"
+                  *ngFor="let document of this.tokenAndVgmForm.get('depositform.documents').value"
+                  (fileDeleted)="fileDeleted(this.tokenAndVgmForm.controls.depositform,$event)"
+                  class="zo-85"
+                ></app-file-delete-view>
+              </div>
+      </ng-container>
+          
+    </div>
+  </ng-container>
+  <ng-container *ngIf="depositHistory.length">
+    <p class="fs-6 fw-semibold">Deposit Token History</p>
+    <ng-container *ngFor="let history of depositHistory">
+      <div class="row mx-0 py-2 details" >
+        <p class="col-lg-4 col-md-6 "><b>Reason: </b>{{history?.reason || '-'}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Cancel Customer Charge Linked to Token: </b>{{history?.cancel_charge==0?'Yes':'No'}} </p>
+        <p class="col-lg-4 col-md-6 "><b>Token Number: </b>{{history?.token_no || '-'}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Token Date: </b>{{dateChange(history?.token_date)}} </p>
+        <p class="col-lg-4 col-md-6 "><b>Token Slot Timing: </b>{{history?.token_slot || '-'}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Terminal: </b>{{history?.terminal || '-'}}</p>
+        <p class="col-lg-4 col-md-6 "><b>Token Responsibility: </b>{{history?.token_responsibility=='0'?'Customer':'Company'}}</p>
+        <ng-container *ngIf="history?.token_responsibility=='1'">
+          <p class="col-lg-4 col-md-6 "><b>Token Amount: </b> {{history?.token_amount }}</p>
+          <ng-container *ngIf="history?.is_employee_paid" >
+            <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b>Paid By Employee</p>
+            <p class="col-lg-4 col-md-6 "><b>Employee: </b>{{history?.employee || '-'}}</p>
+          </ng-container>
+          <ng-container *ngIf="!history?.is_employee_paid" >
+            <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b> {{history?.payment_mode}}</p>
+          </ng-container>
+          <p class="col-lg-4 col-md-6 "><b>Include Token Charge in Invoice: </b>{{history?.include_in_invoice==0?'Yes':'No'}}</p>
+          <p class="col-lg-4 col-md-6 " *ngIf="history?.include_in_invoice==0"><b>Charge Amount: </b>{{history?.charge_amount}}</p>
+        </ng-container>
+      </div>
+      <p class="px-2 fw-semibold " *ngIf="history?.documents?.length">Attachments</p>
+      <div class="col-12 d-flex flex-wrap gap-4 py-3 px-2">
+        <app-file-delete-view
+                [showInlineEdit]="false"
+                [fileData]="document"
+                [showDelete]="false"
+                *ngFor="let document of history?.documents"
+                class="zo-85"
+        ></app-file-delete-view>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="vgmDetails.length>0" >
+    <div  class="d-flex align-items-center fw-semibold mb-2"*ngIf="showVgm">  <mat-checkbox [disabled]="isVgmEdit" color="primary" formControlName="vgm" (change)="onVgmChange()"> Add VGM</mat-checkbox><hr class="w-100 ms-4"></div>
+  </ng-container>
+  <ng-container *ngIf="vgmDetails.length==0" >
+    <div  class="d-flex align-items-center fw-semibold mb-2" *ngIf="showVgm">  <mat-checkbox  color="primary" formControlName="vgm" (change)="onVgmChange()"> Add VGM</mat-checkbox><hr class="w-100 ms-4"></div>
+  </ng-container>
+
+  <div class="alert alert-danger" role="alert"*ngIf="vgmErrorMsg">
+   {{vgmErrorMsg}}
+  </div>
+    <!-- vgmpart -->
+
+  <ng-container *ngIf="tokenAndVgmForm.get('vgm').value"> 
+    <div  class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+      <p class="fs-6 fw-semibold">VGM Number Details</p>
+      <div class="d-flex justify-content-end align-items-center flex-wrap gap-2">
+        <ng-container *ngIf="!tokenAndVgmForm.get('is_edit_vgm').value">
+        <button class="gb-btn gb-btn-icon gb-btn-grey"  [disabled]="isVgmEdit" (click)="editVgm()"><span  class="material-icons"> create </span>Edit</button>
+      </ng-container>
+      <ng-container *ngIf="tokenAndVgmForm.get('is_edit_vgm').value">
+        <button class="btn  btn--sm w-auto" (click)="vgmCancel()">Cancel</button>
+        <button class="btn btn--primary btn--sm w-auto" (click)="vgmUpdate()">Update</button>
+      </ng-container>
+      </div>
+    </div>
+    <div formArrayName="vgmForm">
+      <ng-container *ngFor="let control of tokenAndVgmForm.controls.vgmForm['controls']; let i = index;"
+          [formGroupName]="i">
+          <div class="pb-3" [ngClass]="{'border-bottom':i != tokenAndVgmForm.controls.vgmForm['controls'].length-1}" style="border-style: dashed;">
+            <ng-container *ngIf="!tokenAndVgmForm.get('is_edit_vgm').value">
+              <div class="row mx-0 py-2 details">
+                <p class="col-lg-4 col-md-6 "><b>DPW Reference No: </b>{{vgmDetails[i]?.reference_no || '-'}}</p>
+                <p class="col-lg-4 col-md-6 "><b>Date: </b>{{vgmDetails[i]?.vgm_date |  date:'dd-MM-yyyy' }} <span *ngIf="!vgmDetails[i]?.vgm_date">-</span></p>
+                <p class="col-lg-4 col-md-6 "><b>Container: </b>{{vgmDetails[i]?.container_no || '-'}}</p>
+                <p class="col-lg-4 col-md-6 "><b>VGM Responsibility: </b>{{vgmDetails[i]?.vgm_responsibility=='0'?'Customer':'Company'}}</p>
+                <ng-container *ngIf="vgmDetails[i]?.vgm_responsibility=='1'">
+                  <p class="col-lg-4 col-md-6 "><b>VGM Amount: </b> {{vgmDetails[i]?.vgm_amount}}</p>
+                  <ng-container *ngIf="vgmDetails[i]?.is_employee_paid" >
+                    <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b>Paid By Employee</p>
+                    <p class="col-lg-4 col-md-6 "><b>Employee: </b>{{vgmDetails[i]?.employee?.display_name || '-'}}</p>
+                  </ng-container>
+                  <ng-container *ngIf="!vgmDetails[i]?.is_employee_paid" >
+                    <p class="col-lg-4 col-md-6 "><b>Payment Mode: </b> {{vgmDetails[i]?.payment_mode?.name || '-'}}</p>
+                  </ng-container>
+                  <p class="col-lg-4 col-md-6 "><b>Include VGM Charge to Invoice: </b>{{vgmDetails[i]?.include_in_invoice==0?'Yes':'No'}}</p>
+                  <p class="col-lg-4 col-md-6 " *ngIf="vgmDetails[i]?.include_in_invoice==0"><b>Charge Amount: </b>{{vgmDetails[i]?.charge_amount}}</p>
+                </ng-container>
+              </div>
+         <p class="px-2 fw-semibold " *ngIf="vgmDetails[i]?.documents.length">Attachments</p>
+          <div class="d-flex flex-wrap gap-4 py-3" >
+            <app-file-delete-view
+            [showInlineEdit]="false"
+            [fileData]="document"
+            [showDelete]="false"
+            *ngFor="let document of vgmDetails[i]?.documents"
+            class="zo-85"
+          ></app-file-delete-view>
+          </div>
+        </ng-container>
+        
+        <ng-container *ngIf="tokenAndVgmForm.get('is_edit_vgm').value">
+          <div class="row mx-0 pt-4">
+            <div class="col-xl-3 col-lg-3 col-6">
+              <div class="input-wrap ">
+                <label for="" class="input">DPW Reference No</label>
+                <input
+                  type="text"
+                  class="no-style input--bd"
+                  placeholder="123456"
+                  value=""
+                  formControlName="reference_no"
+                />
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-3  col-md-3 col-6">
+                  <div class="input-wrap">
+                    <label for="">Date</label>
+                    <mat-form-field>
+                      <input matInput readonly [matDatepicker]="vgm_date" formControlName="vgm_date" (focus)="vgm_date.open()"
+                        placeholder="DD/MM/YYYY">
+                      <mat-datepicker-toggle matSuffix [for]="vgm_date"></mat-datepicker-toggle>
+                      <mat-datepicker #vgm_date></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+            <div class="col-xl-3 col-lg-3 col-md-3 col-6">
+              <div class="input-wrap">
+                <label for="">Container </label>
+                <input
+                type="text"
+                class="no-style input--bd"
+                placeholder="123456"
+                value=""
+                formControlName="container_no"
+              />
+              </div>
+            </div> 
+            <div class="col-xl-3 col-lg-3 col-md-3 col-6">
+              <div class="input-wrap">
+                <label for="">VGM Responsibility</label>
+                <material-dropdown [searchable]="true" [selectedOption]="initialValues.vgmresponsibility[i]">
+                  <select
+                    #customSelect
+                    formControlName="vgm_responsibility"
+                    class="no-style select--modify"
+                     (change)="onChangeVgmResponsibility(control,i)">
+                    <option *ngFor="let option of responsibilityList" value="{{ option?.value }}">
+                      {{ option?.label }}
+                    </option>
+                  </select>
+                </material-dropdown>
+              </div>
+            </div>
+            <ng-container *ngIf="control.get('vgm_responsibility').value=='1'"> 
+              <div class="col-lg-3 col-6">
+                <div class="input-wrap">
+                  <label for="">Payment Mode</label>
+                  <material-dropdown [searchable]="true" [addable]="true" [selectedOption]="initialValues.vgmPaymentMode[i]">
+                    <select
+                      #customSelect
+                      formControlName="payment_mode"
+                      class="no-style select--modify" (change)="onChangeVgmPaymentMode(control)" >
+                      <option value="paid_by_employee">
+                        Paid By Employee
+                      </option>
+                      <option *ngFor="let option of bankList" value="{{ option?.id }}">
+                        {{ option?.display_name }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </div>
+              <ng-container *ngIf="control.get('payment_mode').value=='paid_by_employee'" >
+                <div class="col-lg-3 col-6">
+                  <div class="input-wrap">
+                    <label for="">Employee Name </label>
+                    <material-dropdown [searchable]="true" [selectedOption]="initialValues.vgmEmployee[i]">
+                      <select
+                        #customSelect
+                        formControlName="employee"
+                        class="no-style select--modify" >
+                        <option *ngFor="let option of employeeList" value="{{ option?.id }}">
+                          {{ option?.first_name }} {{ option?.last_name }}
+                        </option>
+                      </select>
+                    </material-dropdown>
+                  </div>
+                </div>
+              </ng-container>
+             
+              <div class="col-lg-3 col-6">
+                <div class="input-wrap ">
+                  <label for="" class="input">VGM Amount</label>
+                  <input
+                    type="text"
+                    positiveThreeDigitDecimalNumber
+                    class="no-style input--bd"
+                    placeholder="123456"
+                    value=""
+                    formControlName="vgm_amount" (change)="onChangeVgmChargeInvoice(control)"
+                  />
+                </div>
+              </div>
+              <div class="col-lg-3 col-6">
+                <div class="input-wrap">
+                  <label for="">Include VGM Charge to Invoice</label>
+                  <material-dropdown [searchable]="true" [selectedOption]="initialValues.vgmIncludeInInvoice[i]">
+                    <select
+                      #customSelect
+                      formControlName="include_in_invoice"
+                      class="no-style select--modify" (change)="onChangeVgmChargeInvoice(control)">
+                      <option *ngFor="let option of includeTokenChargeList" value="{{ option?.value }}">
+                        {{ option?.label }}
+                      </option>
+                    </select>
+                  </material-dropdown>
+                </div>
+              </div>
+              <div class="col-lg-3 col-6" *ngIf="control.get('include_in_invoice').value=='0'">
+                <div class="input-wrap ">
+                  <label for="" class="input">Charge Amount</label>
+                  <input
+                    type="text"
+                    positiveThreeDigitDecimalNumber
+                    class="no-style input--bd"
+                    placeholder="123456"
+                    value=""
+                    formControlName="charge_amount"
+                  />
+                </div>
+              </div>
+            </ng-container> 
+
+          </div>
+          <p class="px-2 fw-semibold ">Attachments</p>
+
+          <div class="d-flex flex-wrap gap-4 py-3">
+            <file-uploader-v2
+              (onFileUploaded)="fileUploader(control,$event)"
+              [uploaderId]="i"
+              fileName="Unknown Document" 
+              [isShowOnlyUpload]="false"
+              class="zo-85"
+            ></file-uploader-v2>
+            <app-file-delete-view
+              [showInlineEdit]="true"
+              [fileData]="document"
+              *ngFor="let document of control.get('documents').value"
+              (fileDeleted)="fileDeleted(control,$event)"
+              class="zo-85"
+            ></app-file-delete-view>
+          </div>
+          </ng-container>
+        
+          <div class="d-flex justify-content-end pe-5 " *ngIf="tokenAndVgmForm.get('is_edit_vgm').value">
+
+              <button class=" row-btn row-btn-delete " (click)="removeVgm(i)"
+                  *ngIf="tokenAndVgmForm.controls.vgmForm['controls'].length !== 1"><span
+                      class="material-icons">
+                      close
+                  </span></button>
+              <button class=" row-btn row-btn-add " (click)="addVgm()"
+                  *ngIf="i==tokenAndVgmForm.controls.vgmForm['controls'].length - 1"><span
+                      class="material-icons">
+                      add
+                  </span>
+              </button>
+          </div>
+        </div>
+      
+      </ng-container>
+    </div>
+
+  </ng-container>
+</div>
