@@ -1,7 +1,0 @@
-
-<ng-container *ngIf="vehicleCategory">
-    <app-container-common-rate-card-details [rateCardDetails]="rateCardDetails" *ngIf="vehicleCategory=='container';else others"></app-container-common-rate-card-details>
-    <ng-template #others>
-        <app-rate-card-header-details [rateCardDetails]="rateCardDetails"></app-rate-card-header-details>
-    </ng-template>
-</ng-container>

@@ -1,6 +1,0 @@
-
-<div class="pagination tabIndexActive">
-  <a href="javascript:void(0);" (click)= "previousPage()" *ngIf="pageNumbers.length>0">«</a>
-  <a href="javascript:void(0);"  (click)= "changePage(page)" *ngFor="let page of pageNumbers" [ngClass]="{'active': page===currentPage}" >{{page}}</a>
-  <a  href="javascript:void(0);" (click)= "nextPage()"  *ngIf="pageNumbers.length>0">»</a>
-</div>

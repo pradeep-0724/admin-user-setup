@@ -1,8 +1,0 @@
-@import "../../../../../../../assets/styles/helpers/variable";
-@import "../../../../../../../assets/styles/helpers/mixins";
-
-.btn--save-continue{
-    @include respond-to(mobile){
-        width: 100%;
-    }
-  }

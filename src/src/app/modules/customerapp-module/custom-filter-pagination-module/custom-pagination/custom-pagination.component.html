@@ -1,7 +1,0 @@
-<div class="pagination">
-  <a (click)= "previousPage()" class="arrow-key"></a>
-  <a  (click)= "changePage(page)" *ngFor="let page of pageNumbers" [ngClass]="{'active': page===currentPage}" >{{page}}</a>
-  <a (click)= "nextPage()" class="arrow-key">></a>
-  <span class="totalPage"> of {{ totalPageCount }}</span>
-</div>
-
